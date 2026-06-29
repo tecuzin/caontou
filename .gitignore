@@ -1,0 +1,28 @@
+# Dépendances
+node_modules/
+
+# Sorties de build web
+dist/
+
+# Projet natif Android (régénéré par `npx cap add android`)
+android/
+
+# Artefacts APK
+build/
+*.apk
+*.aab
+
+# Gradle / SDK
+.gradle/
+local.properties
+*.keystore
+
+# Divers
+.DS_Store
+*.log
+*.bak
+*.tmp
+
+# Claude Code — local/runtime
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
