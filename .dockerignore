@@ -1,0 +1,14 @@
+node_modules
+dist
+android
+build
+.git
+.gradle
+*.apk
+*.aab
+.DS_Store
+*.log
+*.bak
+ios-frame.jsx
+support.js
+*.dc.html
