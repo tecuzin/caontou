@@ -1,4 +1,689 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+
+/* ------------------------------------------------------------------ *
+ * Helper : transforme une chaîne CSS (issue du prototype) en objet de
+ * style React. Permet de coller les styles inline du design tel quel,
+ * pour une reproduction fidèle au pixel.
+ * ------------------------------------------------------------------ */
+function s(css) {
+  const o = {}
+  css.split(';').forEach((decl) => {
+    const i = decl.indexOf(':')
+    if (i < 0) return
+    const k = decl.slice(0, i).trim()
+    const v = decl.slice(i + 1).trim()
+    if (!k) return
+    o[k.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = v
+  })
+  return o
+}
+
+/* ------------------------------------------------------------------ *
+ * Données de référence (statiques) — reprises du prototype de design.
+ * ------------------------------------------------------------------ */
+const CATS = [
+  { name: 'Hébergement', color: '#9c6b4a' },
+  { name: 'Transport', color: '#4f8a86' },
+  { name: 'Nourriture', color: '#cf7d3c' },
+  { name: 'Visites', color: '#5b7042' },
+  { name: 'Extra', color: '#b8503f' },
+]
+const VCAT = { Nature: '#5b7042', Famille: '#cf7d3c', Patrimoine: '#9c6b4a', Baignade: '#4f8a86', Gourmand: '#b8503f', Marché: '#8a8b3d' }
+const FILTERS = ['Tous', 'Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché']
+
+const MODULES = [
+  { emoji: '🚗', name: 'Trajet', sub: 'Lyon → Puy Mary', bg: '#dfeae6', action: 'sub:trajet' },
+  { emoji: '🏡', name: 'Hébergement', sub: 'La Grange, Mandailles', bg: '#f1e4d4', action: 'sub:hebergement' },
+  { emoji: '🧳', name: 'Préparatifs', sub: 'Valises & listes', bg: '#e7ecdf', action: 'sub:logistique' },
+  { emoji: '⛅', name: 'Météo', sub: '7 jours sur place', bg: '#eee7d4', action: 'sub:meteo' },
+  { emoji: '🍽️', name: 'Repas', sub: 'Menus & courses', bg: '#f3e2d6', action: 'tab:repas' },
+  { emoji: '💶', name: 'Budget', sub: '1 800 € prévus', bg: '#e6ece0', action: 'tab:budget' },
+]
+
+const DAYS = [
+  { dow: 'Sam', num: 11, title: 'Le grand départ', sub: 'Lyon → Mandailles', items: [
+    { time: '08:30', title: 'Départ de Lyon', note: 'Voiture chargée, c’est parti !', color: '#5b7042' },
+    { time: '10:00', title: 'Pause à Thiers', note: 'Café & toilettes', color: '#cf7d3c' },
+    { time: '12:30', title: 'Pique-nique à Murat', note: 'Se dégourdir les jambes', color: '#4f8a86' },
+    { time: '13:30', title: 'Arrivée au gîte', note: 'Installation & goûter', color: '#9c6b4a' },
+    { time: '16:00', title: 'Courses à Aurillac', note: 'Premier ravitaillement', color: '#8a8b3d' },
+    { time: '19:30', title: 'Dîner au coin du cantou', note: 'Pâtes au pesto', color: '#b8503f' },
+  ] },
+  { dow: 'Dim', num: 12, title: 'Mise en jambes', sub: 'Vallée de Mandailles', items: [
+    { time: '09:30', title: 'Petit-déj tranquille', note: 'On prend le temps', color: '#cf7d3c' },
+    { time: '10:30', title: 'Cascade du Faillitoux', note: 'Balade facile (1 h)', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique au bord de l’eau', note: '', color: '#4f8a86' },
+    { time: '15:00', title: 'Sieste & jeux au jardin', note: '', color: '#9c6b4a' },
+    { time: '18:00', title: 'Marché de producteurs', note: 'Fromages & charcuterie', color: '#8a8b3d' },
+  ] },
+  { dow: 'Lun', num: 13, title: 'Ascension du Puy Mary', sub: 'Pas de Peyrol', items: [
+    { time: '08:30', title: 'Départ tôt', note: 'Avant la chaleur', color: '#5b7042' },
+    { time: '09:30', title: 'Parking Pas de Peyrol', note: '1 589 m', color: '#9c6b4a' },
+    { time: '10:00', title: 'Montée au sommet', note: 'Porte-bébé conseillé', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° 🏔️', color: '#4f8a86' },
+    { time: '15:00', title: 'Glace à Dienne', note: 'Récompense méritée', color: '#b8503f' },
+  ] },
+  { dow: 'Mar', num: 14, title: 'Fermes & fromages', sub: 'Autour de Salers', items: [
+    { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
+    { time: '12:30', title: 'Déjeuner truffade', note: 'À l’auberge', color: '#b8503f' },
+    { time: '15:00', title: 'Buronnerie & dégustation', note: 'Cantal AOP', color: '#8a8b3d' },
+    { time: '17:00', title: 'Baignade au lac', note: '', color: '#4f8a86' },
+  ] },
+  { dow: 'Mer', num: 15, title: 'Cap sur Aurillac', sub: 'La ville', items: [
+    { time: '10:00', title: 'Château Saint-Étienne', note: '', color: '#9c6b4a' },
+    { time: '12:00', title: 'Déjeuner en ville', note: '', color: '#b8503f' },
+    { time: '14:30', title: 'Maison des Volcans', note: 'Ludique pour les enfants', color: '#cf7d3c' },
+    { time: '16:30', title: 'Parc & manège', note: '', color: '#5b7042' },
+  ] },
+  { dow: 'Jeu', num: 16, title: 'Train & lacs', sub: 'Riom-ès-Montagnes', items: [
+    { time: '10:00', title: 'Gentiane Express', note: 'Train touristique 🚂', color: '#cf7d3c' },
+    { time: '13:00', title: 'Pique-nique au lac', note: '', color: '#4f8a86' },
+    { time: '15:30', title: 'Pédalo & baignade', note: '', color: '#4f8a86' },
+    { time: '18:00', title: 'Retour & repos', note: '', color: '#9c6b4a' },
+  ] },
+  { dow: 'Ven', num: 17, title: 'Journée libre', sub: 'Au gré de l’envie', items: [
+    { time: 'Matin', title: 'Grasse matinée', note: 'On souffle', color: '#cf7d3c' },
+    { time: '11:00', title: 'Dernière balade douce', note: '', color: '#5b7042' },
+    { time: '16:00', title: 'Souvenirs & fromages', note: 'À ramener', color: '#b8503f' },
+    { time: '18:00', title: 'Rangement des valises', note: '', color: '#9c6b4a' },
+  ] },
+  { dow: 'Sam', num: 18, title: 'Le retour', sub: 'Mandailles → Lyon', items: [
+    { time: '09:30', title: 'Check-out du gîte', note: 'État des lieux', color: '#9c6b4a' },
+    { time: '10:00', title: 'Route du retour', note: '', color: '#5b7042' },
+    { time: '13:00', title: 'Pause déjeuner', note: '', color: '#b8503f' },
+    { time: '16:00', title: 'Arrivée à Lyon', note: 'Des souvenirs plein la tête 💛', color: '#4f8a86' },
+  ] },
+]
+
+const VISITS = [
+  { id: 1, emoji: '⛰️', name: 'Puy Mary — Pas de Peyrol', cat: 'Nature', dist: '25 min', dur: '2 h', age: 'Dès 4 ans (porte-bébé)' },
+  { id: 2, emoji: '💧', name: 'Cascade du Faillitoux', cat: 'Nature', dist: '10 min', dur: '1 h', age: 'Poussette non' },
+  { id: 3, emoji: '🐄', name: 'Ferme pédagogique des burons', cat: 'Famille', dist: '15 min', dur: '2 h', age: 'Tous âges' },
+  { id: 4, emoji: '🌋', name: 'Maison des Volcans, Aurillac', cat: 'Patrimoine', dist: '40 min', dur: '1 h 30', age: 'Dès 3 ans' },
+  { id: 5, emoji: '🚂', name: 'Gentiane Express', cat: 'Famille', dist: '35 min', dur: '3 h', age: 'Tous âges' },
+  { id: 6, emoji: '🧺', name: 'Marché de Salers', cat: 'Marché', dist: '30 min', dur: '1 h', age: 'Tous âges' },
+  { id: 7, emoji: '🏊', name: 'Lac de Saint-Étienne-Cantalès', cat: 'Baignade', dist: '45 min', dur: '½ journée', age: 'Tous âges' },
+  { id: 8, emoji: '🏘️', name: 'Village de Salers', cat: 'Patrimoine', dist: '30 min', dur: '2 h', age: 'Poussette ok' },
+  { id: 9, emoji: '🧀', name: 'Buronnerie & dégustation Cantal', cat: 'Gourmand', dist: '20 min', dur: '1 h', age: 'Tous âges' },
+]
+
+const MEALS = [
+  { day: 'Sam 11', dish: 'Pâtes au pesto (soir d’arrivée)' },
+  { day: 'Dim 12', dish: 'Truffade maison + salade' },
+  { day: 'Lun 13', dish: 'Poulet rôti & légumes' },
+  { day: 'Mar 14', dish: 'Aligot & saucisse de Cantal' },
+  { day: 'Mer 15', dish: 'Pizzeria à Murat' },
+  { day: 'Jeu 16', dish: 'Omelette aux cèpes' },
+  { day: 'Ven 17', dish: 'Grillades au jardin' },
+]
+
+const LOGI = [
+  { key: 've', name: 'Valise enfants', emoji: '🧒', items: ['Bodies & sous-vêtements', 'Pulls chauds (montagne !)', 'K-way / imperméable', 'Bottes & baskets', 'Chapeaux & crème solaire', 'Doudous & jouets', 'Médicaments habituels'] },
+  { key: 'va', name: 'Valise adultes', emoji: '🎒', items: ['Vêtements chauds', 'Chaussures de rando', 'Maillots de bain', 'Trousse de toilette', 'Chargeurs & batteries', 'Sac à dos de rando'] },
+  { key: 'ph', name: 'Pharmacie', emoji: '🩹', items: ['Paracétamol adulte', 'Doliprane enfant', 'Pansements', 'Crème solaire', 'Anti-moustique', 'Tire-tique', 'Désinfectant'] },
+  { key: 'vo', name: 'Voiture', emoji: '🚗', items: ['Sièges auto', 'Gilets & triangle', 'Plaid & oreillers', 'Jeux de voiture', 'En-cas & eau'] },
+  { key: 'ma', name: 'Maison (avant départ)', emoji: '🏠', items: ['Couper l’eau & le gaz', 'Sortir les poubelles', 'Fermer les volets', 'Prévenir les voisins', 'Vider le frigo', 'Arroser les plantes'] },
+]
+
+const COURSES = [
+  { key: 'co_frais', name: 'Frais', items: ['Lait', 'Œufs (x12)', 'Beurre', 'Cantal AOP', 'Saint-Nectaire', 'Yaourts enfants', 'Jambon'] },
+  { key: 'co_epic', name: 'Épicerie', items: ['Pâtes', 'Riz', 'Pesto', 'Huile d’olive', 'Café', 'Céréales', 'Chocolat'] },
+  { key: 'co_fl', name: 'Fruits & légumes', items: ['Pommes de terre (aligot)', 'Salade', 'Tomates', 'Pommes', 'Bananes', 'Oignons'] },
+  { key: 'co_enf', name: 'Pour les enfants', items: ['Compotes à boire', 'Petits gâteaux', 'Jus de fruits', 'Sirop'] },
+  { key: 'co_autre', name: 'Autres', items: ['Pain', 'Eau (pack)', 'Sacs poubelle', 'Charbon BBQ', 'Essuie-tout'] },
+]
+
+const TRAJET_STEPS = [
+  { time: '08:30', place: 'Lyon', note: 'Départ, voiture chargée', color: '#5b7042' },
+  { time: '10:00', place: 'Thiers', note: 'Pause café & toilettes', color: '#cf7d3c' },
+  { time: '11:15', place: 'Massiac (A75)', note: 'On quitte l’autoroute', color: '#4f8a86' },
+  { time: '12:30', place: 'Murat', note: 'Pique-nique & jambes', color: '#8a8b3d' },
+  { time: '13:30', place: 'Mandailles', note: 'Arrivée au gîte 🎉', color: '#b8503f' },
+]
+const TRAJET_CHECK_ITEMS = ['Pleins faits', 'Sièges auto installés', 'Eau & en-cas à portée', 'Doudous accessibles', 'Itinéraire chargé hors-ligne', 'Sac de change bébé']
+
+const HEB_EQUIP = ['Wi-Fi', 'Cheminée (cantou)', 'Lave-linge', 'Lit bébé', 'Jardin clos', 'Parking', 'Lave-vaisselle', 'Barbecue']
+
+const METEO = [
+  { d: 'Sam', n: 11, icon: '☀️', hi: 24, lo: 12, rain: '10 %' },
+  { d: 'Dim', n: 12, icon: '⛅', hi: 22, lo: 11, rain: '20 %' },
+  { d: 'Lun', n: 13, icon: '🌧️', hi: 17, lo: 9, rain: '80 %' },
+  { d: 'Mar', n: 14, icon: '☀️', hi: 23, lo: 12, rain: '5 %' },
+  { d: 'Mer', n: 15, icon: '⛅', hi: 21, lo: 11, rain: '30 %' },
+  { d: 'Jeu', n: 16, icon: '⛅', hi: 20, lo: 10, rain: '40 %' },
+  { d: 'Ven', n: 17, icon: '☀️', hi: 25, lo: 13, rain: '5 %' },
+]
+
+const BUDGET_TOTAL = 1800
+
+/* ------------------------------------------------------------------ *
+ * Persistance locale (sur le téléphone) — localStorage, persistant
+ * dans la WebView Android. Aucune dépendance réseau / serveur.
+ * ------------------------------------------------------------------ */
+const STORE_KEY = 'cantou.v1'
+const DEFAULTS = {
+  saved: { 1: true, 5: true },
+  checks: {
+    ve: { 'Bodies & sous-vêtements': true, 'Pulls chauds (montagne !)': true, 'Bottes & baskets': true, 'Doudous & jouets': true },
+    va: { 'Vêtements chauds': true, 'Chaussures de rando': true },
+    ph: { 'Crème solaire': true, 'Pansements': true },
+    vo: { 'Sièges auto': true },
+    ma: {},
+    tr_dep: { 'Sièges auto installés': true, 'Doudous accessibles': true },
+    co_frais: { 'Lait': true, 'Œufs (x12)': true },
+    co_epic: { 'Café': true },
+    co_fl: {},
+    co_enf: { 'Compotes à boire': true },
+    co_autre: { 'Pain': true },
+  },
+  expenses: [
+    { label: 'Acompte gîte', cat: 'Hébergement', amt: 360 },
+    { label: 'Plein d’essence', cat: 'Transport', amt: 95 },
+    { label: 'Courses Aurillac', cat: 'Nourriture', amt: 87.4 },
+    { label: 'Gentiane Express', cat: 'Visites', amt: 32 },
+    { label: 'Péage A75', cat: 'Transport', amt: 24.6 },
+  ],
+}
+
+function loadStore() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY)
+    if (!raw) return structuredClone(DEFAULTS)
+    const p = JSON.parse(raw)
+    return {
+      saved: p.saved ?? structuredClone(DEFAULTS.saved),
+      checks: p.checks ?? structuredClone(DEFAULTS.checks),
+      expenses: p.expenses ?? structuredClone(DEFAULTS.expenses),
+    }
+  } catch {
+    return structuredClone(DEFAULTS)
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Utilitaires
+ * ------------------------------------------------------------------ */
+const eur = (n) =>
+  Number(n).toLocaleString('fr-FR', { minimumFractionDigits: n % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 }) + ' €'
+
+const catColor = (n) => (CATS.find((x) => x.name === n) || {}).color || '#8a8273'
+
+function buildList(checks, key, items) {
+  const mapped = items.map((l) => ({ label: l, checked: !!(checks[key] && checks[key][l]) }))
+  const done = mapped.filter((x) => x.checked).length
+  return { items: mapped, done, total: mapped.length, pct: Math.round(mapped.length ? (done / mapped.length) * 100 : 0) }
+}
+
+/* ------------------------------------------------------------------ *
+ * Brique réutilisable : ligne cochable (trajet / logistique / courses)
+ * ------------------------------------------------------------------ */
+function CheckRow({ label, checked, onToggle }) {
+  return (
+    <button onClick={onToggle} style={s('width:100%;text-align:left;border:none;border-bottom:1px solid #f1e9da;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
+      {checked ? (
+        <>
+          <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
+          <span style={s('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{label}</span>
+        </>
+      ) : (
+        <>
+          <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid #d8cbb0;background:#fff;')} />
+          <span style={s('font-size:14px;color:#2f2a22;')}>{label}</span>
+        </>
+      )}
+    </button>
+  )
+}
+
+const SectionLabel = ({ children }) => (
+  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>{children}</div>
+)
+
+/* ================================================================== */
 export default function App() {
-  return <div><h1>Cantou</h1></div>
+  // état UI (non persisté)
+  const [tab, setTab] = useState('accueil')
+  const [sub, setSub] = useState(null)
+  const [day, setDay] = useState(0)
+  const [filter, setFilter] = useState('Tous')
+  const [mealTab, setMealTab] = useState('repas')
+  const [showAdd, setShowAdd] = useState(false)
+  const [newAmt, setNewAmt] = useState('')
+  const [newCat, setNewCat] = useState('Nourriture')
+  const [newLabel, setNewLabel] = useState('')
+
+  // état persisté (sur le téléphone)
+  const initial = useMemo(loadStore, [])
+  const [saved, setSaved] = useState(initial.saved)
+  const [checks, setChecks] = useState(initial.checks)
+  const [expenses, setExpenses] = useState(initial.expenses)
+
+  useEffect(() => {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses })) } catch { /* stockage indisponible */ }
+  }, [saved, checks, expenses])
+
+  const toggleCheck = (key, label) =>
+    setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
+  const toggleSaved = (id) => setSaved((sv) => ({ ...sv, [id]: !sv[id] }))
+
+  // compte à rebours (date réelle)
+  const countdown = useMemo(() => {
+    const start = new Date(2026, 6, 11)
+    return Math.max(0, Math.round((start - new Date()) / 86400000))
+  }, [])
+
+  // dérivés préparatifs
+  let packDone = 0, packTotal = 0
+  LOGI.forEach((L) => { const b = buildList(checks, L.key, L.items); packDone += b.done; packTotal += b.total })
+  const packPct = packTotal ? Math.round((packDone / packTotal) * 100) : 0
+
+  // dérivés budget
+  const spent = expenses.reduce((a, e) => a + e.amt, 0)
+  const remain = BUDGET_TOTAL - spent
+  const spentPct = Math.round((spent / BUDGET_TOTAL) * 100)
+  const budgetCats = CATS
+    .map((c) => { const a = expenses.filter((e) => e.cat === c.name).reduce((sum, e) => sum + e.amt, 0); return { ...c, amt: a, pct: Math.round(spent ? (a / spent) * 100 : 0) } })
+    .filter((c) => c.amt > 0)
+    .sort((a, b) => b.amt - a.amt)
+
+  // dérivés courses
+  let coursesDone = 0, coursesTotal = 0
+  const coursesGroups = COURSES.map((g) => { const b = buildList(checks, g.key, g.items); coursesDone += b.done; coursesTotal += b.total; return { name: g.name, doneStr: `${b.done}/${b.total}`, items: b.items, key: g.key } })
+  const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
+
+  // visites filtrées
+  const visits = VISITS.filter((v) => filter === 'Tous' || v.cat === filter)
+  const savedCount = Object.values(saved).filter(Boolean).length
+
+  const cur = DAYS[day]
+  const tr = buildList(checks, 'tr_dep', TRAJET_CHECK_ITEMS)
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo' }[sub] || ''
+
+  const openModule = (action) =>
+    action.indexOf('sub:') === 0 ? setSub(action.slice(4)) : (setTab(action.slice(4)), setSub(null))
+
+  const submitExpense = () => {
+    const a = parseFloat(String(newAmt).replace(',', '.'))
+    if (!a || a <= 0) return
+    setExpenses((list) => [...list, { label: newLabel || newCat, cat: newCat, amt: a }])
+    setShowAdd(false); setNewAmt(''); setNewLabel('')
+  }
+  const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel('') }
+
+  const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
+
+  /* ---------------------------------------------------------------- */
+  return (
+    <div style={s("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;")}>
+
+      {/* ============ SOUS-ÉCRANS ============ */}
+      {sub && (
+        <div style={s('height:100%;display:flex;flex-direction:column;')}>
+          <div style={s('display:flex;align-items:center;gap:8px;padding:54px 14px 12px;background:#fffdf8;border-bottom:1px solid #ece2cf;flex:0 0 auto;')}>
+            <button onClick={() => setSub(null)} style={s('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:3px;')}>‹</button>
+            <span style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
+          </div>
+          <div style={s('flex:1;overflow-y:auto;')}>
+
+            {/* TRAJET */}
+            {sub === 'trajet' && (
+              <div style={s('padding:16px 18px 40px;')}>
+                <div style={s('background:#4a5d3a;border-radius:20px;padding:18px;color:#f3ecda;box-shadow:0 8px 20px rgba(74,93,58,0.2);')}>
+                  <div style={s('display:flex;align-items:center;gap:10px;font-family:Quicksand;font-weight:700;font-size:19px;')}><span>Lyon</span><span style={s('color:#c9d2b6;')}>→</span><span>Mandailles</span></div>
+                  <div style={s('display:flex;gap:20px;margin-top:14px;')}>
+                    <div><div style={s('font-size:12px;color:#c9d2b6;')}>Durée</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>3 h 40</div></div>
+                    <div><div style={s('font-size:12px;color:#c9d2b6;')}>Distance</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>285 km</div></div>
+                    <div><div style={s('font-size:12px;color:#c9d2b6;')}>Budget</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>≈ 77 €</div></div>
+                  </div>
+                </div>
+                <div style={s('margin-top:14px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>👶 Avec les enfants : une pause toutes les 1 h 30, et la playlist d’histoires audio prête pour la route.</div>
+                <div style={s('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Les étapes</div>
+                {TRAJET_STEPS.map((st, i) => (
+                  <div key={i} style={s('display:flex;gap:12px;')}>
+                    <div style={s('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{st.time}</div>
+                    <div style={s('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
+                      <div style={s(`width:13px;height:13px;border-radius:50%;background:${st.color};margin-top:3px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${st.color};`)} />
+                      <div style={s('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
+                    </div>
+                    <div style={s('flex:1;padding-bottom:18px;')}>
+                      <div style={s('font-weight:700;font-size:15px;')}>{st.place}</div>
+                      <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{st.note}</div>
+                    </div>
+                  </div>
+                ))}
+                <div style={s('margin:8px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Avant de partir · {tr.done}/{tr.total}</div>
+                <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
+                  {tr.items.map((it) => <CheckRow key={it.label} label={it.label} checked={it.checked} onToggle={() => toggleCheck('tr_dep', it.label)} />)}
+                </div>
+              </div>
+            )}
+
+            {/* LOGISTIQUE */}
+            {sub === 'logistique' && (
+              <div style={s('padding:16px 18px 40px;')}>
+                {LOGI.map((L) => {
+                  const b = buildList(checks, L.key, L.items)
+                  return (
+                    <div key={L.key} style={s('margin-bottom:18px;')}>
+                      <div style={s('display:flex;align-items:center;gap:9px;margin-bottom:8px;')}>
+                        <span style={s('font-size:18px;')}>{L.emoji}</span>
+                        <span style={s('font-family:Quicksand;font-weight:700;font-size:16px;flex:1;')}>{L.name}</span>
+                        <span style={s('font-size:12px;color:#8a8273;font-weight:700;')}>{b.done}/{b.total}</span>
+                      </div>
+                      <div style={s('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={s(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
+                      <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
+                        {b.items.map((it) => <CheckRow key={it.label} label={it.label} checked={it.checked} onToggle={() => toggleCheck(L.key, it.label)} />)}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* HEBERGEMENT */}
+            {sub === 'hebergement' && (
+              <div style={s('padding:16px 18px 40px;')}>
+                <div style={s('height:150px;border-radius:18px;background:repeating-linear-gradient(45deg,#e8dcc2,#e8dcc2 12px,#e0d3b6 12px,#e0d3b6 24px);display:flex;align-items:center;justify-content:center;')}>
+                  <span style={s("font-family:ui-monospace,'SF Mono',monospace;font-size:12px;color:#9c8a66;background:rgba(255,253,248,0.85);padding:5px 10px;border-radius:8px;")}>photo · La Grange du Puy Mary</span>
+                </div>
+                <div style={s('margin-top:14px;font-family:Quicksand;font-weight:700;font-size:20px;')}>La Grange du Puy Mary</div>
+                <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>📍 Mandailles-Saint-Julien (15590)</div>
+                <div style={s('display:flex;gap:10px;margin-top:14px;')}>
+                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#8a8273;')}>Arrivée</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>Sam 11 · dès 16 h</div></div>
+                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#8a8273;')}>Départ</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>Sam 18 · avant 10 h</div></div>
+                </div>
+                <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>🛏️ 4–5 personnes · 2 chambres · lit bébé fourni</div>
+                <div style={s('margin:18px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Équipements</div>
+                <div style={s('display:flex;flex-wrap:wrap;gap:8px;')}>
+                  {HEB_EQUIP.map((eq) => <span key={eq} style={s('background:#fffdf8;border:1px solid #e3d8c2;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:#6b6354;')}>{eq}</span>)}
+                </div>
+                <div style={s('margin-top:16px;background:#e7ecdf;border-radius:14px;padding:14px;')}>
+                  <div style={s('font-weight:700;font-family:Quicksand;')}>📶 Wi-Fi</div>
+                  <div style={s('font-size:13px;color:#4a5d3a;margin-top:5px;')}>Réseau : <b>LaGrange-Gite</b></div>
+                  <div style={s('font-size:13px;color:#4a5d3a;margin-top:2px;')}>Code : <b>puymary15</b></div>
+                </div>
+                <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 Mme Vidal · 06 12 34 56 78</div>
+                <div style={s('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🔥 La maison a son cantou (cheminée traditionnelle) — parfait pour les soirées, même en été en altitude.</div>
+              </div>
+            )}
+
+            {/* METEO */}
+            {sub === 'meteo' && (
+              <div style={s('padding:16px 18px 40px;')}>
+                <div style={s('background:#4a5d3a;border-radius:18px;padding:16px;color:#f3ecda;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Puy Mary &amp; vallées</div>
+                  <div style={s('font-size:13px;color:#dbe2c9;margin-top:2px;')}>Prévisions du 11 au 17 juillet</div>
+                </div>
+                <div style={s('margin-top:12px;background:#eee7d4;border-radius:14px;padding:13px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧥 En altitude (Puy Mary, 1 783 m) il fait plus frais — prévoir une polaire même en été !</div>
+                <div style={s('margin-top:14px;display:flex;flex-direction:column;gap:8px;')}>
+                  {METEO.map((w, i) => (
+                    <div key={i} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 16px;')}>
+                      <div style={s('width:64px;font-weight:700;font-size:14px;')}>{w.d} {w.n}</div>
+                      <div style={s('font-size:24px;width:32px;text-align:center;')}>{w.icon}</div>
+                      <div style={s('font-size:12px;color:#6f8fb0;flex:1;font-weight:600;')}>💧 {w.rain}</div>
+                      <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{w.hi}° <span style={s('color:#b3a892;')}>{w.lo}°</span></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+        </div>
+      )}
+
+      {/* ============ ÉCRANS PRINCIPAUX (onglets) ============ */}
+      {!sub && (
+        <div style={s('height:100%;display:flex;flex-direction:column;')}>
+          <div style={s('flex:1;overflow-y:auto;')}>
+
+            {/* ACCUEIL */}
+            {tab === 'accueil' && (
+              <div>
+                <div style={s('padding:54px 18px 6px;display:flex;align-items:center;justify-content:space-between;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Bonjour 👋</div>
+                  <div style={s('width:38px;height:38px;border-radius:50%;background:#cf7d3c;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Quicksand;')}>F</div>
+                </div>
+                <div style={s('margin:8px 18px 14px;background:#4a5d3a;border-radius:26px;padding:20px;color:#f3ecda;box-shadow:0 10px 26px rgba(74,93,58,0.24);')}>
+                  <div style={s('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#c9d2b6;')}>PROCHAINE AVENTURE</div>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;')}>Puy Mary,<br />Cantal</div>
+                  <div style={s('margin-top:9px;font-size:14px;color:#dbe2c9;')}>Sam 11 → Sam 18 juillet 2026</div>
+                  <div style={s('display:flex;gap:8px;margin-top:16px;')}>
+                    <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
+                    <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
+                  </div>
+                </div>
+
+                <div style={s('margin:0 18px 12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                  <div style={s('display:flex;align-items:center;gap:12px;')}>
+                    <div style={s('width:44px;height:44px;border-radius:14px;background:#dfeae6;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🚗</div>
+                    <div style={s('flex:1;')}>
+                      <div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>Le grand départ</div>
+                      <div style={s('font-size:13px;color:#8a8273;margin-top:1px;')}>Sam 11 · 08:30 depuis Lyon · ≈ 3 h 40</div>
+                    </div>
+                  </div>
+                  <button onClick={() => setSub('trajet')} style={s('margin-top:13px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le trajet →</button>
+                </div>
+
+                <button onClick={() => setSub('logistique')} style={s('margin:0 18px 14px;width:calc(100% - 36px);text-align:left;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                  <div style={s('display:flex;justify-content:space-between;align-items:center;')}>
+                    <div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>🧳 Valises &amp; préparatifs</div>
+                    <div style={s('font-size:13px;color:#8a8273;font-weight:700;')}>{packDone}/{packTotal}</div>
+                  </div>
+                  <div style={s('margin-top:11px;height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={s(`height:100%;border-radius:9px;background:#cf7d3c;width:${packPct}%;`)} /></div>
+                </button>
+
+                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Tout le séjour</div>
+                <div style={s('padding:0 18px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;')}>
+                  {MODULES.map((m) => (
+                    <button key={m.name} onClick={() => openModule(m.action)} style={s('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                      <div style={s(`width:42px;height:42px;border-radius:13px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:21px;`)}>{m.emoji}</div>
+                      <div>
+                        <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{m.name}</div>
+                        <div style={s('font-size:12px;color:#8a8273;margin-top:1px;')}>{m.sub}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div style={s('height:16px;')} />
+              </div>
+            )}
+
+            {/* PLANNING */}
+            {tab === 'planning' && (
+              <div>
+                <div style={s('padding:54px 18px 4px;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Planning</div>
+                  <div style={s('font-size:13px;color:#8a8273;')}>8 jours · 11 → 18 juillet</div>
+                </div>
+                <div style={s('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 16px;')}>
+                  {DAYS.map((d, i) => (
+                    <button key={i} onClick={() => setDay(i)} style={s(`flex:0 0 auto;width:54px;border:1px solid ${i === day ? '#4a5d3a' : '#ece2cf'};background:${i === day ? '#4a5d3a' : '#fffdf8'};color:${i === day ? '#fffaf0' : '#6b6354'};border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;`)}>
+                      <span style={s('font-size:12px;font-weight:600;')}>{d.dow}</span>
+                      <span style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>{d.num}</span>
+                    </button>
+                  ))}
+                </div>
+                <div style={s('padding:0 18px 8px;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;')}>{cur.title}</div>
+                  <div style={s('font-size:13px;color:#8a8273;margin-bottom:16px;')}>{cur.sub}</div>
+                  {cur.items.map((it, i) => (
+                    <div key={i} style={s('display:flex;gap:12px;')}>
+                      <div style={s('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{it.time}</div>
+                      <div style={s('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
+                        <div style={s(`width:13px;height:13px;border-radius:50%;background:${it.color};margin-top:3px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${it.color};`)} />
+                        <div style={s('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
+                      </div>
+                      <div style={s('flex:1;padding-bottom:18px;')}>
+                        <div style={s('font-weight:700;font-size:15px;')}>{it.title}</div>
+                        {it.note && <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{it.note}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={s('height:16px;')} />
+              </div>
+            )}
+
+            {/* VISITES */}
+            {tab === 'visites' && (
+              <div>
+                <div style={s('padding:54px 18px 4px;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>À faire</div>
+                  <div style={s('font-size:13px;color:#8a8273;')}>Autour du Puy Mary · {savedCount} enregistrées ♥</div>
+                </div>
+                <div style={s('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 14px;')}>
+                  {FILTERS.map((f) => (
+                    <button key={f} onClick={() => setFilter(f)} style={s(`flex:0 0 auto;border:1px solid ${filter === f ? '#4a5d3a' : '#ece2cf'};background:${filter === f ? '#4a5d3a' : '#fffdf8'};color:${filter === f ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;`)}>{f}</button>
+                  ))}
+                </div>
+                <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:12px;')}>
+                  {visits.map((v) => {
+                    const sv = !!saved[v.id]
+                    return (
+                      <div key={v.id} style={s('display:flex;gap:12px;align-items:center;background:#fffdf8;border:1px solid #efe6d4;border-radius:18px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                        <div style={s('width:52px;height:52px;flex:0 0 auto;border-radius:14px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:26px;')}>{v.emoji}</div>
+                        <div style={s('flex:1;min-width:0;')}>
+                          <div style={s('display:flex;align-items:center;gap:6px;')}>
+                            <span style={s(`width:8px;height:8px;border-radius:50%;background:${VCAT[v.cat]};flex:0 0 auto;`)} />
+                            <span style={s(`font-size:11px;font-weight:700;color:${VCAT[v.cat]};text-transform:uppercase;letter-spacing:0.5px;`)}>{v.cat}</span>
+                          </div>
+                          <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{v.name}</div>
+                          <div style={s('font-size:12px;color:#8a8273;margin-top:2px;')}>{v.dist}  ·  {v.dur}</div>
+                          <div style={s('display:inline-block;margin-top:7px;font-size:11px;font-weight:700;color:#6b6354;background:#f1e9da;border-radius:8px;padding:3px 8px;')}>👶 {v.age}</div>
+                        </div>
+                        <button onClick={() => toggleSaved(v.id)} style={s('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:24px;line-height:1;')}>
+                          {sv ? <span style={s('color:#b8503f;')}>♥</span> : <span style={s('color:#cabfa6;')}>♡</span>}
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+                <div style={s('height:16px;')} />
+              </div>
+            )}
+
+            {/* REPAS */}
+            {tab === 'repas' && (
+              <div>
+                <div style={s('padding:54px 18px 14px;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Repas &amp; courses</div>
+                </div>
+                <div style={s('margin:0 18px 16px;display:flex;background:#ece2cf;border-radius:14px;padding:4px;')}>
+                  <button onClick={() => setMealTab('repas')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'repas' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'repas' ? '#fffaf0' : '#6b6354'};`)}>Menus</button>
+                  <button onClick={() => setMealTab('courses')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'courses' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'courses' ? '#fffaf0' : '#6b6354'};`)}>Courses</button>
+                </div>
+
+                {mealTab === 'repas' && (
+                  <>
+                    <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:10px;')}>
+                      {MEALS.map((ml, i) => (
+                        <div key={i} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:13px 14px;')}>
+                          <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#cf7d3c;width:54px;flex:0 0 auto;')}>{ml.day}</div>
+                          <div style={s('font-weight:600;font-size:14px;')}>{ml.dish}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={s('margin:14px 18px 16px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧀 Spécialités à goûter : Cantal AOP, Salers, Saint-Nectaire, truffade &amp; aligot maison.</div>
+                  </>
+                )}
+
+                {mealTab === 'courses' && (
+                  <div style={s('padding:0 18px 16px;')}>
+                    <div style={s('display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6b6354;margin-bottom:6px;')}><span>Liste de courses</span><span>{coursesDone}/{coursesTotal}</span></div>
+                    <div style={s('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;margin-bottom:18px;')}><div style={s(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
+                    {coursesGroups.map((g) => (
+                      <div key={g.key} style={s('margin-bottom:16px;')}>
+                        <div style={s('display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;')}>
+                          <span style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{g.name}</span>
+                          <span style={s('font-size:12px;color:#8a8273;')}>{g.doneStr}</span>
+                        </div>
+                        <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
+                          {g.items.map((it) => <CheckRow key={it.label} label={it.label} checked={it.checked} onToggle={() => toggleCheck(g.key, it.label)} />)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* BUDGET */}
+            {tab === 'budget' && (
+              <div>
+                <div style={s('padding:54px 18px 14px;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Budget</div>
+                </div>
+                <div style={s('margin:0 18px 14px;background:#4a5d3a;border-radius:22px;padding:18px;color:#f3ecda;box-shadow:0 10px 24px rgba(74,93,58,0.22);')}>
+                  <div style={s('display:flex;justify-content:space-between;align-items:flex-end;')}>
+                    <div><div style={s('font-size:12px;color:#c9d2b6;font-weight:700;letter-spacing:0.5px;')}>RESTANT</div><div style={s('font-family:Quicksand;font-weight:700;font-size:30px;margin-top:2px;')}>{eur(remain)}</div></div>
+                    <div style={s('text-align:right;font-size:12px;color:#dbe2c9;')}>sur {eur(BUDGET_TOTAL)}</div>
+                  </div>
+                  <div style={s('margin-top:14px;height:10px;border-radius:10px;background:rgba(255,255,255,0.18);overflow:hidden;')}><div style={s(`height:100%;background:#e8c07a;width:${spentPct}%;`)} /></div>
+                  <div style={s('margin-top:8px;font-size:13px;color:#dbe2c9;')}>Dépensé {eur(spent)} · {spentPct} %</div>
+                </div>
+                <button onClick={() => setShowAdd(true)} style={s('margin:0 18px 18px;width:calc(100% - 36px);border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Ajouter une dépense</button>
+                <div style={s('padding:0 18px 8px;')}><SectionLabel>Par catégorie</SectionLabel></div>
+                <div style={s('padding:0 18px 14px;display:flex;flex-direction:column;gap:13px;')}>
+                  {budgetCats.map((c) => (
+                    <div key={c.name}>
+                      <div style={s('display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;')}><span style={s('font-weight:700;')}>{c.name}</span><span style={s('font-weight:700;color:#6b6354;')}>{eur(c.amt)}</span></div>
+                      <div style={s('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={s(`height:100%;background:${c.color};width:${c.pct}%;`)} /></div>
+                    </div>
+                  ))}
+                </div>
+                <div style={s('padding:4px 18px 8px;')}><SectionLabel>Dernières dépenses</SectionLabel></div>
+                <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:8px;')}>
+                  {expenses.slice().reverse().map((e, i) => (
+                    <div key={i} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
+                      <span style={s(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
+                      <div style={s('flex:1;min-width:0;')}><div style={s('font-weight:700;font-size:14px;')}>{e.label}</div><div style={s('font-size:12px;color:#8a8273;')}>{e.cat}</div></div>
+                      <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={s('height:16px;')} />
+              </div>
+            )}
+
+          </div>
+
+          {/* BARRE D'ONGLETS */}
+          <div style={s('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
+            {TABS.map(([key, emoji, label]) => (
+              <button key={key} onClick={() => { setTab(key); setSub(null) }} style={s('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
+                <span style={s('font-size:20px;')}>{emoji}</span>
+                <span style={s(`font-size:11px;color:${tab === key ? '#4a5d3a' : '#b3a892'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : AJOUTER UNE DÉPENSE ============ */}
+      {showAdd && (
+        <div onClick={closeAdd} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle dépense</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Montant</div>
+            <input value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:18px;font-family:Quicksand;font-weight:700;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Libellé</div>
+            <input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Catégorie</div>
+            <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:7px;margin-bottom:20px;')}>
+              {CATS.map((c) => (
+                <button key={c.name} onClick={() => setNewCat(c.name)} style={s(`border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
+              ))}
+            </div>
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={submitExpense} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  )
 }
