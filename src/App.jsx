@@ -124,13 +124,6 @@ const COURSES = [
   { key: 'co_autre', name: 'Autres', items: ['Pain', 'Eau (pack)', 'Sacs poubelle', 'Charbon BBQ', 'Essuie-tout'] },
 ]
 
-const TRAJET_STEPS = [
-  { time: '08:30', place: 'Lyon', note: 'Départ, voiture chargée', color: '#5b7042' },
-  { time: '10:00', place: 'Thiers', note: 'Pause café & toilettes', color: '#cf7d3c' },
-  { time: '11:15', place: 'Massiac (A75)', note: 'On quitte l’autoroute', color: '#4f8a86' },
-  { time: '12:30', place: 'Murat', note: 'Pique-nique & jambes', color: '#8a8b3d' },
-  { time: '13:30', place: 'Mandailles', note: 'Arrivée au gîte 🎉', color: '#b8503f' },
-]
 const TRAJET_CHECK_ITEMS = ['Pleins faits', 'Sièges auto installés', 'Eau & en-cas à portée', 'Doudous accessibles', 'Itinéraire chargé hors-ligne', 'Sac de change bébé']
 
 const HEB_EQUIP = ['Wi-Fi', 'Cheminée (cantou)', 'Lave-linge', 'Lit bébé', 'Jardin clos', 'Parking', 'Lave-vaisselle', 'Barbecue']
@@ -190,6 +183,7 @@ function loadStore() {
       days: p.days ?? structuredClone(DAYS_INITIAL),
       visits: p.visits ?? structuredClone(VISITS_INITIAL),
       meteo: p.meteo ?? structuredClone(METEO_INITIAL),
+      trajetSteps: p.trajetSteps ?? structuredClone(TRAJET_STEPS_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -269,6 +263,12 @@ export default function App() {
   const [newVisitDur, setNewVisitDur] = useState('')
   const [newVisitAge, setNewVisitAge] = useState('')
   const [newVisitCat, setNewVisitCat] = useState('Nature')
+  const [showTrajetEdit, setShowTrajetEdit] = useState(false)
+  const [editingTrajetIdx, setEditingTrajetIdx] = useState(null)
+  const [newTrajetTime, setNewTrajetTime] = useState('')
+  const [newTrajetPlace, setNewTrajetPlace] = useState('')
+  const [newTrajetNote, setNewTrajetNote] = useState('')
+  const [newTrajetColor, setNewTrajetColor] = useState('#5b7042')
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -280,10 +280,11 @@ export default function App() {
   const [days, setDays] = useState(initial.days || structuredClone(DAYS_INITIAL))
   const [visits, setVisits] = useState(initial.visits || structuredClone(VISITS_INITIAL))
   const [meteo, setMeteo] = useState(initial.meteo || structuredClone(METEO_INITIAL))
+  const [trajetSteps, setTrajetSteps] = useState(initial.trajetSteps || structuredClone(TRAJET_STEPS_INITIAL))
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo })) } catch { /* stockage indisponible */ }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps })) } catch { /* stockage indisponible */ }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps])
 
   const toggleCheck = (key, label) =>
     setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
@@ -459,6 +460,26 @@ export default function App() {
   }
   const closeVisitAdd = () => { setShowVisitEdit(false); setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature') }
 
+  const editTrajetStep = (idx) => {
+    const st = trajetSteps[idx]
+    setNewTrajetTime(st.time)
+    setNewTrajetPlace(st.place)
+    setNewTrajetNote(st.note)
+    setNewTrajetColor(st.color)
+    setEditingTrajetIdx(idx)
+    setShowTrajetEdit(true)
+  }
+  const saveTrajetStep = () => {
+    if (!newTrajetTime.trim() || !newTrajetPlace.trim() || editingTrajetIdx === null) return
+    setTrajetSteps((list) => list.map((st, i) => i === editingTrajetIdx ? { time: newTrajetTime, place: newTrajetPlace, note: newTrajetNote, color: newTrajetColor } : st))
+    closeTrajetEdit()
+  }
+  const closeTrajetEdit = () => { setShowTrajetEdit(false); setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042') }
+  const deleteTrajetStep = (idx) => {
+    if (trajetSteps.length <= 1) return
+    setTrajetSteps((list) => list.filter((_, i) => i !== idx))
+  }
+
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
   /* ---------------------------------------------------------------- */
@@ -486,8 +507,8 @@ export default function App() {
                   </div>
                 </div>
                 <div style={s('margin-top:14px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>👶 Avec les enfants : une pause toutes les 1 h 30, et la playlist d’histoires audio prête pour la route.</div>
-                <div style={s('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Les étapes</div>
-                {TRAJET_STEPS.map((st, i) => (
+                <div style={s('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Les etapes</div>
+                {trajetSteps.map((st, i) => (
                   <div key={i} style={s('display:flex;gap:12px;')}>
                     <div style={s('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{st.time}</div>
                     <div style={s('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
@@ -495,8 +516,14 @@ export default function App() {
                       <div style={s('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
                     </div>
                     <div style={s('flex:1;padding-bottom:18px;')}>
-                      <div style={s('font-weight:700;font-size:15px;')}>{st.place}</div>
-                      <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{st.note}</div>
+                      <div style={s('display:flex;align-items:center;gap:8px;')}>
+                        <div style={s('flex:1;')}>
+                          <div style={s('font-weight:700;font-size:15px;')}>{st.place}</div>
+                          <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{st.note}</div>
+                        </div>
+                        <button onClick={() => editTrajetStep(i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
+                        <button onClick={() => deleteTrajetStep(i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -937,6 +964,32 @@ export default function App() {
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeActivityAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={submitActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : EDITER TRAJET ============ */}
+      {showTrajetEdit && editingTrajetIdx !== null && (
+        <div onClick={closeTrajetEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer etape</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Horaire</div>
+            <input value={newTrajetTime} onChange={(e) => setNewTrajetTime(e.target.value)} placeholder="Ex : 08:30" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Lieu</div>
+            <input value={newTrajetPlace} onChange={(e) => setNewTrajetPlace(e.target.value)} placeholder="Ex : Lyon" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Note</div>
+            <input value={newTrajetNote} onChange={(e) => setNewTrajetNote(e.target.value)} placeholder="Ex : Pause cafe" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Couleur</div>
+            <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
+              {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
+                <button key={c} onClick={() => setNewTrajetColor(c)} style={s(`width:32px;height:32px;border-radius:50%;background:${c};border:${newTrajetColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
+              ))}
+            </div>
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeTrajetEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveTrajetStep} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
