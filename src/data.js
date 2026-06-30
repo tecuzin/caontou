@@ -19,6 +19,13 @@ export const SHOPPING_INITIAL = {
   co_autre: { 'Pain': true },
 }
 
-export const PLANNING_INITIAL = [
-  // Days come from DAYS constant - can be made editable per activity
+export const PLANNING_INITIAL = []
+
+// Shopping items stored as flat list with category + checked state
+export const SHOPPING_ITEMS_INITIAL = [
+  { id: 1, cat: 'co_frais', label: 'Lait', checked: true },
+  { id: 2, cat: 'co_frais', label: 'Oeufs (x12)', checked: true },
+  { id: 3, cat: 'co_epic', label: 'Cafe', checked: true },
+  { id: 4, cat: 'co_enf', label: 'Compotes a boire', checked: true },
+  { id: 5, cat: 'co_autre', label: 'Pain', checked: true },
 ]

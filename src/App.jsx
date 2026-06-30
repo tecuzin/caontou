@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { MEALS_INITIAL } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL } from './data.js'
 
 /* ------------------------------------------------------------------ *
  * Helper : transforme une chaîne CSS (issue du prototype) en objet de
@@ -196,6 +196,7 @@ function loadStore() {
       checks: p.checks ?? structuredClone(DEFAULTS.checks),
       expenses: p.expenses ?? structuredClone(DEFAULTS.expenses),
       meals: p.meals ?? structuredClone(MEALS_INITIAL),
+      shoppingItems: p.shoppingItems ?? structuredClone(SHOPPING_ITEMS_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -264,10 +265,11 @@ export default function App() {
   const [checks, setChecks] = useState(initial.checks)
   const [expenses, setExpenses] = useState(initial.expenses)
   const [meals, setMeals] = useState(initial.meals || structuredClone(MEALS_INITIAL))
+  const [shoppingItems, setShoppingItems] = useState(initial.shoppingItems || structuredClone(SHOPPING_ITEMS_INITIAL))
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals })) } catch { /* stockage indisponible */ }
-  }, [saved, checks, expenses, meals])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems })) } catch { /* stockage indisponible */ }
+  }, [saved, checks, expenses, meals, shoppingItems])
 
   const toggleCheck = (key, label) =>
     setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
@@ -347,6 +349,13 @@ export default function App() {
     closeMealEdit()
   }
   const closeMealEdit = () => { setShowMealEdit(false); setEditingMealDay(null); setNewMealDish('') }
+
+  const deleteShoppingItem = (id) => {
+    setShoppingItems((list) => list.filter(item => item.id !== id))
+  }
+  const toggleShoppingItem = (id) => {
+    setShoppingItems((list) => list.map(item => item.id === id ? { ...item, checked: !item.checked } : item))
+  }
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
@@ -642,6 +651,18 @@ export default function App() {
                         </div>
                       </div>
                     ))}
+                    <div style={s('margin-top:20px;padding-top:16px;border-top:1px solid #efe6d4;')}>
+                      <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#8a8273;text-transform:uppercase;margin-bottom:10px;')}>Gerer les articles</div>
+                      <div style={s('display:flex;flex-direction:column;gap:8px;')}>
+                        {shoppingItems.map((item) => (
+                          <div key={item.id} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
+                            <input type="checkbox" checked={item.checked} onChange={() => toggleShoppingItem(item.id)} style={s('cursor:pointer;')} />
+                            <span style={s('font-size:14px;flex:1;')}>{item.label}</span>
+                            <button onClick={() => deleteShoppingItem(item.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:4px;')}>delete</button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
