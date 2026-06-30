@@ -601,7 +601,7 @@ export default function App() {
             {/* LOGISTIQUE */}
             {sub === 'logistique' && (
               <div style={s('padding:16px 18px 40px;')}>
-                {LOGI.map((L) => {
+                {logi.map((L) => {
                   const b = buildList(checks, L.key, L.items)
                   return (
                     <div key={L.key} style={s('margin-bottom:18px;')}>
@@ -612,8 +612,26 @@ export default function App() {
                       </div>
                       <div style={s('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={s(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
                       <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
-                        {b.items.map((it) => <CheckRow key={it.label} label={it.label} checked={it.checked} onToggle={() => toggleCheck(L.key, it.label)} />)}
+                        {b.items.map((it) => (
+                          <div key={it.label} style={s('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
+                            <button onClick={() => toggleCheck(L.key, it.label)} style={s('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
+                              {it.checked ? (
+                                <>
+                                  <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
+                                  <span style={s('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{it.label}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid #d8cbb0;background:#fff;')} />
+                                  <span style={s('font-size:14px;color:#2f2a22;')}>{it.label}</span>
+                                </>
+                              )}
+                            </button>
+                            <button onClick={() => deleteLogiItem(L.key, it.label)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
+                          </div>
+                        ))}
                       </div>
+                      <button onClick={() => { setEditingLogiKey(L.key); setShowAddLogiItem(true) }} style={s('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
                     </div>
                   )
                 })}
@@ -854,8 +872,26 @@ export default function App() {
                           <span style={s('font-size:12px;color:#8a8273;')}>{g.doneStr}</span>
                         </div>
                         <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
-                          {g.items.map((it) => <CheckRow key={it.label} label={it.label} checked={it.checked} onToggle={() => toggleCheck(g.key, it.label)} />)}
+                          {g.items.map((it) => (
+                            <div key={it.label} style={s('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
+                              <button onClick={() => toggleCheck(g.key, it.label)} style={s('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
+                                {it.checked ? (
+                                  <>
+                                    <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
+                                    <span style={s('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{it.label}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid #d8cbb0;background:#fff;')} />
+                                    <span style={s('font-size:14px;color:#2f2a22;')}>{it.label}</span>
+                                  </>
+                                )}
+                              </button>
+                              <button onClick={() => deleteCourseItem(g.key, it.label)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
+                            </div>
+                          ))}
                         </div>
+                        <button onClick={() => { setEditingCourseKey(g.key); setShowAddCourseItem(true) }} style={s('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
                       </div>
                     ))}
                     <div style={s('margin-top:20px;padding-top:16px;border-top:1px solid #efe6d4;')}>
@@ -1028,6 +1064,38 @@ export default function App() {
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeActivityAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={submitActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : AJOUTER ARTICLE LOGI ============ */}
+      {showAddLogiItem && (
+        <div onClick={closeAddLogiItem} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Description</div>
+            <input value={newLogiItem} onChange={(e) => setNewLogiItem(e.target.value)} placeholder="Ex : Chaussettes" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeAddLogiItem} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={addLogiItem} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : AJOUTER ARTICLE COURSES ============ */}
+      {showAddCourseItem && (
+        <div onClick={closeAddCourseItem} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Description</div>
+            <input value={newCourseItem} onChange={(e) => setNewCourseItem(e.target.value)} placeholder="Ex : Fromage" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeAddCourseItem} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={addCourseItem} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
