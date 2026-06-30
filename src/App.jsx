@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { MEALS_INITIAL } from './data.js'
 
 /* ------------------------------------------------------------------ *
  * Helper : transforme une chaîne CSS (issue du prototype) en objet de
@@ -194,6 +195,7 @@ function loadStore() {
       saved: p.saved ?? structuredClone(DEFAULTS.saved),
       checks: p.checks ?? structuredClone(DEFAULTS.checks),
       expenses: p.expenses ?? structuredClone(DEFAULTS.expenses),
+      meals: p.meals ?? structuredClone(MEALS_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -248,20 +250,24 @@ export default function App() {
   const [filter, setFilter] = useState('Tous')
   const [mealTab, setMealTab] = useState('repas')
   const [showAdd, setShowAdd] = useState(false)
+  const [showMealEdit, setShowMealEdit] = useState(false)
   const [editingExpenseIdx, setEditingExpenseIdx] = useState(null)
+  const [editingMealDay, setEditingMealDay] = useState(null)
   const [newAmt, setNewAmt] = useState('')
   const [newCat, setNewCat] = useState('Nourriture')
   const [newLabel, setNewLabel] = useState('')
+  const [newMealDish, setNewMealDish] = useState('')
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
   const [saved, setSaved] = useState(initial.saved)
   const [checks, setChecks] = useState(initial.checks)
   const [expenses, setExpenses] = useState(initial.expenses)
+  const [meals, setMeals] = useState(initial.meals || structuredClone(MEALS_INITIAL))
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses })) } catch { /* stockage indisponible */ }
-  }, [saved, checks, expenses])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals })) } catch { /* stockage indisponible */ }
+  }, [saved, checks, expenses, meals])
 
   const toggleCheck = (key, label) =>
     setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
@@ -326,6 +332,21 @@ export default function App() {
     setShowAdd(true)
   }
   const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel(''); setEditingExpenseIdx(null) }
+
+  const editMeal = (day) => {
+    const m = meals.find(x => x.day === day)
+    if (m) {
+      setNewMealDish(m.dish)
+      setEditingMealDay(day)
+      setShowMealEdit(true)
+    }
+  }
+  const saveMeal = () => {
+    if (!newMealDish.trim() || !editingMealDay) return
+    setMeals((list) => list.map(m => m.day === editingMealDay ? { ...m, dish: newMealDish } : m))
+    closeMealEdit()
+  }
+  const closeMealEdit = () => { setShowMealEdit(false); setEditingMealDay(null); setNewMealDish('') }
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
@@ -594,10 +615,11 @@ export default function App() {
                 {mealTab === 'repas' && (
                   <>
                     <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:10px;')}>
-                      {MEALS.map((ml, i) => (
+                      {meals.map((ml, i) => (
                         <div key={i} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:13px 14px;')}>
                           <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#cf7d3c;width:54px;flex:0 0 auto;')}>{ml.day}</div>
-                          <div style={s('font-weight:600;font-size:14px;')}>{ml.dish}</div>
+                          <div style={s('font-weight:600;font-size:14px;flex:1;')}>{ml.dish}</div>
+                          <button onClick={() => editMeal(ml.day)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>edit</button>
                         </div>
                       ))}
                     </div>
@@ -701,6 +723,22 @@ export default function App() {
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={submitExpense} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : EDITER REPAS ============ */}
+      {showMealEdit && (
+        <div onClick={closeMealEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Repas du {editingMealDay}</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Plat</div>
+            <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeMealEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveMeal} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
