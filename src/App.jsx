@@ -308,6 +308,11 @@ export default function App() {
   const [logi, setLogi] = useState(initial.logi || structuredClone(LOGI_INITIAL))
   const [courses, setCourses] = useState(initial.courses || structuredClone(COURSES_INITIAL))
 
+  // états tri
+  const [logiSorted, setLogiSorted] = useState(false)
+  const [coursesSorted, setCoursesSorted] = useState(false)
+  const [visitSort, setVisitSort] = useState(null) // null | 'dist' | 'cat'
+
   useEffect(() => {
     try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses })) } catch { }
   }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses])
@@ -341,8 +346,16 @@ export default function App() {
   const coursesGroups = courses.map((g) => { const b = buildList(checks, g.key, g.items); coursesDone += b.done; coursesTotal += b.total; return { name: g.name, doneStr: `${b.done}/${b.total}`, items: b.items, key: g.key } })
   const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
 
-  // visites filtrées
-  const filteredVisits = visits.filter((v) => filter === 'Tous' || v.cat === filter)
+  // visites filtrées + triées
+  const parseDist = (d) => { const m = String(d).match(/\d+/); return m ? parseInt(m[0]) : 999 }
+  const CAT_ORDER = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Marche']
+  const filteredVisits = visits
+    .filter((v) => filter === 'Tous' || v.cat === filter)
+    .sort((a, b) => {
+      if (visitSort === 'dist') return parseDist(a.dist) - parseDist(b.dist)
+      if (visitSort === 'cat') return CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat)
+      return 0
+    })
   const savedCount = Object.values(saved).filter(Boolean).length
 
   const cur = days[day]
@@ -399,10 +412,12 @@ export default function App() {
   }
 
   const editActivity = (dayIdx, itemIdx) => {
-    const item = DAYS[dayIdx].items[itemIdx]
+    const item = days[dayIdx].items[itemIdx]
     setNewActivityTime(item.time)
     setNewActivityTitle(item.title)
+    setNewActivityColor(item.color || '#5b7042')
     setEditingActivityIdx({ dayIdx, itemIdx })
+    setEditingActivityDayIdx(dayIdx)
     setShowActivityEdit(true)
   }
   const saveActivity = () => {
@@ -443,11 +458,19 @@ export default function App() {
     if (!newActivityTime.trim() || !newActivityTitle.trim() || editingActivityDayIdx === null) return
     if (editingActivityIdx) {
       const { dayIdx, itemIdx } = editingActivityIdx
-      setDays((list) => list.map((d, di) => di === dayIdx ? { ...d, items: d.items.map((it, ii) => ii === itemIdx ? { time: newActivityTime, title: newActivityTitle, note: it.note, color: newActivityColor } : it) } : d))
+      setDays((list) => list.map((d, di) => {
+        if (di !== dayIdx) return d
+        const updated = d.items.map((it, ii) => ii === itemIdx ? { time: newActivityTime, title: newActivityTitle, note: it.note, color: newActivityColor } : it)
+        return { ...d, items: sortItemsByTime(updated) }
+      }))
       setShowActivityEdit(false)
       setEditingActivityIdx(null)
     } else {
-      setDays((list) => list.map((d, di) => di === editingActivityDayIdx ? { ...d, items: [...d.items, { time: newActivityTime, title: newActivityTitle, note: '', color: newActivityColor }] } : d))
+      setDays((list) => list.map((d, di) => {
+        if (di !== editingActivityDayIdx) return d
+        const updated = [...d.items, { time: newActivityTime, title: newActivityTitle, note: '', color: newActivityColor }]
+        return { ...d, items: sortItemsByTime(updated) }
+      }))
       closeActivityAdd()
     }
   }
@@ -455,6 +478,14 @@ export default function App() {
   const deleteActivity = (dayIdx, itemIdx) => {
     setDays((list) => list.map((d, di) => di === dayIdx ? { ...d, items: d.items.filter((_, ii) => ii !== itemIdx) } : d))
   }
+
+  const sortItemsByTime = (items) => [...items].sort((a, b) => {
+    const toMin = (t) => {
+      const m = t.match(/(\d{1,2}):(\d{2})/)
+      return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999
+    }
+    return toMin(a.time) - toMin(b.time)
+  })
 
   const editVisit = (visitId) => {
     const v = visits.find(x => x.id === visitId)
@@ -601,8 +632,12 @@ export default function App() {
             {/* LOGISTIQUE */}
             {sub === 'logistique' && (
               <div style={s('padding:16px 18px 40px;')}>
+                <div style={s('display:flex;justify-content:flex-end;margin-bottom:12px;')}>
+                  <button onClick={() => setLogiSorted(!logiSorted)} style={s(`border:1px solid ${logiSorted ? '#4a5d3a' : '#ece2cf'};background:${logiSorted ? '#4a5d3a' : '#fffdf8'};color:${logiSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
+                </div>
                 {logi.map((L) => {
                   const b = buildList(checks, L.key, L.items)
+                  const displayItems = logiSorted ? [...b.items].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)) : b.items
                   return (
                     <div key={L.key} style={s('margin-bottom:18px;')}>
                       <div style={s('display:flex;align-items:center;gap:9px;margin-bottom:8px;')}>
@@ -612,7 +647,7 @@ export default function App() {
                       </div>
                       <div style={s('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={s(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
                       <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
-                        {b.items.map((it) => (
+                        {displayItems.map((it) => (
                           <div key={it.label} style={s('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
                             <button onClick={() => toggleCheck(L.key, it.label)} style={s('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
                               {it.checked ? (
@@ -807,6 +842,11 @@ export default function App() {
                     <button key={f} onClick={() => setFilter(f)} style={s(`flex:0 0 auto;border:1px solid ${filter === f ? '#4a5d3a' : '#ece2cf'};background:${filter === f ? '#4a5d3a' : '#fffdf8'};color:${filter === f ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;`)}>{f}</button>
                   ))}
                 </div>
+                <div style={s('display:flex;gap:8px;padding:0 18px 14px;')}>
+                  {[['dist', '📍 Distance'], ['cat', '🏷️ Catégorie']].map(([k, label]) => (
+                    <button key={k} onClick={() => setVisitSort(visitSort === k ? null : k)} style={s(`flex:0 0 auto;border:1px solid ${visitSort === k ? '#4a5d3a' : '#ece2cf'};background:${visitSort === k ? '#4a5d3a' : '#fffdf8'};color:${visitSort === k ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>{label}</button>
+                  ))}
+                </div>
                 <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:12px;')}>
                   {filteredVisits.map((v) => {
                     const sv = !!saved[v.id]
@@ -864,7 +904,10 @@ export default function App() {
                 {mealTab === 'courses' && (
                   <div style={s('padding:0 18px 16px;')}>
                     <div style={s('display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6b6354;margin-bottom:6px;')}><span>Liste de courses</span><span>{coursesDone}/{coursesTotal}</span></div>
-                    <div style={s('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;margin-bottom:18px;')}><div style={s(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
+                    <div style={s('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;margin-bottom:14px;')}><div style={s(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
+                    <div style={s('display:flex;justify-content:flex-end;margin-bottom:14px;')}>
+                      <button onClick={() => setCoursesSorted(!coursesSorted)} style={s(`border:1px solid ${coursesSorted ? '#4a5d3a' : '#ece2cf'};background:${coursesSorted ? '#4a5d3a' : '#fffdf8'};color:${coursesSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
+                    </div>
                     {coursesGroups.map((g) => (
                       <div key={g.key} style={s('margin-bottom:16px;')}>
                         <div style={s('display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;')}>
@@ -872,7 +915,7 @@ export default function App() {
                           <span style={s('font-size:12px;color:#8a8273;')}>{g.doneStr}</span>
                         </div>
                         <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
-                          {g.items.map((it) => (
+                          {(coursesSorted ? [...g.items].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)) : g.items).map((it) => (
                             <div key={it.label} style={s('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
                               <button onClick={() => toggleCheck(g.key, it.label)} style={s('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
                                 {it.checked ? (
