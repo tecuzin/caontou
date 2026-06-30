@@ -175,6 +175,8 @@ function loadStore() {
       visits: p.visits ?? structuredClone(VISITS_INITIAL),
       meteo: p.meteo ?? structuredClone(METEO_INITIAL),
       trajetSteps: p.trajetSteps ?? structuredClone(TRAJET_STEPS_INITIAL),
+      logi: p.logi ?? structuredClone(LOGI_INITIAL),
+      courses: p.courses ?? structuredClone(COURSES_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -285,6 +287,12 @@ export default function App() {
   const [newMeteoLo, setNewMeteoLo] = useState('')
   const [newMeteoRain, setNewMeteoRain] = useState('')
   const [newMeteoIcon, setNewMeteoIcon] = useState('☀️')
+  const [showAddLogiItem, setShowAddLogiItem] = useState(false)
+  const [editingLogiKey, setEditingLogiKey] = useState(null)
+  const [newLogiItem, setNewLogiItem] = useState('')
+  const [showAddCourseItem, setShowAddCourseItem] = useState(false)
+  const [editingCourseKey, setEditingCourseKey] = useState(null)
+  const [newCourseItem, setNewCourseItem] = useState('')
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -297,10 +305,12 @@ export default function App() {
   const [visits, setVisits] = useState(initial.visits || structuredClone(VISITS_INITIAL))
   const [meteo, setMeteo] = useState(initial.meteo || structuredClone(METEO_INITIAL))
   const [trajetSteps, setTrajetSteps] = useState(initial.trajetSteps || structuredClone(TRAJET_STEPS_INITIAL))
+  const [logi, setLogi] = useState(initial.logi || structuredClone(LOGI_INITIAL))
+  const [courses, setCourses] = useState(initial.courses || structuredClone(COURSES_INITIAL))
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses])
 
   const toggleCheck = (key, label) =>
     setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
@@ -314,7 +324,7 @@ export default function App() {
 
   // dérivés préparatifs
   let packDone = 0, packTotal = 0
-  LOGI.forEach((L) => { const b = buildList(checks, L.key, L.items); packDone += b.done; packTotal += b.total })
+  logi.forEach((L) => { const b = buildList(checks, L.key, L.items); packDone += b.done; packTotal += b.total })
   const packPct = packTotal ? Math.round((packDone / packTotal) * 100) : 0
 
   // dérivés budget
@@ -328,7 +338,7 @@ export default function App() {
 
   // dérivés courses
   let coursesDone = 0, coursesTotal = 0
-  const coursesGroups = COURSES.map((g) => { const b = buildList(checks, g.key, g.items); coursesDone += b.done; coursesTotal += b.total; return { name: g.name, doneStr: `${b.done}/${b.total}`, items: b.items, key: g.key } })
+  const coursesGroups = courses.map((g) => { const b = buildList(checks, g.key, g.items); coursesDone += b.done; coursesTotal += b.total; return { name: g.name, doneStr: `${b.done}/${b.total}`, items: b.items, key: g.key } })
   const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
 
   // visites filtrées
@@ -513,6 +523,26 @@ export default function App() {
     closeMeteoEdit()
   }
   const closeMeteoEdit = () => { setShowMeteoEdit(false); setEditingMeteoIdx(null); setNewMeteoHi(''); setNewMeteoLo(''); setNewMeteoRain(''); setNewMeteoIcon('☀️') }
+
+  const addLogiItem = () => {
+    if (!newLogiItem.trim() || !editingLogiKey) return
+    setLogi((list) => list.map((L) => L.key === editingLogiKey ? { ...L, items: [...L.items, newLogiItem] } : L))
+    closeAddLogiItem()
+  }
+  const closeAddLogiItem = () => { setShowAddLogiItem(false); setEditingLogiKey(null); setNewLogiItem('') }
+  const deleteLogiItem = (key, item) => {
+    setLogi((list) => list.map((L) => L.key === key ? { ...L, items: L.items.filter((i) => i !== item) } : L))
+  }
+
+  const addCourseItem = () => {
+    if (!newCourseItem.trim() || !editingCourseKey) return
+    setCourses((list) => list.map((g) => g.key === editingCourseKey ? { ...g, items: [...g.items, newCourseItem] } : g))
+    closeAddCourseItem()
+  }
+  const closeAddCourseItem = () => { setShowAddCourseItem(false); setEditingCourseKey(null); setNewCourseItem('') }
+  const deleteCourseItem = (key, item) => {
+    setCourses((list) => list.map((g) => g.key === key ? { ...g, items: g.items.filter((i) => i !== item) } : g))
+  }
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
