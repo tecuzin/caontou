@@ -1,6 +1,61 @@
 import { useState, useEffect, useMemo } from 'react'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL } from './data.js'
 
+const DAYS_INITIAL = [
+  { dow: 'Sam', num: 11, title: 'Le grand départ', sub: 'Lyon → Mandailles', items: [
+    { time: '08:30', title: 'Départ de Lyon', note: 'Voiture chargée, c\'est parti !', color: '#5b7042' },
+    { time: '10:00', title: 'Pause à Thiers', note: 'Café & toilettes', color: '#cf7d3c' },
+    { time: '12:30', title: 'Pique-nique à Murat', note: 'Se dégourdir les jambes', color: '#4f8a86' },
+    { time: '13:30', title: 'Arrivée au gîte', note: 'Installation & goûter', color: '#9c6b4a' },
+    { time: '16:00', title: 'Courses à Aurillac', note: 'Premier ravitaillement', color: '#8a8b3d' },
+    { time: '19:30', title: 'Dîner au coin du cantou', note: 'Pâtes au pesto', color: '#b8503f' },
+  ] },
+  { dow: 'Dim', num: 12, title: 'Mise en jambes', sub: 'Vallée de Mandailles', items: [
+    { time: '09:30', title: 'Petit-déj tranquille', note: 'On prend le temps', color: '#cf7d3c' },
+    { time: '10:30', title: 'Cascade du Faillitoux', note: 'Balade facile (1 h)', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique au bord de l\'eau', note: '', color: '#4f8a86' },
+    { time: '15:00', title: 'Sieste & jeux au jardin', note: '', color: '#9c6b4a' },
+    { time: '18:00', title: 'Marché de producteurs', note: 'Fromages & charcuterie', color: '#8a8b3d' },
+  ] },
+  { dow: 'Lun', num: 13, title: 'Ascension du Puy Mary', sub: 'Pas de Peyrol', items: [
+    { time: '08:30', title: 'Départ tôt', note: 'Avant la chaleur', color: '#5b7042' },
+    { time: '09:30', title: 'Parking Pas de Peyrol', note: '1 589 m', color: '#9c6b4a' },
+    { time: '10:00', title: 'Montée au sommet', note: 'Porte-bébé conseillé', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° 🏔️', color: '#4f8a86' },
+    { time: '15:00', title: 'Glace à Dienne', note: 'Récompense méritée', color: '#b8503f' },
+  ] },
+  { dow: 'Mar', num: 14, title: 'Fermes & fromages', sub: 'Autour de Salers', items: [
+    { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
+    { time: '12:30', title: 'Déjeuner truffade', note: 'À l\'auberge', color: '#b8503f' },
+    { time: '15:00', title: 'Buronnerie & dégustation', note: 'Cantal AOP', color: '#8a8b3d' },
+    { time: '17:00', title: 'Baignade au lac', note: '', color: '#4f8a86' },
+  ] },
+  { dow: 'Mer', num: 15, title: 'Cap sur Aurillac', sub: 'La ville', items: [
+    { time: '10:00', title: 'Château Saint-Étienne', note: '', color: '#9c6b4a' },
+    { time: '12:00', title: 'Déjeuner en ville', note: '', color: '#b8503f' },
+    { time: '14:30', title: 'Maison des Volcans', note: 'Ludique pour les enfants', color: '#cf7d3c' },
+    { time: '16:30', title: 'Parc & manège', note: '', color: '#5b7042' },
+  ] },
+  { dow: 'Jeu', num: 16, title: 'Train & lacs', sub: 'Riom-ès-Montagnes', items: [
+    { time: '10:00', title: 'Gentiane Express', note: 'Train touristique 🚂', color: '#cf7d3c' },
+    { time: '13:00', title: 'Pique-nique au lac', note: '', color: '#4f8a86' },
+    { time: '15:30', title: 'Pédalo & baignade', note: '', color: '#4f8a86' },
+    { time: '18:00', title: 'Retour & repos', note: '', color: '#9c6b4a' },
+  ] },
+  { dow: 'Ven', num: 17, title: 'Journée libre', sub: 'Au gré de l\'envie', items: [
+    { time: 'Matin', title: 'Grasse matinée', note: 'On souffle', color: '#cf7d3c' },
+    { time: '11:00', title: 'Dernière balade douce', note: '', color: '#5b7042' },
+    { time: '16:00', title: 'Souvenirs & fromages', note: 'À ramener', color: '#b8503f' },
+    { time: '18:00', title: 'Rangement des valises', note: '', color: '#9c6b4a' },
+  ] },
+  { dow: 'Sam', num: 18, title: 'Le retour', sub: 'Mandailles → Lyon', items: [
+    { time: '09:30', title: 'Check-out du gîte', note: 'État des lieux', color: '#9c6b4a' },
+    { time: '10:00', title: 'Route du retour', note: '', color: '#5b7042' },
+    { time: '13:00', title: 'Pause déjeuner', note: '', color: '#b8503f' },
+    { time: '16:00', title: 'Arrivée à Lyon', note: 'Des souvenirs plein la tête 💛', color: '#4f8a86' },
+  ] },
+]
+
 /* ------------------------------------------------------------------ *
  * Helper : transforme une chaîne CSS (issue du prototype) en objet de
  * style React. Permet de coller les styles inline du design tel quel,
@@ -41,60 +96,6 @@ const MODULES = [
   { emoji: '💶', name: 'Budget', sub: '1 800 € prévus', bg: '#e6ece0', action: 'tab:budget' },
 ]
 
-const DAYS = [
-  { dow: 'Sam', num: 11, title: 'Le grand départ', sub: 'Lyon → Mandailles', items: [
-    { time: '08:30', title: 'Départ de Lyon', note: 'Voiture chargée, c’est parti !', color: '#5b7042' },
-    { time: '10:00', title: 'Pause à Thiers', note: 'Café & toilettes', color: '#cf7d3c' },
-    { time: '12:30', title: 'Pique-nique à Murat', note: 'Se dégourdir les jambes', color: '#4f8a86' },
-    { time: '13:30', title: 'Arrivée au gîte', note: 'Installation & goûter', color: '#9c6b4a' },
-    { time: '16:00', title: 'Courses à Aurillac', note: 'Premier ravitaillement', color: '#8a8b3d' },
-    { time: '19:30', title: 'Dîner au coin du cantou', note: 'Pâtes au pesto', color: '#b8503f' },
-  ] },
-  { dow: 'Dim', num: 12, title: 'Mise en jambes', sub: 'Vallée de Mandailles', items: [
-    { time: '09:30', title: 'Petit-déj tranquille', note: 'On prend le temps', color: '#cf7d3c' },
-    { time: '10:30', title: 'Cascade du Faillitoux', note: 'Balade facile (1 h)', color: '#5b7042' },
-    { time: '12:30', title: 'Pique-nique au bord de l’eau', note: '', color: '#4f8a86' },
-    { time: '15:00', title: 'Sieste & jeux au jardin', note: '', color: '#9c6b4a' },
-    { time: '18:00', title: 'Marché de producteurs', note: 'Fromages & charcuterie', color: '#8a8b3d' },
-  ] },
-  { dow: 'Lun', num: 13, title: 'Ascension du Puy Mary', sub: 'Pas de Peyrol', items: [
-    { time: '08:30', title: 'Départ tôt', note: 'Avant la chaleur', color: '#5b7042' },
-    { time: '09:30', title: 'Parking Pas de Peyrol', note: '1 589 m', color: '#9c6b4a' },
-    { time: '10:00', title: 'Montée au sommet', note: 'Porte-bébé conseillé', color: '#5b7042' },
-    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° 🏔️', color: '#4f8a86' },
-    { time: '15:00', title: 'Glace à Dienne', note: 'Récompense méritée', color: '#b8503f' },
-  ] },
-  { dow: 'Mar', num: 14, title: 'Fermes & fromages', sub: 'Autour de Salers', items: [
-    { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
-    { time: '12:30', title: 'Déjeuner truffade', note: 'À l’auberge', color: '#b8503f' },
-    { time: '15:00', title: 'Buronnerie & dégustation', note: 'Cantal AOP', color: '#8a8b3d' },
-    { time: '17:00', title: 'Baignade au lac', note: '', color: '#4f8a86' },
-  ] },
-  { dow: 'Mer', num: 15, title: 'Cap sur Aurillac', sub: 'La ville', items: [
-    { time: '10:00', title: 'Château Saint-Étienne', note: '', color: '#9c6b4a' },
-    { time: '12:00', title: 'Déjeuner en ville', note: '', color: '#b8503f' },
-    { time: '14:30', title: 'Maison des Volcans', note: 'Ludique pour les enfants', color: '#cf7d3c' },
-    { time: '16:30', title: 'Parc & manège', note: '', color: '#5b7042' },
-  ] },
-  { dow: 'Jeu', num: 16, title: 'Train & lacs', sub: 'Riom-ès-Montagnes', items: [
-    { time: '10:00', title: 'Gentiane Express', note: 'Train touristique 🚂', color: '#cf7d3c' },
-    { time: '13:00', title: 'Pique-nique au lac', note: '', color: '#4f8a86' },
-    { time: '15:30', title: 'Pédalo & baignade', note: '', color: '#4f8a86' },
-    { time: '18:00', title: 'Retour & repos', note: '', color: '#9c6b4a' },
-  ] },
-  { dow: 'Ven', num: 17, title: 'Journée libre', sub: 'Au gré de l’envie', items: [
-    { time: 'Matin', title: 'Grasse matinée', note: 'On souffle', color: '#cf7d3c' },
-    { time: '11:00', title: 'Dernière balade douce', note: '', color: '#5b7042' },
-    { time: '16:00', title: 'Souvenirs & fromages', note: 'À ramener', color: '#b8503f' },
-    { time: '18:00', title: 'Rangement des valises', note: '', color: '#9c6b4a' },
-  ] },
-  { dow: 'Sam', num: 18, title: 'Le retour', sub: 'Mandailles → Lyon', items: [
-    { time: '09:30', title: 'Check-out du gîte', note: 'État des lieux', color: '#9c6b4a' },
-    { time: '10:00', title: 'Route du retour', note: '', color: '#5b7042' },
-    { time: '13:00', title: 'Pause déjeuner', note: '', color: '#b8503f' },
-    { time: '16:00', title: 'Arrivée à Lyon', note: 'Des souvenirs plein la tête 💛', color: '#4f8a86' },
-  ] },
-]
 
 const VISITS = [
   { id: 1, emoji: '⛰️', name: 'Puy Mary — Pas de Peyrol', cat: 'Nature', dist: '25 min', dur: '2 h', age: 'Dès 4 ans (porte-bébé)' },
@@ -197,6 +198,7 @@ function loadStore() {
       expenses: p.expenses ?? structuredClone(DEFAULTS.expenses),
       meals: p.meals ?? structuredClone(MEALS_INITIAL),
       shoppingItems: p.shoppingItems ?? structuredClone(SHOPPING_ITEMS_INITIAL),
+      days: p.days ?? structuredClone(DAYS_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -262,6 +264,13 @@ export default function App() {
   const [newMealDish, setNewMealDish] = useState('')
   const [newActivityTime, setNewActivityTime] = useState('')
   const [newActivityTitle, setNewActivityTitle] = useState('')
+  const [showDayEdit, setShowDayEdit] = useState(false)
+  const [editingDayIdx, setEditingDayIdx] = useState(null)
+  const [newDayTitle, setNewDayTitle] = useState('')
+  const [newDaySub, setNewDaySub] = useState('')
+  const [newActivityColor, setNewActivityColor] = useState('#5b7042')
+  const [showActivityAdd, setShowActivityAdd] = useState(false)
+  const [editingActivityDayIdx, setEditingActivityDayIdx] = useState(null)
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -270,10 +279,11 @@ export default function App() {
   const [expenses, setExpenses] = useState(initial.expenses)
   const [meals, setMeals] = useState(initial.meals || structuredClone(MEALS_INITIAL))
   const [shoppingItems, setShoppingItems] = useState(initial.shoppingItems || structuredClone(SHOPPING_ITEMS_INITIAL))
+  const [days, setDays] = useState(initial.days || structuredClone(DAYS_INITIAL))
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems })) } catch { /* stockage indisponible */ }
-  }, [saved, checks, expenses, meals, shoppingItems])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days })) } catch { /* stockage indisponible */ }
+  }, [saved, checks, expenses, meals, shoppingItems, days])
 
   const toggleCheck = (key, label) =>
     setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
@@ -308,7 +318,7 @@ export default function App() {
   const visits = VISITS.filter((v) => filter === 'Tous' || v.cat === filter)
   const savedCount = Object.values(saved).filter(Boolean).length
 
-  const cur = DAYS[day]
+  const cur = days[day]
   const tr = buildList(checks, 'tr_dep', TRAJET_CHECK_ITEMS)
   const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo' }[sub] || ''
 
@@ -375,6 +385,49 @@ export default function App() {
     closeActivityEdit()
   }
   const closeActivityEdit = () => { setShowActivityEdit(false); setEditingActivityIdx(null); setNewActivityTime(''); setNewActivityTitle('') }
+
+  const editDay = (dayIdx) => {
+    const d = days[dayIdx]
+    setNewDayTitle(d.title)
+    setNewDaySub(d.sub)
+    setEditingDayIdx(dayIdx)
+    setShowDayEdit(true)
+  }
+  const saveDay = () => {
+    if (!newDayTitle.trim() || !newDaySub.trim() || editingDayIdx === null) return
+    setDays((list) => list.map((d, i) => i === editingDayIdx ? { ...d, title: newDayTitle, sub: newDaySub } : d))
+    closeDayEdit()
+  }
+  const closeDayEdit = () => { setShowDayEdit(false); setEditingDayIdx(null); setNewDayTitle(''); setNewDaySub('') }
+  const deleteDay = (dayIdx) => {
+    if (days.length <= 1) return
+    setDays((list) => list.filter((_, i) => i !== dayIdx))
+    if (day === dayIdx) setDay(Math.max(0, day - 1))
+  }
+
+  const startAddActivity = (dayIdx) => {
+    setEditingActivityDayIdx(dayIdx)
+    setNewActivityTime('')
+    setNewActivityTitle('')
+    setNewActivityColor('#5b7042')
+    setShowActivityAdd(true)
+  }
+  const submitActivity = () => {
+    if (!newActivityTime.trim() || !newActivityTitle.trim() || editingActivityDayIdx === null) return
+    if (editingActivityIdx) {
+      const { dayIdx, itemIdx } = editingActivityIdx
+      setDays((list) => list.map((d, di) => di === dayIdx ? { ...d, items: d.items.map((it, ii) => ii === itemIdx ? { time: newActivityTime, title: newActivityTitle, note: it.note, color: newActivityColor } : it) } : d))
+      setShowActivityEdit(false)
+      setEditingActivityIdx(null)
+    } else {
+      setDays((list) => list.map((d, di) => di === editingActivityDayIdx ? { ...d, items: [...d.items, { time: newActivityTime, title: newActivityTitle, note: '', color: newActivityColor }] } : d))
+      closeActivityAdd()
+    }
+  }
+  const closeActivityAdd = () => { setShowActivityAdd(false); setEditingActivityDayIdx(null); setNewActivityTime(''); setNewActivityTitle(''); setNewActivityColor('#5b7042') }
+  const deleteActivity = (dayIdx, itemIdx) => {
+    setDays((list) => list.map((d, di) => di === dayIdx ? { ...d, items: d.items.filter((_, ii) => ii !== itemIdx) } : d))
+  }
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
@@ -563,7 +616,7 @@ export default function App() {
                   <div style={s('font-size:13px;color:#8a8273;')}>8 jours · 11 → 18 juillet</div>
                 </div>
                 <div style={s('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 16px;')}>
-                  {DAYS.map((d, i) => (
+                  {days.map((d, i) => (
                     <button key={i} onClick={() => setDay(i)} style={s(`flex:0 0 auto;width:54px;border:1px solid ${i === day ? '#4a5d3a' : '#ece2cf'};background:${i === day ? '#4a5d3a' : '#fffdf8'};color:${i === day ? '#fffaf0' : '#6b6354'};border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;`)}>
                       <span style={s('font-size:12px;font-weight:600;')}>{d.dow}</span>
                       <span style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>{d.num}</span>
@@ -571,8 +624,13 @@ export default function App() {
                   ))}
                 </div>
                 <div style={s('padding:0 18px 8px;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;')}>{cur.title}</div>
-                  <div style={s('font-size:13px;color:#8a8273;margin-bottom:16px;')}>{cur.sub}</div>
+                  <div style={s('display:flex;align-items:center;justify-content:space-between;')}>
+                    <div>
+                      <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;')}>{cur.title}</div>
+                      <div style={s('font-size:13px;color:#8a8273;margin-bottom:16px;')}>{cur.sub}</div>
+                    </div>
+                    <button onClick={() => editDay(day)} style={s('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;flex:0 0 auto;')}>✏️</button>
+                  </div>
                   {cur.items.map((it, i) => (
                     <div key={i} style={s('display:flex;gap:12px;')}>
                       <div style={s('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{it.time}</div>
@@ -586,11 +644,13 @@ export default function App() {
                             <div style={s('font-weight:700;font-size:15px;')}>{it.title}</div>
                             {it.note && <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{it.note}</div>}
                           </div>
-                          <button onClick={() => editActivity(day, i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>edit</button>
+                          <button onClick={() => editActivity(day, i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
+                          <button onClick={() => deleteActivity(day, i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
                         </div>
                       </div>
                     </div>
                   ))}
+                  <button onClick={() => startAddActivity(day)} style={s('margin-top:12px;width:100%;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:12px;padding:10px;cursor:pointer;')}>+ Ajouter activite</button>
                 </div>
                 <div style={s('height:16px;')} />
               </div>
@@ -801,7 +861,50 @@ export default function App() {
             <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeActivityEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+              <button onClick={submitActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : AJOUTER/EDITER JOUR ============ */}
+      {showDayEdit && editingDayIdx !== null && (
+        <div onClick={closeDayEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer jour</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Titre</div>
+            <input value={newDayTitle} onChange={(e) => setNewDayTitle(e.target.value)} placeholder="Ex : Le grand depart" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Sous-titre</div>
+            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Lyon -> Mandailles" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeDayEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveDay} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+              {days.length > 1 && <button onClick={() => { deleteDay(editingDayIdx); closeDayEdit() }} style={s('flex:0 0 auto;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Supprimer</button>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : AJOUTER ACTIVITE ============ */}
+      {showActivityAdd && (
+        <div onClick={closeActivityAdd} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter activite</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Horaire</div>
+            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Titre</div>
+            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Couleur</div>
+            <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
+              {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
+                <button key={c} onClick={() => setNewActivityColor(c)} style={s(`width:32px;height:32px;border-radius:50%;background:${c};border:${newActivityColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
+              ))}
+            </div>
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeActivityAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={submitActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
