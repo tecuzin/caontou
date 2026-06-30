@@ -128,15 +128,6 @@ const TRAJET_CHECK_ITEMS = ['Pleins faits', 'Sièges auto installés', 'Eau & en
 
 const HEB_EQUIP = ['Wi-Fi', 'Cheminée (cantou)', 'Lave-linge', 'Lit bébé', 'Jardin clos', 'Parking', 'Lave-vaisselle', 'Barbecue']
 
-const METEO = [
-  { d: 'Sam', n: 11, icon: '☀️', hi: 24, lo: 12, rain: '10 %' },
-  { d: 'Dim', n: 12, icon: '⛅', hi: 22, lo: 11, rain: '20 %' },
-  { d: 'Lun', n: 13, icon: '🌧️', hi: 17, lo: 9, rain: '80 %' },
-  { d: 'Mar', n: 14, icon: '☀️', hi: 23, lo: 12, rain: '5 %' },
-  { d: 'Mer', n: 15, icon: '⛅', hi: 21, lo: 11, rain: '30 %' },
-  { d: 'Jeu', n: 16, icon: '⛅', hi: 20, lo: 10, rain: '40 %' },
-  { d: 'Ven', n: 17, icon: '☀️', hi: 25, lo: 13, rain: '5 %' },
-]
 
 const BUDGET_TOTAL = 1800
 
@@ -269,6 +260,12 @@ export default function App() {
   const [newTrajetPlace, setNewTrajetPlace] = useState('')
   const [newTrajetNote, setNewTrajetNote] = useState('')
   const [newTrajetColor, setNewTrajetColor] = useState('#5b7042')
+  const [showMeteoEdit, setShowMeteoEdit] = useState(false)
+  const [editingMeteoIdx, setEditingMeteoIdx] = useState(null)
+  const [newMeteoHi, setNewMeteoHi] = useState('')
+  const [newMeteoLo, setNewMeteoLo] = useState('')
+  const [newMeteoRain, setNewMeteoRain] = useState('')
+  const [newMeteoIcon, setNewMeteoIcon] = useState('☀️')
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -283,7 +280,7 @@ export default function App() {
   const [trajetSteps, setTrajetSteps] = useState(initial.trajetSteps || structuredClone(TRAJET_STEPS_INITIAL))
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps })) } catch { /* stockage indisponible */ }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps })) } catch { }
   }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps])
 
   const toggleCheck = (key, label) =>
@@ -480,6 +477,24 @@ export default function App() {
     setTrajetSteps((list) => list.filter((_, i) => i !== idx))
   }
 
+  const editMeteo = (idx) => {
+    const w = meteo[idx]
+    setNewMeteoHi(String(w.hi))
+    setNewMeteoLo(String(w.lo))
+    setNewMeteoRain(w.rain)
+    setNewMeteoIcon(w.icon)
+    setEditingMeteoIdx(idx)
+    setShowMeteoEdit(true)
+  }
+  const saveMeteo = () => {
+    const hi = parseInt(newMeteoHi, 10)
+    const lo = parseInt(newMeteoLo, 10)
+    if (!hi || !lo || editingMeteoIdx === null) return
+    setMeteo((list) => list.map((w, i) => i === editingMeteoIdx ? { ...w, hi, lo, rain: newMeteoRain, icon: newMeteoIcon } : w))
+    closeMeteoEdit()
+  }
+  const closeMeteoEdit = () => { setShowMeteoEdit(false); setEditingMeteoIdx(null); setNewMeteoHi(''); setNewMeteoLo(''); setNewMeteoRain(''); setNewMeteoIcon('☀️') }
+
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
   /* ---------------------------------------------------------------- */
@@ -592,13 +607,13 @@ export default function App() {
                 </div>
                 <div style={s('margin-top:12px;background:#eee7d4;border-radius:14px;padding:13px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧥 En altitude (Puy Mary, 1 783 m) il fait plus frais — prévoir une polaire même en été !</div>
                 <div style={s('margin-top:14px;display:flex;flex-direction:column;gap:8px;')}>
-                  {METEO.map((w, i) => (
-                    <div key={i} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 16px;')}>
+                  {meteo.map((w, i) => (
+                    <button key={i} onClick={() => editMeteo(i)} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 16px;cursor:pointer;text-align:left;width:100%;')}>
                       <div style={s('width:64px;font-weight:700;font-size:14px;')}>{w.d} {w.n}</div>
                       <div style={s('font-size:24px;width:32px;text-align:center;')}>{w.icon}</div>
                       <div style={s('font-size:12px;color:#6f8fb0;flex:1;font-weight:600;')}>💧 {w.rain}</div>
                       <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{w.hi}° <span style={s('color:#b3a892;')}>{w.lo}°</span></div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -964,6 +979,28 @@ export default function App() {
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeActivityAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={submitActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : EDITER METEO ============ */}
+      {showMeteoEdit && editingMeteoIdx !== null && (
+        <div onClick={closeMeteoEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Meteo</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Icone</div>
+            <input value={newMeteoIcon} onChange={(e) => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Temp max</div>
+            <input value={newMeteoHi} onChange={(e) => setNewMeteoHi(e.target.value)} placeholder="24" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Temp min</div>
+            <input value={newMeteoLo} onChange={(e) => setNewMeteoLo(e.target.value)} placeholder="12" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Pluie</div>
+            <input value={newMeteoRain} onChange={(e) => setNewMeteoRain(e.target.value)} placeholder="10 %" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeMeteoEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveMeteo} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
