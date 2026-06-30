@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJET_STEPS_INITIAL } from './data.js'
 
 const DAYS_INITIAL = [
   { dow: 'Sam', num: 11, title: 'Le grand départ', sub: 'Lyon → Mandailles', items: [
@@ -97,17 +97,6 @@ const MODULES = [
 ]
 
 
-const VISITS = [
-  { id: 1, emoji: '⛰️', name: 'Puy Mary — Pas de Peyrol', cat: 'Nature', dist: '25 min', dur: '2 h', age: 'Dès 4 ans (porte-bébé)' },
-  { id: 2, emoji: '💧', name: 'Cascade du Faillitoux', cat: 'Nature', dist: '10 min', dur: '1 h', age: 'Poussette non' },
-  { id: 3, emoji: '🐄', name: 'Ferme pédagogique des burons', cat: 'Famille', dist: '15 min', dur: '2 h', age: 'Tous âges' },
-  { id: 4, emoji: '🌋', name: 'Maison des Volcans, Aurillac', cat: 'Patrimoine', dist: '40 min', dur: '1 h 30', age: 'Dès 3 ans' },
-  { id: 5, emoji: '🚂', name: 'Gentiane Express', cat: 'Famille', dist: '35 min', dur: '3 h', age: 'Tous âges' },
-  { id: 6, emoji: '🧺', name: 'Marché de Salers', cat: 'Marché', dist: '30 min', dur: '1 h', age: 'Tous âges' },
-  { id: 7, emoji: '🏊', name: 'Lac de Saint-Étienne-Cantalès', cat: 'Baignade', dist: '45 min', dur: '½ journée', age: 'Tous âges' },
-  { id: 8, emoji: '🏘️', name: 'Village de Salers', cat: 'Patrimoine', dist: '30 min', dur: '2 h', age: 'Poussette ok' },
-  { id: 9, emoji: '🧀', name: 'Buronnerie & dégustation Cantal', cat: 'Gourmand', dist: '20 min', dur: '1 h', age: 'Tous âges' },
-]
 
 const MEALS = [
   { day: 'Sam 11', dish: 'Pâtes au pesto (soir d’arrivée)' },
@@ -199,6 +188,8 @@ function loadStore() {
       meals: p.meals ?? structuredClone(MEALS_INITIAL),
       shoppingItems: p.shoppingItems ?? structuredClone(SHOPPING_ITEMS_INITIAL),
       days: p.days ?? structuredClone(DAYS_INITIAL),
+      visits: p.visits ?? structuredClone(VISITS_INITIAL),
+      meteo: p.meteo ?? structuredClone(METEO_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -271,6 +262,13 @@ export default function App() {
   const [newActivityColor, setNewActivityColor] = useState('#5b7042')
   const [showActivityAdd, setShowActivityAdd] = useState(false)
   const [editingActivityDayIdx, setEditingActivityDayIdx] = useState(null)
+  const [showVisitEdit, setShowVisitEdit] = useState(false)
+  const [editingVisitId, setEditingVisitId] = useState(null)
+  const [newVisitName, setNewVisitName] = useState('')
+  const [newVisitDist, setNewVisitDist] = useState('')
+  const [newVisitDur, setNewVisitDur] = useState('')
+  const [newVisitAge, setNewVisitAge] = useState('')
+  const [newVisitCat, setNewVisitCat] = useState('Nature')
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -280,10 +278,12 @@ export default function App() {
   const [meals, setMeals] = useState(initial.meals || structuredClone(MEALS_INITIAL))
   const [shoppingItems, setShoppingItems] = useState(initial.shoppingItems || structuredClone(SHOPPING_ITEMS_INITIAL))
   const [days, setDays] = useState(initial.days || structuredClone(DAYS_INITIAL))
+  const [visits, setVisits] = useState(initial.visits || structuredClone(VISITS_INITIAL))
+  const [meteo, setMeteo] = useState(initial.meteo || structuredClone(METEO_INITIAL))
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days })) } catch { /* stockage indisponible */ }
-  }, [saved, checks, expenses, meals, shoppingItems, days])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo })) } catch { /* stockage indisponible */ }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo])
 
   const toggleCheck = (key, label) =>
     setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
@@ -315,7 +315,7 @@ export default function App() {
   const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
 
   // visites filtrées
-  const visits = VISITS.filter((v) => filter === 'Tous' || v.cat === filter)
+  const filteredVisits = visits.filter((v) => filter === 'Tous' || v.cat === filter)
   const savedCount = Object.values(saved).filter(Boolean).length
 
   const cur = days[day]
@@ -428,6 +428,36 @@ export default function App() {
   const deleteActivity = (dayIdx, itemIdx) => {
     setDays((list) => list.map((d, di) => di === dayIdx ? { ...d, items: d.items.filter((_, ii) => ii !== itemIdx) } : d))
   }
+
+  const editVisit = (visitId) => {
+    const v = visits.find(x => x.id === visitId)
+    if (v) {
+      setNewVisitName(v.name)
+      setNewVisitDist(v.dist)
+      setNewVisitDur(v.dur)
+      setNewVisitAge(v.age)
+      setNewVisitCat(v.cat)
+      setEditingVisitId(visitId)
+      setShowVisitEdit(true)
+    }
+  }
+  const saveVisit = () => {
+    if (!newVisitName.trim() || !editingVisitId) return
+    setVisits((list) => list.map(v => v.id === editingVisitId ? { ...v, name: newVisitName, dist: newVisitDist, dur: newVisitDur, age: newVisitAge, cat: newVisitCat } : v))
+    closeVisitEdit()
+  }
+  const closeVisitEdit = () => { setShowVisitEdit(false); setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature') }
+  const deleteVisit = (visitId) => {
+    if (visits.length <= 1) return
+    setVisits((list) => list.filter(v => v.id !== visitId))
+  }
+  const addVisit = () => {
+    if (!newVisitName.trim()) return
+    const newId = Math.max(...visits.map(v => v.id), 0) + 1
+    setVisits((list) => [...list, { id: newId, emoji: '📍', name: newVisitName, cat: newVisitCat, dist: newVisitDist, dur: newVisitDur, age: newVisitAge }])
+    closeVisitAdd()
+  }
+  const closeVisitAdd = () => { setShowVisitEdit(false); setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature') }
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
@@ -669,7 +699,7 @@ export default function App() {
                   ))}
                 </div>
                 <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:12px;')}>
-                  {visits.map((v) => {
+                  {filteredVisits.map((v) => {
                     const sv = !!saved[v.id]
                     return (
                       <div key={v.id} style={s('display:flex;gap:12px;align-items:center;background:#fffdf8;border:1px solid #efe6d4;border-radius:18px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
@@ -686,6 +716,8 @@ export default function App() {
                         <button onClick={() => toggleSaved(v.id)} style={s('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:24px;line-height:1;')}>
                           {sv ? <span style={s('color:#b8503f;')}>♥</span> : <span style={s('color:#cabfa6;')}>♡</span>}
                         </button>
+                        <button onClick={() => editVisit(v.id)} style={s('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;')}>✏️</button>
+                        <button onClick={() => deleteVisit(v.id)} style={s('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;color:#b8503f;')}>🗑️</button>
                       </div>
                     )
                   })}
@@ -905,6 +937,37 @@ export default function App() {
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeActivityAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={submitActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : EDITER VISITE ============ */}
+      {showVisitEdit && editingVisitId !== null && (
+        <div onClick={closeVisitEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer visite</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Nom</div>
+            <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Puy Mary" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Categorie</div>
+            <select value={newVisitCat} onChange={(e) => setNewVisitCat(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
+              <option>Nature</option>
+              <option>Famille</option>
+              <option>Patrimoine</option>
+              <option>Baignade</option>
+              <option>Gourmand</option>
+              <option>Marche</option>
+            </select>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Distance</div>
+            <input value={newVisitDist} onChange={(e) => setNewVisitDist(e.target.value)} placeholder="Ex : 25 min" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Duree</div>
+            <input value={newVisitDur} onChange={(e) => setNewVisitDur(e.target.value)} placeholder="Ex : 2 h" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Age recommande</div>
+            <input value={newVisitAge} onChange={(e) => setNewVisitAge(e.target.value)} placeholder="Ex : Des 3 ans" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeVisitEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveVisit} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
