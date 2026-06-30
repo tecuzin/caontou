@@ -248,6 +248,7 @@ export default function App() {
   const [filter, setFilter] = useState('Tous')
   const [mealTab, setMealTab] = useState('repas')
   const [showAdd, setShowAdd] = useState(false)
+  const [editingExpenseIdx, setEditingExpenseIdx] = useState(null)
   const [newAmt, setNewAmt] = useState('')
   const [newCat, setNewCat] = useState('Nourriture')
   const [newLabel, setNewLabel] = useState('')
@@ -305,10 +306,26 @@ export default function App() {
   const submitExpense = () => {
     const a = parseFloat(String(newAmt).replace(',', '.'))
     if (!a || a <= 0) return
-    setExpenses((list) => [...list, { label: newLabel || newCat, cat: newCat, amt: a }])
+    if (editingExpenseIdx !== null) {
+      setExpenses((list) => list.map((e, i) => i === editingExpenseIdx ? { label: newLabel || newCat, cat: newCat, amt: a } : e))
+      setEditingExpenseIdx(null)
+    } else {
+      setExpenses((list) => [...list, { label: newLabel || newCat, cat: newCat, amt: a }])
+    }
     setShowAdd(false); setNewAmt(''); setNewLabel('')
   }
-  const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel('') }
+  const deleteExpense = (idx) => {
+    setExpenses((list) => list.filter((_, i) => i !== idx))
+  }
+  const startEditExpense = (idx) => {
+    const e = expenses[idx]
+    setNewAmt(String(e.amt))
+    setNewLabel(e.label)
+    setNewCat(e.cat)
+    setEditingExpenseIdx(idx)
+    setShowAdd(true)
+  }
+  const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel(''); setEditingExpenseIdx(null) }
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
@@ -634,13 +651,18 @@ export default function App() {
                 </div>
                 <div style={s('padding:4px 18px 8px;')}><SectionLabel>Dernières dépenses</SectionLabel></div>
                 <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:8px;')}>
-                  {expenses.slice().reverse().map((e, i) => (
-                    <div key={i} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
-                      <span style={s(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
-                      <div style={s('flex:1;min-width:0;')}><div style={s('font-weight:700;font-size:14px;')}>{e.label}</div><div style={s('font-size:12px;color:#8a8273;')}>{e.cat}</div></div>
-                      <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
-                    </div>
-                  ))}
+                  {expenses.slice().reverse().map((e, idx) => {
+                    const origIdx = expenses.length - 1 - idx
+                    return (
+                      <div key={idx} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
+                        <span style={s(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
+                        <div style={s('flex:1;min-width:0;')}><div style={s('font-weight:700;font-size:14px;')}>{e.label}</div><div style={s('font-size:12px;color:#8a8273;')}>{e.cat}</div></div>
+                        <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
+                        <button onClick={() => startEditExpense(origIdx)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
+                        <button onClick={() => deleteExpense(origIdx)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
+                      </div>
+                    )
+                  })}
                 </div>
                 <div style={s('height:16px;')} />
               </div>
@@ -665,7 +687,7 @@ export default function App() {
         <div onClick={closeAdd} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle dépense</div>
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Montant</div>
             <input value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:18px;font-family:Quicksand;font-weight:700;')} />
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Libellé</div>
@@ -678,7 +700,7 @@ export default function App() {
             </div>
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitExpense} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+              <button onClick={submitExpense} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
             </div>
           </div>
         </div>
