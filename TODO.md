@@ -29,14 +29,11 @@
 
 ## 🔄 En cours
 
-- [ ] **Tri intelligent des listes** — en attente de précisions utilisateur :
-  - [ ] Logi/Courses : tri auto permanent ou bouton toggle ?
-  - [ ] Visites : par distance (parsée) ou par catégorie ?
-  - Proposition acceptée :
-    - Logi/Courses → non cochés en premier
-    - Visites → par distance
-    - Budget → par montant décroissant
-    - Planning → par horaire
+- [x] **Tri intelligent des listes**
+  - [x] Logi/Courses : bouton toggle "Non cochés en premier"
+  - [x] Visites : boutons toggle Distance / Catégorie
+  - [x] Planning : tri automatique par heure après chaque add/edit
+  - [ ] Budget : tri par montant décroissant (backlog)
 
 ---
 
