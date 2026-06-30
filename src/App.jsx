@@ -221,7 +221,26 @@ const SectionLabel = ({ children }) => (
 )
 
 /* ================================================================== */
+// Notifications
+const scheduleNotification = (title, body, delayMs) => {
+  setTimeout(() => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body, icon: '/cantou-icon.png' })
+    }
+  }, delayMs)
+}
+
+const requestNotificationPermission = () => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission()
+  }
+}
+
+/* ================================================================== */
 export default function App() {
+  useEffect(() => {
+    requestNotificationPermission()
+  }, [])
   // état UI (non persisté)
   const [tab, setTab] = useState('accueil')
   const [sub, setSub] = useState(null)
