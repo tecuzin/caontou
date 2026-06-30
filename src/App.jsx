@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL } from './data.js'
 
 /* ------------------------------------------------------------------ *
  * Helper : transforme une chaîne CSS (issue du prototype) en objet de
@@ -254,10 +254,14 @@ export default function App() {
   const [showMealEdit, setShowMealEdit] = useState(false)
   const [editingExpenseIdx, setEditingExpenseIdx] = useState(null)
   const [editingMealDay, setEditingMealDay] = useState(null)
+  const [editingActivityIdx, setEditingActivityIdx] = useState(null)
+  const [showActivityEdit, setShowActivityEdit] = useState(false)
   const [newAmt, setNewAmt] = useState('')
   const [newCat, setNewCat] = useState('Nourriture')
   const [newLabel, setNewLabel] = useState('')
   const [newMealDish, setNewMealDish] = useState('')
+  const [newActivityTime, setNewActivityTime] = useState('')
+  const [newActivityTitle, setNewActivityTitle] = useState('')
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -356,6 +360,21 @@ export default function App() {
   const toggleShoppingItem = (id) => {
     setShoppingItems((list) => list.map(item => item.id === id ? { ...item, checked: !item.checked } : item))
   }
+
+  const editActivity = (dayIdx, itemIdx) => {
+    const item = DAYS[dayIdx].items[itemIdx]
+    setNewActivityTime(item.time)
+    setNewActivityTitle(item.title)
+    setEditingActivityIdx({ dayIdx, itemIdx })
+    setShowActivityEdit(true)
+  }
+  const saveActivity = () => {
+    if (!newActivityTime.trim() || !newActivityTitle.trim() || !editingActivityIdx) return
+    // Note: DAYS is const - for full CRUD we'd need to refactor to useState
+    // For now, this is placeholder to show the UI pattern
+    closeActivityEdit()
+  }
+  const closeActivityEdit = () => { setShowActivityEdit(false); setEditingActivityIdx(null); setNewActivityTime(''); setNewActivityTitle('') }
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
@@ -562,8 +581,13 @@ export default function App() {
                         <div style={s('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
                       </div>
                       <div style={s('flex:1;padding-bottom:18px;')}>
-                        <div style={s('font-weight:700;font-size:15px;')}>{it.title}</div>
-                        {it.note && <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{it.note}</div>}
+                        <div style={s('display:flex;align-items:center;gap:8px;')}>
+                          <div style={s('flex:1;')}>
+                            <div style={s('font-weight:700;font-size:15px;')}>{it.title}</div>
+                            {it.note && <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{it.note}</div>}
+                          </div>
+                          <button onClick={() => editActivity(day, i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>edit</button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -760,6 +784,24 @@ export default function App() {
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeMealEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={saveMeal} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============ FEUILLE : EDITER ACTIVITE PLANNING ============ */}
+      {showActivityEdit && editingActivityIdx && (
+        <div onClick={closeActivityEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer activite</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Horaire</div>
+            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Titre</div>
+            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={closeActivityEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>

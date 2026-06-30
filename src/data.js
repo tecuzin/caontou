@@ -29,3 +29,6 @@ export const SHOPPING_ITEMS_INITIAL = [
   { id: 4, cat: 'co_enf', label: 'Compotes a boire', checked: true },
   { id: 5, cat: 'co_autre', label: 'Pain', checked: true },
 ]
+
+// Planning activities stored as flat list with day index, time, title
+export const PLANNING_ACTIVITIES_INITIAL = []
