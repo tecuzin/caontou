@@ -10,6 +10,8 @@
 - [x] Design hi-fi porté dans `src/App.jsx` (fidèle au prototype)
 - [x] Persistance locale `localStorage` (clé `cantou.v1`)
 - [x] Pipeline build APK Docker/Rosetta opérationnel (`./build-docker.sh`)
+- [x] **Versionning APK** — `build.number` auto-incrémenté, `versionCode`/`versionName` injectés dans Gradle, APK renommé `cantou-v{ver}-build{N}-{ts}.apk`
+- [x] **Déploiement Telegram** — `./build-docker.sh --deploy` envoie l'APK dans un canal via Bot API (`scripts/deploy-telegram.sh`)
 - [x] Skills créés : `build-apk`, `commit`, `test-unit`, `test-e2e`, `test-appium`
 - [x] **CRUD Budget** — edit/delete dépenses + modal ajout
 - [x] **CRUD Repas** — edit plat du jour via modal
