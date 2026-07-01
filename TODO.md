@@ -52,6 +52,7 @@
 - [ ] **Edit checklist trajet** (items "Avant de partir" — add/delete)
 - [ ] **Hébergement éditable** — nom, adresse, contact, Wi-Fi, équipements
 - [ ] **Budget total éditable** (actuellement hardcodé à 1 800 €)
+- [ ] 
 
 ### UX / Polish
 - [ ] Boutons edit/delete remplacer les textes `"edit"` / `"delete"` par icônes ✏️ 🗑️ (repas, shopping)
@@ -59,8 +60,9 @@
 - [ ] Retour haptique sur actions (Capacitor Haptics)
 
 ### Tests
-- [ ] Tests unitaires vitest (hooks CRUD)
-- [ ] Tests E2E Playwright (flows complets)
+- [x] Tests unitaires vitest — 27 tests (`s`, `eur`, `buildList`, `sortItemsByTime`, `parseDist`)
+- [x] Tests intégration React Testing Library — 18 tests (navigation, CRUD budget, planning, visites, persistance)
+- [x] Tests E2E Playwright — 15 tests (navigation, CRUD budget, planning, visites, persistance)
 - [ ] Tests Appium (APK Android)
 
 ---
@@ -77,3 +79,4 @@ Voir `docs/adr/` pour toutes les décisions techniques.
 | [ADR-004](docs/adr/004-data-separation.md) | Données mutables dans `src/data.js` | Accepté |
 | [ADR-005](docs/adr/005-pwa-notifications.md) | Notifications via PWA `Notification` API | Accepté |
 | [ADR-006](docs/adr/006-inline-styles.md) | Styles inline via helper `s()` | Accepté |
+| [ADR-007](docs/adr/007-testing-strategy.md) | Stratégie tests : Vitest + RTL + Playwright | Accepté |

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJET_STEPS_INITIAL } from './data.js'
+import { s, eur, buildList, sortItemsByTime, parseDist } from './utils.js'
 
 const DAYS_INITIAL = [
   { dow: 'Sam', num: 11, title: 'Le grand départ', sub: 'Lyon → Mandailles', items: [
@@ -61,18 +62,6 @@ const DAYS_INITIAL = [
  * style React. Permet de coller les styles inline du design tel quel,
  * pour une reproduction fidèle au pixel.
  * ------------------------------------------------------------------ */
-function s(css) {
-  const o = {}
-  css.split(';').forEach((decl) => {
-    const i = decl.indexOf(':')
-    if (i < 0) return
-    const k = decl.slice(0, i).trim()
-    const v = decl.slice(i + 1).trim()
-    if (!k) return
-    o[k.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = v
-  })
-  return o
-}
 
 /* ------------------------------------------------------------------ *
  * Données de référence (statiques) — reprises du prototype de design.
@@ -186,16 +175,7 @@ function loadStore() {
 /* ------------------------------------------------------------------ *
  * Utilitaires
  * ------------------------------------------------------------------ */
-const eur = (n) =>
-  Number(n).toLocaleString('fr-FR', { minimumFractionDigits: n % 1 === 0 ? 0 : 2, maximumFractionDigits: 2 }) + ' €'
-
 const catColor = (n) => (CATS.find((x) => x.name === n) || {}).color || '#8a8273'
-
-function buildList(checks, key, items) {
-  const mapped = items.map((l) => ({ label: l, checked: !!(checks[key] && checks[key][l]) }))
-  const done = mapped.filter((x) => x.checked).length
-  return { items: mapped, done, total: mapped.length, pct: Math.round(mapped.length ? (done / mapped.length) * 100 : 0) }
-}
 
 /* ------------------------------------------------------------------ *
  * Brique réutilisable : ligne cochable (trajet / logistique / courses)
@@ -347,7 +327,6 @@ export default function App() {
   const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
 
   // visites filtrées + triées
-  const parseDist = (d) => { const m = String(d).match(/\d+/); return m ? parseInt(m[0]) : 999 }
   const CAT_ORDER = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Marche']
   const filteredVisits = visits
     .filter((v) => filter === 'Tous' || v.cat === filter)
@@ -478,14 +457,6 @@ export default function App() {
   const deleteActivity = (dayIdx, itemIdx) => {
     setDays((list) => list.map((d, di) => di === dayIdx ? { ...d, items: d.items.filter((_, ii) => ii !== itemIdx) } : d))
   }
-
-  const sortItemsByTime = (items) => [...items].sort((a, b) => {
-    const toMin = (t) => {
-      const m = t.match(/(\d{1,2}):(\d{2})/)
-      return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999
-    }
-    return toMin(a.time) - toMin(b.time)
-  })
 
   const editVisit = (visitId) => {
     const v = visits.find(x => x.id === visitId)
@@ -732,7 +703,7 @@ export default function App() {
 
             {/* ACCUEIL */}
             {tab === 'accueil' && (
-              <div>
+              <div data-testid="screen-accueil">
                 <div style={s('padding:54px 18px 6px;display:flex;align-items:center;justify-content:space-between;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Bonjour 👋</div>
                   <div style={s('width:38px;height:38px;border-radius:50%;background:#cf7d3c;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Quicksand;')}>F</div>
@@ -784,7 +755,7 @@ export default function App() {
 
             {/* PLANNING */}
             {tab === 'planning' && (
-              <div>
+              <div data-testid="screen-planning">
                 <div style={s('padding:54px 18px 4px;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Planning</div>
                   <div style={s('font-size:13px;color:#8a8273;')}>8 jours · 11 → 18 juillet</div>
@@ -832,7 +803,7 @@ export default function App() {
 
             {/* VISITES */}
             {tab === 'visites' && (
-              <div>
+              <div data-testid="screen-visites">
                 <div style={s('padding:54px 18px 4px;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>À faire</div>
                   <div style={s('font-size:13px;color:#8a8273;')}>Autour du Puy Mary · {savedCount} enregistrées ♥</div>
@@ -877,7 +848,7 @@ export default function App() {
 
             {/* REPAS */}
             {tab === 'repas' && (
-              <div>
+              <div data-testid="screen-repas">
                 <div style={s('padding:54px 18px 14px;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Repas &amp; courses</div>
                 </div>
@@ -956,7 +927,7 @@ export default function App() {
 
             {/* BUDGET */}
             {tab === 'budget' && (
-              <div>
+              <div data-testid="screen-budget">
                 <div style={s('padding:54px 18px 14px;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Budget</div>
                 </div>
@@ -968,7 +939,7 @@ export default function App() {
                   <div style={s('margin-top:14px;height:10px;border-radius:10px;background:rgba(255,255,255,0.18);overflow:hidden;')}><div style={s(`height:100%;background:#e8c07a;width:${spentPct}%;`)} /></div>
                   <div style={s('margin-top:8px;font-size:13px;color:#dbe2c9;')}>Dépensé {eur(spent)} · {spentPct} %</div>
                 </div>
-                <button onClick={() => setShowAdd(true)} style={s('margin:0 18px 18px;width:calc(100% - 36px);border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Ajouter une dépense</button>
+                <button data-testid="btn-add-depense" onClick={() => setShowAdd(true)} style={s('margin:0 18px 18px;width:calc(100% - 36px);border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Ajouter une dépense</button>
                 <div style={s('padding:0 18px 8px;')}><SectionLabel>Par catégorie</SectionLabel></div>
                 <div style={s('padding:0 18px 14px;display:flex;flex-direction:column;gap:13px;')}>
                   {budgetCats.map((c) => (
@@ -1002,7 +973,7 @@ export default function App() {
           {/* BARRE D'ONGLETS */}
           <div style={s('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
             {TABS.map(([key, emoji, label]) => (
-              <button key={key} onClick={() => { setTab(key); setSub(null) }} style={s('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
+              <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={s('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
                 <span style={s('font-size:20px;')}>{emoji}</span>
                 <span style={s(`font-size:11px;color:${tab === key ? '#4a5d3a' : '#b3a892'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
               </button>
@@ -1018,9 +989,9 @@ export default function App() {
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Montant</div>
-            <input value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:18px;font-family:Quicksand;font-weight:700;')} />
+            <input data-testid="input-montant" value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:18px;font-family:Quicksand;font-weight:700;')} />
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Libellé</div>
-            <input value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <input data-testid="input-label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Catégorie</div>
             <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:7px;margin-bottom:20px;')}>
               {CATS.map((c) => (
@@ -1029,7 +1000,7 @@ export default function App() {
             </div>
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitExpense} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
+              <button data-testid="btn-submit-depense" onClick={submitExpense} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
             </div>
           </div>
         </div>
