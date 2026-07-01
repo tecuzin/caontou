@@ -90,16 +90,6 @@ const MODULES = [
 
 
 
-const MEALS = [
-  { day: 'Sam 11', dish: 'Pâtes au pesto (soir d’arrivée)' },
-  { day: 'Dim 12', dish: 'Truffade maison + salade' },
-  { day: 'Lun 13', dish: 'Poulet rôti & légumes' },
-  { day: 'Mar 14', dish: 'Aligot & saucisse de Cantal' },
-  { day: 'Mer 15', dish: 'Pizzeria à Murat' },
-  { day: 'Jeu 16', dish: 'Omelette aux cèpes' },
-  { day: 'Ven 17', dish: 'Grillades au jardin' },
-]
-
 const LOGI = [
   { key: 've', name: 'Valise enfants', emoji: '🧒', items: ['Bodies & sous-vêtements', 'Pulls chauds (montagne !)', 'K-way / imperméable', 'Bottes & baskets', 'Chapeaux & crème solaire', 'Doudous & jouets', 'Médicaments habituels'] },
   { key: 'va', name: 'Valise adultes', emoji: '🎒', items: ['Vêtements chauds', 'Chaussures de rando', 'Maillots de bain', 'Trousse de toilette', 'Chargeurs & batteries', 'Sac à dos de rando'] },
@@ -256,7 +246,7 @@ export default function App() {
   const [showAdd, setShowAdd] = useState(false)
   const [showMealEdit, setShowMealEdit] = useState(false)
   const [editingExpenseIdx, setEditingExpenseIdx] = useState(null)
-  const [editingMealDay, setEditingMealDay] = useState(null)
+  const [editingMealId, setEditingMealId] = useState(null)
   const [editingActivityIdx, setEditingActivityIdx] = useState(null)
   const [showActivityEdit, setShowActivityEdit] = useState(false)
   const [newAmt, setNewAmt] = useState('')
@@ -287,6 +277,8 @@ export default function App() {
   const [newTrajetColor, setNewTrajetColor] = useState('#5b7042')
   const [showMeteoEdit, setShowMeteoEdit] = useState(false)
   const [editingMeteoIdx, setEditingMeteoIdx] = useState(null)
+  const [newMeteoDay, setNewMeteoDay] = useState('')
+  const [newMeteoNum, setNewMeteoNum] = useState('')
   const [newMeteoHi, setNewMeteoHi] = useState('')
   const [newMeteoLo, setNewMeteoLo] = useState('')
   const [newMeteoRain, setNewMeteoRain] = useState('')
@@ -297,6 +289,7 @@ export default function App() {
   const [showAddCourseItem, setShowAddCourseItem] = useState(false)
   const [editingCourseKey, setEditingCourseKey] = useState(null)
   const [newCourseItem, setNewCourseItem] = useState('')
+  const [newShoppingItem, setNewShoppingItem] = useState('')
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -451,23 +444,29 @@ export default function App() {
   }
   const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel(''); setEditingExpenseIdx(null) }
 
-  const editMeal = (day) => {
-    const m = meals.find(x => x.day === day)
-    if (m) { setNewMealDish(m.dish); setNewMealDay(m.day); setEditingMealDay(day); setShowMealEdit(true) }
+  const editMeal = (id) => {
+    const m = meals.find(x => x.id === id)
+    if (m) { setNewMealDish(m.dish); setNewMealDay(m.day); setEditingMealId(id); setShowMealEdit(true) }
   }
-  const openAddMeal = () => { setNewMealDay(''); setNewMealDish(''); setEditingMealDay(null); setShowMealEdit(true) }
+  const openAddMeal = () => { setNewMealDay(''); setNewMealDish(''); setEditingMealId(null); setShowMealEdit(true) }
   const saveMeal = () => {
     if (!newMealDish.trim()) return
-    if (editingMealDay === null) {
-      if (!newMealDay.trim()) return
-      setMeals((list) => [...list, { day: newMealDay.trim(), dish: newMealDish.trim() }])
-    } else {
-      setMeals((list) => list.map(m => m.day === editingMealDay ? { ...m, dish: newMealDish } : m))
-    }
     haptic(ImpactStyle.Medium)
+    if (editingMealId === null) {
+      if (!newMealDay.trim()) return
+      const newId = Math.max(0, ...meals.map(m => m.id)) + 1
+      setMeals((list) => [...list, { id: newId, day: newMealDay.trim(), dish: newMealDish.trim() }])
+    } else {
+      setMeals((list) => list.map(m => m.id === editingMealId ? { ...m, day: newMealDay, dish: newMealDish } : m))
+    }
     closeMealEdit()
   }
-  const closeMealEdit = () => { setShowMealEdit(false); setEditingMealDay(null); setNewMealDish(''); setNewMealDay('') }
+  const closeMealEdit = () => { setShowMealEdit(false); setEditingMealId(null); setNewMealDish(''); setNewMealDay('') }
+  const deleteMeal = (id) => {
+    if (meals.length <= 1) return
+    haptic(ImpactStyle.Medium)
+    setMeals((list) => list.filter(m => m.id !== id))
+  }
 
   const deleteShoppingItem = (id) => {
     haptic(ImpactStyle.Medium)
@@ -476,6 +475,13 @@ export default function App() {
   const toggleShoppingItem = (id) => {
     haptic(ImpactStyle.Light)
     setShoppingItems((list) => list.map(item => item.id === id ? { ...item, checked: !item.checked } : item))
+  }
+  const addShoppingItem = () => {
+    if (!newShoppingItem.trim()) return
+    haptic(ImpactStyle.Medium)
+    const newId = Math.max(0, ...shoppingItems.map(i => i.id)) + 1
+    setShoppingItems((list) => [...list, { id: newId, label: newShoppingItem.trim(), checked: false }])
+    setNewShoppingItem('')
   }
 
   const editActivity = (dayIdx, itemIdx) => {
@@ -486,12 +492,6 @@ export default function App() {
     setEditingActivityIdx({ dayIdx, itemIdx })
     setEditingActivityDayIdx(dayIdx)
     setShowActivityEdit(true)
-  }
-  const saveActivity = () => {
-    if (!newActivityTime.trim() || !newActivityTitle.trim() || !editingActivityIdx) return
-    // Note: DAYS is const - for full CRUD we'd need to refactor to useState
-    // For now, this is placeholder to show the UI pattern
-    closeActivityEdit()
   }
   const closeActivityEdit = () => { setShowActivityEdit(false); setEditingActivityIdx(null); setNewActivityTime(''); setNewActivityTitle('') }
 
@@ -611,6 +611,8 @@ export default function App() {
 
   const editMeteo = (idx) => {
     const w = meteo[idx]
+    setNewMeteoDay(w.d)
+    setNewMeteoNum(String(w.n))
     setNewMeteoHi(String(w.hi))
     setNewMeteoLo(String(w.lo))
     setNewMeteoRain(w.rain)
@@ -618,15 +620,30 @@ export default function App() {
     setEditingMeteoIdx(idx)
     setShowMeteoEdit(true)
   }
+  const openAddMeteo = () => {
+    setNewMeteoDay(''); setNewMeteoNum(''); setNewMeteoHi(''); setNewMeteoLo(''); setNewMeteoRain(''); setNewMeteoIcon('☀️')
+    setEditingMeteoIdx(null)
+    setShowMeteoEdit(true)
+  }
   const saveMeteo = () => {
     const hi = parseInt(newMeteoHi, 10)
     const lo = parseInt(newMeteoLo, 10)
-    if (!hi || !lo || editingMeteoIdx === null) return
+    const n = parseInt(newMeteoNum, 10)
+    if (!hi || !lo || !newMeteoDay.trim() || !n) return
     haptic(ImpactStyle.Medium)
-    setMeteo((list) => list.map((w, i) => i === editingMeteoIdx ? { ...w, hi, lo, rain: newMeteoRain, icon: newMeteoIcon } : w))
+    if (editingMeteoIdx === null) {
+      setMeteo((list) => [...list, { d: newMeteoDay.trim(), n, hi, lo, rain: newMeteoRain, icon: newMeteoIcon }])
+    } else {
+      setMeteo((list) => list.map((w, i) => i === editingMeteoIdx ? { ...w, d: newMeteoDay.trim(), n, hi, lo, rain: newMeteoRain, icon: newMeteoIcon } : w))
+    }
     closeMeteoEdit()
   }
-  const closeMeteoEdit = () => { setShowMeteoEdit(false); setEditingMeteoIdx(null); setNewMeteoHi(''); setNewMeteoLo(''); setNewMeteoRain(''); setNewMeteoIcon('☀️') }
+  const closeMeteoEdit = () => { setShowMeteoEdit(false); setEditingMeteoIdx(null); setNewMeteoDay(''); setNewMeteoNum(''); setNewMeteoHi(''); setNewMeteoLo(''); setNewMeteoRain(''); setNewMeteoIcon('☀️') }
+  const deleteMeteo = (idx) => {
+    if (meteo.length <= 1) return
+    haptic(ImpactStyle.Medium)
+    setMeteo((list) => list.filter((_, i) => i !== idx))
+  }
 
   const addLogiItem = () => {
     if (!newLogiItem.trim() || !editingLogiKey) return
@@ -636,7 +653,9 @@ export default function App() {
   }
   const closeAddLogiItem = () => { setShowAddLogiItem(false); setEditingLogiKey(null); setNewLogiItem('') }
   const deleteLogiItem = (key, item) => {
+    haptic(ImpactStyle.Medium)
     setLogi((list) => list.map((L) => L.key === key ? { ...L, items: L.items.filter((i) => i !== item) } : L))
+    setChecks((c) => { const nr = { ...(c[key] || {}) }; delete nr[item]; return { ...c, [key]: nr } })
   }
 
   const addCourseItem = () => {
@@ -647,7 +666,9 @@ export default function App() {
   }
   const closeAddCourseItem = () => { setShowAddCourseItem(false); setEditingCourseKey(null); setNewCourseItem('') }
   const deleteCourseItem = (key, item) => {
+    haptic(ImpactStyle.Medium)
     setCourses((list) => list.map((g) => g.key === key ? { ...g, items: g.items.filter((i) => i !== item) } : g))
+    setChecks((c) => { const nr = { ...(c[key] || {}) }; delete nr[item]; return { ...c, [key]: nr } })
   }
 
   // Budget total éditable
@@ -829,14 +850,18 @@ export default function App() {
                 <div style={s('margin-top:12px;background:#eee7d4;border-radius:14px;padding:13px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧥 En altitude (Puy Mary, 1 783 m) il fait plus frais — prévoir une polaire même en été !</div>
                 <div style={s('margin-top:14px;display:flex;flex-direction:column;gap:8px;')}>
                   {meteo.map((w, i) => (
-                    <button key={i} onClick={() => editMeteo(i)} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 16px;cursor:pointer;text-align:left;width:100%;')}>
-                      <div style={s('width:64px;font-weight:700;font-size:14px;')}>{w.d} {w.n}</div>
-                      <div style={s('font-size:24px;width:32px;text-align:center;')}>{w.icon}</div>
-                      <div style={s('font-size:12px;color:#6f8fb0;flex:1;font-weight:600;')}>💧 {w.rain}</div>
-                      <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{w.hi}° <span style={s('color:#b3a892;')}>{w.lo}°</span></div>
-                    </button>
+                    <div key={i} style={s('display:flex;align-items:center;gap:6px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:6px 8px 6px 16px;')}>
+                      <button onClick={() => editMeteo(i)} style={s('flex:1;display:flex;align-items:center;gap:14px;border:none;background:transparent;cursor:pointer;text-align:left;padding:6px 0;')}>
+                        <div style={s('width:64px;font-weight:700;font-size:14px;')}>{w.d} {w.n}</div>
+                        <div style={s('font-size:24px;width:32px;text-align:center;')}>{w.icon}</div>
+                        <div style={s('font-size:12px;color:#6f8fb0;flex:1;font-weight:600;')}>💧 {w.rain}</div>
+                        <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{w.hi}° <span style={s('color:#b3a892;')}>{w.lo}°</span></div>
+                      </button>
+                      <button onClick={() => deleteMeteo(i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
+                    </div>
                   ))}
                 </div>
+                <button onClick={openAddMeteo} style={s('width:100%;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:14px;padding:10px;cursor:pointer;')}>+ Ajouter un jour</button>
               </div>
             )}
 
@@ -1011,11 +1036,12 @@ export default function App() {
                 {mealTab === 'repas' && (
                   <>
                     <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:10px;')}>
-                      {meals.map((ml, i) => (
-                        <div key={i} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:13px 14px;')}>
+                      {meals.map((ml) => (
+                        <div key={ml.id} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:13px 14px;')}>
                           <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#cf7d3c;width:54px;flex:0 0 auto;')}>{ml.day}</div>
                           <div style={s('font-weight:600;font-size:14px;flex:1;')}>{ml.dish}</div>
-                          <button onClick={() => editMeal(ml.day)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
+                          <button onClick={() => editMeal(ml.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
+                          <button onClick={() => deleteMeal(ml.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
                         </div>
                       ))}
                     </div>
@@ -1070,6 +1096,10 @@ export default function App() {
                             <button onClick={() => deleteShoppingItem(item.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:4px;')}>🗑️</button>
                           </div>
                         ))}
+                      </div>
+                      <div style={s('display:flex;gap:8px;margin-top:10px;')}>
+                        <input value={newShoppingItem} onChange={(e) => setNewShoppingItem(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addShoppingItem()} placeholder="Nouvel article…" style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:10px 12px;font-size:14px;')} />
+                        <button onClick={addShoppingItem} style={s('border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:0 16px;cursor:pointer;')}>+ Ajouter</button>
                       </div>
                     </div>
                   </div>
@@ -1175,13 +1205,9 @@ export default function App() {
         <div onClick={closeMealEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealDay === null ? 'Ajouter un repas' : `Repas du ${editingMealDay}`}</div>
-            {editingMealDay === null && (
-              <>
-                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Jour</div>
-                <input value={newMealDay} onChange={(e) => setNewMealDay(e.target.value)} placeholder="Ex : Sam 11" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </>
-            )}
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealId === null ? 'Ajouter un repas' : `Repas du ${newMealDay}`}</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Jour</div>
+            <input value={newMealDay} onChange={(e) => setNewMealDay(e.target.value)} placeholder="Ex : Sam 11" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Plat</div>
             <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
@@ -1286,11 +1312,21 @@ export default function App() {
       )}
 
       {/* ============ FEUILLE : EDITER METEO ============ */}
-      {showMeteoEdit && editingMeteoIdx !== null && (
+      {showMeteoEdit && (
         <div onClick={closeMeteoEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Meteo</div>
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMeteoIdx === null ? 'Ajouter un jour' : 'Meteo'}</div>
+            <div style={s('display:flex;gap:10px;')}>
+              <div style={s('flex:1;')}>
+                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Jour</div>
+                <input value={newMeteoDay} onChange={(e) => setNewMeteoDay(e.target.value)} placeholder="Sam" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              </div>
+              <div style={s('flex:1;')}>
+                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Numero</div>
+                <input value={newMeteoNum} onChange={(e) => setNewMeteoNum(e.target.value)} placeholder="11" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              </div>
+            </div>
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Icone</div>
             <input value={newMeteoIcon} onChange={(e) => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Temp max</div>
