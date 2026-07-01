@@ -35,37 +35,37 @@
   - [x] Logi/Courses : bouton toggle "Non cochés en premier"
   - [x] Visites : boutons toggle Distance / Catégorie
   - [x] Planning : tri automatique par heure après chaque add/edit
-  - [ ] Budget : tri par montant décroissant (backlog)
+  - [x] Budget : tri par montant décroissant (toggle bouton « ↓ Par montant »)
 
 ---
 
 ## 📋 Backlog confirmé
 
 ### Notifications
-- [ ] Rappels **30 min avant** chaque activité planning
-- [ ] Rappels **étapes trajet** (J-1 la veille + le matin du départ)
-- [ ] Rappels **repas du jour** (matin 8 h)
-- [ ] Alerte **budget** si dépensé > 80 % du total
+- [x] Rappels **30 min avant** chaque activité planning (schedulés au démarrage si permission accordée)
+- [x] Rappels **étapes trajet** (J-1 : 10 juillet 20 h · matin départ : 11 juillet 7 h)
+- [x] Rappels **repas du jour** (8 h chaque matin de séjour)
+- [x] Alerte **budget** si dépensé > 80 % du total
 
 ### CRUD restant / améliorations
-- [ ] **Ajout de visite** depuis l'écran Visites (bouton +)
-- [ ] **Ajout de repas** (actuellement 7 jours fixes — permettre d'en ajouter)
-- [ ] **Ajout d'étape trajet** (bouton + dans l'écran trajet)
-- [ ] **Edit checklist trajet** (items "Avant de partir" — add/delete)
-- [ ] **Hébergement éditable** — nom, adresse, contact, Wi-Fi, équipements
-- [ ] **Budget total éditable** (actuellement hardcodé à 1 800 €)
-- [ ] 
+- [x] **Ajout de visite** depuis l'écran Visites (bouton +)
+- [x] **Ajout de repas** (bouton + dans l'onglet Menus, champ jour libre)
+- [x] **Ajout d'étape trajet** (bouton + dans l'écran trajet)
+- [x] **Edit checklist trajet** (items "Avant de partir" — add/delete)
+- [x] **Hébergement éditable** — nom, adresse, contact, Wi-Fi (modal 8 champs)
+- [x] **Budget total éditable** (modal avec input numérique)
+- [x] **Alerte budget > 80 %** (bandeau orange dans l'onglet Budget)
 
 ### UX / Polish
-- [ ] Boutons edit/delete remplacer les textes `"edit"` / `"delete"` par icônes ✏️ 🗑️ (repas, shopping)
-- [ ] Animations sur les modals (déjà sheetUp, vérifier cohérence)
-- [ ] Retour haptique sur actions (Capacitor Haptics)
+- [x] Boutons edit/delete : textes `"edit"` / `"delete"` remplacés par icônes ✏️ 🗑️ (repas, shopping)
+- [x] Animations sur les modals — `sheetUp` + `fadeIn` uniformisés sur tous les modals (3 nouveaux corrigés)
+- [x] Retour haptique — `@capacitor/haptics` intégré sur toutes les actions (toggle, save, delete)
 
 ### Tests
 - [x] Tests unitaires vitest — 27 tests (`s`, `eur`, `buildList`, `sortItemsByTime`, `parseDist`)
 - [x] Tests intégration React Testing Library — 18 tests (navigation, CRUD budget, planning, visites, persistance)
 - [x] Tests E2E Playwright — 15 tests (navigation, CRUD budget, planning, visites, persistance)
-- [ ] Tests Appium (APK Android)
+- [x] Tests Appium (WebdriverIO) — `tests/appium/` : navigation, budget, repas, shopping · `npm run test:appium` (requiert device + Appium server)
 
 ---
 
