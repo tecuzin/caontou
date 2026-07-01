@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
+import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJET_STEPS_INITIAL } from './data.js'
 import { s, eur, buildList, sortItemsByTime, parseDist } from './utils.js'
+
+const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
 const DAYS_INITIAL = [
   { dow: 'Sam', num: 11, title: 'Le grand départ', sub: 'Lyon → Mandailles', items: [
@@ -113,12 +116,23 @@ const COURSES = [
   { key: 'co_autre', name: 'Autres', items: ['Pain', 'Eau (pack)', 'Sacs poubelle', 'Charbon BBQ', 'Essuie-tout'] },
 ]
 
-const TRAJET_CHECK_ITEMS = ['Pleins faits', 'Sièges auto installés', 'Eau & en-cas à portée', 'Doudous accessibles', 'Itinéraire chargé hors-ligne', 'Sac de change bébé']
+const TRAJET_CHECK_ITEMS_INITIAL = ['Pleins faits', 'Sièges auto installés', 'Eau & en-cas à portée', 'Doudous accessibles', 'Itinéraire chargé hors-ligne', 'Sac de change bébé']
 
 const HEB_EQUIP = ['Wi-Fi', 'Cheminée (cantou)', 'Lave-linge', 'Lit bébé', 'Jardin clos', 'Parking', 'Lave-vaisselle', 'Barbecue']
 
+const HEB_INITIAL = {
+  nom: 'La Grange du Puy Mary',
+  adresse: 'Mandailles-Saint-Julien (15590)',
+  arrivee: 'Sam 11 · dès 16 h',
+  depart: 'Sam 18 · avant 10 h',
+  capacite: '4–5 personnes · 2 chambres · lit bébé fourni',
+  wifiNom: 'LaGrange-Gite',
+  wifiPass: 'puymary15',
+  contact: 'Mme Vidal · 06 12 34 56 78',
+  note: '🔥 La maison a son cantou (cheminée traditionnelle) — parfait pour les soirées, même en été en altitude.',
+}
 
-const BUDGET_TOTAL = 1800
+const BUDGET_INITIAL = 1800
 
 /* ------------------------------------------------------------------ *
  * Persistance locale (sur le téléphone) — localStorage, persistant
@@ -166,6 +180,9 @@ function loadStore() {
       trajetSteps: p.trajetSteps ?? structuredClone(TRAJET_STEPS_INITIAL),
       logi: p.logi ?? structuredClone(LOGI_INITIAL),
       courses: p.courses ?? structuredClone(COURSES_INITIAL),
+      budgetTotal: p.budgetTotal ?? BUDGET_INITIAL,
+      hebergement: p.hebergement ?? structuredClone(HEB_INITIAL),
+      trajetCheckItems: p.trajetCheckItems ?? [...TRAJET_CHECK_ITEMS_INITIAL],
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -221,8 +238,15 @@ const requestNotificationPermission = () => {
 /* ================================================================== */
 export default function App() {
   useEffect(() => {
-    requestNotificationPermission()
-  }, [])
+    if (!('Notification' in window)) return
+    if (Notification.permission === 'granted') {
+      scheduleAllNotifications(days, meals)
+    } else if (Notification.permission === 'default') {
+      Notification.requestPermission().then((perm) => {
+        if (perm === 'granted') scheduleAllNotifications(days, meals)
+      })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   // état UI (non persisté)
   const [tab, setTab] = useState('accueil')
   const [sub, setSub] = useState(null)
@@ -287,19 +311,76 @@ export default function App() {
   const [trajetSteps, setTrajetSteps] = useState(initial.trajetSteps || structuredClone(TRAJET_STEPS_INITIAL))
   const [logi, setLogi] = useState(initial.logi || structuredClone(LOGI_INITIAL))
   const [courses, setCourses] = useState(initial.courses || structuredClone(COURSES_INITIAL))
+  const [budgetTotal, setBudgetTotal] = useState(initial.budgetTotal || BUDGET_INITIAL)
+  const [hebergement, setHebergement] = useState(initial.hebergement || structuredClone(HEB_INITIAL))
+  const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
+
+  // états UI modals nouveaux
+  const [showBudgetTotalEdit, setShowBudgetTotalEdit] = useState(false)
+  const [newBudgetTotal, setNewBudgetTotal] = useState('')
+  const [showHebEdit, setShowHebEdit] = useState(false)
+  const [newHebNom, setNewHebNom] = useState('')
+  const [newHebAdresse, setNewHebAdresse] = useState('')
+  const [newHebArrivee, setNewHebArrivee] = useState('')
+  const [newHebDepart, setNewHebDepart] = useState('')
+  const [newHebCapacite, setNewHebCapacite] = useState('')
+  const [newHebWifiNom, setNewHebWifiNom] = useState('')
+  const [newHebWifiPass, setNewHebWifiPass] = useState('')
+  const [newHebContact, setNewHebContact] = useState('')
+  const [showAddTrajetCheck, setShowAddTrajetCheck] = useState(false)
+  const [newTrajetCheckItem, setNewTrajetCheckItem] = useState('')
 
   // états tri
   const [logiSorted, setLogiSorted] = useState(false)
   const [coursesSorted, setCoursesSorted] = useState(false)
   const [visitSort, setVisitSort] = useState(null) // null | 'dist' | 'cat'
+  const [sortExpenses, setSortExpenses] = useState('date') // 'date' | 'amt'
+
+  // états ajout repas
+  const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems])
 
-  const toggleCheck = (key, label) =>
+  // Planification de toutes les notifications
+  const scheduleAllNotifications = (daysData, mealsData) => {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return
+    const now = Date.now()
+    // Planning : 30 min avant chaque activité
+    daysData.forEach((d) => {
+      const dayDate = new Date(2026, 6, d.num) // juillet = mois 6
+      d.items.forEach((item) => {
+        const m = item.time.match(/^(\d{1,2}):(\d{2})$/)
+        if (!m) return
+        const t = new Date(dayDate)
+        t.setHours(parseInt(m[1]), parseInt(m[2]), 0, 0)
+        const delay = t.getTime() - 30 * 60 * 1000 - now
+        if (delay > 0) scheduleNotification(`🗓️ Dans 30 min · ${item.title}`, `${d.dow} ${d.num} juillet · ${item.time}`, delay)
+      })
+    })
+    // Repas : rappel à 8 h chaque matin
+    daysData.forEach((d, i) => {
+      const t = new Date(2026, 6, d.num)
+      t.setHours(8, 0, 0, 0)
+      const delay = t.getTime() - now
+      if (delay > 0) {
+        const ml = mealsData[i]
+        scheduleNotification(`🍽️ Menu du jour · ${d.dow} ${d.num}`, ml ? ml.dish : 'Voir les menus', delay)
+      }
+    })
+    // Trajet : veille (10 juillet 20 h) + matin départ (11 juillet 7 h)
+    const veille = new Date(2026, 6, 10, 20, 0, 0)
+    const matin = new Date(2026, 6, 11, 7, 0, 0)
+    if (veille.getTime() > now) scheduleNotification('🚗 Départ demain !', 'Checklist trajet à valider ce soir', veille.getTime() - now)
+    if (matin.getTime() > now) scheduleNotification("🚗 C'est le grand jour !", 'Départ à 08:30 · Lyon → Mandailles', matin.getTime() - now)
+  }
+
+  const toggleCheck = (key, label) => {
+    haptic(ImpactStyle.Light)
     setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
-  const toggleSaved = (id) => setSaved((sv) => ({ ...sv, [id]: !sv[id] }))
+  }
+  const toggleSaved = (id) => { haptic(ImpactStyle.Medium); setSaved((sv) => ({ ...sv, [id]: !sv[id] })) }
 
   // compte à rebours (date réelle)
   const countdown = useMemo(() => {
@@ -314,8 +395,8 @@ export default function App() {
 
   // dérivés budget
   const spent = expenses.reduce((a, e) => a + e.amt, 0)
-  const remain = BUDGET_TOTAL - spent
-  const spentPct = Math.round((spent / BUDGET_TOTAL) * 100)
+  const remain = budgetTotal - spent
+  const spentPct = Math.round((spent / budgetTotal) * 100)
   const budgetCats = CATS
     .map((c) => { const a = expenses.filter((e) => e.cat === c.name).reduce((sum, e) => sum + e.amt, 0); return { ...c, amt: a, pct: Math.round(spent ? (a / spent) * 100 : 0) } })
     .filter((c) => c.amt > 0)
@@ -338,7 +419,7 @@ export default function App() {
   const savedCount = Object.values(saved).filter(Boolean).length
 
   const cur = days[day]
-  const tr = buildList(checks, 'tr_dep', TRAJET_CHECK_ITEMS)
+  const tr = buildList(checks, 'tr_dep', trajetCheckItems)
   const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo' }[sub] || ''
 
   const openModule = (action) =>
@@ -347,6 +428,7 @@ export default function App() {
   const submitExpense = () => {
     const a = parseFloat(String(newAmt).replace(',', '.'))
     if (!a || a <= 0) return
+    haptic(ImpactStyle.Medium)
     if (editingExpenseIdx !== null) {
       setExpenses((list) => list.map((e, i) => i === editingExpenseIdx ? { label: newLabel || newCat, cat: newCat, amt: a } : e))
       setEditingExpenseIdx(null)
@@ -356,6 +438,7 @@ export default function App() {
     setShowAdd(false); setNewAmt(''); setNewLabel('')
   }
   const deleteExpense = (idx) => {
+    haptic(ImpactStyle.Medium)
     setExpenses((list) => list.filter((_, i) => i !== idx))
   }
   const startEditExpense = (idx) => {
@@ -370,23 +453,28 @@ export default function App() {
 
   const editMeal = (day) => {
     const m = meals.find(x => x.day === day)
-    if (m) {
-      setNewMealDish(m.dish)
-      setEditingMealDay(day)
-      setShowMealEdit(true)
-    }
+    if (m) { setNewMealDish(m.dish); setNewMealDay(m.day); setEditingMealDay(day); setShowMealEdit(true) }
   }
+  const openAddMeal = () => { setNewMealDay(''); setNewMealDish(''); setEditingMealDay(null); setShowMealEdit(true) }
   const saveMeal = () => {
-    if (!newMealDish.trim() || !editingMealDay) return
-    setMeals((list) => list.map(m => m.day === editingMealDay ? { ...m, dish: newMealDish } : m))
+    if (!newMealDish.trim()) return
+    if (editingMealDay === null) {
+      if (!newMealDay.trim()) return
+      setMeals((list) => [...list, { day: newMealDay.trim(), dish: newMealDish.trim() }])
+    } else {
+      setMeals((list) => list.map(m => m.day === editingMealDay ? { ...m, dish: newMealDish } : m))
+    }
+    haptic(ImpactStyle.Medium)
     closeMealEdit()
   }
-  const closeMealEdit = () => { setShowMealEdit(false); setEditingMealDay(null); setNewMealDish('') }
+  const closeMealEdit = () => { setShowMealEdit(false); setEditingMealDay(null); setNewMealDish(''); setNewMealDay('') }
 
   const deleteShoppingItem = (id) => {
+    haptic(ImpactStyle.Medium)
     setShoppingItems((list) => list.filter(item => item.id !== id))
   }
   const toggleShoppingItem = (id) => {
+    haptic(ImpactStyle.Light)
     setShoppingItems((list) => list.map(item => item.id === id ? { ...item, checked: !item.checked } : item))
   }
 
@@ -416,6 +504,7 @@ export default function App() {
   }
   const saveDay = () => {
     if (!newDayTitle.trim() || !newDaySub.trim() || editingDayIdx === null) return
+    haptic(ImpactStyle.Medium)
     setDays((list) => list.map((d, i) => i === editingDayIdx ? { ...d, title: newDayTitle, sub: newDaySub } : d))
     closeDayEdit()
   }
@@ -435,6 +524,7 @@ export default function App() {
   }
   const submitActivity = () => {
     if (!newActivityTime.trim() || !newActivityTitle.trim() || editingActivityDayIdx === null) return
+    haptic(ImpactStyle.Medium)
     if (editingActivityIdx) {
       const { dayIdx, itemIdx } = editingActivityIdx
       setDays((list) => list.map((d, di) => {
@@ -471,8 +561,14 @@ export default function App() {
     }
   }
   const saveVisit = () => {
-    if (!newVisitName.trim() || !editingVisitId) return
-    setVisits((list) => list.map(v => v.id === editingVisitId ? { ...v, name: newVisitName, dist: newVisitDist, dur: newVisitDur, age: newVisitAge, cat: newVisitCat } : v))
+    if (!newVisitName.trim()) return
+    haptic(ImpactStyle.Medium)
+    if (!editingVisitId) {
+      const newId = Math.max(...visits.map(v => v.id), 0) + 1
+      setVisits((list) => [...list, { id: newId, emoji: '📍', name: newVisitName, cat: newVisitCat, dist: newVisitDist, dur: newVisitDur, age: newVisitAge }])
+    } else {
+      setVisits((list) => list.map(v => v.id === editingVisitId ? { ...v, name: newVisitName, dist: newVisitDist, dur: newVisitDur, age: newVisitAge, cat: newVisitCat } : v))
+    }
     closeVisitEdit()
   }
   const closeVisitEdit = () => { setShowVisitEdit(false); setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature') }
@@ -498,8 +594,13 @@ export default function App() {
     setShowTrajetEdit(true)
   }
   const saveTrajetStep = () => {
-    if (!newTrajetTime.trim() || !newTrajetPlace.trim() || editingTrajetIdx === null) return
-    setTrajetSteps((list) => list.map((st, i) => i === editingTrajetIdx ? { time: newTrajetTime, place: newTrajetPlace, note: newTrajetNote, color: newTrajetColor } : st))
+    if (!newTrajetTime.trim() || !newTrajetPlace.trim()) return
+    haptic(ImpactStyle.Medium)
+    if (editingTrajetIdx === null) {
+      setTrajetSteps((list) => [...list, { time: newTrajetTime, place: newTrajetPlace, note: newTrajetNote, color: newTrajetColor }])
+    } else {
+      setTrajetSteps((list) => list.map((st, i) => i === editingTrajetIdx ? { time: newTrajetTime, place: newTrajetPlace, note: newTrajetNote, color: newTrajetColor } : st))
+    }
     closeTrajetEdit()
   }
   const closeTrajetEdit = () => { setShowTrajetEdit(false); setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042') }
@@ -521,6 +622,7 @@ export default function App() {
     const hi = parseInt(newMeteoHi, 10)
     const lo = parseInt(newMeteoLo, 10)
     if (!hi || !lo || editingMeteoIdx === null) return
+    haptic(ImpactStyle.Medium)
     setMeteo((list) => list.map((w, i) => i === editingMeteoIdx ? { ...w, hi, lo, rain: newMeteoRain, icon: newMeteoIcon } : w))
     closeMeteoEdit()
   }
@@ -528,6 +630,7 @@ export default function App() {
 
   const addLogiItem = () => {
     if (!newLogiItem.trim() || !editingLogiKey) return
+    haptic(ImpactStyle.Medium)
     setLogi((list) => list.map((L) => L.key === editingLogiKey ? { ...L, items: [...L.items, newLogiItem] } : L))
     closeAddLogiItem()
   }
@@ -538,12 +641,45 @@ export default function App() {
 
   const addCourseItem = () => {
     if (!newCourseItem.trim() || !editingCourseKey) return
+    haptic(ImpactStyle.Medium)
     setCourses((list) => list.map((g) => g.key === editingCourseKey ? { ...g, items: [...g.items, newCourseItem] } : g))
     closeAddCourseItem()
   }
   const closeAddCourseItem = () => { setShowAddCourseItem(false); setEditingCourseKey(null); setNewCourseItem('') }
   const deleteCourseItem = (key, item) => {
     setCourses((list) => list.map((g) => g.key === key ? { ...g, items: g.items.filter((i) => i !== item) } : g))
+  }
+
+  // Budget total éditable
+  const saveBudgetTotal = () => {
+    const val = parseFloat(String(newBudgetTotal).replace(',', '.'))
+    if (val > 0) { haptic(ImpactStyle.Medium); setBudgetTotal(val); setShowBudgetTotalEdit(false); setNewBudgetTotal('') }
+  }
+
+  // Hébergement éditable
+  const openHebEdit = () => {
+    setNewHebNom(hebergement.nom); setNewHebAdresse(hebergement.adresse)
+    setNewHebArrivee(hebergement.arrivee); setNewHebDepart(hebergement.depart)
+    setNewHebCapacite(hebergement.capacite); setNewHebWifiNom(hebergement.wifiNom)
+    setNewHebWifiPass(hebergement.wifiPass); setNewHebContact(hebergement.contact)
+    setShowHebEdit(true)
+  }
+  const saveHebergement = () => {
+    haptic(ImpactStyle.Medium)
+    setHebergement({ ...hebergement, nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact })
+    setShowHebEdit(false)
+  }
+
+  // Checklist trajet éditable
+  const addTrajetCheckItem = () => {
+    if (!newTrajetCheckItem.trim()) return
+    haptic(ImpactStyle.Medium)
+    setTrajetCheckItems((list) => [...list, newTrajetCheckItem])
+    setNewTrajetCheckItem(''); setShowAddTrajetCheck(false)
+  }
+  const deleteTrajetCheckItem = (label) => {
+    setTrajetCheckItems((list) => list.filter((i) => i !== label))
+    setChecks((c) => { const nr = { ...(c.tr_dep || {}) }; delete nr[label]; return { ...c, tr_dep: nr } })
   }
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
@@ -593,9 +729,18 @@ export default function App() {
                     </div>
                   </div>
                 ))}
-                <div style={s('margin:8px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Avant de partir · {tr.done}/{tr.total}</div>
+                <button onClick={() => { setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042'); setShowTrajetEdit(true) }} style={s('width:100%;margin:4px 0 16px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter une étape</button>
+                <div style={s('display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Avant de partir · {tr.done}/{tr.total}</div>
+                  <button onClick={() => setShowAddTrajetCheck(true)} style={s('border:none;background:transparent;cursor:pointer;font-size:18px;padding:2px 4px;color:#9c6b4a;')}>＋</button>
+                </div>
                 <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
-                  {tr.items.map((it) => <CheckRow key={it.label} label={it.label} checked={it.checked} onToggle={() => toggleCheck('tr_dep', it.label)} />)}
+                  {tr.items.map((it) => (
+                    <div key={it.label} style={s('display:flex;align-items:center;border-bottom:1px solid #f1e9da;')}>
+                      <div style={s('flex:1;')}><CheckRow label={it.label} checked={it.checked} onToggle={() => toggleCheck('tr_dep', it.label)} /></div>
+                      <button onClick={() => deleteTrajetCheckItem(it.label)} style={s('border:none;background:transparent;cursor:pointer;font-size:13px;padding:4px 10px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -648,26 +793,29 @@ export default function App() {
             {sub === 'hebergement' && (
               <div style={s('padding:16px 18px 40px;')}>
                 <div style={s('height:150px;border-radius:18px;background:repeating-linear-gradient(45deg,#e8dcc2,#e8dcc2 12px,#e0d3b6 12px,#e0d3b6 24px);display:flex;align-items:center;justify-content:center;')}>
-                  <span style={s("font-family:ui-monospace,'SF Mono',monospace;font-size:12px;color:#9c8a66;background:rgba(255,253,248,0.85);padding:5px 10px;border-radius:8px;")}>photo · La Grange du Puy Mary</span>
+                  <span style={s("font-family:ui-monospace,'SF Mono',monospace;font-size:12px;color:#9c8a66;background:rgba(255,253,248,0.85);padding:5px 10px;border-radius:8px;")}>photo · {hebergement.nom}</span>
                 </div>
-                <div style={s('margin-top:14px;font-family:Quicksand;font-weight:700;font-size:20px;')}>La Grange du Puy Mary</div>
-                <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>📍 Mandailles-Saint-Julien (15590)</div>
+                <div style={s('display:flex;align-items:center;margin-top:14px;gap:10px;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;flex:1;')}>{hebergement.nom}</div>
+                  <button onClick={openHebEdit} style={s('border:none;background:transparent;cursor:pointer;font-size:18px;padding:4px;')}>✏️</button>
+                </div>
+                <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>📍 {hebergement.adresse}</div>
                 <div style={s('display:flex;gap:10px;margin-top:14px;')}>
-                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#8a8273;')}>Arrivée</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>Sam 11 · dès 16 h</div></div>
-                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#8a8273;')}>Départ</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>Sam 18 · avant 10 h</div></div>
+                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#8a8273;')}>Arrivée</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.arrivee}</div></div>
+                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#8a8273;')}>Départ</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.depart}</div></div>
                 </div>
-                <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>🛏️ 4–5 personnes · 2 chambres · lit bébé fourni</div>
+                <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>🛏️ {hebergement.capacite}</div>
                 <div style={s('margin:18px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Équipements</div>
                 <div style={s('display:flex;flex-wrap:wrap;gap:8px;')}>
                   {HEB_EQUIP.map((eq) => <span key={eq} style={s('background:#fffdf8;border:1px solid #e3d8c2;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:#6b6354;')}>{eq}</span>)}
                 </div>
                 <div style={s('margin-top:16px;background:#e7ecdf;border-radius:14px;padding:14px;')}>
                   <div style={s('font-weight:700;font-family:Quicksand;')}>📶 Wi-Fi</div>
-                  <div style={s('font-size:13px;color:#4a5d3a;margin-top:5px;')}>Réseau : <b>LaGrange-Gite</b></div>
-                  <div style={s('font-size:13px;color:#4a5d3a;margin-top:2px;')}>Code : <b>puymary15</b></div>
+                  <div style={s('font-size:13px;color:#4a5d3a;margin-top:5px;')}>Réseau : <b>{hebergement.wifiNom}</b></div>
+                  <div style={s('font-size:13px;color:#4a5d3a;margin-top:2px;')}>Code : <b>{hebergement.wifiPass}</b></div>
                 </div>
-                <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 Mme Vidal · 06 12 34 56 78</div>
-                <div style={s('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🔥 La maison a son cantou (cheminée traditionnelle) — parfait pour les soirées, même en été en altitude.</div>
+                <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 {hebergement.contact}</div>
+                <div style={s('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>{hebergement.note}</div>
               </div>
             )}
 
@@ -818,6 +966,9 @@ export default function App() {
                     <button key={k} onClick={() => setVisitSort(visitSort === k ? null : k)} style={s(`flex:0 0 auto;border:1px solid ${visitSort === k ? '#4a5d3a' : '#ece2cf'};background:${visitSort === k ? '#4a5d3a' : '#fffdf8'};color:${visitSort === k ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>{label}</button>
                   ))}
                 </div>
+                <div style={s('padding:0 18px 8px;display:flex;justify-content:flex-end;')}>
+                  <button onClick={() => { setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature'); setShowVisitEdit(true) }} style={s('border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:7px 14px;cursor:pointer;')}>+ Ajouter visite</button>
+                </div>
                 <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:12px;')}>
                   {filteredVisits.map((v) => {
                     const sv = !!saved[v.id]
@@ -864,10 +1015,11 @@ export default function App() {
                         <div key={i} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:13px 14px;')}>
                           <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#cf7d3c;width:54px;flex:0 0 auto;')}>{ml.day}</div>
                           <div style={s('font-weight:600;font-size:14px;flex:1;')}>{ml.dish}</div>
-                          <button onClick={() => editMeal(ml.day)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>edit</button>
+                          <button onClick={() => editMeal(ml.day)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
                         </div>
                       ))}
                     </div>
+                    <button onClick={openAddMeal} style={s('display:block;width:calc(100% - 36px);margin:10px 18px 0;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:14px;padding:10px;cursor:pointer;')}>+ Ajouter un repas</button>
                     <div style={s('margin:14px 18px 16px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧀 Spécialités à goûter : Cantal AOP, Salers, Saint-Nectaire, truffade &amp; aligot maison.</div>
                   </>
                 )}
@@ -915,7 +1067,7 @@ export default function App() {
                           <div key={item.id} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
                             <input type="checkbox" checked={item.checked} onChange={() => toggleShoppingItem(item.id)} style={s('cursor:pointer;')} />
                             <span style={s('font-size:14px;flex:1;')}>{item.label}</span>
-                            <button onClick={() => deleteShoppingItem(item.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:4px;')}>delete</button>
+                            <button onClick={() => deleteShoppingItem(item.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:4px;')}>🗑️</button>
                           </div>
                         ))}
                       </div>
@@ -934,11 +1086,20 @@ export default function App() {
                 <div style={s('margin:0 18px 14px;background:#4a5d3a;border-radius:22px;padding:18px;color:#f3ecda;box-shadow:0 10px 24px rgba(74,93,58,0.22);')}>
                   <div style={s('display:flex;justify-content:space-between;align-items:flex-end;')}>
                     <div><div style={s('font-size:12px;color:#c9d2b6;font-weight:700;letter-spacing:0.5px;')}>RESTANT</div><div style={s('font-family:Quicksand;font-weight:700;font-size:30px;margin-top:2px;')}>{eur(remain)}</div></div>
-                    <div style={s('text-align:right;font-size:12px;color:#dbe2c9;')}>sur {eur(BUDGET_TOTAL)}</div>
+                    <div style={s('text-align:right;')}>
+                      <div style={s('font-size:12px;color:#dbe2c9;')}>sur {eur(budgetTotal)}</div>
+                      <button onClick={() => { setNewBudgetTotal(String(budgetTotal)); setShowBudgetTotalEdit(true) }} style={s('margin-top:4px;border:none;background:rgba(255,255,255,0.15);color:#dbe2c9;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer;')}>✏️ Modifier</button>
+                    </div>
                   </div>
                   <div style={s('margin-top:14px;height:10px;border-radius:10px;background:rgba(255,255,255,0.18);overflow:hidden;')}><div style={s(`height:100%;background:#e8c07a;width:${spentPct}%;`)} /></div>
                   <div style={s('margin-top:8px;font-size:13px;color:#dbe2c9;')}>Dépensé {eur(spent)} · {spentPct} %</div>
                 </div>
+                {spentPct >= 80 && (
+                  <div style={s('margin:0 18px 14px;background:#b8503f;border-radius:14px;padding:12px 16px;color:#fff;display:flex;align-items:center;gap:10px;')}>
+                    <span style={s('font-size:20px;')}>⚠️</span>
+                    <div><div style={s('font-weight:700;font-family:Quicksand;font-size:14px;')}>Budget à {spentPct} %</div><div style={s('font-size:12px;opacity:0.9;margin-top:2px;')}>Plus que {eur(remain)} restants</div></div>
+                  </div>
+                )}
                 <button data-testid="btn-add-depense" onClick={() => setShowAdd(true)} style={s('margin:0 18px 18px;width:calc(100% - 36px);border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Ajouter une dépense</button>
                 <div style={s('padding:0 18px 8px;')}><SectionLabel>Par catégorie</SectionLabel></div>
                 <div style={s('padding:0 18px 14px;display:flex;flex-direction:column;gap:13px;')}>
@@ -949,20 +1110,23 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <div style={s('padding:4px 18px 8px;')}><SectionLabel>Dernières dépenses</SectionLabel></div>
+                <div style={s('padding:4px 18px 8px;display:flex;align-items:center;justify-content:space-between;')}>
+                  <SectionLabel>Dépenses</SectionLabel>
+                  <button onClick={() => setSortExpenses(s2 => s2 === 'amt' ? 'date' : 'amt')} style={s(`border:1px solid ${sortExpenses === 'amt' ? '#4a5d3a' : '#ece2cf'};background:${sortExpenses === 'amt' ? '#4a5d3a' : '#fffdf8'};color:${sortExpenses === 'amt' ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:5px 12px;font-weight:700;font-size:11px;cursor:pointer;`)}>↓ Par montant</button>
+                </div>
                 <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:8px;')}>
-                  {expenses.slice().reverse().map((e, idx) => {
-                    const origIdx = expenses.length - 1 - idx
-                    return (
-                      <div key={idx} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
-                        <span style={s(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
-                        <div style={s('flex:1;min-width:0;')}><div style={s('font-weight:700;font-size:14px;')}>{e.label}</div><div style={s('font-size:12px;color:#8a8273;')}>{e.cat}</div></div>
-                        <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
-                        <button onClick={() => startEditExpense(origIdx)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
-                        <button onClick={() => deleteExpense(origIdx)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
-                      </div>
-                    )
-                  })}
+                  {(sortExpenses === 'amt'
+                    ? expenses.map((e, i) => ({...e, _i: i})).sort((a, b) => b.amt - a.amt)
+                    : [...expenses.map((e, i) => ({...e, _i: i}))].reverse()
+                  ).map((e) => (
+                    <div key={e._i} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
+                      <span style={s(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
+                      <div style={s('flex:1;min-width:0;')}><div style={s('font-weight:700;font-size:14px;')}>{e.label}</div><div style={s('font-size:12px;color:#8a8273;')}>{e.cat}</div></div>
+                      <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
+                      <button onClick={() => startEditExpense(e._i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
+                      <button onClick={() => deleteExpense(e._i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
+                    </div>
+                  ))}
                 </div>
                 <div style={s('height:16px;')} />
               </div>
@@ -1011,7 +1175,13 @@ export default function App() {
         <div onClick={closeMealEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Repas du {editingMealDay}</div>
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealDay === null ? 'Ajouter un repas' : `Repas du ${editingMealDay}`}</div>
+            {editingMealDay === null && (
+              <>
+                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Jour</div>
+                <input value={newMealDay} onChange={(e) => setNewMealDay(e.target.value)} placeholder="Ex : Sam 11" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              </>
+            )}
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Plat</div>
             <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
@@ -1189,6 +1359,67 @@ export default function App() {
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeVisitEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={saveVisit} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Budget total edit */}
+      {showBudgetTotalEdit && (
+        <div onClick={() => setShowBudgetTotalEdit(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Budget total</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Montant (€)</div>
+            <input type="number" value={newBudgetTotal} onChange={(e) => setNewBudgetTotal(e.target.value)} placeholder={String(budgetTotal)} style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && saveBudgetTotal()} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={() => setShowBudgetTotalEdit(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveBudgetTotal} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Hébergement edit */}
+      {showHebEdit && (
+        <div onClick={() => setShowHebEdit(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Modifier l'hébergement</div>
+            {[
+              ['Nom', newHebNom, setNewHebNom, 'La Grange du Puy Mary'],
+              ['Adresse', newHebAdresse, setNewHebAdresse, 'Mandailles-Saint-Julien (15590)'],
+              ['Arrivée', newHebArrivee, setNewHebArrivee, 'Sam 11 · dès 16 h'],
+              ['Départ', newHebDepart, setNewHebDepart, 'Sam 18 · avant 10 h'],
+              ['Capacité', newHebCapacite, setNewHebCapacite, '4–5 personnes · 2 chambres'],
+              ['Wi-Fi réseau', newHebWifiNom, setNewHebWifiNom, 'LaGrange-Gite'],
+              ['Wi-Fi code', newHebWifiPass, setNewHebWifiPass, ''],
+              ['Contact', newHebContact, setNewHebContact, 'Mme Vidal · 06 12 34 56 78'],
+            ].map(([label, val, setter, ph]) => (
+              <div key={label}>
+                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>{label}</div>
+                <input value={val} onChange={(e) => setter(e.target.value)} placeholder={ph} style={s('width:100%;margin-top:6px;margin-bottom:12px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              </div>
+            ))}
+            <div style={s('display:flex;gap:10px;margin-top:8px;')}>
+              <button onClick={() => setShowHebEdit(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveHebergement} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Trajet checklist add item */}
+      {showAddTrajetCheck && (
+        <div onClick={() => setShowAddTrajetCheck(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un item</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Description</div>
+            <input value={newTrajetCheckItem} onChange={(e) => setNewTrajetCheckItem(e.target.value)} placeholder="Ex : Chargeur téléphone" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addTrajetCheckItem()} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={() => setShowAddTrajetCheck(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={addTrajetCheckItem} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
