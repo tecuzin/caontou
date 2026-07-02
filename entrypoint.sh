@@ -3,6 +3,13 @@ set -e
 
 cd /workspace
 
+# Métadonnées de build injectées par build-docker.sh via --env
+BUILD_NUMBER="${BUILD_NUMBER:-0}"
+BUILD_TIMESTAMP="${BUILD_TIMESTAMP:-$(date '+%Y%m%d-%H%M')}"
+VERSION_NAME="${VERSION_NAME:-0.0.0-build0}"
+
+echo "=== Build n°${BUILD_NUMBER} — ${BUILD_TIMESTAMP} — v${VERSION_NAME} ==="
+
 echo "=== [1/6] npm install ==="
 npm install --no-audit --no-fund 2>&1 | tail -10
 
@@ -14,8 +21,17 @@ if [ ! -d android ]; then
     npx cap add android 2>&1 | tail -10
 fi
 
+echo "=== [3b] Icone Cantou (remplace l'icone par defaut Capacitor) ==="
+python3 scripts/generate-icon.py 2>&1 | tail -20
+
 echo "=== [4/6] capacitor sync ==="
 npx cap sync 2>&1 | tail -10
+
+echo "=== [4b] Injection versionCode=${BUILD_NUMBER} versionName=${VERSION_NAME} ==="
+# cap sync régénère build.gradle avec versionCode=1 — patch après sync
+sed -i "s/versionCode 1$/versionCode ${BUILD_NUMBER}/" android/app/build.gradle
+sed -i "s/versionName \"1.0\"/versionName \"${VERSION_NAME}\"/" android/app/build.gradle
+grep -E "versionCode|versionName" android/app/build.gradle | head -2
 
 echo "=== [5/6] gradle assembleRelease ==="
 cd android
@@ -46,8 +62,7 @@ mkdir -p /artifacts
     --out /artifacts/cantou-release.apk /tmp/aligned.apk
 "$BT/apksigner" verify --print-certs /artifacts/cantou-release.apk 2>&1 | head -4
 
-# On garde aussi la version non signee
 cp "$UNSIGNED" /artifacts/
 
-echo "OK APK signe genere:"
+echo "OK APK signe — build ${BUILD_NUMBER} / ${VERSION_NAME}:"
 ls -lh /artifacts/*.apk

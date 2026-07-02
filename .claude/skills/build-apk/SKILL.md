@@ -24,14 +24,20 @@ bascule sur `colima-cantou` ; revenir avec `docker context use colima`.
 
 ## Lancer le build
 ```bash
-./build-docker.sh          # → build/outputs/apk/cantou-release.apk
+./build-docker.sh           # → build/outputs/apk/cantou-v{ver}-build{N}-{ts}.apk
+./build-docker.sh --deploy  # idem + envoi Telegram (requiert .env.deploy)
 ```
 
 `build-docker.sh` fait :
-1. `DOCKER_HOST` = socket du profil `cantou`, `DOCKER_BUILDKIT=0` (buildx absent).
-2. `docker build -t cantou-builder:amd64 .` (l'image est amd64 via `FROM --platform=`).
-3. `docker run --platform linux/amd64 --name cantou-build …` (Rosetta traduit x86_64).
-4. `docker cp cantou-build:/artifacts/. build/outputs/apk/` puis supprime le conteneur.
+1. Lit et incrémente `build.number`, calcule le timestamp.
+2. `DOCKER_HOST` = socket du profil `cantou`, `DOCKER_BUILDKIT=0` (buildx absent).
+3. `docker build -t cantou-builder:amd64 .` (l'image est amd64 via `FROM --platform=`).
+4. `docker run --platform linux/amd64 --env BUILD_NUMBER --env VERSION_NAME …` (Rosetta).
+5. `entrypoint.sh` patche `build.gradle` (versionCode + versionName) après `cap sync`.
+6. `docker cp cantou-build:/artifacts/. build/outputs/apk/` puis renomme l'APK.
+7. (optionnel) `scripts/deploy-telegram.sh` envoie l'APK dans le canal configuré.
+
+Voir `docs/deploy-telegram.md` et le skill **deploy** pour la config Telegram.
 
 ## Invariants à respecter (sinon ça casse)
 - **`FROM --platform=linux/amd64`** dans le Dockerfile + `--platform linux/amd64` au `run`.

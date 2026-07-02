@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a6fa5"/>
+      <stop offset="100%" stop-color="#a8c8e8"/>
+    </linearGradient>
+    <linearGradient id="meadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a9e5a"/>
+      <stop offset="100%" stop-color="#4a6832"/>
+    </linearGradient>
+    <linearGradient id="mtn1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6b8a5a"/>
+      <stop offset="100%" stop-color="#4a5d3a"/>
+    </linearGradient>
+    <linearGradient id="mtn2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3d5030"/>
+      <stop offset="100%" stop-color="#2d3d22"/>
+    </linearGradient>
+    <clipPath id="rounded">
+      <rect width="512" height="512" rx="112" ry="112"/>
+    </clipPath>
+  </defs>
+
+  <!-- Fond arrondi -->
+  <rect width="512" height="512" rx="112" ry="112" fill="url(#sky)"/>
+
+  <g clip-path="url(#rounded)">
+    <!-- Nuages -->
+    <ellipse cx="80" cy="100" rx="48" ry="22" fill="white" opacity="0.6"/>
+    <ellipse cx="112" cy="92" rx="38" ry="20" fill="white" opacity="0.6"/>
+    <ellipse cx="58" cy="108" rx="32" ry="16" fill="white" opacity="0.6"/>
+
+    <ellipse cx="300" cy="75" rx="40" ry="18" fill="white" opacity="0.45"/>
+    <ellipse cx="328" cy="67" rx="32" ry="16" fill="white" opacity="0.45"/>
+
+    <!-- Soleil -->
+    <circle cx="400" cy="100" r="52" fill="#f5c518"/>
+    <!-- Halo soleil -->
+    <circle cx="400" cy="100" r="66" fill="#f5c518" opacity="0.2"/>
+    <!-- Rayons -->
+    <g stroke="#f5c518" stroke-width="10" stroke-linecap="round" opacity="0.8">
+      <line x1="400" y1="20" x2="400" y2="2"/>
+      <line x1="454" y1="46" x2="468" y2="32"/>
+      <line x1="480" y1="100" x2="498" y2="100"/>
+      <line x1="454" y1="154" x2="468" y2="168"/>
+      <line x1="346" y1="46" x2="332" y2="32"/>
+      <line x1="320" y1="100" x2="302" y2="100"/>
+    </g>
+
+    <!-- Montagne lointaine gauche -->
+    <polygon points="-20,460 80,200 200,380 110,460" fill="#8aaa6a" opacity="0.7"/>
+
+    <!-- Montagne arrière centre-droite (Puy Mary) -->
+    <polygon points="60,470 200,170 360,390 440,140 550,320 550,470" fill="url(#mtn1)"/>
+    <!-- Neige Puy Mary -->
+    <polygon points="440,140 406,200 474,200" fill="white" opacity="0.92"/>
+    <!-- Ombre versant -->
+    <polygon points="440,140 406,200 440,220 480,200" fill="#2d4020" opacity="0.3"/>
+
+    <!-- Montagne avant (premier plan) -->
+    <polygon points="-20,512 120,260 270,430 370,230 512,360 512,512" fill="url(#mtn2)"/>
+    <!-- Neige montagne avant -->
+    <polygon points="370,230 335,285 405,285" fill="white" opacity="0.88"/>
+
+    <!-- Prairie -->
+    <path d="M-20,460 Q130,410 256,430 Q390,450 530,420 L530,512 L-20,512 Z" fill="url(#meadow)"/>
+
+    <!-- Reflets prairie -->
+    <path d="M60,480 Q130,470 200,478" stroke="#9ab87a" stroke-width="3" fill="none" opacity="0.5"/>
+    <path d="M300,475 Q370,465 440,472" stroke="#9ab87a" stroke-width="3" fill="none" opacity="0.5"/>
+
+    <!-- Gite / La Grange -->
+    <rect x="188" y="415" width="110" height="68" fill="#d4a96a" rx="5"/>
+    <!-- Toit -->
+    <polygon points="178,415 243,362 308,415" fill="#8b3a2a"/>
+    <!-- Cheminée -->
+    <rect x="268" y="362" width="16" height="30" fill="#9c7055"/>
+    <rect x="264" y="358" width="24" height="8" fill="#7a5540" rx="2"/>
+    <!-- Fumée (cantou !) -->
+    <path d="M276,358 C270,340 284,328 272,312 C264,300 278,290 272,278" stroke="#ccc" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <!-- Fenêtres -->
+    <rect x="200" y="425" width="24" height="22" fill="#a8c8e8" rx="3"/>
+    <rect x="200" y="425" width="24" height="1" fill="#7a9ab8"/>
+    <rect x="211" y="425" width="1" height="22" fill="#7a9ab8"/>
+    <rect x="262" y="425" width="24" height="22" fill="#a8c8e8" rx="3"/>
+    <rect x="262" y="425" width="24" height="1" fill="#7a9ab8"/>
+    <rect x="273" y="425" width="1" height="22" fill="#7a9ab8"/>
+    <!-- Porte -->
+    <rect x="228" y="443" width="30" height="40" fill="#7a5030" rx="4"/>
+    <circle cx="254" cy="464" r="3" fill="#d4a96a"/>
+
+    <!-- Petits sapins -->
+    <g fill="#2d5020">
+      <polygon points="145,470 158,435 171,470"/>
+      <polygon points="148,460 158,432 168,460"/>
+      <polygon points="332,465 344,432 356,465"/>
+      <polygon points="335,455 344,428 353,455"/>
+    </g>
+
+    <!-- Vignette subtile en bas -->
+    <path d="M0,400 L0,512 L512,512 L512,400 Q256,480 0,400" fill="#1a2810" opacity="0.15"/>
+  </g>
+</svg>
