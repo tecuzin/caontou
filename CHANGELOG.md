@@ -2,6 +2,15 @@
 
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
+## [0.3.1] - 2026-07-02
+### Corrigé
+- **Signature APK stable** : `cantou.keystore` committé et réutilisé à
+  chaque build, au lieu d'un keystore régénéré (jetable) dans le
+  conteneur. Corrige le « conflit de package » Android à l'installation
+  d'une mise à jour (INSTALL_FAILED_UPDATE_INCOMPATIBLE).
+  ⚠️ Une désinstallation de l'app (signée avec l'ancienne clé jetable)
+  est nécessaire une dernière fois ; ensuite les mises à jour passent.
+
 ## [0.3.0] - 2026-07-02
 ### Ajouté
 - **CRUD complet sur tous les écrans** : dépenses, budget total éditable,
