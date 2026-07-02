@@ -37,10 +37,13 @@ empaquetée en **APK Android via Capacitor**, compilée **entièrement dans Dock
 6. **Android SDK** : `platforms;android-34` (cible Capacitor 6) **et** `android-35`,
    `build-tools;34.0.0`/`35.0.0`. Licences acceptées dans l'image.
 
-7. **APK signé** : l'APK release de Gradle est *non signé*. L'entrypoint signe
-   (keystore auto-généré + `zipalign` + `apksigner`) → `cantou-release.apk` installable.
-   Keystore de sideload : alias `cantou` / mdp `cantou123`. **Remplacer par un vrai
-   keystore pour le Play Store.**
+7. **APK signé avec un keystore STABLE** : l'APK release de Gradle est *non signé*.
+   L'entrypoint signe avec **`cantou.keystore` committé à la racine** (alias `cantou` /
+   mdp `cantou123`) + `zipalign` + `apksigner` → `cantou-release.apk` installable.
+   **Ne jamais régénérer ce keystore** : une clé différente = Android refuse la mise à
+   jour (conflit de package, désinstallation forcée = perte du localStorage).
+   Keystore de sideload familial ; **remplacer par un vrai keystore hors-repo pour le
+   Play Store.**
 
 ## Comment construire l'APK
 ```bash

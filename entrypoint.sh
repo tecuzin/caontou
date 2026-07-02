@@ -49,11 +49,20 @@ echo "=== [6/6] Signature (zipalign + apksigner) ==="
 BT=$(ls -d /android-sdk/build-tools/* | sort -V | tail -1)
 echo "build-tools: $BT"
 
-# Keystore auto-genere pour sideload (CN/mdp fixes)
-keytool -genkeypair -v -keystore /tmp/cantou.keystore -alias cantou \
-    -keyalg RSA -keysize 2048 -validity 10000 \
-    -storepass cantou123 -keypass cantou123 \
-    -dname "CN=Cantou, OU=Dev, O=DouaStart, L=Lyon, C=FR" 2>&1 | tail -2
+# Signature STABLE : le keystore committé dans le repo est réutilisé à
+# chaque build. Un keystore régénéré à chaque fois = clé différente =
+# Android refuse la mise à jour (conflit de package, il faut désinstaller).
+if [ -f /workspace/cantou.keystore ]; then
+    echo "Keystore stable du repo : /workspace/cantou.keystore"
+    cp /workspace/cantou.keystore /tmp/cantou.keystore
+else
+    echo "⚠️  cantou.keystore absent du repo — génération d'un keystore JETABLE."
+    echo "⚠️  L'APK ne pourra PAS mettre à jour une installation existante."
+    keytool -genkeypair -v -keystore /tmp/cantou.keystore -alias cantou \
+        -keyalg RSA -keysize 2048 -validity 10000 \
+        -storepass cantou123 -keypass cantou123 \
+        -dname "CN=Cantou, OU=Dev, O=DouaStart, L=Lyon, C=FR" 2>&1 | tail -2
+fi
 
 mkdir -p /artifacts
 "$BT/zipalign" -f 4 "$UNSIGNED" /tmp/aligned.apk

@@ -16,6 +16,11 @@ build/
 .gradle/
 local.properties
 *.keystore
+# Exception : keystore de sideload familial, committé pour garantir une
+# signature STABLE entre les builds (sinon Android refuse la mise à jour :
+# conflit de package). À remplacer par un vrai keystore hors-repo pour
+# une éventuelle publication Play Store.
+!cantou.keystore
 
 # Divers
 .DS_Store
