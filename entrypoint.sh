@@ -21,6 +21,9 @@ if [ ! -d android ]; then
     npx cap add android 2>&1 | tail -10
 fi
 
+echo "=== [3b] Icone Cantou (remplace l'icone par defaut Capacitor) ==="
+python3 scripts/generate-icon.py 2>&1 | tail -20
+
 echo "=== [4/6] capacitor sync ==="
 npx cap sync 2>&1 | tail -10
 
