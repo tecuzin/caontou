@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJET_STEPS_INITIAL } from './data.js'
 import { s, eur, buildList, sortItemsByTime, parseDist } from './utils.js'
+import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
@@ -721,12 +722,15 @@ export default function App() {
             {/* TRAJET */}
             {sub === 'trajet' && (
               <div style={s('padding:16px 18px 40px;')}>
-                <div style={s('background:#4a5d3a;border-radius:20px;padding:18px;color:#f3ecda;box-shadow:0 8px 20px rgba(74,93,58,0.2);')}>
-                  <div style={s('display:flex;align-items:center;gap:10px;font-family:Quicksand;font-weight:700;font-size:19px;')}><span>Lyon</span><span style={s('color:#c9d2b6;')}>→</span><span>Mandailles</span></div>
-                  <div style={s('display:flex;gap:20px;margin-top:14px;')}>
-                    <div><div style={s('font-size:12px;color:#c9d2b6;')}>Durée</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>3 h 40</div></div>
-                    <div><div style={s('font-size:12px;color:#c9d2b6;')}>Distance</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>285 km</div></div>
-                    <div><div style={s('font-size:12px;color:#c9d2b6;')}>Budget</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>≈ 77 €</div></div>
+                <div style={s('background:#4a5d3a;border-radius:20px;padding:18px;color:#f3ecda;box-shadow:0 8px 20px rgba(74,93,58,0.2);position:relative;overflow:hidden;')}>
+                  <Ridge />
+                  <div style={s('position:relative;')}>
+                    <div style={s('display:flex;align-items:center;gap:10px;font-family:Quicksand;font-weight:700;font-size:19px;')}><span>Lyon</span><span style={s('color:#c9d2b6;')}>→</span><span>Mandailles</span></div>
+                    <div style={s('display:flex;gap:20px;margin-top:14px;')}>
+                      <div><div style={s('font-size:12px;color:#c9d2b6;')}>Durée</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>3 h 40</div></div>
+                      <div><div style={s('font-size:12px;color:#c9d2b6;')}>Distance</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>285 km</div></div>
+                      <div><div style={s('font-size:12px;color:#c9d2b6;')}>Budget</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>≈ 77 €</div></div>
+                    </div>
                   </div>
                 </div>
                 <div style={s('margin-top:14px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>👶 Avec les enfants : une pause toutes les 1 h 30, et la playlist d’histoires audio prête pour la route.</div>
@@ -813,8 +817,8 @@ export default function App() {
             {/* HEBERGEMENT */}
             {sub === 'hebergement' && (
               <div style={s('padding:16px 18px 40px;')}>
-                <div style={s('height:150px;border-radius:18px;background:repeating-linear-gradient(45deg,#e8dcc2,#e8dcc2 12px,#e0d3b6 12px,#e0d3b6 24px);display:flex;align-items:center;justify-content:center;')}>
-                  <span style={s("font-family:ui-monospace,'SF Mono',monospace;font-size:12px;color:#9c8a66;background:rgba(255,253,248,0.85);padding:5px 10px;border-radius:8px;")}>photo · {hebergement.nom}</span>
+                <div style={s('height:150px;border-radius:18px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.1);')}>
+                  <GiteScene />
                 </div>
                 <div style={s('display:flex;align-items:center;margin-top:14px;gap:10px;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;flex:1;')}>{hebergement.nom}</div>
@@ -843,9 +847,12 @@ export default function App() {
             {/* METEO */}
             {sub === 'meteo' && (
               <div style={s('padding:16px 18px 40px;')}>
-                <div style={s('background:#4a5d3a;border-radius:18px;padding:16px;color:#f3ecda;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Puy Mary &amp; vallées</div>
-                  <div style={s('font-size:13px;color:#dbe2c9;margin-top:2px;')}>Prévisions du 11 au 17 juillet</div>
+                <div style={s('background:#4a5d3a;border-radius:18px;padding:16px;color:#f3ecda;position:relative;overflow:hidden;')}>
+                  <Ridge opacity={0.14} />
+                  <div style={s('position:relative;')}>
+                    <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Puy Mary &amp; vallées</div>
+                    <div style={s('font-size:13px;color:#dbe2c9;margin-top:2px;')}>Prévisions du 11 au 17 juillet</div>
+                  </div>
                 </div>
                 <div style={s('margin-top:12px;background:#eee7d4;border-radius:14px;padding:13px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧥 En altitude (Puy Mary, 1 783 m) il fait plus frais — prévoir une polaire même en été !</div>
                 <div style={s('margin-top:14px;display:flex;flex-direction:column;gap:8px;')}>
@@ -881,14 +888,21 @@ export default function App() {
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Bonjour 👋</div>
                   <div style={s('width:38px;height:38px;border-radius:50%;background:#cf7d3c;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Quicksand;')}>F</div>
                 </div>
-                <div style={s('margin:8px 18px 14px;background:#4a5d3a;border-radius:26px;padding:20px;color:#f3ecda;box-shadow:0 10px 26px rgba(74,93,58,0.24);')}>
-                  <div style={s('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#c9d2b6;')}>PROCHAINE AVENTURE</div>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;')}>Puy Mary,<br />Cantal</div>
-                  <div style={s('margin-top:9px;font-size:14px;color:#dbe2c9;')}>Sam 11 → Sam 18 juillet 2026</div>
-                  <div style={s('display:flex;gap:8px;margin-top:16px;')}>
-                    <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
-                    <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
+                <div style={s('margin:8px 18px 14px;background:#4a5d3a;border-radius:26px;padding:20px;color:#f3ecda;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;')}>
+                  <Ridge />
+                  <div style={s('position:relative;')}>
+                    <div style={s('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#c9d2b6;')}>PROCHAINE AVENTURE</div>
+                    <div style={s('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;')}>Puy Mary,<br />Cantal</div>
+                    <div style={s('margin-top:9px;font-size:14px;color:#dbe2c9;')}>Sam 11 → Sam 18 juillet 2026</div>
+                    <div style={s('display:flex;gap:8px;margin-top:16px;')}>
+                      <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
+                      <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
+                    </div>
                   </div>
+                </div>
+
+                <div style={s('margin:0 18px 14px;border-radius:20px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.08);')}>
+                  <Panorama />
                 </div>
 
                 <div style={s('margin:0 18px 12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
