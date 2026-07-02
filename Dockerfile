@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/android-sdk/cmdline-tools/latest/bin:/android-sdk/platform-tools:${PATH}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openjdk-17-jdk-headless curl wget git unzip zip \
+    openjdk-17-jdk-headless curl wget git unzip zip python3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Android SDK command-line tools
