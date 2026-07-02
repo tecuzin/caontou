@@ -47,10 +47,17 @@ Voir `docs/deploy-telegram.md` et le skill **deploy** pour la config Telegram.
 - **`.dockerignore`** garde `index.html` mais exclut `node_modules/dist/android/build`.
 - SDK : `platforms;android-34` (+35), `build-tools;34.0.0`/`35.0.0`.
 
-## Signature
-L'APK release de Gradle est non signé. L'`entrypoint.sh` génère un keystore
-(alias `cantou`, mdp `cantou123`), `zipalign -f 4`, puis `apksigner sign`.
-→ `cantou-release.apk` installable (`adb install -r …`).
+## Signature (keystore STABLE)
+L'APK release de Gradle est non signé. L'`entrypoint.sh` signe avec le
+**keystore committé `cantou.keystore`** (racine du repo, alias `cantou`,
+mdp `cantou123`), `zipalign -f 4`, puis `apksigner sign`.
+→ `cantou-release.apk` installable et **à jour par-dessus l'existant** (`adb install -r …`).
+
+⚠️ **Ne jamais régénérer/supprimer `cantou.keystore`** : un APK signé avec une
+autre clé ne peut pas mettre à jour l'app installée (Android : « conflit de
+package » / INSTALL_FAILED_UPDATE_INCOMPATIBLE) — il faudrait désinstaller,
+donc perdre les données localStorage. Le fallback de génération dans
+l'entrypoint n'existe que si le fichier manque, avec avertissement.
 **Pour le Play Store : remplacer par un vrai keystore et le garder hors du repo.**
 
 ## Dépannage
