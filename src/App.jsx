@@ -291,6 +291,12 @@ export default function App() {
   const [editingCourseKey, setEditingCourseKey] = useState(null)
   const [newCourseItem, setNewCourseItem] = useState('')
   const [newShoppingItem, setNewShoppingItem] = useState('')
+  const [showExport, setShowExport] = useState(false)
+  const [exportCopied, setExportCopied] = useState(false)
+  const [showImport, setShowImport] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [importError, setImportError] = useState('')
+  const [importPreview, setImportPreview] = useState(null)
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -704,6 +710,63 @@ export default function App() {
     setChecks((c) => { const nr = { ...(c.tr_dep || {}) }; delete nr[label]; return { ...c, tr_dep: nr } })
   }
 
+  // Export / import complet des données (JSON)
+  const STORE_KEYS = ['saved', 'checks', 'expenses', 'meals', 'shoppingItems', 'days', 'visits', 'meteo', 'trajetSteps', 'logi', 'courses', 'budgetTotal', 'hebergement', 'trajetCheckItems']
+  const buildExport = () => JSON.stringify({
+    app: 'cantou',
+    schema: STORE_KEY,
+    exportedAt: new Date().toISOString(),
+    data: { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems },
+  }, null, 2)
+  const copyExport = async () => {
+    try {
+      await navigator.clipboard.writeText(buildExport())
+      setExportCopied(true)
+      setTimeout(() => setExportCopied(false), 2500)
+    } catch { }
+  }
+  const downloadExport = () => {
+    try {
+      const ts = new Date().toISOString().slice(0, 16).replace(/[T:]/g, '-')
+      const blob = new Blob([buildExport()], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `cantou-export-${ts}.json`
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 5000)
+    } catch { }
+  }
+  const parseImport = (text) => {
+    setImportError(''); setImportPreview(null)
+    if (!text.trim()) return
+    let parsed
+    try { parsed = JSON.parse(text) } catch { setImportError('JSON invalide — vérifier le contenu collé.'); return }
+    // Accepte l'export enveloppé ({app:'cantou', data:{…}}) ou le store brut
+    const data = parsed && parsed.app === 'cantou' && parsed.data ? parsed.data : parsed
+    if (!data || typeof data !== 'object' || !STORE_KEYS.some((k) => k in data)) {
+      setImportError('Ce JSON ne ressemble pas à un export Cantou.')
+      return
+    }
+    setImportPreview(data)
+  }
+  const handleImportFile = (e) => {
+    const f = e.target.files && e.target.files[0]
+    if (!f) return
+    const reader = new FileReader()
+    reader.onload = () => { setImportText(String(reader.result)); parseImport(String(reader.result)) }
+    reader.readAsText(f)
+    e.target.value = ''
+  }
+  const applyImport = () => {
+    if (!importPreview) return
+    haptic(ImpactStyle.Medium)
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(importPreview)) } catch { }
+    // Recharge l'app pour ré-hydrater tous les états depuis le store importé
+    try { window.location.reload() } catch { }
+  }
+  const closeImport = () => { setShowImport(false); setImportText(''); setImportError(''); setImportPreview(null) }
+
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
   /* ---------------------------------------------------------------- */
@@ -935,6 +998,12 @@ export default function App() {
                       </div>
                     </button>
                   ))}
+                </div>
+
+                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Sauvegarde</div>
+                <div style={s('padding:0 18px 12px;display:flex;gap:12px;')}>
+                  <button data-testid="btn-export" onClick={() => { setExportCopied(false); setShowExport(true) }} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#4a5d3a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬇️ Exporter (JSON)</button>
+                  <button data-testid="btn-import" onClick={() => setShowImport(true)} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#9c6b4a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬆️ Importer</button>
                 </div>
                 <div style={s('height:16px;')} />
               </div>
@@ -1471,6 +1540,50 @@ export default function App() {
               <button onClick={() => setShowAddTrajetCheck(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={addTrajetCheckItem} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Export des données */}
+      {showExport && (
+        <div onClick={() => setShowExport(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Exporter les données</div>
+            <div style={s('font-size:13px;color:#8a8273;margin-bottom:14px;')}>Toutes les données de l'app (planning, dépenses, listes, favoris…) au format JSON. À garder en lieu sûr ou à envoyer sur un autre téléphone.</div>
+            <textarea data-testid="export-json" readOnly value={buildExport()} onFocus={(e) => e.target.select()} style={s('width:100%;height:180px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
+            <div style={s('display:flex;gap:10px;margin-top:14px;')}>
+              <button onClick={copyExport} style={s(`flex:1;border:none;background:${exportCopied ? '#5b7042' : '#4a5d3a'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;`)}>{exportCopied ? '✓ Copié !' : '📋 Copier'}</button>
+              <button onClick={downloadExport} style={s('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>💾 Télécharger</button>
+            </div>
+            <button onClick={() => setShowExport(false)} style={s('width:100%;margin-top:10px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Import des données */}
+      {showImport && (
+        <div onClick={closeImport} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Importer des données</div>
+            <div style={s('font-size:13px;color:#8a8273;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
+            <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); parseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={s('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
+            <label style={s('display:block;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;text-align:center;')}>
+              📂 Choisir un fichier…
+              <input type="file" accept=".json,application/json" onChange={handleImportFile} style={s('display:none;')} />
+            </label>
+            {importError && <div style={s('margin-top:10px;background:#f7e2dc;border-radius:12px;padding:11px 13px;font-size:13px;color:#b8503f;font-weight:600;')}>⚠️ {importError}</div>}
+            {importPreview && (
+              <div data-testid="import-preview" style={s('margin-top:10px;background:#e7ecdf;border-radius:12px;padding:11px 13px;font-size:13px;color:#4a5d3a;')}>
+                ✓ Export Cantou valide — {Array.isArray(importPreview.expenses) ? importPreview.expenses.length : 0} dépenses, {Array.isArray(importPreview.meals) ? importPreview.meals.length : 0} repas, {Array.isArray(importPreview.visits) ? importPreview.visits.length : 0} visites, {Array.isArray(importPreview.days) ? importPreview.days.length : 0} jours de planning.
+              </div>
+            )}
+            <div style={s('display:flex;gap:10px;margin-top:14px;')}>
+              <button onClick={closeImport} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={s(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
+            </div>
+            <div style={s('margin-top:10px;font-size:12px;color:#8a8273;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
           </div>
         </div>
       )}

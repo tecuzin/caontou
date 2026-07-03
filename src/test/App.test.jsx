@@ -192,3 +192,49 @@ describe('Persistance localStorage', () => {
     expect(screen.getByText('Test persistance')).toBeInTheDocument()
   })
 })
+
+describe('Export / import des données', () => {
+  it('ouvre la modal export avec un JSON Cantou complet', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-export'))
+    const json = screen.getByTestId('export-json').value
+    const parsed = JSON.parse(json)
+    expect(parsed.app).toBe('cantou')
+    expect(parsed.schema).toBe('cantou.v1')
+    expect(parsed.data).toHaveProperty('expenses')
+    expect(parsed.data).toHaveProperty('meals')
+    expect(parsed.data).toHaveProperty('budgetTotal')
+  })
+
+  it('valide un export collé et affiche le résumé', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-import'))
+    const payload = JSON.stringify({ app: 'cantou', data: { expenses: [{ label: 'X', cat: 'Extra', amt: 5 }], meals: [], budgetTotal: 1000 } })
+    fireEvent.change(screen.getByTestId('import-textarea'), { target: { value: payload } })
+    expect(screen.getByTestId('import-preview')).toBeInTheDocument()
+    expect(screen.getByTestId('btn-apply-import')).not.toBeDisabled()
+  })
+
+  it('rejette un JSON qui n\'est pas un export Cantou', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-import'))
+    fireEvent.change(screen.getByTestId('import-textarea'), { target: { value: '{"foo":1}' } })
+    expect(screen.queryByTestId('import-preview')).not.toBeInTheDocument()
+    expect(screen.getByTestId('btn-apply-import')).toBeDisabled()
+  })
+
+  it('écrit le store importé dans localStorage au clic sur Remplacer', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-import'))
+    const payload = JSON.stringify({ app: 'cantou', data: { expenses: [{ label: 'Importé', cat: 'Extra', amt: 42 }], budgetTotal: 2500 } })
+    fireEvent.change(screen.getByTestId('import-textarea'), { target: { value: payload } })
+    await user.click(screen.getByTestId('btn-apply-import'))
+    const stored = JSON.parse(window.localStorage.getItem('cantou.v1'))
+    expect(stored.budgetTotal).toBe(2500)
+    expect(stored.expenses[0].label).toBe('Importé')
+  })
+})
