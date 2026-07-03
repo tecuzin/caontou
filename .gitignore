@@ -11,7 +11,7 @@ android/
 build/
 *.apk
 *.aab
-
+.vite/
 # Gradle / SDK
 .gradle/
 local.properties
