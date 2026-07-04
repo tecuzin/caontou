@@ -1,7 +1,8 @@
 # Cantou — TODO & Backlog
 
 > Lire ce fichier en début de session. Mettre à jour les cases au fil du travail.
-> Départ voyage : **7 août 2026**. Deadline app : **15 juillet 2026**.
+> Voyage paramétrable dans l'app (⚙️ sur l'accueil) — par défaut **5 → 15 août 2026**
+> (Beauvais → Laschamps → Cantal). Deadline app : **15 juillet 2026**.
 
 ---
 
@@ -96,7 +97,7 @@
 
 ### Notifications
 - [x] Rappels **30 min avant** chaque activité planning (schedulés au démarrage si permission accordée)
-- [x] Rappels **étapes trajet** (J-1 : 10 juillet 20 h · matin départ : 11 juillet 7 h)
+- [x] Rappels **étapes trajet** (veille 20 h + matin du départ 7 h, dates dérivées de `trip.start`/`trip.end` — voir voyage paramétrable ci-dessus)
 - [x] Rappels **repas du jour** (8 h chaque matin de séjour)
 - [x] Alerte **budget** si dépensé > 80 % du total
 
