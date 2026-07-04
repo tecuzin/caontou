@@ -173,6 +173,24 @@ describe('Visites — filtres et tri', () => {
     expect(screen.getByText(/📍.*Distance|Distance.*📍/)).toBeInTheDocument()
     expect(screen.getByText(/🏷️.*Catégorie|Catégorie.*🏷️/)).toBeInTheDocument()
   })
+
+  it('ouvre bien la modal au clic sur "+ Ajouter visite" (régression)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    await user.click(screen.getByText('+ Ajouter visite'))
+    expect(screen.getByText('Ajouter une visite')).toBeInTheDocument()
+  })
+
+  it('ajoute une nouvelle visite via la modal', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    await user.click(screen.getByText('+ Ajouter visite'))
+    await user.type(screen.getByPlaceholderText('Ex : Puy Mary'), 'Grotte du Loup')
+    await user.click(screen.getByText('Enregistrer'))
+    expect(screen.getByText('Grotte du Loup')).toBeInTheDocument()
+  })
 })
 
 describe('Persistance localStorage', () => {
