@@ -6,6 +6,8 @@ import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { buildExport, exportFilename, parseImport, downloadExport, shareExport } from './backup.js'
 import { useVisits } from './hooks/useVisits.js'
+import { useExpenses } from './hooks/useExpenses.js'
+import { useMeals } from './hooks/useMeals.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
@@ -315,9 +317,9 @@ export default function App() {
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
   const { visits, setVisits, saved, setSaved, savedCount, toggleSaved: hookToggleSaved, addVisit: hookAddVisit, updateVisit, removeVisit } = useVisits(initial.visits, initial.saved)
+  const { expenses, setExpenses, addExpense, updateExpense, removeExpense } = useExpenses(initial.expenses)
+  const { meals, setMeals, addMeal: hookAddMeal, updateMeal, removeMeal } = useMeals(initial.meals)
   const [checks, setChecks] = useState(initial.checks)
-  const [expenses, setExpenses] = useState(initial.expenses)
-  const [meals, setMeals] = useState(initial.meals || structuredClone(MEALS_INITIAL))
   const [shoppingItems, setShoppingItems] = useState(initial.shoppingItems || structuredClone(SHOPPING_ITEMS_INITIAL))
   const [days, setDays] = useState(initial.days || structuredClone(DAYS_INITIAL))
   const [meteo, setMeteo] = useState(initial.meteo || structuredClone(METEO_INITIAL))
@@ -459,18 +461,19 @@ export default function App() {
     const a = parseFloat(String(newAmt).replace(',', '.'))
     if (!a || a <= 0) return
     haptic(ImpactStyle.Medium)
+    const data = { label: newLabel || newCat, cat: newCat, amt: a }
     if (editingExpenseIdx !== null) {
-      setExpenses((list) => list.map((e, i) => i === editingExpenseIdx ? { label: newLabel || newCat, cat: newCat, amt: a } : e))
+      updateExpense(editingExpenseIdx, data)
       setEditingExpenseIdx(null)
     } else {
-      setExpenses((list) => [...list, { label: newLabel || newCat, cat: newCat, amt: a }])
+      addExpense(data)
     }
     setShowAdd(false); setNewAmt(''); setNewLabel('')
   }
   const deleteExpense = (idx) => {
     haptic(ImpactStyle.Medium)
     offerUndo('Dépense supprimée')
-    setExpenses((list) => list.filter((_, i) => i !== idx))
+    removeExpense(idx)
   }
   const startEditExpense = (idx) => {
     const e = expenses[idx]
@@ -492,10 +495,9 @@ export default function App() {
     haptic(ImpactStyle.Medium)
     if (editingMealId === null) {
       if (!newMealDay.trim()) return
-      const newId = Math.max(0, ...meals.map(m => m.id)) + 1
-      setMeals((list) => [...list, { id: newId, day: newMealDay.trim(), dish: newMealDish.trim() }])
+      hookAddMeal({ day: newMealDay.trim(), dish: newMealDish.trim() })
     } else {
-      setMeals((list) => list.map(m => m.id === editingMealId ? { ...m, day: newMealDay, dish: newMealDish } : m))
+      updateMeal(editingMealId, { day: newMealDay, dish: newMealDish })
     }
     closeMealEdit()
   }
@@ -504,7 +506,7 @@ export default function App() {
     if (meals.length <= 1) return
     haptic(ImpactStyle.Medium)
     offerUndo('Repas supprimé')
-    setMeals((list) => list.filter(m => m.id !== id))
+    removeMeal(id)
   }
 
   const deleteShoppingItem = (id) => {
