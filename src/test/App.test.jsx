@@ -89,6 +89,16 @@ describe('Accueil — contenu', () => {
     // Budget appears in tab bar + module card — both are fine
     expect(screen.getAllByText('Budget').length).toBeGreaterThanOrEqual(1)
   })
+
+  it('n\'affiche plus la ligne "Bonjour" ni l\'avatar (nettoyage demandé)', () => {
+    render(<App />)
+    expect(screen.queryByText(/Bonjour/)).not.toBeInTheDocument()
+  })
+
+  it('affiche le panorama montagnes en fond de la carte héro', () => {
+    render(<App />)
+    expect(screen.getByTestId('hero-panorama-bg')).toBeInTheDocument()
+  })
 })
 
 describe('Budget — ajout d\'une dépense', () => {

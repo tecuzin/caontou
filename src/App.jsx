@@ -1067,20 +1067,19 @@ export default function App() {
             {/* ACCUEIL */}
             {tab === 'accueil' && (
               <div data-testid="screen-accueil">
-                <div style={s('padding:54px 18px 6px;display:flex;align-items:center;justify-content:space-between;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Bonjour 👋</div>
-                  <div style={s('width:38px;height:38px;border-radius:50%;background:#cf7d3c;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:Quicksand;')}>F</div>
-                </div>
-                <div style={s('margin:8px 18px 14px;background:#4a5d3a;border-radius:26px;padding:20px;color:#f3ecda;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;')}>
-                  <Ridge />
-                  <button data-testid="btn-trip-settings" onClick={openTripEdit} style={s('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.15);color:#f3ecda;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
-                  <div style={s('position:relative;')}>
-                    <div style={s('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#c9d2b6;')}>PROCHAINE AVENTURE</div>
-                    <div style={s('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;')}>Puy Mary,<br />Cantal</div>
-                    <div style={s('margin-top:9px;font-size:14px;color:#dbe2c9;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
+                <div style={s('margin:54px 18px 14px 18px;border-radius:26px;padding:20px;color:#fffaf0;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;min-height:190px;')}>
+                  <div data-testid="hero-panorama-bg" style={s('position:absolute;inset:0;z-index:0;')}>
+                    <Panorama height="100%" />
+                    <div style={s('position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,40,25,0.15) 0%,rgba(25,35,20,0.55) 60%,rgba(20,28,16,0.75) 100%);')} />
+                  </div>
+                  <button data-testid="btn-trip-settings" onClick={openTripEdit} style={s('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
+                  <div style={s('position:relative;z-index:1;')}>
+                    <div style={s('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#e8e2cf;')}>PROCHAINE AVENTURE</div>
+                    <div style={s('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;text-shadow:0 2px 8px rgba(0,0,0,0.25);')}>Puy Mary,<br />Cantal</div>
+                    <div style={s('margin-top:9px;font-size:14px;color:#e8e2cf;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
                     <div style={s('display:flex;gap:8px;margin-top:16px;')}>
-                      <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
-                      <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
+                      <div style={s('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
+                      <div style={s('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
                     </div>
                   </div>
                 </div>
@@ -1110,10 +1109,6 @@ export default function App() {
                     <button onClick={() => { setTab('planning'); setDay(today.dayIdx) }} style={s('margin-top:13px;width:100%;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le planning du jour →</button>
                   </div>
                 )}
-
-                <div style={s('margin:0 18px 14px;border-radius:20px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.08);')}>
-                  <Panorama />
-                </div>
 
                 <div style={s('margin:0 18px 12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
                   <div style={s('display:flex;align-items:center;gap:12px;')}>
