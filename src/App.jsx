@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { LocalNotifications } from '@capacitor/local-notifications'
@@ -364,6 +364,29 @@ export default function App() {
   const [hebergement, setHebergement] = useState(initial.hebergement || structuredClone(HEB_INITIAL))
   const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
 
+  // Undo suppression : instantané complet du store avant chaque 🗑️,
+  // restaurable pendant 5 s via le bandeau « Annuler »
+  const [undoMsg, setUndoMsg] = useState(null)
+  const undoSnapRef = useRef(null)
+  const undoTimerRef = useRef(null)
+  const offerUndo = (msg) => {
+    undoSnapRef.current = { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems }
+    setUndoMsg(msg)
+    clearTimeout(undoTimerRef.current)
+    undoTimerRef.current = setTimeout(() => setUndoMsg(null), 5000)
+  }
+  const applyUndo = () => {
+    const s0 = undoSnapRef.current
+    if (!s0) return
+    haptic(ImpactStyle.Medium)
+    setSaved(s0.saved); setChecks(s0.checks); setExpenses(s0.expenses); setMeals(s0.meals)
+    setShoppingItems(s0.shoppingItems); setDays(s0.days); setVisits(s0.visits); setMeteo(s0.meteo)
+    setTrajetSteps(s0.trajetSteps); setLogi(s0.logi); setCourses(s0.courses)
+    setBudgetTotal(s0.budgetTotal); setHebergement(s0.hebergement); setTrajetCheckItems(s0.trajetCheckItems)
+    setUndoMsg(null)
+    undoSnapRef.current = null
+  }
+
   // états UI modals nouveaux
   const [showBudgetTotalEdit, setShowBudgetTotalEdit] = useState(false)
   const [newBudgetTotal, setNewBudgetTotal] = useState('')
@@ -462,6 +485,7 @@ export default function App() {
   }
   const deleteExpense = (idx) => {
     haptic(ImpactStyle.Medium)
+    offerUndo('Dépense supprimée')
     setExpenses((list) => list.filter((_, i) => i !== idx))
   }
   const startEditExpense = (idx) => {
@@ -495,11 +519,13 @@ export default function App() {
   const deleteMeal = (id) => {
     if (meals.length <= 1) return
     haptic(ImpactStyle.Medium)
+    offerUndo('Repas supprimé')
     setMeals((list) => list.filter(m => m.id !== id))
   }
 
   const deleteShoppingItem = (id) => {
     haptic(ImpactStyle.Medium)
+    offerUndo('Article supprimé')
     setShoppingItems((list) => list.filter(item => item.id !== id))
   }
   const toggleShoppingItem = (id) => {
@@ -541,6 +567,8 @@ export default function App() {
   const closeDayEdit = () => { setShowDayEdit(false); setEditingDayIdx(null); setNewDayTitle(''); setNewDaySub('') }
   const deleteDay = (dayIdx) => {
     if (days.length <= 1) return
+    haptic(ImpactStyle.Medium)
+    offerUndo('Jour supprimé')
     setDays((list) => list.filter((_, i) => i !== dayIdx))
     if (day === dayIdx) setDay(Math.max(0, day - 1))
   }
@@ -575,6 +603,8 @@ export default function App() {
   }
   const closeActivityAdd = () => { setShowActivityAdd(false); setEditingActivityDayIdx(null); setNewActivityTime(''); setNewActivityTitle(''); setNewActivityColor('#5b7042') }
   const deleteActivity = (dayIdx, itemIdx) => {
+    haptic(ImpactStyle.Medium)
+    offerUndo('Activité supprimée')
     setDays((list) => list.map((d, di) => di === dayIdx ? { ...d, items: d.items.filter((_, ii) => ii !== itemIdx) } : d))
   }
 
@@ -604,6 +634,8 @@ export default function App() {
   const closeVisitEdit = () => { setShowVisitEdit(false); setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature') }
   const deleteVisit = (visitId) => {
     if (visits.length <= 1) return
+    haptic(ImpactStyle.Medium)
+    offerUndo('Visite supprimée')
     setVisits((list) => list.filter(v => v.id !== visitId))
   }
   const addVisit = () => {
@@ -636,6 +668,8 @@ export default function App() {
   const closeTrajetEdit = () => { setShowTrajetEdit(false); setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042') }
   const deleteTrajetStep = (idx) => {
     if (trajetSteps.length <= 1) return
+    haptic(ImpactStyle.Medium)
+    offerUndo('Étape supprimée')
     setTrajetSteps((list) => list.filter((_, i) => i !== idx))
   }
 
@@ -672,6 +706,7 @@ export default function App() {
   const deleteMeteo = (idx) => {
     if (meteo.length <= 1) return
     haptic(ImpactStyle.Medium)
+    offerUndo('Jour météo supprimé')
     setMeteo((list) => list.filter((_, i) => i !== idx))
   }
 
@@ -684,6 +719,7 @@ export default function App() {
   const closeAddLogiItem = () => { setShowAddLogiItem(false); setEditingLogiKey(null); setNewLogiItem('') }
   const deleteLogiItem = (key, item) => {
     haptic(ImpactStyle.Medium)
+    offerUndo('Article supprimé')
     setLogi((list) => list.map((L) => L.key === key ? { ...L, items: L.items.filter((i) => i !== item) } : L))
     setChecks((c) => { const nr = { ...(c[key] || {}) }; delete nr[item]; return { ...c, [key]: nr } })
   }
@@ -697,6 +733,7 @@ export default function App() {
   const closeAddCourseItem = () => { setShowAddCourseItem(false); setEditingCourseKey(null); setNewCourseItem('') }
   const deleteCourseItem = (key, item) => {
     haptic(ImpactStyle.Medium)
+    offerUndo('Article supprimé')
     setCourses((list) => list.map((g) => g.key === key ? { ...g, items: g.items.filter((i) => i !== item) } : g))
     setChecks((c) => { const nr = { ...(c[key] || {}) }; delete nr[item]; return { ...c, [key]: nr } })
   }
@@ -729,6 +766,8 @@ export default function App() {
     setNewTrajetCheckItem(''); setShowAddTrajetCheck(false)
   }
   const deleteTrajetCheckItem = (label) => {
+    haptic(ImpactStyle.Medium)
+    offerUndo('Item supprimé')
     setTrajetCheckItems((list) => list.filter((i) => i !== label))
     setChecks((c) => { const nr = { ...(c.tr_dep || {}) }; delete nr[label]; return { ...c, tr_dep: nr } })
   }
@@ -1608,6 +1647,14 @@ export default function App() {
             </div>
             <div style={s('margin-top:10px;font-size:12px;color:#8a8273;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
           </div>
+        </div>
+      )}
+
+      {/* BANDEAU UNDO SUPPRESSION */}
+      {undoMsg && (
+        <div data-testid="undo-snackbar" style={s('position:fixed;left:18px;right:18px;bottom:96px;z-index:300;background:#2f2a22;color:#fffaf0;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:fadeIn 0.2s ease;')}>
+          <span style={s('flex:1;font-size:14px;font-weight:600;')}>{undoMsg}</span>
+          <button data-testid="btn-undo" onClick={applyUndo} style={s('border:none;background:transparent;color:#e8c07a;font-weight:700;font-family:Quicksand;font-size:14px;cursor:pointer;padding:4px 8px;')}>Annuler</button>
         </div>
       )}
 
