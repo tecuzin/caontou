@@ -99,6 +99,11 @@ describe('Accueil — contenu', () => {
     render(<App />)
     expect(screen.getByTestId('hero-panorama-bg')).toBeInTheDocument()
   })
+
+  it('expose un landmark <main> pour l\'accessibilité (audit Lighthouse)', () => {
+    render(<App />)
+    expect(screen.getByRole('main')).toBeInTheDocument()
+  })
 })
 
 describe('Budget — ajout d\'une dépense', () => {

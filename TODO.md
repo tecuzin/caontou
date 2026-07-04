@@ -159,6 +159,54 @@
   « Bonjour 👋 » + avatar rond. Carte Panorama autonome (redondante)
   supprimée. 151 tests verts.
 
+## ✅ Complété — audit complet (sécurité, perf, accessibilité)
+
+**Outils utilisés** : Trivy (dépendances/secrets/config Docker), `npm audit`,
+ESLint + `eslint-plugin-sonarjs` + `eslint-plugin-security` (équivalent
+SonarQube hors-ligne — pas de serveur Sonar/token disponible dans cet
+environnement), agent LLM dédié à la revue de sécurité (audit complet de
+`src/` + scripts de build/déploiement), Lighthouse (performance +
+accessibilité, mobile 402×874).
+
+**Résultats sécurité** : 0 finding Critique/Élevé/Moyen. 3 Faibles
+(validation import JSON superficielle, pas de limite de taille avant
+`JSON.parse`, wifiPass en clair — attendu/voulu) + 4 Info (dont
+prototype pollution non exploitable, keystore/mdp de secours déjà
+documentés). Aucun secret dans l'historique git (`.env.deploy` jamais
+committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
+
+- [x] Garde-fou taille sur l'import JSON (`parseImport`, backup.js) —
+  rejette > 5 Mo avant `JSON.parse`, message d'erreur explicite.
+- [x] Findings ESLint (object-injection, no-empty) revus : faux positifs
+  (clés internes non issues d'une source non fiable, `catch {}`
+  intentionnels pour la dégradation gracieuse du partage).
+- [x] Trivy : 1 finding (Dockerfile tourne en root) — **risque accepté**,
+  documenté : conteneur de build éphémère, 100% local, jamais exposé au
+  réseau, détruit après chaque build ; le risque de casser le pipeline
+  (déjà fragile aujourd'hui) dépasse le bénéfice réel.
+- [x] `npm audit` : 7 vulnérabilités (3 modérées, 4 élevées) — toutes dans
+  des devDependencies (`@capacitor/cli`, `vite`, `mocha`...), **aucune
+  dans les dépendances runtime embarquées dans l'APK**. Pas de fix non
+  cassant disponible ; pas forcé de breaking change pour un risque nul
+  côté produit livré.
+
+**Résultats Lighthouse (mobile)** :
+| Catégorie | Avant | Après |
+|---|---|---|
+| Performance | 94/100 | 94/100 |
+| Accessibilité | 74/100 | **91/100** |
+| Bonnes pratiques | 92/100 | 92/100 |
+
+- [x] Contraste de texte insuffisant (`#8a8273`, 74 occurrences, ratio
+  3.2-3.7:1) → remplacé par `#6b6354` (déjà utilisé 34× ailleurs dans le
+  design, ratio 5.0-5.8:1, conforme WCAG AA).
+- [x] Viewport bloquait le zoom (`user-scalable=no`, `maximum-scale=1.0`)
+  → `maximum-scale=5.0`, zoom autorisé (accessibilité basse vision).
+- [x] Absence de landmark `<main>` → racine du composant `App` changée
+  de `<div>` à `<main>`.
+- [x] 3 tests de régression ajoutés (garde-fou taille import, landmark
+  main) — 154 tests verts au total, 0 régression.
+
 ## 📅 Backlog suivant
 
 - [ ] **Poursuivre l'extraction de hooks** (voir skill `refactor`, priorité 1) :
