@@ -60,10 +60,27 @@
 - [x] **Undo suppression** — bandeau « Supprimé · Annuler » (5 s) après chaque 🗑️
   (11 handlers), restaure un instantané complet du store
 
+## 🔄 En cours — 4 juillet : voyage paramétrable
+
+> Nouveau brief : trajet **Beauvais → Laschamps (étape nuit) → Cantal** aller ET
+> retour ; dates **5 → 15 août 2026 par défaut mais paramétrables** ; préparatifs
+> et courses **entièrement personnalisables** (listes/catégories, pas seulement items).
+
+- [ ] **Paramètres du voyage** — modal ⚙️ : ville de départ, étape, destination,
+  date de départ, date de retour. Persisté (`trip`), tout le reste en dérive :
+  compte à rebours J-, textes des cartes, notifications (mois/année), rappels trajet.
+- [ ] **Trajet aller/retour** — deux onglets Aller · Retour, chacun avec ses étapes
+  éditables (CRUD existant). Défauts : Beauvais → Laschamps (nuit) → Mandailles,
+  et inverse au retour. Migration `trajetSteps` → `trajets.{aller,retour}`.
+- [ ] **Préparatifs personnalisables** — ajouter/supprimer des LISTES logistique
+  (nom + emoji) et des CATÉGORIES de courses, en plus des items (undo inclus).
+- [ ] **Planning : ajouter un jour** — bouton + (11 jours de séjour désormais) ;
+  défauts recalés sur août (Mer 5 → Sam 15, étapes Laschamps incluses).
+
 ## 📅 Backlog suivant
 
 - [ ] **Écran « Aujourd'hui »** — tableau de bord du jour pendant le séjour
-  (planning du jour + météo + repas du soir), affiché par défaut du 11 au 18 juillet
+  (planning du jour + météo + repas du soir), affiché par défaut pendant le voyage
 - [ ] **Partage natif de la sauvegarde** (`@capacitor/share`) — envoyer l'export JSON
   directement dans Telegram/WhatsApp pour synchroniser deux téléphones
 
