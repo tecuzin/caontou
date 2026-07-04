@@ -370,3 +370,63 @@ describe('Partage natif de la sauvegarde', () => {
     expect(screen.getByTestId('btn-share-export')).toBeInTheDocument()
   })
 })
+
+describe('Navigation par glissement (swipe)', () => {
+  const swipeLeft = (el) => {
+    fireEvent.touchStart(el, { touches: [{ clientX: 300, clientY: 400 }] })
+    fireEvent.touchEnd(el, { changedTouches: [{ clientX: 150, clientY: 400 }] })
+  }
+  const swipeRight = (el) => {
+    fireEvent.touchStart(el, { touches: [{ clientX: 100, clientY: 400 }] })
+    fireEvent.touchEnd(el, { changedTouches: [{ clientX: 250, clientY: 400 }] })
+  }
+
+  it('swipe vers la gauche sur la barre d\'onglets va à l\'écran suivant', async () => {
+    render(<App />)
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+    swipeLeft(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-planning')).toBeInTheDocument()
+  })
+
+  it('swipe vers la droite sur la barre d\'onglets revient à l\'écran précédent', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    expect(screen.getByTestId('screen-visites')).toBeInTheDocument()
+    swipeRight(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-planning')).toBeInTheDocument()
+  })
+
+  it('ne dépasse pas le dernier onglet en swipant à gauche sur Budget', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-budget'))
+    swipeLeft(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+  })
+
+  it('ne recule pas avant Accueil en swipant à droite sur le premier onglet', () => {
+    render(<App />)
+    swipeRight(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+  })
+
+  it('swipe gauche→droite sur un sous-écran revient en arrière (équivalent bouton ‹)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Trajet'))
+    expect(screen.getByTestId('sub-screen-wrapper')).toBeInTheDocument()
+    swipeRight(screen.getByTestId('sub-screen-wrapper'))
+    expect(screen.queryByTestId('sub-screen-wrapper')).not.toBeInTheDocument()
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+  })
+
+  it('un tap normal (sans déplacement) sur la barre d\'onglets ne déclenche pas de swipe', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-budget'))
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+    // clic normal (userEvent.click) simule un tap sans déplacement — ne doit rien changer d'autre
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+  })
+})

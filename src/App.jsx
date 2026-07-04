@@ -6,6 +6,7 @@ import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { buildExport, exportFilename, parseImport, downloadExport, shareExport } from './backup.js'
 import { useVisits } from './hooks/useVisits.js'
+import { useSwipe } from './hooks/useSwipe.js'
 import { useExpenses } from './hooks/useExpenses.js'
 import { useMeals } from './hooks/useMeals.js'
 
@@ -846,13 +847,27 @@ export default function App() {
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
 
+  // Navigation par glissement : gauche/droite sur la barre d'onglets pour
+  // changer d'écran, glissement gauche→droite sur le contenu d'un
+  // sous-écran pour revenir en arrière (équivalent du bouton ‹).
+  const currentTabIdx = TABS.findIndex(([key]) => key === tab)
+  const goToAdjacentTab = (dir) => {
+    const nextIdx = currentTabIdx + dir
+    if (nextIdx < 0 || nextIdx >= TABS.length) return
+    haptic(ImpactStyle.Light)
+    setTab(TABS[nextIdx][0])
+    setSub(null)
+  }
+  const tabBarSwipe = useSwipe(() => goToAdjacentTab(1), () => goToAdjacentTab(-1))
+  const subScreenSwipe = useSwipe(null, () => { if (sub) { haptic(ImpactStyle.Light); setSub(null) } })
+
   /* ---------------------------------------------------------------- */
   return (
     <div style={s("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;")}>
 
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (
-        <div style={s('height:100%;display:flex;flex-direction:column;')}>
+        <div data-testid="sub-screen-wrapper" onTouchStart={subScreenSwipe.onTouchStart} onTouchEnd={subScreenSwipe.onTouchEnd} style={s('height:100%;display:flex;flex-direction:column;')}>
           <div style={s('display:flex;align-items:center;gap:8px;padding:54px 14px 12px;background:#fffdf8;border-bottom:1px solid #ece2cf;flex:0 0 auto;')}>
             <button onClick={() => setSub(null)} style={s('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:3px;')}>‹</button>
             <span style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
@@ -1364,7 +1379,7 @@ export default function App() {
           </div>
 
           {/* BARRE D'ONGLETS */}
-          <div style={s('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
+          <div data-testid="tab-bar" onTouchStart={tabBarSwipe.onTouchStart} onTouchEnd={tabBarSwipe.onTouchEnd} style={s('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
             {TABS.map(([key, emoji, label]) => (
               <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={s('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
                 <span style={s('font-size:20px;')}>{emoji}</span>
