@@ -430,3 +430,58 @@ describe('Navigation par glissement (swipe)', () => {
     expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
   })
 })
+
+describe('Suggestions', () => {
+  it('ajoute une suggestion et l\'affiche dans la liste', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'Ajouter un mode sombre')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByText('Ajouter un mode sombre')).toBeInTheDocument()
+  })
+
+  it('n\'ajoute rien si le champ est vide', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.queryByTestId('btn-send-suggestions')).not.toBeInTheDocument()
+  })
+
+  it('affiche le bouton d\'envoi seulement s\'il y a au moins une suggestion', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    expect(screen.queryByTestId('btn-send-suggestions')).not.toBeInTheDocument()
+    await user.type(screen.getByTestId('input-suggestion'), 'Une idée')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByTestId('btn-send-suggestions')).toBeInTheDocument()
+  })
+
+  it('supprime une suggestion via son bouton 🗑️', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'À supprimer')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByText('À supprimer')).toBeInTheDocument()
+    await user.click(screen.getByText('🗑️'))
+    expect(screen.queryByText('À supprimer')).not.toBeInTheDocument()
+  })
+
+  it('persiste les suggestions dans localStorage', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'Suggestion persistante')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    unmount()
+    render(<App />)
+    expect(screen.getByText('Suggestion persistante')).toBeInTheDocument()
+  })
+
+  it('vide le champ après ajout', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const input = screen.getByTestId('input-suggestion')
+    await user.type(input, 'Test')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(input.value).toBe('')
+  })
+})

@@ -130,12 +130,33 @@
   100% de couverture, 7 tests.
 - [x] Couverture globale : 50.13% → **51.84%**, 112 tests verts.
 
+## ✅ Complété — fix bug + suggestions + swipe (4 juillet, fin de soirée)
+
+- [x] **Fix « + Ajouter visite »** — la modal ne s'ouvrait jamais (condition
+  `editingVisitId !== null` qui excluait le mode ajout, même bug que la
+  météo corrigé dans une session précédente, raté ici). 2 tests de
+  régression.
+- [x] **Champ « Suggestions »** sur l'accueil — notes libres pour de
+  futures fonctionnalités ou consignes d'intégration de données, avec
+  bouton « 📤 Envoyer sur Telegram / WhatsApp… » (texte brut lisible
+  directement, pas un JSON à parser). `src/suggestions.js` (formatage +
+  partage) + `src/hooks/useSuggestions.js`. **Process à suivre en début
+  de session future : vérifier le canal Telegram pour d'éventuelles
+  suggestions envoyées depuis l'app, et les intégrer ici dans le
+  backlog.**
+- [x] **Navigation par glissement (swipe)** — swipe gauche/droite sur la
+  barre d'onglets pour changer d'écran, swipe gauche→droite sur un
+  sous-écran pour revenir en arrière (équivalent bouton ‹).
+  `src/hooks/useSwipe.js`, pur et testable.
+- [x] 149 tests verts, couverture globale 51.84% → **57.01%**.
+
 ## 📅 Backlog suivant
 
 - [ ] **Poursuivre l'extraction de hooks** (voir skill `refactor`, priorité 1) :
   `useTrajets`, `useLogi`, `useCourses`, `useMeteo`, `usePlanning`,
   `useTripConfig` — même pattern que `useVisits`/`useExpenses`/`useMeals`
   (état + actions pures, haptic/undo restent des wrappers côté App.jsx).
+  `useSuggestions` déjà fait sur ce modèle.
 - [ ] **Extraire les écrans en composants** (priorité 2 du skill) une fois
   les hooks sortis — Budget, Repas, Planning, Trajet, Logistique,
   Hébergement, Météo, Visites, Accueil.
