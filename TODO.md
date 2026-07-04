@@ -150,6 +150,15 @@
   `src/hooks/useSwipe.js`, pur et testable.
 - [x] 149 tests verts, couverture globale 51.84% → **57.01%**.
 
+## ✅ Complété — consigne reçue via Telegram (accueil)
+
+- [x] **Nettoyage du haut de l'accueil** (consigne reçue dans le canal
+  Telegram via le champ Suggestions) : montagnes du Panorama en fond
+  plein cadre de la carte héro « Prochaine aventure » (dégradé sombre
+  superposé pour la lisibilité du texte), suppression de la ligne
+  « Bonjour 👋 » + avatar rond. Carte Panorama autonome (redondante)
+  supprimée. 151 tests verts.
+
 ## 📅 Backlog suivant
 
 - [ ] **Poursuivre l'extraction de hooks** (voir skill `refactor`, priorité 1) :
