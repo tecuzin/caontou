@@ -18,7 +18,17 @@
       ::-webkit-scrollbar { width: 0; height: 0; }
       @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      body.dark { background: #1c1a16; }
     </style>
+    <script>
+      // Anti-flash : applique le fond sombre avant même le montage React,
+      // pour éviter un flash clair au démarrage si le mode sombre est actif.
+      try {
+        var saved = localStorage.getItem('cantou.darkMode')
+        var dark = saved !== null ? saved === 'true' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        if (dark) document.body.classList.add('dark')
+      } catch (e) {}
+    </script>
 </head>
 <body>
     <div id="app"></div>

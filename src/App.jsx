@@ -4,6 +4,7 @@ import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOG
 import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
+import { applyDarkTheme } from './theme.js'
 import { buildExport, exportFilename, parseImport, downloadExport, shareExport, formatLastBackup } from './backup.js'
 import { useVisits } from './hooks/useVisits.js'
 import { useSwipe } from './hooks/useSwipe.js'
@@ -242,6 +243,21 @@ const SectionLabel = ({ children }) => (
 
 /* ================================================================== */
 export default function App() {
+  // Mode sombre — préférence locale à l'appareil (pas synchronisée via
+  // l'export/import, chacun peut avoir sa propre préférence). Défaut :
+  // préférence système si jamais réglé explicitement.
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cantou.darkMode')
+      if (saved !== null) return saved === 'true'
+    } catch { }
+    try { return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches } catch { return false }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('cantou.darkMode', String(darkMode)) } catch { }
+  }, [darkMode])
+  const sx = (css) => s(darkMode ? applyDarkTheme(css) : css)
+
   // état UI (non persisté)
   const [tab, setTab] = useState('accueil')
   const [sub, setSub] = useState(null)
@@ -886,69 +902,69 @@ export default function App() {
 
   /* ---------------------------------------------------------------- */
   return (
-    <main style={s("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;")}>
+    <main style={sx("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;")}>
 
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (
-        <div data-testid="sub-screen-wrapper" onTouchStart={subScreenSwipe.onTouchStart} onTouchEnd={subScreenSwipe.onTouchEnd} style={s('height:100%;display:flex;flex-direction:column;')}>
-          <div style={s('display:flex;align-items:center;gap:8px;padding:54px 14px 12px;background:#fffdf8;border-bottom:1px solid #ece2cf;flex:0 0 auto;')}>
-            <button onClick={() => setSub(null)} style={s('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:3px;')}>‹</button>
-            <span style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
+        <div data-testid="sub-screen-wrapper" onTouchStart={subScreenSwipe.onTouchStart} onTouchEnd={subScreenSwipe.onTouchEnd} style={sx('height:100%;display:flex;flex-direction:column;')}>
+          <div style={sx('display:flex;align-items:center;gap:8px;padding:54px 14px 12px;background:#fffdf8;border-bottom:1px solid #ece2cf;flex:0 0 auto;')}>
+            <button onClick={() => setSub(null)} style={sx('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:3px;')}>‹</button>
+            <span style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
           </div>
-          <div style={s('flex:1;overflow-y:auto;')}>
+          <div style={sx('flex:1;overflow-y:auto;')}>
 
             {/* TRAJET */}
             {sub === 'trajet' && (
-              <div style={s('padding:16px 18px 40px;')}>
-                <div style={s('background:#4a5d3a;border-radius:20px;padding:18px;color:#f3ecda;box-shadow:0 8px 20px rgba(74,93,58,0.2);position:relative;overflow:hidden;')}>
+              <div style={sx('padding:16px 18px 40px;')}>
+                <div style={sx('background:#4a5d3a;border-radius:20px;padding:18px;color:#f3ecda;box-shadow:0 8px 20px rgba(74,93,58,0.2);position:relative;overflow:hidden;')}>
                   <Ridge />
-                  <div style={s('position:relative;')}>
-                    <div style={s('display:flex;align-items:center;gap:10px;font-family:Quicksand;font-weight:700;font-size:19px;flex-wrap:wrap;')}>
+                  <div style={sx('position:relative;')}>
+                    <div style={sx('display:flex;align-items:center;gap:10px;font-family:Quicksand;font-weight:700;font-size:19px;flex-wrap:wrap;')}>
                       <span>{trajetDir === 'aller' ? trip.origin : trip.destination}</span>
-                      <span style={s('color:#c9d2b6;')}>→</span>
+                      <span style={sx('color:#c9d2b6;')}>→</span>
                       <span>{trajetDir === 'aller' ? trip.destination : trip.origin}</span>
                     </div>
-                    <div style={s('display:flex;gap:20px;margin-top:14px;flex-wrap:wrap;')}>
-                      <div><div style={s('font-size:12px;color:#c9d2b6;')}>{trajetDir === 'aller' ? 'Départ' : 'Retour'}</div><div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>{fmtDayShort(trajetDir === 'aller' ? trip.start : trip.end)}</div></div>
-                      {trip.etape && <div><div style={s('font-size:12px;color:#c9d2b6;')}>Étape (nuit)</div><div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>{trip.etape}</div></div>}
+                    <div style={sx('display:flex;gap:20px;margin-top:14px;flex-wrap:wrap;')}>
+                      <div><div style={sx('font-size:12px;color:#c9d2b6;')}>{trajetDir === 'aller' ? 'Départ' : 'Retour'}</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{fmtDayShort(trajetDir === 'aller' ? trip.start : trip.end)}</div></div>
+                      {trip.etape && <div><div style={sx('font-size:12px;color:#c9d2b6;')}>Étape (nuit)</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{trip.etape}</div></div>}
                     </div>
                   </div>
                 </div>
-                <div style={s('margin-top:14px;display:flex;background:#ece2cf;border-radius:14px;padding:4px;')}>
-                  <button data-testid="btn-trajet-aller" onClick={() => setTrajetDir('aller')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'aller' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'aller' ? '#fffaf0' : '#6b6354'};`)}>Aller</button>
-                  <button data-testid="btn-trajet-retour" onClick={() => setTrajetDir('retour')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'retour' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'retour' ? '#fffaf0' : '#6b6354'};`)}>Retour</button>
+                <div style={sx('margin-top:14px;display:flex;background:#ece2cf;border-radius:14px;padding:4px;')}>
+                  <button data-testid="btn-trajet-aller" onClick={() => setTrajetDir('aller')} style={sx(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'aller' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'aller' ? '#fffaf0' : '#6b6354'};`)}>Aller</button>
+                  <button data-testid="btn-trajet-retour" onClick={() => setTrajetDir('retour')} style={sx(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'retour' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'retour' ? '#fffaf0' : '#6b6354'};`)}>Retour</button>
                 </div>
-                <div style={s('margin-top:14px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>👶 Avec les enfants : une pause toutes les 1 h 30, et la playlist d’histoires audio prête pour la route.</div>
-                <div style={s('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Les etapes · {trajetDir}</div>
+                <div style={sx('margin-top:14px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>👶 Avec les enfants : une pause toutes les 1 h 30, et la playlist d’histoires audio prête pour la route.</div>
+                <div style={sx('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Les etapes · {trajetDir}</div>
                 {trajets[trajetDir].map((st, i) => (
-                  <div key={i} style={s('display:flex;gap:12px;')}>
-                    <div style={s('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{st.time}</div>
-                    <div style={s('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
-                      <div style={s(`width:13px;height:13px;border-radius:50%;background:${st.color};margin-top:3px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${st.color};`)} />
-                      <div style={s('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
+                  <div key={i} style={sx('display:flex;gap:12px;')}>
+                    <div style={sx('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{st.time}</div>
+                    <div style={sx('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
+                      <div style={sx(`width:13px;height:13px;border-radius:50%;background:${st.color};margin-top:3px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${st.color};`)} />
+                      <div style={sx('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
                     </div>
-                    <div style={s('flex:1;padding-bottom:18px;')}>
-                      <div style={s('display:flex;align-items:center;gap:8px;')}>
-                        <div style={s('flex:1;')}>
-                          <div style={s('font-weight:700;font-size:15px;')}>{st.place}</div>
-                          <div style={s('font-size:13px;color:#6b6354;margin-top:2px;')}>{st.note}</div>
+                    <div style={sx('flex:1;padding-bottom:18px;')}>
+                      <div style={sx('display:flex;align-items:center;gap:8px;')}>
+                        <div style={sx('flex:1;')}>
+                          <div style={sx('font-weight:700;font-size:15px;')}>{st.place}</div>
+                          <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>{st.note}</div>
                         </div>
-                        <button onClick={() => editTrajetStep(i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
-                        <button onClick={() => deleteTrajetStep(i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
+                        <button onClick={() => editTrajetStep(i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
+                        <button onClick={() => deleteTrajetStep(i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
                       </div>
                     </div>
                   </div>
                 ))}
-                <button onClick={() => { setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042'); setShowTrajetEdit(true) }} style={s('width:100%;margin:4px 0 16px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter une étape</button>
-                <div style={s('display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Avant de partir · {tr.done}/{tr.total}</div>
-                  <button onClick={() => setShowAddTrajetCheck(true)} style={s('border:none;background:transparent;cursor:pointer;font-size:18px;padding:2px 4px;color:#9c6b4a;')}>＋</button>
+                <button onClick={() => { setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042'); setShowTrajetEdit(true) }} style={sx('width:100%;margin:4px 0 16px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter une étape</button>
+                <div style={sx('display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;')}>
+                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Avant de partir · {tr.done}/{tr.total}</div>
+                  <button onClick={() => setShowAddTrajetCheck(true)} style={sx('border:none;background:transparent;cursor:pointer;font-size:18px;padding:2px 4px;color:#9c6b4a;')}>＋</button>
                 </div>
-                <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
+                <div style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
                   {tr.items.map((it) => (
-                    <div key={it.label} style={s('display:flex;align-items:center;border-bottom:1px solid #f1e9da;')}>
-                      <div style={s('flex:1;')}><CheckRow label={it.label} checked={it.checked} onToggle={() => toggleCheck('tr_dep', it.label)} /></div>
-                      <button onClick={() => deleteTrajetCheckItem(it.label)} style={s('border:none;background:transparent;cursor:pointer;font-size:13px;padding:4px 10px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
+                    <div key={it.label} style={sx('display:flex;align-items:center;border-bottom:1px solid #f1e9da;')}>
+                      <div style={sx('flex:1;')}><CheckRow label={it.label} checked={it.checked} onToggle={() => toggleCheck('tr_dep', it.label)} /></div>
+                      <button onClick={() => deleteTrajetCheckItem(it.label)} style={sx('border:none;background:transparent;cursor:pointer;font-size:13px;padding:4px 10px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
                     </div>
                   ))}
                 </div>
@@ -957,105 +973,105 @@ export default function App() {
 
             {/* LOGISTIQUE */}
             {sub === 'logistique' && (
-              <div style={s('padding:16px 18px 40px;')}>
-                <div style={s('display:flex;justify-content:flex-end;margin-bottom:12px;')}>
-                  <button onClick={() => setLogiSorted(!logiSorted)} style={s(`border:1px solid ${logiSorted ? '#4a5d3a' : '#ece2cf'};background:${logiSorted ? '#4a5d3a' : '#fffdf8'};color:${logiSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
+              <div style={sx('padding:16px 18px 40px;')}>
+                <div style={sx('display:flex;justify-content:flex-end;margin-bottom:12px;')}>
+                  <button onClick={() => setLogiSorted(!logiSorted)} style={sx(`border:1px solid ${logiSorted ? '#4a5d3a' : '#ece2cf'};background:${logiSorted ? '#4a5d3a' : '#fffdf8'};color:${logiSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
                 </div>
                 {logi.map((L) => {
                   const b = buildList(checks, L.key, L.items)
                   const displayItems = logiSorted ? [...b.items].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)) : b.items
                   return (
-                    <div key={L.key} style={s('margin-bottom:18px;')}>
-                      <div style={s('display:flex;align-items:center;gap:9px;margin-bottom:8px;')}>
-                        <span style={s('font-size:18px;')}>{L.emoji}</span>
-                        <span style={s('font-family:Quicksand;font-weight:700;font-size:16px;flex:1;')}>{L.name}</span>
-                        <span style={s('font-size:12px;color:#6b6354;font-weight:700;')}>{b.done}/{b.total}</span>
-                        <button onClick={() => deleteLogiList(L.key)} style={s('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
+                    <div key={L.key} style={sx('margin-bottom:18px;')}>
+                      <div style={sx('display:flex;align-items:center;gap:9px;margin-bottom:8px;')}>
+                        <span style={sx('font-size:18px;')}>{L.emoji}</span>
+                        <span style={sx('font-family:Quicksand;font-weight:700;font-size:16px;flex:1;')}>{L.name}</span>
+                        <span style={sx('font-size:12px;color:#6b6354;font-weight:700;')}>{b.done}/{b.total}</span>
+                        <button onClick={() => deleteLogiList(L.key)} style={sx('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
                       </div>
-                      <div style={s('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={s(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
-                      <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
+                      <div style={sx('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={sx(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
+                      <div style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
                         {displayItems.map((it) => (
-                          <div key={it.label} style={s('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
-                            <button onClick={() => toggleCheck(L.key, it.label)} style={s('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
+                          <div key={it.label} style={sx('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
+                            <button onClick={() => toggleCheck(L.key, it.label)} style={sx('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
                               {it.checked ? (
                                 <>
-                                  <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
-                                  <span style={s('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{it.label}</span>
+                                  <span style={sx('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
+                                  <span style={sx('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{it.label}</span>
                                 </>
                               ) : (
                                 <>
-                                  <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid #d8cbb0;background:#fff;')} />
-                                  <span style={s('font-size:14px;color:#2f2a22;')}>{it.label}</span>
+                                  <span style={sx('width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid #d8cbb0;background:#fff;')} />
+                                  <span style={sx('font-size:14px;color:#2f2a22;')}>{it.label}</span>
                                 </>
                               )}
                             </button>
-                            <button onClick={() => deleteLogiItem(L.key, it.label)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
+                            <button onClick={() => deleteLogiItem(L.key, it.label)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
                           </div>
                         ))}
                       </div>
-                      <button onClick={() => { setEditingLogiKey(L.key); setShowAddLogiItem(true) }} style={s('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
+                      <button onClick={() => { setEditingLogiKey(L.key); setShowAddLogiItem(true) }} style={sx('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
                     </div>
                   )
                 })}
-                <button data-testid="btn-add-logi-list" onClick={() => setShowAddLogiList(true)} style={s('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle liste</button>
+                <button data-testid="btn-add-logi-list" onClick={() => setShowAddLogiList(true)} style={sx('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle liste</button>
               </div>
             )}
 
             {/* HEBERGEMENT */}
             {sub === 'hebergement' && (
-              <div style={s('padding:16px 18px 40px;')}>
-                <div style={s('height:150px;border-radius:18px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.1);')}>
+              <div style={sx('padding:16px 18px 40px;')}>
+                <div style={sx('height:150px;border-radius:18px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.1);')}>
                   <GiteScene />
                 </div>
-                <div style={s('display:flex;align-items:center;margin-top:14px;gap:10px;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;flex:1;')}>{hebergement.nom}</div>
-                  <button onClick={openHebEdit} style={s('border:none;background:transparent;cursor:pointer;font-size:18px;padding:4px;')}>✏️</button>
+                <div style={sx('display:flex;align-items:center;margin-top:14px;gap:10px;')}>
+                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:20px;flex:1;')}>{hebergement.nom}</div>
+                  <button onClick={openHebEdit} style={sx('border:none;background:transparent;cursor:pointer;font-size:18px;padding:4px;')}>✏️</button>
                 </div>
-                <div style={s('font-size:13px;color:#6b6354;margin-top:2px;')}>📍 {hebergement.adresse}</div>
-                <div style={s('display:flex;gap:10px;margin-top:14px;')}>
-                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#6b6354;')}>Arrivée</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.arrivee}</div></div>
-                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#6b6354;')}>Départ</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.depart}</div></div>
+                <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>📍 {hebergement.adresse}</div>
+                <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
+                  <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Arrivée</div><div style={sx('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.arrivee}</div></div>
+                  <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Départ</div><div style={sx('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.depart}</div></div>
                 </div>
-                <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>🛏️ {hebergement.capacite}</div>
-                <div style={s('margin:18px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Équipements</div>
-                <div style={s('display:flex;flex-wrap:wrap;gap:8px;')}>
-                  {HEB_EQUIP.map((eq) => <span key={eq} style={s('background:#fffdf8;border:1px solid #e3d8c2;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:#6b6354;')}>{eq}</span>)}
+                <div style={sx('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>🛏️ {hebergement.capacite}</div>
+                <div style={sx('margin:18px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Équipements</div>
+                <div style={sx('display:flex;flex-wrap:wrap;gap:8px;')}>
+                  {HEB_EQUIP.map((eq) => <span key={eq} style={sx('background:#fffdf8;border:1px solid #e3d8c2;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:#6b6354;')}>{eq}</span>)}
                 </div>
-                <div style={s('margin-top:16px;background:#e7ecdf;border-radius:14px;padding:14px;')}>
-                  <div style={s('font-weight:700;font-family:Quicksand;')}>📶 Wi-Fi</div>
-                  <div style={s('font-size:13px;color:#4a5d3a;margin-top:5px;')}>Réseau : <b>{hebergement.wifiNom}</b></div>
-                  <div style={s('font-size:13px;color:#4a5d3a;margin-top:2px;')}>Code : <b>{hebergement.wifiPass}</b></div>
+                <div style={sx('margin-top:16px;background:#e7ecdf;border-radius:14px;padding:14px;')}>
+                  <div style={sx('font-weight:700;font-family:Quicksand;')}>📶 Wi-Fi</div>
+                  <div style={sx('font-size:13px;color:#4a5d3a;margin-top:5px;')}>Réseau : <b>{hebergement.wifiNom}</b></div>
+                  <div style={sx('font-size:13px;color:#4a5d3a;margin-top:2px;')}>Code : <b>{hebergement.wifiPass}</b></div>
                 </div>
-                <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 {hebergement.contact}</div>
-                <div style={s('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>{hebergement.note}</div>
+                <div style={sx('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 {hebergement.contact}</div>
+                <div style={sx('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>{hebergement.note}</div>
               </div>
             )}
 
             {/* METEO */}
             {sub === 'meteo' && (
-              <div style={s('padding:16px 18px 40px;')}>
-                <div style={s('background:#4a5d3a;border-radius:18px;padding:16px;color:#f3ecda;position:relative;overflow:hidden;')}>
+              <div style={sx('padding:16px 18px 40px;')}>
+                <div style={sx('background:#4a5d3a;border-radius:18px;padding:16px;color:#f3ecda;position:relative;overflow:hidden;')}>
                   <Ridge opacity={0.14} />
-                  <div style={s('position:relative;')}>
-                    <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Puy Mary &amp; vallées</div>
-                    <div style={s('font-size:13px;color:#dbe2c9;margin-top:2px;')}>Prévisions du {fmtDayShort(trip.start)} au {fmtDayShort(trip.end)}</div>
+                  <div style={sx('position:relative;')}>
+                    <div style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>Puy Mary &amp; vallées</div>
+                    <div style={sx('font-size:13px;color:#dbe2c9;margin-top:2px;')}>Prévisions du {fmtDayShort(trip.start)} au {fmtDayShort(trip.end)}</div>
                   </div>
                 </div>
-                <div style={s('margin-top:12px;background:#eee7d4;border-radius:14px;padding:13px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧥 En altitude (Puy Mary, 1 783 m) il fait plus frais — prévoir une polaire même en été !</div>
-                <div style={s('margin-top:14px;display:flex;flex-direction:column;gap:8px;')}>
+                <div style={sx('margin-top:12px;background:#eee7d4;border-radius:14px;padding:13px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧥 En altitude (Puy Mary, 1 783 m) il fait plus frais — prévoir une polaire même en été !</div>
+                <div style={sx('margin-top:14px;display:flex;flex-direction:column;gap:8px;')}>
                   {meteo.map((w, i) => (
-                    <div key={i} style={s('display:flex;align-items:center;gap:6px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:6px 8px 6px 16px;')}>
-                      <button onClick={() => editMeteo(i)} style={s('flex:1;display:flex;align-items:center;gap:14px;border:none;background:transparent;cursor:pointer;text-align:left;padding:6px 0;')}>
-                        <div style={s('width:64px;font-weight:700;font-size:14px;')}>{w.d} {w.n}</div>
-                        <div style={s('font-size:24px;width:32px;text-align:center;')}>{w.icon}</div>
-                        <div style={s('font-size:12px;color:#6f8fb0;flex:1;font-weight:600;')}>💧 {w.rain}</div>
-                        <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{w.hi}° <span style={s('color:#b3a892;')}>{w.lo}°</span></div>
+                    <div key={i} style={sx('display:flex;align-items:center;gap:6px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:6px 8px 6px 16px;')}>
+                      <button onClick={() => editMeteo(i)} style={sx('flex:1;display:flex;align-items:center;gap:14px;border:none;background:transparent;cursor:pointer;text-align:left;padding:6px 0;')}>
+                        <div style={sx('width:64px;font-weight:700;font-size:14px;')}>{w.d} {w.n}</div>
+                        <div style={sx('font-size:24px;width:32px;text-align:center;')}>{w.icon}</div>
+                        <div style={sx('font-size:12px;color:#6f8fb0;flex:1;font-weight:600;')}>💧 {w.rain}</div>
+                        <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{w.hi}° <span style={sx('color:#b3a892;')}>{w.lo}°</span></div>
                       </button>
-                      <button onClick={() => deleteMeteo(i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
+                      <button onClick={() => deleteMeteo(i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
                     </div>
                   ))}
                 </div>
-                <button onClick={openAddMeteo} style={s('width:100%;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:14px;padding:10px;cursor:pointer;')}>+ Ajouter un jour</button>
+                <button onClick={openAddMeteo} style={sx('width:100%;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:14px;padding:10px;cursor:pointer;')}>+ Ajouter un jour</button>
               </div>
             )}
 
@@ -1065,296 +1081,297 @@ export default function App() {
 
       {/* ============ ÉCRANS PRINCIPAUX (onglets) ============ */}
       {!sub && (
-        <div style={s('height:100%;display:flex;flex-direction:column;')}>
-          <div style={s('flex:1;overflow-y:auto;')}>
+        <div style={sx('height:100%;display:flex;flex-direction:column;')}>
+          <div style={sx('flex:1;overflow-y:auto;')}>
 
             {/* ACCUEIL */}
             {tab === 'accueil' && (
               <div data-testid="screen-accueil">
-                <div style={s('margin:54px 18px 14px 18px;border-radius:26px;padding:20px;color:#fffaf0;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;min-height:190px;')}>
-                  <div data-testid="hero-panorama-bg" style={s('position:absolute;inset:0;z-index:0;')}>
+                <div style={sx('margin:54px 18px 14px 18px;border-radius:26px;padding:20px;color:#fffaf0;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;min-height:190px;')}>
+                  <div data-testid="hero-panorama-bg" style={sx('position:absolute;inset:0;z-index:0;')}>
                     <Panorama height="100%" />
-                    <div style={s('position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,40,25,0.15) 0%,rgba(25,35,20,0.55) 60%,rgba(20,28,16,0.75) 100%);')} />
+                    <div style={sx('position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,40,25,0.15) 0%,rgba(25,35,20,0.55) 60%,rgba(20,28,16,0.75) 100%);')} />
                   </div>
-                  <button data-testid="btn-trip-settings" onClick={openTripEdit} style={s('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
-                  <div style={s('position:relative;z-index:1;')}>
-                    <div style={s('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#e8e2cf;')}>PROCHAINE AVENTURE</div>
-                    <div style={s('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;text-shadow:0 2px 8px rgba(0,0,0,0.25);')}>Puy Mary,<br />Cantal</div>
-                    <div style={s('margin-top:9px;font-size:14px;color:#e8e2cf;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
-                    <div style={s('display:flex;gap:8px;margin-top:16px;')}>
-                      <div style={s('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
-                      <div style={s('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
+                  <button data-testid="btn-dark-mode-toggle" onClick={() => setDarkMode((d) => !d)} style={sx('position:absolute;top:14px;right:56px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>{darkMode ? '☀️' : '🌙'}</button>
+                  <button data-testid="btn-trip-settings" onClick={openTripEdit} style={sx('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
+                  <div style={sx('position:relative;z-index:1;')}>
+                    <div style={sx('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#e8e2cf;')}>PROCHAINE AVENTURE</div>
+                    <div style={sx('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;text-shadow:0 2px 8px rgba(0,0,0,0.25);')}>Puy Mary,<br />Cantal</div>
+                    <div style={sx('margin-top:9px;font-size:14px;color:#e8e2cf;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
+                    <div style={sx('display:flex;gap:8px;margin-top:16px;')}>
+                      <div style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
+                      <div style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
                     </div>
                   </div>
                 </div>
 
                 {today && (
-                  <div data-testid="today-card" style={s('margin:0 18px 14px;background:#fffdf8;border:2px solid #cf7d3c;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(207,125,60,0.18);')}>
-                    <div style={s('display:flex;align-items:center;justify-content:space-between;')}>
-                      <div style={s('font-size:12px;letter-spacing:1px;font-weight:700;color:#cf7d3c;')}>🗓️ AUJOURD'HUI · {today.d.dow} {today.d.num}</div>
-                      {today.w && <div style={s('font-family:Quicksand;font-weight:700;font-size:14px;')}>{today.w.icon} {today.w.hi}° <span style={s('color:#b3a892;')}>{today.w.lo}°</span></div>}
+                  <div data-testid="today-card" style={sx('margin:0 18px 14px;background:#fffdf8;border:2px solid #cf7d3c;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(207,125,60,0.18);')}>
+                    <div style={sx('display:flex;align-items:center;justify-content:space-between;')}>
+                      <div style={sx('font-size:12px;letter-spacing:1px;font-weight:700;color:#cf7d3c;')}>🗓️ AUJOURD'HUI · {today.d.dow} {today.d.num}</div>
+                      {today.w && <div style={sx('font-family:Quicksand;font-weight:700;font-size:14px;')}>{today.w.icon} {today.w.hi}° <span style={sx('color:#b3a892;')}>{today.w.lo}°</span></div>}
                     </div>
-                    <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-top:6px;')}>{today.d.title}</div>
-                    <div style={s('font-size:13px;color:#6b6354;margin-top:1px;')}>{today.d.sub}</div>
+                    <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-top:6px;')}>{today.d.title}</div>
+                    <div style={sx('font-size:13px;color:#6b6354;margin-top:1px;')}>{today.d.sub}</div>
                     {today.d.items.length > 0 && (
-                      <div style={s('margin-top:12px;display:flex;flex-direction:column;gap:8px;')}>
+                      <div style={sx('margin-top:12px;display:flex;flex-direction:column;gap:8px;')}>
                         {today.d.items.map((it, i) => (
-                          <div key={i} style={s('display:flex;align-items:center;gap:10px;')}>
-                            <span style={s(`width:8px;height:8px;border-radius:50%;background:${it.color};flex:0 0 auto;`)} />
-                            <span style={s('font-size:13px;font-weight:700;color:#9a917f;width:44px;flex:0 0 auto;')}>{it.time}</span>
-                            <span style={s('font-size:14px;flex:1;')}>{it.title}</span>
+                          <div key={i} style={sx('display:flex;align-items:center;gap:10px;')}>
+                            <span style={sx(`width:8px;height:8px;border-radius:50%;background:${it.color};flex:0 0 auto;`)} />
+                            <span style={sx('font-size:13px;font-weight:700;color:#9a917f;width:44px;flex:0 0 auto;')}>{it.time}</span>
+                            <span style={sx('font-size:14px;flex:1;')}>{it.title}</span>
                           </div>
                         ))}
                       </div>
                     )}
                     {today.meal && (
-                      <div style={s('margin-top:12px;background:#f1e4d4;border-radius:12px;padding:10px 13px;font-size:13px;color:#6b5a45;')}>🍽️ Ce soir : <b>{today.meal.dish}</b></div>
+                      <div style={sx('margin-top:12px;background:#f1e4d4;border-radius:12px;padding:10px 13px;font-size:13px;color:#6b5a45;')}>🍽️ Ce soir : <b>{today.meal.dish}</b></div>
                     )}
-                    <button onClick={() => { setTab('planning'); setDay(today.dayIdx) }} style={s('margin-top:13px;width:100%;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le planning du jour →</button>
+                    <button onClick={() => { setTab('planning'); setDay(today.dayIdx) }} style={sx('margin-top:13px;width:100%;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le planning du jour →</button>
                   </div>
                 )}
 
-                <div style={s('margin:0 18px 12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-                  <div style={s('display:flex;align-items:center;gap:12px;')}>
-                    <div style={s('width:44px;height:44px;border-radius:14px;background:#dfeae6;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🚗</div>
-                    <div style={s('flex:1;')}>
-                      <div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>Le grand départ</div>
-                      <div style={s('font-size:13px;color:#6b6354;margin-top:1px;')}>{fmtDayShort(trip.start)} · depuis {trip.origin}{trip.etape ? ` · via ${trip.etape}` : ''}</div>
+                <div style={sx('margin:0 18px 12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                  <div style={sx('display:flex;align-items:center;gap:12px;')}>
+                    <div style={sx('width:44px;height:44px;border-radius:14px;background:#dfeae6;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🚗</div>
+                    <div style={sx('flex:1;')}>
+                      <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>Le grand départ</div>
+                      <div style={sx('font-size:13px;color:#6b6354;margin-top:1px;')}>{fmtDayShort(trip.start)} · depuis {trip.origin}{trip.etape ? ` · via ${trip.etape}` : ''}</div>
                     </div>
                   </div>
-                  <button onClick={() => setSub('trajet')} style={s('margin-top:13px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le trajet →</button>
+                  <button onClick={() => setSub('trajet')} style={sx('margin-top:13px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le trajet →</button>
                 </div>
 
-                <button onClick={() => setSub('logistique')} style={s('margin:0 18px 14px;width:calc(100% - 36px);text-align:left;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-                  <div style={s('display:flex;justify-content:space-between;align-items:center;')}>
-                    <div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>🧳 Valises &amp; préparatifs</div>
-                    <div style={s('font-size:13px;color:#6b6354;font-weight:700;')}>{packDone}/{packTotal}</div>
+                <button onClick={() => setSub('logistique')} style={sx('margin:0 18px 14px;width:calc(100% - 36px);text-align:left;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                  <div style={sx('display:flex;justify-content:space-between;align-items:center;')}>
+                    <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>🧳 Valises &amp; préparatifs</div>
+                    <div style={sx('font-size:13px;color:#6b6354;font-weight:700;')}>{packDone}/{packTotal}</div>
                   </div>
-                  <div style={s('margin-top:11px;height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={s(`height:100%;border-radius:9px;background:#cf7d3c;width:${packPct}%;`)} /></div>
+                  <div style={sx('margin-top:11px;height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={sx(`height:100%;border-radius:9px;background:#cf7d3c;width:${packPct}%;`)} /></div>
                 </button>
 
-                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Tout le séjour</div>
-                <div style={s('padding:0 18px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;')}>
+                <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Tout le séjour</div>
+                <div style={sx('padding:0 18px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;')}>
                   {MODULES.map((m) => (
-                    <button key={m.name} onClick={() => openModule(m.action)} style={s('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-                      <div style={s(`width:42px;height:42px;border-radius:13px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:21px;`)}>{m.emoji}</div>
+                    <button key={m.name} onClick={() => openModule(m.action)} style={sx('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                      <div style={sx(`width:42px;height:42px;border-radius:13px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:21px;`)}>{m.emoji}</div>
                       <div>
-                        <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{m.name}</div>
-                        <div style={s('font-size:12px;color:#6b6354;margin-top:1px;')}>{m.sub}</div>
+                        <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{m.name}</div>
+                        <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>{m.sub}</div>
                       </div>
                     </button>
                   ))}
                 </div>
 
-                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>💡 Suggestions</div>
-                <div style={s('padding:0 18px 12px;')}>
-                  <div style={s('font-size:12px;color:#6b6354;margin-bottom:8px;')}>Une idée de fonctionnalité, une consigne pour les prochaines données ? Notez-la ici puis envoyez-la.</div>
-                  <div style={s('display:flex;gap:8px;')}>
-                    <input data-testid="input-suggestion" value={newSuggestionText} onChange={(e) => setNewSuggestionText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitSuggestion()} placeholder="Ex : ajouter un mode sombre…" style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:10px 12px;font-size:14px;')} />
-                    <button data-testid="btn-add-suggestion" onClick={submitSuggestion} style={s('border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:0 16px;cursor:pointer;')}>+ Ajouter</button>
+                <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>💡 Suggestions</div>
+                <div style={sx('padding:0 18px 12px;')}>
+                  <div style={sx('font-size:12px;color:#6b6354;margin-bottom:8px;')}>Une idée de fonctionnalité, une consigne pour les prochaines données ? Notez-la ici puis envoyez-la.</div>
+                  <div style={sx('display:flex;gap:8px;')}>
+                    <input data-testid="input-suggestion" value={newSuggestionText} onChange={(e) => setNewSuggestionText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitSuggestion()} placeholder="Ex : ajouter un mode sombre…" style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:10px 12px;font-size:14px;')} />
+                    <button data-testid="btn-add-suggestion" onClick={submitSuggestion} style={sx('border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:0 16px;cursor:pointer;')}>+ Ajouter</button>
                   </div>
                   {suggestions.length > 0 && (
-                    <div style={s('display:flex;flex-direction:column;gap:8px;margin-top:10px;')}>
+                    <div style={sx('display:flex;flex-direction:column;gap:8px;margin-top:10px;')}>
                       {suggestions.map((sug) => (
-                        <div key={sug.id} style={s('display:flex;align-items:center;gap:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
-                          <span style={s('font-size:13px;flex:1;')}>{sug.text}</span>
-                          <button onClick={() => deleteSuggestion(sug.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:2px 4px;')}>🗑️</button>
+                        <div key={sug.id} style={sx('display:flex;align-items:center;gap:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
+                          <span style={sx('font-size:13px;flex:1;')}>{sug.text}</span>
+                          <button onClick={() => deleteSuggestion(sug.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:2px 4px;')}>🗑️</button>
                         </div>
                       ))}
-                      <button data-testid="btn-send-suggestions" onClick={sendSuggestions} style={s('width:100%;margin-top:2px;border:1px solid #cf7d3c;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📤 Envoyer sur Telegram / WhatsApp…</button>
+                      <button data-testid="btn-send-suggestions" onClick={sendSuggestions} style={sx('width:100%;margin-top:2px;border:1px solid #cf7d3c;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📤 Envoyer sur Telegram / WhatsApp…</button>
                     </div>
                   )}
                 </div>
 
-                <div style={s('padding:6px 18px 4px;display:flex;align-items:baseline;justify-content:space-between;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Sauvegarde</div>
-                  <div data-testid="last-backup-label" style={s('font-size:12px;color:#6b6354;')}>Dernière : {formatLastBackup(lastBackupAt)}</div>
+                <div style={sx('padding:6px 18px 4px;display:flex;align-items:baseline;justify-content:space-between;')}>
+                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Sauvegarde</div>
+                  <div data-testid="last-backup-label" style={sx('font-size:12px;color:#6b6354;')}>Dernière : {formatLastBackup(lastBackupAt)}</div>
                 </div>
-                <div style={s('padding:6px 18px 12px;display:flex;gap:12px;')}>
-                  <button data-testid="btn-export" onClick={() => { setExportCopied(false); setShowExport(true) }} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#4a5d3a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬇️ Exporter (JSON)</button>
-                  <button data-testid="btn-import" onClick={() => setShowImport(true)} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#9c6b4a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬆️ Importer</button>
+                <div style={sx('padding:6px 18px 12px;display:flex;gap:12px;')}>
+                  <button data-testid="btn-export" onClick={() => { setExportCopied(false); setShowExport(true) }} style={sx('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#4a5d3a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬇️ Exporter (JSON)</button>
+                  <button data-testid="btn-import" onClick={() => setShowImport(true)} style={sx('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#9c6b4a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬆️ Importer</button>
                 </div>
-                <div style={s('height:16px;')} />
+                <div style={sx('height:16px;')} />
               </div>
             )}
 
             {/* PLANNING */}
             {tab === 'planning' && (
               <div data-testid="screen-planning">
-                <div style={s('padding:54px 18px 4px;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Planning</div>
-                  <div style={s('font-size:13px;color:#6b6354;')}>{days.length} jours · {fmtDayShort(trip.start)} → {fmtDayShort(trip.end)}</div>
+                <div style={sx('padding:54px 18px 4px;')}>
+                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>Planning</div>
+                  <div style={sx('font-size:13px;color:#6b6354;')}>{days.length} jours · {fmtDayShort(trip.start)} → {fmtDayShort(trip.end)}</div>
                 </div>
-                <div style={s('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 16px;')}>
+                <div style={sx('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 16px;')}>
                   {days.map((d, i) => (
-                    <button key={i} onClick={() => setDay(i)} style={s(`flex:0 0 auto;width:54px;border:1px solid ${i === day ? '#4a5d3a' : '#ece2cf'};background:${i === day ? '#4a5d3a' : '#fffdf8'};color:${i === day ? '#fffaf0' : '#6b6354'};border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;`)}>
-                      <span style={s('font-size:12px;font-weight:600;')}>{d.dow}</span>
-                      <span style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>{d.num}</span>
+                    <button key={i} onClick={() => setDay(i)} style={sx(`flex:0 0 auto;width:54px;border:1px solid ${i === day ? '#4a5d3a' : '#ece2cf'};background:${i === day ? '#4a5d3a' : '#fffdf8'};color:${i === day ? '#fffaf0' : '#6b6354'};border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;`)}>
+                      <span style={sx('font-size:12px;font-weight:600;')}>{d.dow}</span>
+                      <span style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>{d.num}</span>
                     </button>
                   ))}
-                  <button data-testid="btn-add-day" onClick={() => setShowDayAdd(true)} style={s('flex:0 0 auto;width:54px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:20px;font-weight:700;')}>＋</button>
+                  <button data-testid="btn-add-day" onClick={() => setShowDayAdd(true)} style={sx('flex:0 0 auto;width:54px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:20px;font-weight:700;')}>＋</button>
                 </div>
-                <div style={s('padding:0 18px 8px;')}>
-                  <div style={s('display:flex;align-items:center;justify-content:space-between;')}>
+                <div style={sx('padding:0 18px 8px;')}>
+                  <div style={sx('display:flex;align-items:center;justify-content:space-between;')}>
                     <div>
-                      <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;')}>{cur.title}</div>
-                      <div style={s('font-size:13px;color:#6b6354;margin-bottom:16px;')}>{cur.sub}</div>
+                      <div style={sx('font-family:Quicksand;font-weight:700;font-size:20px;')}>{cur.title}</div>
+                      <div style={sx('font-size:13px;color:#6b6354;margin-bottom:16px;')}>{cur.sub}</div>
                     </div>
-                    <button onClick={() => editDay(day)} style={s('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;flex:0 0 auto;')}>✏️</button>
+                    <button onClick={() => editDay(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;flex:0 0 auto;')}>✏️</button>
                   </div>
                   {cur.items.map((it, i) => (
-                    <div key={i} style={s('display:flex;gap:12px;')}>
-                      <div style={s('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{it.time}</div>
-                      <div style={s('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
-                        <div style={s(`width:13px;height:13px;border-radius:50%;background:${it.color};margin-top:3px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${it.color};`)} />
-                        <div style={s('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
+                    <div key={i} style={sx('display:flex;gap:12px;')}>
+                      <div style={sx('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{it.time}</div>
+                      <div style={sx('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
+                        <div style={sx(`width:13px;height:13px;border-radius:50%;background:${it.color};margin-top:3px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${it.color};`)} />
+                        <div style={sx('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
                       </div>
-                      <div style={s('flex:1;padding-bottom:18px;')}>
-                        <div style={s('display:flex;align-items:center;gap:8px;')}>
-                          <div style={s('flex:1;')}>
-                            <div style={s('font-weight:700;font-size:15px;')}>{it.title}</div>
-                            {it.note && <div style={s('font-size:13px;color:#6b6354;margin-top:2px;')}>{it.note}</div>}
+                      <div style={sx('flex:1;padding-bottom:18px;')}>
+                        <div style={sx('display:flex;align-items:center;gap:8px;')}>
+                          <div style={sx('flex:1;')}>
+                            <div style={sx('font-weight:700;font-size:15px;')}>{it.title}</div>
+                            {it.note && <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>{it.note}</div>}
                           </div>
-                          <button onClick={() => editActivity(day, i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
-                          <button onClick={() => deleteActivity(day, i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
+                          <button onClick={() => editActivity(day, i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
+                          <button onClick={() => deleteActivity(day, i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
                         </div>
                       </div>
                     </div>
                   ))}
-                  <button onClick={() => startAddActivity(day)} style={s('margin-top:12px;width:100%;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:12px;padding:10px;cursor:pointer;')}>+ Ajouter activite</button>
+                  <button onClick={() => startAddActivity(day)} style={sx('margin-top:12px;width:100%;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:12px;padding:10px;cursor:pointer;')}>+ Ajouter activite</button>
                 </div>
-                <div style={s('height:16px;')} />
+                <div style={sx('height:16px;')} />
               </div>
             )}
 
             {/* VISITES */}
             {tab === 'visites' && (
               <div data-testid="screen-visites">
-                <div style={s('padding:54px 18px 4px;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>À faire</div>
-                  <div style={s('font-size:13px;color:#6b6354;')}>Autour du Puy Mary · {savedCount} enregistrées ♥</div>
+                <div style={sx('padding:54px 18px 4px;')}>
+                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>À faire</div>
+                  <div style={sx('font-size:13px;color:#6b6354;')}>Autour du Puy Mary · {savedCount} enregistrées ♥</div>
                 </div>
-                <div style={s('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 14px;')}>
+                <div style={sx('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 14px;')}>
                   {FILTERS.map((f) => (
-                    <button key={f} onClick={() => setFilter(f)} style={s(`flex:0 0 auto;border:1px solid ${filter === f ? '#4a5d3a' : '#ece2cf'};background:${filter === f ? '#4a5d3a' : '#fffdf8'};color:${filter === f ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;`)}>{f}</button>
+                    <button key={f} onClick={() => setFilter(f)} style={sx(`flex:0 0 auto;border:1px solid ${filter === f ? '#4a5d3a' : '#ece2cf'};background:${filter === f ? '#4a5d3a' : '#fffdf8'};color:${filter === f ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;`)}>{f}</button>
                   ))}
                 </div>
-                <div style={s('display:flex;gap:8px;padding:0 18px 14px;')}>
+                <div style={sx('display:flex;gap:8px;padding:0 18px 14px;')}>
                   {[['dist', '📍 Distance'], ['cat', '🏷️ Catégorie']].map(([k, label]) => (
-                    <button key={k} onClick={() => setVisitSort(visitSort === k ? null : k)} style={s(`flex:0 0 auto;border:1px solid ${visitSort === k ? '#4a5d3a' : '#ece2cf'};background:${visitSort === k ? '#4a5d3a' : '#fffdf8'};color:${visitSort === k ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>{label}</button>
+                    <button key={k} onClick={() => setVisitSort(visitSort === k ? null : k)} style={sx(`flex:0 0 auto;border:1px solid ${visitSort === k ? '#4a5d3a' : '#ece2cf'};background:${visitSort === k ? '#4a5d3a' : '#fffdf8'};color:${visitSort === k ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>{label}</button>
                   ))}
                 </div>
-                <div style={s('padding:0 18px 8px;display:flex;justify-content:flex-end;')}>
-                  <button onClick={() => { setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature'); setShowVisitEdit(true) }} style={s('border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:7px 14px;cursor:pointer;')}>+ Ajouter visite</button>
+                <div style={sx('padding:0 18px 8px;display:flex;justify-content:flex-end;')}>
+                  <button onClick={() => { setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature'); setShowVisitEdit(true) }} style={sx('border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:7px 14px;cursor:pointer;')}>+ Ajouter visite</button>
                 </div>
-                <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:12px;')}>
+                <div style={sx('padding:0 18px;display:flex;flex-direction:column;gap:12px;')}>
                   {filteredVisits.map((v) => {
                     const sv = !!saved[v.id]
                     return (
-                      <div key={v.id} style={s('display:flex;gap:12px;align-items:center;background:#fffdf8;border:1px solid #efe6d4;border-radius:18px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-                        <div style={s('width:52px;height:52px;flex:0 0 auto;border-radius:14px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:26px;')}>{v.emoji}</div>
-                        <div style={s('flex:1;min-width:0;')}>
-                          <div style={s('display:flex;align-items:center;gap:6px;')}>
-                            <span style={s(`width:8px;height:8px;border-radius:50%;background:${VCAT[v.cat]};flex:0 0 auto;`)} />
-                            <span style={s(`font-size:11px;font-weight:700;color:${VCAT[v.cat]};text-transform:uppercase;letter-spacing:0.5px;`)}>{v.cat}</span>
+                      <div key={v.id} style={sx('display:flex;gap:12px;align-items:center;background:#fffdf8;border:1px solid #efe6d4;border-radius:18px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                        <div style={sx('width:52px;height:52px;flex:0 0 auto;border-radius:14px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:26px;')}>{v.emoji}</div>
+                        <div style={sx('flex:1;min-width:0;')}>
+                          <div style={sx('display:flex;align-items:center;gap:6px;')}>
+                            <span style={sx(`width:8px;height:8px;border-radius:50%;background:${VCAT[v.cat]};flex:0 0 auto;`)} />
+                            <span style={sx(`font-size:11px;font-weight:700;color:${VCAT[v.cat]};text-transform:uppercase;letter-spacing:0.5px;`)}>{v.cat}</span>
                           </div>
-                          <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{v.name}</div>
-                          <div style={s('font-size:12px;color:#6b6354;margin-top:2px;')}>{v.dist}  ·  {v.dur}</div>
-                          <div style={s('display:inline-block;margin-top:7px;font-size:11px;font-weight:700;color:#6b6354;background:#f1e9da;border-radius:8px;padding:3px 8px;')}>👶 {v.age}</div>
+                          <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{v.name}</div>
+                          <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>{v.dist}  ·  {v.dur}</div>
+                          <div style={sx('display:inline-block;margin-top:7px;font-size:11px;font-weight:700;color:#6b6354;background:#f1e9da;border-radius:8px;padding:3px 8px;')}>👶 {v.age}</div>
                         </div>
-                        <button onClick={() => toggleSaved(v.id)} style={s('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:24px;line-height:1;')}>
-                          {sv ? <span style={s('color:#b8503f;')}>♥</span> : <span style={s('color:#cabfa6;')}>♡</span>}
+                        <button onClick={() => toggleSaved(v.id)} style={sx('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:24px;line-height:1;')}>
+                          {sv ? <span style={sx('color:#b8503f;')}>♥</span> : <span style={sx('color:#cabfa6;')}>♡</span>}
                         </button>
-                        <button onClick={() => editVisit(v.id)} style={s('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;')}>✏️</button>
-                        <button onClick={() => deleteVisit(v.id)} style={s('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;color:#b8503f;')}>🗑️</button>
+                        <button onClick={() => editVisit(v.id)} style={sx('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;')}>✏️</button>
+                        <button onClick={() => deleteVisit(v.id)} style={sx('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;color:#b8503f;')}>🗑️</button>
                       </div>
                     )
                   })}
                 </div>
-                <div style={s('height:16px;')} />
+                <div style={sx('height:16px;')} />
               </div>
             )}
 
             {/* REPAS */}
             {tab === 'repas' && (
               <div data-testid="screen-repas">
-                <div style={s('padding:54px 18px 14px;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Repas &amp; courses</div>
+                <div style={sx('padding:54px 18px 14px;')}>
+                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>Repas &amp; courses</div>
                 </div>
-                <div style={s('margin:0 18px 16px;display:flex;background:#ece2cf;border-radius:14px;padding:4px;')}>
-                  <button onClick={() => setMealTab('repas')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'repas' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'repas' ? '#fffaf0' : '#6b6354'};`)}>Menus</button>
-                  <button onClick={() => setMealTab('courses')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'courses' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'courses' ? '#fffaf0' : '#6b6354'};`)}>Courses</button>
+                <div style={sx('margin:0 18px 16px;display:flex;background:#ece2cf;border-radius:14px;padding:4px;')}>
+                  <button onClick={() => setMealTab('repas')} style={sx(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'repas' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'repas' ? '#fffaf0' : '#6b6354'};`)}>Menus</button>
+                  <button onClick={() => setMealTab('courses')} style={sx(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'courses' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'courses' ? '#fffaf0' : '#6b6354'};`)}>Courses</button>
                 </div>
 
                 {mealTab === 'repas' && (
                   <>
-                    <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:10px;')}>
+                    <div style={sx('padding:0 18px;display:flex;flex-direction:column;gap:10px;')}>
                       {meals.map((ml) => (
-                        <div key={ml.id} style={s('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:13px 14px;')}>
-                          <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#cf7d3c;width:54px;flex:0 0 auto;')}>{ml.day}</div>
-                          <div style={s('font-weight:600;font-size:14px;flex:1;')}>{ml.dish}</div>
-                          <button onClick={() => editMeal(ml.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
-                          <button onClick={() => deleteMeal(ml.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
+                        <div key={ml.id} style={sx('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:13px 14px;')}>
+                          <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;color:#cf7d3c;width:54px;flex:0 0 auto;')}>{ml.day}</div>
+                          <div style={sx('font-weight:600;font-size:14px;flex:1;')}>{ml.dish}</div>
+                          <button onClick={() => editMeal(ml.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
+                          <button onClick={() => deleteMeal(ml.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
                         </div>
                       ))}
                     </div>
-                    <button onClick={openAddMeal} style={s('display:block;width:calc(100% - 36px);margin:10px 18px 0;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:14px;padding:10px;cursor:pointer;')}>+ Ajouter un repas</button>
-                    <div style={s('margin:14px 18px 16px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧀 Spécialités à goûter : Cantal AOP, Salers, Saint-Nectaire, truffade &amp; aligot maison.</div>
+                    <button onClick={openAddMeal} style={sx('display:block;width:calc(100% - 36px);margin:10px 18px 0;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:14px;padding:10px;cursor:pointer;')}>+ Ajouter un repas</button>
+                    <div style={sx('margin:14px 18px 16px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧀 Spécialités à goûter : Cantal AOP, Salers, Saint-Nectaire, truffade &amp; aligot maison.</div>
                   </>
                 )}
 
                 {mealTab === 'courses' && (
-                  <div style={s('padding:0 18px 16px;')}>
-                    <div style={s('display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6b6354;margin-bottom:6px;')}><span>Liste de courses</span><span>{coursesDone}/{coursesTotal}</span></div>
-                    <div style={s('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;margin-bottom:14px;')}><div style={s(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
-                    <div style={s('display:flex;justify-content:flex-end;margin-bottom:14px;')}>
-                      <button onClick={() => setCoursesSorted(!coursesSorted)} style={s(`border:1px solid ${coursesSorted ? '#4a5d3a' : '#ece2cf'};background:${coursesSorted ? '#4a5d3a' : '#fffdf8'};color:${coursesSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
+                  <div style={sx('padding:0 18px 16px;')}>
+                    <div style={sx('display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6b6354;margin-bottom:6px;')}><span>Liste de courses</span><span>{coursesDone}/{coursesTotal}</span></div>
+                    <div style={sx('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;margin-bottom:14px;')}><div style={sx(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
+                    <div style={sx('display:flex;justify-content:flex-end;margin-bottom:14px;')}>
+                      <button onClick={() => setCoursesSorted(!coursesSorted)} style={sx(`border:1px solid ${coursesSorted ? '#4a5d3a' : '#ece2cf'};background:${coursesSorted ? '#4a5d3a' : '#fffdf8'};color:${coursesSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
                     </div>
                     {coursesGroups.map((g) => (
-                      <div key={g.key} style={s('margin-bottom:16px;')}>
-                        <div style={s('display:flex;align-items:baseline;gap:8px;margin-bottom:7px;')}>
-                          <span style={s('font-family:Quicksand;font-weight:700;font-size:15px;flex:1;')}>{g.name}</span>
-                          <span style={s('font-size:12px;color:#6b6354;')}>{g.doneStr}</span>
-                          <button onClick={() => deleteCourseCategory(g.key)} style={s('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
+                      <div key={g.key} style={sx('margin-bottom:16px;')}>
+                        <div style={sx('display:flex;align-items:baseline;gap:8px;margin-bottom:7px;')}>
+                          <span style={sx('font-family:Quicksand;font-weight:700;font-size:15px;flex:1;')}>{g.name}</span>
+                          <span style={sx('font-size:12px;color:#6b6354;')}>{g.doneStr}</span>
+                          <button onClick={() => deleteCourseCategory(g.key)} style={sx('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
                         </div>
-                        <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
+                        <div style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
                           {(coursesSorted ? [...g.items].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)) : g.items).map((it) => (
-                            <div key={it.label} style={s('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
-                              <button onClick={() => toggleCheck(g.key, it.label)} style={s('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
+                            <div key={it.label} style={sx('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
+                              <button onClick={() => toggleCheck(g.key, it.label)} style={sx('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
                                 {it.checked ? (
                                   <>
-                                    <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
-                                    <span style={s('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{it.label}</span>
+                                    <span style={sx('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
+                                    <span style={sx('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{it.label}</span>
                                   </>
                                 ) : (
                                   <>
-                                    <span style={s('width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid #d8cbb0;background:#fff;')} />
-                                    <span style={s('font-size:14px;color:#2f2a22;')}>{it.label}</span>
+                                    <span style={sx('width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid #d8cbb0;background:#fff;')} />
+                                    <span style={sx('font-size:14px;color:#2f2a22;')}>{it.label}</span>
                                   </>
                                 )}
                               </button>
-                              <button onClick={() => deleteCourseItem(g.key, it.label)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
+                              <button onClick={() => deleteCourseItem(g.key, it.label)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
                             </div>
                           ))}
                         </div>
-                        <button onClick={() => { setEditingCourseKey(g.key); setShowAddCourseItem(true) }} style={s('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
+                        <button onClick={() => { setEditingCourseKey(g.key); setShowAddCourseItem(true) }} style={sx('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
                       </div>
                     ))}
-                    <button data-testid="btn-add-course-cat" onClick={() => setShowAddCourseCat(true)} style={s('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle catégorie</button>
-                    <div style={s('margin-top:20px;padding-top:16px;border-top:1px solid #efe6d4;')}>
-                      <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>Gerer les articles</div>
-                      <div style={s('display:flex;flex-direction:column;gap:8px;')}>
+                    <button data-testid="btn-add-course-cat" onClick={() => setShowAddCourseCat(true)} style={sx('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle catégorie</button>
+                    <div style={sx('margin-top:20px;padding-top:16px;border-top:1px solid #efe6d4;')}>
+                      <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>Gerer les articles</div>
+                      <div style={sx('display:flex;flex-direction:column;gap:8px;')}>
                         {shoppingItems.map((item) => (
-                          <div key={item.id} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
-                            <input type="checkbox" checked={item.checked} onChange={() => toggleShoppingItem(item.id)} style={s('cursor:pointer;')} />
-                            <span style={s('font-size:14px;flex:1;')}>{item.label}</span>
-                            <button onClick={() => deleteShoppingItem(item.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:4px;')}>🗑️</button>
+                          <div key={item.id} style={sx('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
+                            <input type="checkbox" checked={item.checked} onChange={() => toggleShoppingItem(item.id)} style={sx('cursor:pointer;')} />
+                            <span style={sx('font-size:14px;flex:1;')}>{item.label}</span>
+                            <button onClick={() => deleteShoppingItem(item.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:4px;')}>🗑️</button>
                           </div>
                         ))}
                       </div>
-                      <div style={s('display:flex;gap:8px;margin-top:10px;')}>
-                        <input value={newShoppingItem} onChange={(e) => setNewShoppingItem(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addShoppingItem()} placeholder="Nouvel article…" style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:10px 12px;font-size:14px;')} />
-                        <button onClick={addShoppingItem} style={s('border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:0 16px;cursor:pointer;')}>+ Ajouter</button>
+                      <div style={sx('display:flex;gap:8px;margin-top:10px;')}>
+                        <input value={newShoppingItem} onChange={(e) => setNewShoppingItem(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addShoppingItem()} placeholder="Nouvel article…" style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:10px 12px;font-size:14px;')} />
+                        <button onClick={addShoppingItem} style={sx('border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:0 16px;cursor:pointer;')}>+ Ajouter</button>
                       </div>
                     </div>
                   </div>
@@ -1365,66 +1382,66 @@ export default function App() {
             {/* BUDGET */}
             {tab === 'budget' && (
               <div data-testid="screen-budget">
-                <div style={s('padding:54px 18px 14px;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Budget</div>
+                <div style={sx('padding:54px 18px 14px;')}>
+                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>Budget</div>
                 </div>
-                <div style={s('margin:0 18px 14px;background:#4a5d3a;border-radius:22px;padding:18px;color:#f3ecda;box-shadow:0 10px 24px rgba(74,93,58,0.22);')}>
-                  <div style={s('display:flex;justify-content:space-between;align-items:flex-end;')}>
-                    <div><div style={s('font-size:12px;color:#c9d2b6;font-weight:700;letter-spacing:0.5px;')}>RESTANT</div><div style={s('font-family:Quicksand;font-weight:700;font-size:30px;margin-top:2px;')}>{eur(remain)}</div></div>
-                    <div style={s('text-align:right;')}>
-                      <div style={s('font-size:12px;color:#dbe2c9;')}>sur {eur(budgetTotal)}</div>
-                      <button onClick={() => { setNewBudgetTotal(String(budgetTotal)); setShowBudgetTotalEdit(true) }} style={s('margin-top:4px;border:none;background:rgba(255,255,255,0.15);color:#dbe2c9;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer;')}>✏️ Modifier</button>
+                <div style={sx('margin:0 18px 14px;background:#4a5d3a;border-radius:22px;padding:18px;color:#f3ecda;box-shadow:0 10px 24px rgba(74,93,58,0.22);')}>
+                  <div style={sx('display:flex;justify-content:space-between;align-items:flex-end;')}>
+                    <div><div style={sx('font-size:12px;color:#c9d2b6;font-weight:700;letter-spacing:0.5px;')}>RESTANT</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:30px;margin-top:2px;')}>{eur(remain)}</div></div>
+                    <div style={sx('text-align:right;')}>
+                      <div style={sx('font-size:12px;color:#dbe2c9;')}>sur {eur(budgetTotal)}</div>
+                      <button onClick={() => { setNewBudgetTotal(String(budgetTotal)); setShowBudgetTotalEdit(true) }} style={sx('margin-top:4px;border:none;background:rgba(255,255,255,0.15);color:#dbe2c9;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer;')}>✏️ Modifier</button>
                     </div>
                   </div>
-                  <div style={s('margin-top:14px;height:10px;border-radius:10px;background:rgba(255,255,255,0.18);overflow:hidden;')}><div style={s(`height:100%;background:#e8c07a;width:${spentPct}%;`)} /></div>
-                  <div style={s('margin-top:8px;font-size:13px;color:#dbe2c9;')}>Dépensé {eur(spent)} · {spentPct} %</div>
+                  <div style={sx('margin-top:14px;height:10px;border-radius:10px;background:rgba(255,255,255,0.18);overflow:hidden;')}><div style={sx(`height:100%;background:#e8c07a;width:${spentPct}%;`)} /></div>
+                  <div style={sx('margin-top:8px;font-size:13px;color:#dbe2c9;')}>Dépensé {eur(spent)} · {spentPct} %</div>
                 </div>
                 {spentPct >= 80 && (
-                  <div style={s('margin:0 18px 14px;background:#b8503f;border-radius:14px;padding:12px 16px;color:#fff;display:flex;align-items:center;gap:10px;')}>
-                    <span style={s('font-size:20px;')}>⚠️</span>
-                    <div><div style={s('font-weight:700;font-family:Quicksand;font-size:14px;')}>Budget à {spentPct} %</div><div style={s('font-size:12px;opacity:0.9;margin-top:2px;')}>Plus que {eur(remain)} restants</div></div>
+                  <div style={sx('margin:0 18px 14px;background:#b8503f;border-radius:14px;padding:12px 16px;color:#fff;display:flex;align-items:center;gap:10px;')}>
+                    <span style={sx('font-size:20px;')}>⚠️</span>
+                    <div><div style={sx('font-weight:700;font-family:Quicksand;font-size:14px;')}>Budget à {spentPct} %</div><div style={sx('font-size:12px;opacity:0.9;margin-top:2px;')}>Plus que {eur(remain)} restants</div></div>
                   </div>
                 )}
-                <button data-testid="btn-add-depense" onClick={() => setShowAdd(true)} style={s('margin:0 18px 18px;width:calc(100% - 36px);border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Ajouter une dépense</button>
-                <div style={s('padding:0 18px 8px;')}><SectionLabel>Par catégorie</SectionLabel></div>
-                <div style={s('padding:0 18px 14px;display:flex;flex-direction:column;gap:13px;')}>
+                <button data-testid="btn-add-depense" onClick={() => setShowAdd(true)} style={sx('margin:0 18px 18px;width:calc(100% - 36px);border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Ajouter une dépense</button>
+                <div style={sx('padding:0 18px 8px;')}><SectionLabel>Par catégorie</SectionLabel></div>
+                <div style={sx('padding:0 18px 14px;display:flex;flex-direction:column;gap:13px;')}>
                   {budgetCats.map((c) => (
                     <div key={c.name}>
-                      <div style={s('display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;')}><span style={s('font-weight:700;')}>{c.name}</span><span style={s('font-weight:700;color:#6b6354;')}>{eur(c.amt)}</span></div>
-                      <div style={s('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={s(`height:100%;background:${c.color};width:${c.pct}%;`)} /></div>
+                      <div style={sx('display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;')}><span style={sx('font-weight:700;')}>{c.name}</span><span style={sx('font-weight:700;color:#6b6354;')}>{eur(c.amt)}</span></div>
+                      <div style={sx('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={sx(`height:100%;background:${c.color};width:${c.pct}%;`)} /></div>
                     </div>
                   ))}
                 </div>
-                <div style={s('padding:4px 18px 8px;display:flex;align-items:center;justify-content:space-between;')}>
+                <div style={sx('padding:4px 18px 8px;display:flex;align-items:center;justify-content:space-between;')}>
                   <SectionLabel>Dépenses</SectionLabel>
-                  <button onClick={() => setSortExpenses(s2 => s2 === 'amt' ? 'date' : 'amt')} style={s(`border:1px solid ${sortExpenses === 'amt' ? '#4a5d3a' : '#ece2cf'};background:${sortExpenses === 'amt' ? '#4a5d3a' : '#fffdf8'};color:${sortExpenses === 'amt' ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:5px 12px;font-weight:700;font-size:11px;cursor:pointer;`)}>↓ Par montant</button>
+                  <button onClick={() => setSortExpenses(s2 => s2 === 'amt' ? 'date' : 'amt')} style={sx(`border:1px solid ${sortExpenses === 'amt' ? '#4a5d3a' : '#ece2cf'};background:${sortExpenses === 'amt' ? '#4a5d3a' : '#fffdf8'};color:${sortExpenses === 'amt' ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:5px 12px;font-weight:700;font-size:11px;cursor:pointer;`)}>↓ Par montant</button>
                 </div>
-                <div style={s('padding:0 18px;display:flex;flex-direction:column;gap:8px;')}>
+                <div style={sx('padding:0 18px;display:flex;flex-direction:column;gap:8px;')}>
                   {(sortExpenses === 'amt'
                     ? expenses.map((e, i) => ({...e, _i: i})).sort((a, b) => b.amt - a.amt)
                     : [...expenses.map((e, i) => ({...e, _i: i}))].reverse()
                   ).map((e) => (
-                    <div key={e._i} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
-                      <span style={s(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
-                      <div style={s('flex:1;min-width:0;')}><div style={s('font-weight:700;font-size:14px;')}>{e.label}</div><div style={s('font-size:12px;color:#6b6354;')}>{e.cat}</div></div>
-                      <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
-                      <button onClick={() => startEditExpense(e._i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
-                      <button onClick={() => deleteExpense(e._i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
+                    <div key={e._i} style={sx('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
+                      <span style={sx(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
+                      <div style={sx('flex:1;min-width:0;')}><div style={sx('font-weight:700;font-size:14px;')}>{e.label}</div><div style={sx('font-size:12px;color:#6b6354;')}>{e.cat}</div></div>
+                      <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
+                      <button onClick={() => startEditExpense(e._i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
+                      <button onClick={() => deleteExpense(e._i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
                     </div>
                   ))}
                 </div>
-                <div style={s('height:16px;')} />
+                <div style={sx('height:16px;')} />
               </div>
             )}
 
           </div>
 
           {/* BARRE D'ONGLETS */}
-          <div data-testid="tab-bar" onTouchStart={tabBarSwipe.onTouchStart} onTouchEnd={tabBarSwipe.onTouchEnd} style={s('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
+          <div data-testid="tab-bar" onTouchStart={tabBarSwipe.onTouchStart} onTouchEnd={tabBarSwipe.onTouchEnd} style={sx('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
             {TABS.map(([key, emoji, label]) => (
-              <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={s('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
-                <span style={s('font-size:20px;')}>{emoji}</span>
-                <span style={s(`font-size:11px;color:${tab === key ? '#4a5d3a' : '#b3a892'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
+              <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={sx('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
+                <span style={sx('font-size:20px;')}>{emoji}</span>
+                <span style={sx(`font-size:11px;color:${tab === key ? '#4a5d3a' : '#b3a892'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
               </button>
             ))}
           </div>
@@ -1433,23 +1450,23 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER UNE DÉPENSE ============ */}
       {showAdd && (
-        <div onClick={closeAdd} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Montant</div>
-            <input data-testid="input-montant" value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:18px;font-family:Quicksand;font-weight:700;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Libellé</div>
-            <input data-testid="input-label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Catégorie</div>
-            <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:7px;margin-bottom:20px;')}>
+        <div onClick={closeAdd} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Montant</div>
+            <input data-testid="input-montant" value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:18px;font-family:Quicksand;font-weight:700;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Libellé</div>
+            <input data-testid="input-label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Catégorie</div>
+            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:7px;margin-bottom:20px;')}>
               {CATS.map((c) => (
-                <button key={c.name} onClick={() => setNewCat(c.name)} style={s(`border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
+                <button key={c.name} onClick={() => setNewCat(c.name)} style={sx(`border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
               ))}
             </div>
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-submit-depense" onClick={submitExpense} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-submit-depense" onClick={submitExpense} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
             </div>
           </div>
         </div>
@@ -1457,17 +1474,17 @@ export default function App() {
 
       {/* ============ FEUILLE : EDITER REPAS ============ */}
       {showMealEdit && (
-        <div onClick={closeMealEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealId === null ? 'Ajouter un repas' : `Repas du ${newMealDay}`}</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
-            <input value={newMealDay} onChange={(e) => setNewMealDay(e.target.value)} placeholder="Ex : Sam 11" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Plat</div>
-            <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeMealEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveMeal} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+        <div onClick={closeMealEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealId === null ? 'Ajouter un repas' : `Repas du ${newMealDay}`}</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
+            <input value={newMealDay} onChange={(e) => setNewMealDay(e.target.value)} placeholder="Ex : Sam 11" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Plat</div>
+            <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeMealEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveMeal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1475,17 +1492,17 @@ export default function App() {
 
       {/* ============ FEUILLE : EDITER ACTIVITE PLANNING ============ */}
       {showActivityEdit && editingActivityIdx && (
-        <div onClick={closeActivityEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer activite</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeActivityEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+        <div onClick={closeActivityEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer activite</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
+            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
+            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeActivityEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1493,18 +1510,18 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER/EDITER JOUR ============ */}
       {showDayEdit && editingDayIdx !== null && (
-        <div onClick={closeDayEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer jour</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newDayTitle} onChange={(e) => setNewDayTitle(e.target.value)} placeholder="Ex : Le grand depart" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
-            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Lyon -> Mandailles" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeDayEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveDay} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-              {days.length > 1 && <button onClick={() => { deleteDay(editingDayIdx); closeDayEdit() }} style={s('flex:0 0 auto;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Supprimer</button>}
+        <div onClick={closeDayEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer jour</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
+            <input value={newDayTitle} onChange={(e) => setNewDayTitle(e.target.value)} placeholder="Ex : Le grand depart" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
+            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Lyon -> Mandailles" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeDayEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+              {days.length > 1 && <button onClick={() => { deleteDay(editingDayIdx); closeDayEdit() }} style={sx('flex:0 0 auto;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Supprimer</button>}
             </div>
           </div>
         </div>
@@ -1512,23 +1529,23 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER ACTIVITE ============ */}
       {showActivityAdd && (
-        <div onClick={closeActivityAdd} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter activite</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
-            <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
+        <div onClick={closeActivityAdd} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter activite</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
+            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
+            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
+            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
               {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
-                <button key={c} onClick={() => setNewActivityColor(c)} style={s(`width:32px;height:32px;border-radius:50%;background:${c};border:${newActivityColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
+                <button key={c} onClick={() => setNewActivityColor(c)} style={sx(`width:32px;height:32px;border-radius:50%;background:${c};border:${newActivityColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
               ))}
             </div>
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeActivityAdd} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitActivity} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeActivityAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1536,15 +1553,15 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER ARTICLE LOGI ============ */}
       {showAddLogiItem && (
-        <div onClick={closeAddLogiItem} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newLogiItem} onChange={(e) => setNewLogiItem(e.target.value)} placeholder="Ex : Chaussettes" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeAddLogiItem} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addLogiItem} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+        <div onClick={closeAddLogiItem} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
+            <input value={newLogiItem} onChange={(e) => setNewLogiItem(e.target.value)} placeholder="Ex : Chaussettes" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeAddLogiItem} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={addLogiItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1552,15 +1569,15 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER ARTICLE COURSES ============ */}
       {showAddCourseItem && (
-        <div onClick={closeAddCourseItem} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newCourseItem} onChange={(e) => setNewCourseItem(e.target.value)} placeholder="Ex : Fromage" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeAddCourseItem} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addCourseItem} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+        <div onClick={closeAddCourseItem} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
+            <input value={newCourseItem} onChange={(e) => setNewCourseItem(e.target.value)} placeholder="Ex : Fromage" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeAddCourseItem} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={addCourseItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1568,31 +1585,31 @@ export default function App() {
 
       {/* ============ FEUILLE : EDITER METEO ============ */}
       {showMeteoEdit && (
-        <div onClick={closeMeteoEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMeteoIdx === null ? 'Ajouter un jour' : 'Meteo'}</div>
-            <div style={s('display:flex;gap:10px;')}>
-              <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
-                <input value={newMeteoDay} onChange={(e) => setNewMeteoDay(e.target.value)} placeholder="Sam" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <div onClick={closeMeteoEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMeteoIdx === null ? 'Ajouter un jour' : 'Meteo'}</div>
+            <div style={sx('display:flex;gap:10px;')}>
+              <div style={sx('flex:1;')}>
+                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
+                <input value={newMeteoDay} onChange={(e) => setNewMeteoDay(e.target.value)} placeholder="Sam" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
-              <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Numero</div>
-                <input value={newMeteoNum} onChange={(e) => setNewMeteoNum(e.target.value)} placeholder="11" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              <div style={sx('flex:1;')}>
+                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Numero</div>
+                <input value={newMeteoNum} onChange={(e) => setNewMeteoNum(e.target.value)} placeholder="11" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
             </div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Icone</div>
-            <input value={newMeteoIcon} onChange={(e) => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Temp max</div>
-            <input value={newMeteoHi} onChange={(e) => setNewMeteoHi(e.target.value)} placeholder="24" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Temp min</div>
-            <input value={newMeteoLo} onChange={(e) => setNewMeteoLo(e.target.value)} placeholder="12" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Pluie</div>
-            <input value={newMeteoRain} onChange={(e) => setNewMeteoRain(e.target.value)} placeholder="10 %" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeMeteoEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveMeteo} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Icone</div>
+            <input value={newMeteoIcon} onChange={(e) => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Temp max</div>
+            <input value={newMeteoHi} onChange={(e) => setNewMeteoHi(e.target.value)} placeholder="24" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Temp min</div>
+            <input value={newMeteoLo} onChange={(e) => setNewMeteoLo(e.target.value)} placeholder="12" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Pluie</div>
+            <input value={newMeteoRain} onChange={(e) => setNewMeteoRain(e.target.value)} placeholder="10 %" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeMeteoEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveMeteo} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1600,25 +1617,25 @@ export default function App() {
 
       {/* ============ FEUILLE : EDITER TRAJET ============ */}
       {showTrajetEdit && editingTrajetIdx !== null && (
-        <div onClick={closeTrajetEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer etape</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newTrajetTime} onChange={(e) => setNewTrajetTime(e.target.value)} placeholder="Ex : 08:30" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Lieu</div>
-            <input value={newTrajetPlace} onChange={(e) => setNewTrajetPlace(e.target.value)} placeholder="Ex : Lyon" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Note</div>
-            <input value={newTrajetNote} onChange={(e) => setNewTrajetNote(e.target.value)} placeholder="Ex : Pause cafe" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
-            <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
+        <div onClick={closeTrajetEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer etape</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
+            <input value={newTrajetTime} onChange={(e) => setNewTrajetTime(e.target.value)} placeholder="Ex : 08:30" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Lieu</div>
+            <input value={newTrajetPlace} onChange={(e) => setNewTrajetPlace(e.target.value)} placeholder="Ex : Lyon" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Note</div>
+            <input value={newTrajetNote} onChange={(e) => setNewTrajetNote(e.target.value)} placeholder="Ex : Pause cafe" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
+            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
               {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
-                <button key={c} onClick={() => setNewTrajetColor(c)} style={s(`width:32px;height:32px;border-radius:50%;background:${c};border:${newTrajetColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
+                <button key={c} onClick={() => setNewTrajetColor(c)} style={sx(`width:32px;height:32px;border-radius:50%;background:${c};border:${newTrajetColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
               ))}
             </div>
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeTrajetEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveTrajetStep} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeTrajetEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveTrajetStep} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1626,14 +1643,14 @@ export default function App() {
 
       {/* ============ FEUILLE : EDITER VISITE ============ */}
       {showVisitEdit && (
-        <div onClick={closeVisitEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingVisitId === null ? 'Ajouter une visite' : 'Editer visite'}</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
-            <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Puy Mary" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Categorie</div>
-            <select value={newVisitCat} onChange={(e) => setNewVisitCat(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
+        <div onClick={closeVisitEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingVisitId === null ? 'Ajouter une visite' : 'Editer visite'}</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
+            <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Puy Mary" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Categorie</div>
+            <select value={newVisitCat} onChange={(e) => setNewVisitCat(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
               <option>Nature</option>
               <option>Famille</option>
               <option>Patrimoine</option>
@@ -1641,15 +1658,15 @@ export default function App() {
               <option>Gourmand</option>
               <option>Marche</option>
             </select>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Distance</div>
-            <input value={newVisitDist} onChange={(e) => setNewVisitDist(e.target.value)} placeholder="Ex : 25 min" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Duree</div>
-            <input value={newVisitDur} onChange={(e) => setNewVisitDur(e.target.value)} placeholder="Ex : 2 h" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Age recommande</div>
-            <input value={newVisitAge} onChange={(e) => setNewVisitAge(e.target.value)} placeholder="Ex : Des 3 ans" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={closeVisitEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveVisit} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Distance</div>
+            <input value={newVisitDist} onChange={(e) => setNewVisitDist(e.target.value)} placeholder="Ex : 25 min" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Duree</div>
+            <input value={newVisitDur} onChange={(e) => setNewVisitDur(e.target.value)} placeholder="Ex : 2 h" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Age recommande</div>
+            <input value={newVisitAge} onChange={(e) => setNewVisitAge(e.target.value)} placeholder="Ex : Des 3 ans" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={closeVisitEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveVisit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1657,15 +1674,15 @@ export default function App() {
 
       {/* MODAL: Budget total edit */}
       {showBudgetTotalEdit && (
-        <div onClick={() => setShowBudgetTotalEdit(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Budget total</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Montant (€)</div>
-            <input type="number" value={newBudgetTotal} onChange={(e) => setNewBudgetTotal(e.target.value)} placeholder={String(budgetTotal)} style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && saveBudgetTotal()} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={() => setShowBudgetTotalEdit(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveBudgetTotal} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+        <div onClick={() => setShowBudgetTotalEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Budget total</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Montant (€)</div>
+            <input type="number" value={newBudgetTotal} onChange={(e) => setNewBudgetTotal(e.target.value)} placeholder={String(budgetTotal)} style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && saveBudgetTotal()} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={() => setShowBudgetTotalEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveBudgetTotal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1673,10 +1690,10 @@ export default function App() {
 
       {/* MODAL: Hébergement edit */}
       {showHebEdit && (
-        <div onClick={() => setShowHebEdit(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Modifier l'hébergement</div>
+        <div onClick={() => setShowHebEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Modifier l'hébergement</div>
             {[
               ['Nom', newHebNom, setNewHebNom, 'La Grange du Puy Mary'],
               ['Adresse', newHebAdresse, setNewHebAdresse, 'Mandailles-Saint-Julien (15590)'],
@@ -1688,13 +1705,13 @@ export default function App() {
               ['Contact', newHebContact, setNewHebContact, 'Mme Vidal · 06 12 34 56 78'],
             ].map(([label, val, setter, ph]) => (
               <div key={label}>
-                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>{label}</div>
-                <input value={val} onChange={(e) => setter(e.target.value)} placeholder={ph} style={s('width:100%;margin-top:6px;margin-bottom:12px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>{label}</div>
+                <input value={val} onChange={(e) => setter(e.target.value)} placeholder={ph} style={sx('width:100%;margin-top:6px;margin-bottom:12px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
             ))}
-            <div style={s('display:flex;gap:10px;margin-top:8px;')}>
-              <button onClick={() => setShowHebEdit(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveHebergement} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            <div style={sx('display:flex;gap:10px;margin-top:8px;')}>
+              <button onClick={() => setShowHebEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveHebergement} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1702,15 +1719,15 @@ export default function App() {
 
       {/* MODAL: Trajet checklist add item */}
       {showAddTrajetCheck && (
-        <div onClick={() => setShowAddTrajetCheck(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un item</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newTrajetCheckItem} onChange={(e) => setNewTrajetCheckItem(e.target.value)} placeholder="Ex : Chargeur téléphone" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addTrajetCheckItem()} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddTrajetCheck(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addTrajetCheckItem} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+        <div onClick={() => setShowAddTrajetCheck(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un item</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
+            <input value={newTrajetCheckItem} onChange={(e) => setNewTrajetCheckItem(e.target.value)} placeholder="Ex : Chargeur téléphone" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addTrajetCheckItem()} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={() => setShowAddTrajetCheck(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button onClick={addTrajetCheckItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1718,75 +1735,75 @@ export default function App() {
 
       {/* MODAL: Export des données */}
       {showExport && (
-        <div onClick={() => setShowExport(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Exporter les données</div>
-            <div style={s('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Toutes les données de l'app (planning, dépenses, listes, favoris…) au format JSON. À garder en lieu sûr ou à envoyer sur un autre téléphone.</div>
-            <textarea data-testid="export-json" readOnly value={buildExport(currentStoreData(), STORE_KEY)} onFocus={(e) => e.target.select()} style={s('width:100%;height:180px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
-            <button data-testid="btn-share-export" onClick={doShareExport} style={s('width:100%;margin-top:14px;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>📤 Envoyer vers Telegram / WhatsApp…</button>
-            <div style={s('display:flex;gap:10px;margin-top:10px;')}>
-              <button onClick={copyExport} style={s(`flex:1;border:none;background:${exportCopied ? '#5b7042' : '#4a5d3a'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;`)}>{exportCopied ? '✓ Copié !' : '📋 Copier'}</button>
-              <button onClick={doDownloadExport} style={s('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>💾 Télécharger</button>
+        <div onClick={() => setShowExport(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Exporter les données</div>
+            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Toutes les données de l'app (planning, dépenses, listes, favoris…) au format JSON. À garder en lieu sûr ou à envoyer sur un autre téléphone.</div>
+            <textarea data-testid="export-json" readOnly value={buildExport(currentStoreData(), STORE_KEY)} onFocus={(e) => e.target.select()} style={sx('width:100%;height:180px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
+            <button data-testid="btn-share-export" onClick={doShareExport} style={sx('width:100%;margin-top:14px;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>📤 Envoyer vers Telegram / WhatsApp…</button>
+            <div style={sx('display:flex;gap:10px;margin-top:10px;')}>
+              <button onClick={copyExport} style={sx(`flex:1;border:none;background:${exportCopied ? '#5b7042' : '#4a5d3a'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;`)}>{exportCopied ? '✓ Copié !' : '📋 Copier'}</button>
+              <button onClick={doDownloadExport} style={sx('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>💾 Télécharger</button>
             </div>
-            <button onClick={() => setShowExport(false)} style={s('width:100%;margin-top:10px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
+            <button onClick={() => setShowExport(false)} style={sx('width:100%;margin-top:10px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
           </div>
         </div>
       )}
 
       {/* MODAL: Import des données */}
       {showImport && (
-        <div onClick={closeImport} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Importer des données</div>
-            <div style={s('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
-            <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); doParseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={s('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
-            <label style={s('display:block;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;text-align:center;')}>
+        <div onClick={closeImport} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Importer des données</div>
+            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
+            <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); doParseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={sx('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
+            <label style={sx('display:block;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;text-align:center;')}>
               📂 Choisir un fichier…
-              <input type="file" accept=".json,application/json" onChange={handleImportFile} style={s('display:none;')} />
+              <input type="file" accept=".json,application/json" onChange={handleImportFile} style={sx('display:none;')} />
             </label>
-            {importError && <div style={s('margin-top:10px;background:#f7e2dc;border-radius:12px;padding:11px 13px;font-size:13px;color:#b8503f;font-weight:600;')}>⚠️ {importError}</div>}
+            {importError && <div style={sx('margin-top:10px;background:#f7e2dc;border-radius:12px;padding:11px 13px;font-size:13px;color:#b8503f;font-weight:600;')}>⚠️ {importError}</div>}
             {importPreview && (
-              <div data-testid="import-preview" style={s('margin-top:10px;background:#e7ecdf;border-radius:12px;padding:11px 13px;font-size:13px;color:#4a5d3a;')}>
+              <div data-testid="import-preview" style={sx('margin-top:10px;background:#e7ecdf;border-radius:12px;padding:11px 13px;font-size:13px;color:#4a5d3a;')}>
                 ✓ Export Cantou valide — {Array.isArray(importPreview.expenses) ? importPreview.expenses.length : 0} dépenses, {Array.isArray(importPreview.meals) ? importPreview.meals.length : 0} repas, {Array.isArray(importPreview.visits) ? importPreview.visits.length : 0} visites, {Array.isArray(importPreview.days) ? importPreview.days.length : 0} jours de planning.
               </div>
             )}
-            <div style={s('display:flex;gap:10px;margin-top:14px;')}>
-              <button onClick={closeImport} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={s(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
+            <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
+              <button onClick={closeImport} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={sx(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
             </div>
-            <div style={s('margin-top:10px;font-size:12px;color:#6b6354;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
+            <div style={sx('margin-top:10px;font-size:12px;color:#6b6354;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
           </div>
         </div>
       )}
 
       {/* MODAL: Paramètres du voyage */}
       {showTripEdit && (
-        <div onClick={() => setShowTripEdit(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Paramètres du voyage</div>
-            <div style={s('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Ces réglages pilotent le compte à rebours, les cartes et les notifications.</div>
-            <div style={s('display:flex;gap:10px;')}>
-              <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Date de départ</div>
-                <input data-testid="input-trip-start" type="date" value={newTripStart} onChange={(e) => setNewTripStart(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <div onClick={() => setShowTripEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Paramètres du voyage</div>
+            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Ces réglages pilotent le compte à rebours, les cartes et les notifications.</div>
+            <div style={sx('display:flex;gap:10px;')}>
+              <div style={sx('flex:1;')}>
+                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Date de départ</div>
+                <input data-testid="input-trip-start" type="date" value={newTripStart} onChange={(e) => setNewTripStart(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
-              <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Date de retour</div>
-                <input data-testid="input-trip-end" type="date" value={newTripEnd} onChange={(e) => setNewTripEnd(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              <div style={sx('flex:1;')}>
+                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Date de retour</div>
+                <input data-testid="input-trip-end" type="date" value={newTripEnd} onChange={(e) => setNewTripEnd(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
             </div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Ville de départ</div>
-            <input data-testid="input-trip-origin" value={newTripOrigin} onChange={(e) => setNewTripOrigin(e.target.value)} placeholder="Ex : Beauvais" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Étape (nuit) — optionnel</div>
-            <input value={newTripEtape} onChange={(e) => setNewTripEtape(e.target.value)} placeholder="Ex : Laschamps" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Destination</div>
-            <input data-testid="input-trip-dest" value={newTripDest} onChange={(e) => setNewTripDest(e.target.value)} placeholder="Ex : Mandailles (Cantal)" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={() => setShowTripEdit(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-trip" onClick={saveTrip} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Ville de départ</div>
+            <input data-testid="input-trip-origin" value={newTripOrigin} onChange={(e) => setNewTripOrigin(e.target.value)} placeholder="Ex : Beauvais" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Étape (nuit) — optionnel</div>
+            <input value={newTripEtape} onChange={(e) => setNewTripEtape(e.target.value)} placeholder="Ex : Laschamps" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Destination</div>
+            <input data-testid="input-trip-dest" value={newTripDest} onChange={(e) => setNewTripDest(e.target.value)} placeholder="Ex : Mandailles (Cantal)" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={() => setShowTripEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-trip" onClick={saveTrip} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1794,17 +1811,17 @@ export default function App() {
 
       {/* MODAL: Nouvelle liste de logistique */}
       {showAddLogiList && (
-        <div onClick={() => setShowAddLogiList(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle liste</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Emoji</div>
-            <input value={newLogiListEmoji} onChange={(e) => setNewLogiListEmoji(e.target.value)} placeholder="📦" maxLength="2" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
-            <input data-testid="input-logi-list-name" value={newLogiListName} onChange={(e) => setNewLogiListName(e.target.value)} placeholder="Ex : Sac de plage" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addLogiList()} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddLogiList(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-logi-list" onClick={addLogiList} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+        <div onClick={() => setShowAddLogiList(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle liste</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Emoji</div>
+            <input value={newLogiListEmoji} onChange={(e) => setNewLogiListEmoji(e.target.value)} placeholder="📦" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
+            <input data-testid="input-logi-list-name" value={newLogiListName} onChange={(e) => setNewLogiListName(e.target.value)} placeholder="Ex : Sac de plage" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addLogiList()} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={() => setShowAddLogiList(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-logi-list" onClick={addLogiList} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1812,15 +1829,15 @@ export default function App() {
 
       {/* MODAL: Nouvelle catégorie de courses */}
       {showAddCourseCat && (
-        <div onClick={() => setShowAddCourseCat(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle catégorie</div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
-            <input data-testid="input-course-cat-name" value={newCourseCatName} onChange={(e) => setNewCourseCatName(e.target.value)} placeholder="Ex : Apéro" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addCourseCategory()} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddCourseCat(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-course-cat" onClick={addCourseCategory} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+        <div onClick={() => setShowAddCourseCat(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle catégorie</div>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
+            <input data-testid="input-course-cat-name" value={newCourseCatName} onChange={(e) => setNewCourseCatName(e.target.value)} placeholder="Ex : Apéro" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addCourseCategory()} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={() => setShowAddCourseCat(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-course-cat" onClick={addCourseCategory} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1828,27 +1845,27 @@ export default function App() {
 
       {/* MODAL: Ajouter un jour au planning */}
       {showDayAdd && (
-        <div onClick={() => setShowDayAdd(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un jour</div>
-            <div style={s('display:flex;gap:10px;')}>
-              <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Jour (abrégé)</div>
-                <input data-testid="input-day-dow" value={newDayDow} onChange={(e) => setNewDayDow(e.target.value)} placeholder="Ex : Dim" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <div onClick={() => setShowDayAdd(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un jour</div>
+            <div style={sx('display:flex;gap:10px;')}>
+              <div style={sx('flex:1;')}>
+                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour (abrégé)</div>
+                <input data-testid="input-day-dow" value={newDayDow} onChange={(e) => setNewDayDow(e.target.value)} placeholder="Ex : Dim" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
-              <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Numéro</div>
-                <input data-testid="input-day-num" value={newDayNum} onChange={(e) => setNewDayNum(e.target.value)} placeholder="Ex : 16" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              <div style={sx('flex:1;')}>
+                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Numéro</div>
+                <input data-testid="input-day-num" value={newDayNum} onChange={(e) => setNewDayNum(e.target.value)} placeholder="Ex : 16" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
             </div>
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input data-testid="input-day-title" value={newDayTitle2} onChange={(e) => setNewDayTitle2(e.target.value)} placeholder="Ex : Journée détente" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
-            <input value={newDaySub2} onChange={(e) => setNewDaySub2(e.target.value)} placeholder="Ex : Au gré de l'envie" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('display:flex;gap:10px;')}>
-              <button onClick={() => setShowDayAdd(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-day-add" onClick={addDay} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
+            <input data-testid="input-day-title" value={newDayTitle2} onChange={(e) => setNewDayTitle2(e.target.value)} placeholder="Ex : Journée détente" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
+            <input value={newDaySub2} onChange={(e) => setNewDaySub2(e.target.value)} placeholder="Ex : Au gré de l'envie" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={sx('display:flex;gap:10px;')}>
+              <button onClick={() => setShowDayAdd(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-day-add" onClick={addDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1856,9 +1873,9 @@ export default function App() {
 
       {/* BANDEAU UNDO SUPPRESSION */}
       {undoMsg && (
-        <div data-testid="undo-snackbar" style={s('position:fixed;left:18px;right:18px;bottom:96px;z-index:300;background:#2f2a22;color:#fffaf0;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:fadeIn 0.2s ease;')}>
-          <span style={s('flex:1;font-size:14px;font-weight:600;')}>{undoMsg}</span>
-          <button data-testid="btn-undo" onClick={applyUndo} style={s('border:none;background:transparent;color:#e8c07a;font-weight:700;font-family:Quicksand;font-size:14px;cursor:pointer;padding:4px 8px;')}>Annuler</button>
+        <div data-testid="undo-snackbar" style={sx('position:fixed;left:18px;right:18px;bottom:96px;z-index:300;background:#2f2a22;color:#fffaf0;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:fadeIn 0.2s ease;')}>
+          <span style={sx('flex:1;font-size:14px;font-weight:600;')}>{undoMsg}</span>
+          <button data-testid="btn-undo" onClick={applyUndo} style={sx('border:none;background:transparent;color:#e8c07a;font-weight:700;font-family:Quicksand;font-size:14px;cursor:pointer;padding:4px 8px;')}>Annuler</button>
         </div>
       )}
 

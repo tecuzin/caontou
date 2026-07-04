@@ -525,3 +525,39 @@ describe('Suggestions', () => {
     expect(input.value).toBe('')
   })
 })
+
+describe('Mode sombre', () => {
+  it('affiche le bouton de bascule sur l\'accueil', () => {
+    render(<App />)
+    expect(screen.getByTestId('btn-dark-mode-toggle')).toBeInTheDocument()
+  })
+
+  it('bascule l\'icône lune/soleil au clic', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const btn = screen.getByTestId('btn-dark-mode-toggle')
+    expect(btn.textContent).toBe('🌙')
+    await user.click(btn)
+    expect(btn.textContent).toBe('☀️')
+    await user.click(btn)
+    expect(btn.textContent).toBe('🌙')
+  })
+
+  it('persiste la préférence dans localStorage sous une clé dédiée', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    expect(window.localStorage.getItem('cantou.darkMode')).toBe('true')
+    unmount()
+    render(<App />)
+    expect(screen.getByTestId('btn-dark-mode-toggle').textContent).toBe('☀️')
+  })
+
+  it('n\'affecte pas le fonctionnement du reste de l\'app (navigation toujours ok)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    await user.click(screen.getByTestId('tab-budget'))
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+  })
+})
