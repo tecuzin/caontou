@@ -5,6 +5,7 @@ import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, f
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { buildExport, exportFilename, parseImport, downloadExport, shareExport } from './backup.js'
+import { useVisits } from './hooks/useVisits.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
@@ -313,13 +314,12 @@ export default function App() {
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
-  const [saved, setSaved] = useState(initial.saved)
+  const { visits, setVisits, saved, setSaved, savedCount, toggleSaved: hookToggleSaved, addVisit: hookAddVisit, updateVisit, removeVisit } = useVisits(initial.visits, initial.saved)
   const [checks, setChecks] = useState(initial.checks)
   const [expenses, setExpenses] = useState(initial.expenses)
   const [meals, setMeals] = useState(initial.meals || structuredClone(MEALS_INITIAL))
   const [shoppingItems, setShoppingItems] = useState(initial.shoppingItems || structuredClone(SHOPPING_ITEMS_INITIAL))
   const [days, setDays] = useState(initial.days || structuredClone(DAYS_INITIAL))
-  const [visits, setVisits] = useState(initial.visits || structuredClone(VISITS_INITIAL))
   const [meteo, setMeteo] = useState(initial.meteo || structuredClone(METEO_INITIAL))
   const [trajets, setTrajets] = useState(initial.trajets || structuredClone(TRAJETS_INITIAL))
   const [trip, setTrip] = useState(initial.trip || { ...TRIP_INITIAL })
@@ -391,7 +391,7 @@ export default function App() {
     haptic(ImpactStyle.Light)
     setChecks((c) => ({ ...c, [key]: { ...(c[key] || {}), [label]: !(c[key] && c[key][label]) } }))
   }
-  const toggleSaved = (id) => { haptic(ImpactStyle.Medium); setSaved((sv) => ({ ...sv, [id]: !sv[id] })) }
+  const toggleSaved = (id) => { haptic(ImpactStyle.Medium); hookToggleSaved(id) }
 
   // compte à rebours depuis la date de départ paramétrée
   const countdown = useMemo(() => {
@@ -447,7 +447,6 @@ export default function App() {
       if (visitSort === 'cat') return CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat)
       return 0
     })
-  const savedCount = Object.values(saved).filter(Boolean).length
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
@@ -608,12 +607,9 @@ export default function App() {
   const saveVisit = () => {
     if (!newVisitName.trim()) return
     haptic(ImpactStyle.Medium)
-    if (!editingVisitId) {
-      const newId = Math.max(...visits.map(v => v.id), 0) + 1
-      setVisits((list) => [...list, { id: newId, emoji: '📍', name: newVisitName, cat: newVisitCat, dist: newVisitDist, dur: newVisitDur, age: newVisitAge }])
-    } else {
-      setVisits((list) => list.map(v => v.id === editingVisitId ? { ...v, name: newVisitName, dist: newVisitDist, dur: newVisitDur, age: newVisitAge, cat: newVisitCat } : v))
-    }
+    const data = { name: newVisitName, cat: newVisitCat, dist: newVisitDist, dur: newVisitDur, age: newVisitAge }
+    if (!editingVisitId) hookAddVisit(data)
+    else updateVisit(editingVisitId, data)
     closeVisitEdit()
   }
   const closeVisitEdit = () => { setShowVisitEdit(false); setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature') }
@@ -621,15 +617,8 @@ export default function App() {
     if (visits.length <= 1) return
     haptic(ImpactStyle.Medium)
     offerUndo('Visite supprimée')
-    setVisits((list) => list.filter(v => v.id !== visitId))
+    removeVisit(visitId)
   }
-  const addVisit = () => {
-    if (!newVisitName.trim()) return
-    const newId = Math.max(...visits.map(v => v.id), 0) + 1
-    setVisits((list) => [...list, { id: newId, emoji: '📍', name: newVisitName, cat: newVisitCat, dist: newVisitDist, dur: newVisitDur, age: newVisitAge }])
-    closeVisitAdd()
-  }
-  const closeVisitAdd = () => { setShowVisitEdit(false); setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature') }
 
   // Trajet : les étapes sont éditées par direction (aller / retour)
   const editTrajetStep = (idx) => {
