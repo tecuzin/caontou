@@ -238,3 +238,25 @@ describe('Export / import des données', () => {
     expect(stored.expenses[0].label).toBe('Importé')
   })
 })
+
+describe('Undo suppression', () => {
+  it('restaure une dépense supprimée via le bandeau Annuler', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-budget'))
+    await user.click(screen.getByTestId('btn-add-depense'))
+    await user.type(screen.getByTestId('input-montant'), '33')
+    await user.type(screen.getByTestId('input-label'), 'Test undo')
+    await user.click(screen.getByTestId('btn-submit-depense'))
+    expect(screen.getByText('Test undo')).toBeInTheDocument()
+
+    const row = screen.getByText('Test undo').closest('div').parentElement.parentElement
+    await user.click(within(row).getByText('🗑️'))
+    expect(screen.queryByText('Test undo')).not.toBeInTheDocument()
+    expect(screen.getByTestId('undo-snackbar')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('btn-undo'))
+    expect(screen.getByText('Test undo')).toBeInTheDocument()
+    expect(screen.queryByTestId('undo-snackbar')).not.toBeInTheDocument()
+  })
+})

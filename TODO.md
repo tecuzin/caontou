@@ -53,12 +53,12 @@
 
 ## 🔄 En cours — soirée du 3 juillet
 
-- [ ] **Notifications natives** (`@capacitor/local-notifications`) — les rappels actuels
-  (`setTimeout`) meurent à la fermeture de l'app ; planification native Android qui
-  survit à la fermeture/verrouillage/redémarrage. Annule+replanifie à chaque
-  changement de planning/repas. Fallback web (Notification API) conservé en dev.
-- [ ] **Undo suppression** — bandeau « Supprimé · Annuler » (5 s) après chaque 🗑️
-  (si le temps le permet ce soir)
+- [x] **Notifications natives** (`@capacitor/local-notifications`) — planification
+  native Android (AlarmManager) : les rappels partent app fermée, téléphone
+  verrouillé ou redémarré. Annule+replanifie à chaque changement de
+  planning/repas (ids déterministes). Fallback web (Notification API) en dev.
+- [x] **Undo suppression** — bandeau « Supprimé · Annuler » (5 s) après chaque 🗑️
+  (11 handlers), restaure un instantané complet du store
 
 ## 📅 Backlog suivant
 
