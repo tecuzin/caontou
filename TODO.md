@@ -122,16 +122,27 @@
 - [x] Couverture globale : **46% → 50.13%** statements, 99 tests verts
   (0 régression sur les 91 tests existants).
 
+## ✅ Complété — 2 hooks supplémentaires (`useExpenses`, `useMeals`)
+
+- [x] **`useExpenses`** — dépenses (Budget), identifiées par index (comportement
+  existant préservé). 100% de couverture, 6 tests.
+- [x] **`useMeals`** — repas, id stable, garde-fou dernier repas restant.
+  100% de couverture, 7 tests.
+- [x] Couverture globale : 50.13% → **51.84%**, 112 tests verts.
+
 ## 📅 Backlog suivant
 
 - [ ] **Poursuivre l'extraction de hooks** (voir skill `refactor`, priorité 1) :
-  `useExpenses`, `useMeals`, `useTrajets`, `useLogi`, `useCourses`,
-  `useMeteo`, `usePlanning`, `useTripConfig` — même pattern que
-  `useVisits` (état + actions pures, haptic/undo restent des wrappers
-  côté App.jsx). App.jsx fait encore ~1870 lignes.
+  `useTrajets`, `useLogi`, `useCourses`, `useMeteo`, `usePlanning`,
+  `useTripConfig` — même pattern que `useVisits`/`useExpenses`/`useMeals`
+  (état + actions pures, haptic/undo restent des wrappers côté App.jsx).
 - [ ] **Extraire les écrans en composants** (priorité 2 du skill) une fois
   les hooks sortis — Budget, Repas, Planning, Trajet, Logistique,
   Hébergement, Météo, Visites, Accueil.
+- [ ] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
+  `npm run test:appium`), jamais exécutée : nécessite un Appium server +
+  device/émulateur Android connecté (non disponible dans cet environnement
+  de développement) — à lancer côté utilisateur avec un téléphone branché.
 - [ ] Tests device réel (notifications natives, écran Aujourd'hui).
 
 ---
