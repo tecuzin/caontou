@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { buildNotificationList } from '../notifications.js'
+import { buildNotificationList, buildBackupReminder } from '../notifications.js'
 
 const trip = { start: '2026-08-05', end: '2026-08-15', origin: 'Beauvais', etape: 'Laschamps', destination: 'Mandailles (Cantal)' }
 
@@ -117,5 +117,40 @@ describe('dispatchWebNotifications() — fallback navigateur', () => {
     expect(created).toHaveLength(1)
     expect(created[0].title).toBe('Test')
     window.Notification = originalNotification
+  })
+})
+
+describe('buildBackupReminder()', () => {
+  it('propose un rappel dans 2 jours si aucune sauvegarde n\'a jamais été faite', () => {
+    const now = new Date(2026, 6, 1, 10, 0, 0)
+    const reminder = buildBackupReminder(null, now)
+    expect(reminder.id).toBe(9000)
+    expect(reminder.body).toMatch(/pas encore fait/)
+    const expected = new Date(2026, 6, 3)
+    expect(reminder.at.getDate()).toBe(expected.getDate())
+    expect(reminder.at.getHours()).toBe(9)
+  })
+
+  it('propose un rappel 5 jours après la dernière sauvegarde', () => {
+    const now = new Date(2026, 6, 1, 10, 0, 0)
+    const lastBackup = new Date(2026, 5, 28).toISOString() // 3 jours avant "now"
+    const reminder = buildBackupReminder(lastBackup, now)
+    expect(reminder.at.getDate()).toBe(3) // 28 juin + 5 jours = 3 juillet
+    expect(reminder.body).toMatch(/5 jours/)
+  })
+
+  it('replanifie pour demain si la sauvegarde est déjà en retard', () => {
+    const now = new Date(2026, 6, 10, 10, 0, 0)
+    const lastBackup = new Date(2026, 5, 1).toISOString() // très ancien, 5 jours largement dépassés
+    const reminder = buildBackupReminder(lastBackup, now)
+    expect(reminder.at.getTime()).toBeGreaterThan(now.getTime())
+    expect(reminder.at.getDate()).toBe(11) // demain
+  })
+
+  it('utilise toujours le même id réservé (pas de collision avec buildNotificationList)', () => {
+    const reminder1 = buildBackupReminder(null)
+    const reminder2 = buildBackupReminder(new Date().toISOString())
+    expect(reminder1.id).toBe(reminder2.id)
+    expect(reminder1.id).toBe(9000)
   })
 })

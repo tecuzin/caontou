@@ -4,7 +4,7 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 
 // Les 15 clés du store cantou.v1 — utilisées pour construire l'export et
 // reconnaître un JSON importé comme un export Cantou valide.
-export const STORE_KEYS = ['saved', 'checks', 'expenses', 'meals', 'shoppingItems', 'days', 'visits', 'meteo', 'trajets', 'trajetSteps', 'trip', 'logi', 'courses', 'budgetTotal', 'hebergement', 'trajetCheckItems', 'suggestions']
+export const STORE_KEYS = ['saved', 'checks', 'expenses', 'meals', 'shoppingItems', 'days', 'visits', 'meteo', 'trajets', 'trajetSteps', 'trip', 'logi', 'courses', 'budgetTotal', 'hebergement', 'trajetCheckItems', 'suggestions', 'lastBackupAt']
 
 /** Construit le JSON d'export (enveloppe app/schema/exportedAt + données). */
 export function buildExport(data, schema) {
@@ -82,4 +82,13 @@ export async function shareExport(content, filename) {
       downloadExport(content, filename)
     }
   } catch { }
+}
+
+/** Formate la date de dernière sauvegarde en texte lisible ("jamais", "aujourd'hui", "il y a N jours"). */
+export function formatLastBackup(lastBackupAt, now = new Date()) {
+  if (!lastBackupAt) return 'jamais'
+  const days = Math.floor((now - new Date(lastBackupAt)) / 86400000)
+  if (days <= 0) return "aujourd'hui"
+  if (days === 1) return 'hier'
+  return `il y a ${days} jours`
 }
