@@ -48,3 +48,18 @@ export function parseDist(d) {
   const m = String(d).match(/\d+/)
   return m ? parseInt(m[0]) : 999
 }
+
+/**
+ * Build a local Date from an ISO date string (yyyy-mm-dd), optionally at a
+ * given hour/minute. Used for trip.start/trip.end throughout the app.
+ */
+export function tripDate(iso, h = 12, min = 0) {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d, h, min, 0)
+}
+
+/** Format an ISO date as "lun. 5" (French, short weekday + day number). */
+export const fmtDayShort = (iso) => tripDate(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' })
+
+/** Format an ISO date as "août 2026" (French, full month + year). */
+export const fmtMonthYear = (iso) => tripDate(iso).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })

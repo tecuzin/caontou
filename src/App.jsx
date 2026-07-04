@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
-import { LocalNotifications } from '@capacitor/local-notifications'
 import { Share } from '@capacitor/share'
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL } from './data.js'
-import { s, eur, buildList, sortItemsByTime, parseDist } from './utils.js'
+import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
+import { scheduleAllNotifications } from './notifications.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
@@ -233,96 +233,6 @@ function CheckRow({ label, checked, onToggle }) {
 const SectionLabel = ({ children }) => (
   <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>{children}</div>
 )
-
-/* ================================================================== */
-// Helpers dates du voyage — trip.start/end sont des ISO (yyyy-mm-dd).
-const tripDate = (iso, h = 12, min = 0) => {
-  const [y, m, d] = iso.split('-').map(Number)
-  return new Date(y, m - 1, d, h, min, 0)
-}
-const fmtDayShort = (iso) => tripDate(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' })
-const fmtMonthYear = (iso) => tripDate(iso).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
-
-// Notifications — construit la liste de tous les rappels à venir
-// (planning 30 min avant, menu du jour à 8 h, trajet J-1 + matin du départ).
-// Ids déterministes : replanifier = annuler les pendantes + re-scheduler.
-// Le mois/année des jours de planning est déduit de trip.start (les jours
-// portent un numéro de jour du mois) ; le nom du mois vient du voyage.
-const buildNotificationList = (daysData, mealsData, trip) => {
-  const now = Date.now()
-  const list = []
-  let id = 1
-  const [ty, tm] = trip.start.split('-').map(Number)
-  const monthName = tripDate(trip.start).toLocaleDateString('fr-FR', { month: 'long' })
-  daysData.forEach((d) => {
-    const dayDate = new Date(ty, tm - 1, d.num)
-    d.items.forEach((item) => {
-      const m = item.time.match(/^(\d{1,2}):(\d{2})$/)
-      if (!m) return
-      const t = new Date(dayDate)
-      t.setHours(parseInt(m[1]), parseInt(m[2]), 0, 0)
-      const at = new Date(t.getTime() - 30 * 60 * 1000)
-      if (at.getTime() > now) list.push({ id: id++, title: `🗓️ Dans 30 min · ${item.title}`, body: `${d.dow} ${d.num} ${monthName} · ${item.time}`, at })
-    })
-  })
-  daysData.forEach((d) => {
-    const at = new Date(ty, tm - 1, d.num, 8, 0, 0)
-    if (at.getTime() > now) {
-      const ml = mealsData.find((m) => m.day === `${d.dow} ${d.num}`)
-      list.push({ id: id++, title: `🍽️ Menu du jour · ${d.dow} ${d.num}`, body: ml ? ml.dish : 'Voir les menus', at })
-    }
-  })
-  const start = tripDate(trip.start)
-  const veille = new Date(start.getFullYear(), start.getMonth(), start.getDate() - 1, 20, 0, 0)
-  const matin = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 7, 0, 0)
-  const end = tripDate(trip.end)
-  const veilleRetour = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 1, 20, 0, 0)
-  const via = trip.etape ? ` (via ${trip.etape})` : ''
-  if (veille.getTime() > now) list.push({ id: id++, title: '🚗 Départ demain !', body: 'Checklist trajet à valider ce soir', at: veille })
-  if (matin.getTime() > now) list.push({ id: id++, title: "🚗 C'est le grand jour !", body: `${trip.origin} → ${trip.destination}${via}`, at: matin })
-  if (veilleRetour.getTime() > now) list.push({ id: id++, title: '🏠 Demain : fin du séjour', body: `Route du retour vers ${trip.origin}${via}`, at: veilleRetour })
-  return list
-}
-
-// Fallback web (dev navigateur) : setTimeout + Notification API.
-// Les timeouts sont suivis pour éviter les doublons à la replanification.
-let webNotifTimeouts = []
-const dispatchWebNotifications = async (list) => {
-  if (!('Notification' in window)) return
-  if (Notification.permission === 'default') await Notification.requestPermission()
-  if (Notification.permission !== 'granted') return
-  webNotifTimeouts.forEach(clearTimeout)
-  webNotifTimeouts = list.map((n) => setTimeout(() => {
-    new Notification(n.title, { body: n.body, icon: '/cantou-icon.png' })
-  }, n.at.getTime() - Date.now()))
-}
-
-// Natif Android : planification via AlarmManager — les rappels partent
-// même app fermée, téléphone verrouillé ou redémarré.
-const dispatchNativeNotifications = async (list) => {
-  const perm = await LocalNotifications.requestPermissions()
-  if (perm.display !== 'granted') return
-  const pending = await LocalNotifications.getPending()
-  if (pending.notifications.length) {
-    await LocalNotifications.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) })
-  }
-  if (list.length) {
-    await LocalNotifications.schedule({
-      notifications: list.map((n) => ({
-        id: n.id,
-        title: n.title,
-        body: n.body,
-        schedule: { at: n.at, allowWhileIdle: true },
-      })),
-    })
-  }
-}
-
-const scheduleAllNotifications = async (daysData, mealsData, trip) => {
-  const list = buildNotificationList(daysData, mealsData, trip)
-  if (Capacitor.isNativePlatform()) await dispatchNativeNotifications(list)
-  else await dispatchWebNotifications(list)
-}
 
 /* ================================================================== */
 export default function App() {
