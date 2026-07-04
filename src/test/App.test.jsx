@@ -192,3 +192,163 @@ describe('Persistance localStorage', () => {
     expect(screen.getByText('Test persistance')).toBeInTheDocument()
   })
 })
+
+describe('Export / import des données', () => {
+  it('ouvre la modal export avec un JSON Cantou complet', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-export'))
+    const json = screen.getByTestId('export-json').value
+    const parsed = JSON.parse(json)
+    expect(parsed.app).toBe('cantou')
+    expect(parsed.schema).toBe('cantou.v1')
+    expect(parsed.data).toHaveProperty('expenses')
+    expect(parsed.data).toHaveProperty('meals')
+    expect(parsed.data).toHaveProperty('budgetTotal')
+  })
+
+  it('valide un export collé et affiche le résumé', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-import'))
+    const payload = JSON.stringify({ app: 'cantou', data: { expenses: [{ label: 'X', cat: 'Extra', amt: 5 }], meals: [], budgetTotal: 1000 } })
+    fireEvent.change(screen.getByTestId('import-textarea'), { target: { value: payload } })
+    expect(screen.getByTestId('import-preview')).toBeInTheDocument()
+    expect(screen.getByTestId('btn-apply-import')).not.toBeDisabled()
+  })
+
+  it('rejette un JSON qui n\'est pas un export Cantou', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-import'))
+    fireEvent.change(screen.getByTestId('import-textarea'), { target: { value: '{"foo":1}' } })
+    expect(screen.queryByTestId('import-preview')).not.toBeInTheDocument()
+    expect(screen.getByTestId('btn-apply-import')).toBeDisabled()
+  })
+
+  it('écrit le store importé dans localStorage au clic sur Remplacer', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-import'))
+    const payload = JSON.stringify({ app: 'cantou', data: { expenses: [{ label: 'Importé', cat: 'Extra', amt: 42 }], budgetTotal: 2500 } })
+    fireEvent.change(screen.getByTestId('import-textarea'), { target: { value: payload } })
+    await user.click(screen.getByTestId('btn-apply-import'))
+    const stored = JSON.parse(window.localStorage.getItem('cantou.v1'))
+    expect(stored.budgetTotal).toBe(2500)
+    expect(stored.expenses[0].label).toBe('Importé')
+  })
+})
+
+describe('Undo suppression', () => {
+  it('restaure une dépense supprimée via le bandeau Annuler', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-budget'))
+    await user.click(screen.getByTestId('btn-add-depense'))
+    await user.type(screen.getByTestId('input-montant'), '33')
+    await user.type(screen.getByTestId('input-label'), 'Test undo')
+    await user.click(screen.getByTestId('btn-submit-depense'))
+    expect(screen.getByText('Test undo')).toBeInTheDocument()
+
+    const row = screen.getByText('Test undo').closest('div').parentElement.parentElement
+    await user.click(within(row).getByText('🗑️'))
+    expect(screen.queryByText('Test undo')).not.toBeInTheDocument()
+    expect(screen.getByTestId('undo-snackbar')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('btn-undo'))
+    expect(screen.getByText('Test undo')).toBeInTheDocument()
+    expect(screen.queryByTestId('undo-snackbar')).not.toBeInTheDocument()
+  })
+})
+
+describe('Paramètres du voyage', () => {
+  it('modifie les dates et villes du voyage', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-trip-settings'))
+    await user.clear(screen.getByTestId('input-trip-origin'))
+    await user.type(screen.getByTestId('input-trip-origin'), 'Paris')
+    await user.clear(screen.getByTestId('input-trip-dest'))
+    await user.type(screen.getByTestId('input-trip-dest'), 'Marseille')
+    await user.click(screen.getByTestId('btn-save-trip'))
+    const stored = JSON.parse(window.localStorage.getItem('cantou.v1'))
+    expect(stored.trip.origin).toBe('Paris')
+    expect(stored.trip.destination).toBe('Marseille')
+  })
+})
+
+describe('Trajet aller / retour', () => {
+  it('bascule entre les étapes aller et retour', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const trajetModule = screen.getByText('Trajet')
+    await user.click(trajetModule)
+    expect(screen.getByTestId('btn-trajet-aller')).toBeInTheDocument()
+    expect(screen.getByTestId('btn-trajet-retour')).toBeInTheDocument()
+    await user.click(screen.getByTestId('btn-trajet-retour'))
+    expect(screen.getByText(/Les etapes · retour/)).toBeInTheDocument()
+  })
+})
+
+describe('Listes de préparatifs personnalisables', () => {
+  it('ajoute une nouvelle liste de logistique', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Préparatifs'))
+    await user.click(screen.getByTestId('btn-add-logi-list'))
+    await user.type(screen.getByTestId('input-logi-list-name'), 'Sac de plage')
+    await user.click(screen.getByTestId('btn-save-logi-list'))
+    expect(screen.getByText('Sac de plage')).toBeInTheDocument()
+  })
+})
+
+describe('Planning : ajout de jour', () => {
+  it('ajoute un nouveau jour au planning', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-planning'))
+    await user.click(screen.getByTestId('btn-add-day'))
+    await user.type(screen.getByTestId('input-day-dow'), 'Dim')
+    await user.type(screen.getByTestId('input-day-num'), '16')
+    await user.type(screen.getByTestId('input-day-title'), 'Journée bonus')
+    await user.click(screen.getByTestId('btn-save-day-add'))
+    const stored = JSON.parse(window.localStorage.getItem('cantou.v1'))
+    expect(stored.days.some((d) => d.title === 'Journée bonus')).toBe(true)
+  })
+})
+
+describe('Écran Aujourd\'hui', () => {
+  it('n\'affiche pas la carte Aujourd\'hui hors des dates du voyage', () => {
+    vi.setSystemTime(new Date(2020, 0, 1))
+    render(<App />)
+    expect(screen.queryByTestId('today-card')).not.toBeInTheDocument()
+    vi.useRealTimers()
+  })
+
+  it('affiche la carte Aujourd\'hui pendant le voyage avec planning/météo/repas du jour', () => {
+    vi.setSystemTime(new Date(2026, 7, 6, 10, 0, 0)) // 6 août 2026, dans la fenêtre par défaut (5-15 août)
+    render(<App />)
+    const card = screen.getByTestId('today-card')
+    expect(card).toBeInTheDocument()
+    expect(within(card).getByText(/Jeu 6/)).toBeInTheDocument()
+    vi.useRealTimers()
+  })
+
+  it('navigue vers le planning du jour au clic', async () => {
+    vi.setSystemTime(new Date(2026, 7, 6, 10, 0, 0))
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Voir le planning du jour →'))
+    expect(screen.getByTestId('screen-planning')).toBeInTheDocument()
+    vi.useRealTimers()
+  })
+})
+
+describe('Partage natif de la sauvegarde', () => {
+  it('affiche le bouton de partage dans la modal export', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-export'))
+    expect(screen.getByTestId('btn-share-export')).toBeInTheDocument()
+  })
+})

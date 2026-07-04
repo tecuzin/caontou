@@ -1,7 +1,8 @@
 # Cantou — TODO & Backlog
 
 > Lire ce fichier en début de session. Mettre à jour les cases au fil du travail.
-> Départ voyage : **7 août 2026**. Deadline app : **15 juillet 2026**.
+> Voyage paramétrable dans l'app (⚙️ sur l'accueil) — par défaut **5 → 15 août 2026**
+> (Beauvais → Laschamps → Cantal). Deadline app : **15 juillet 2026**.
 
 ---
 
@@ -39,11 +40,79 @@
 
 ---
 
+## ✅ Complété depuis la v0.3.0 (2-3 juillet)
+
+- [x] **Release Git Flow v0.3.0** (main taguée) puis **hotfix v0.3.1**
+- [x] **Signature APK stable** — `cantou.keystore` committé, fini le conflit de package à la mise à jour
+- [x] **Icône Android Cantou** — remplace le logo Capacitor (legacy + adaptive icon, générée au build)
+- [x] **Illustrations montagne & vacances** — `src/Scenery.jsx` (panorama accueil, crêtes filigrane, scène gîte)
+- [x] **Export complet JSON** — copie presse-papiers + téléchargement (accueil > Sauvegarde)
+- [x] **Import complet** — collage ou fichier, validation + aperçu, remplace le store et recharge
+- [x] **CRUD météo complet** + fixes CRUD (repas id stable, checks orphelins, add shopping)
+
+---
+
+## 🔄 En cours — soirée du 3 juillet
+
+- [x] **Notifications natives** (`@capacitor/local-notifications`) — planification
+  native Android (AlarmManager) : les rappels partent app fermée, téléphone
+  verrouillé ou redémarré. Annule+replanifie à chaque changement de
+  planning/repas (ids déterministes). Fallback web (Notification API) en dev.
+- [x] **Undo suppression** — bandeau « Supprimé · Annuler » (5 s) après chaque 🗑️
+  (11 handlers), restaure un instantané complet du store
+
+## ✅ Complété — 4 juillet : voyage paramétrable
+
+> Brief : trajet **Beauvais → Laschamps (étape nuit) → Cantal** aller ET retour ;
+> dates **5 → 15 août 2026 par défaut mais paramétrables** ; préparatifs et
+> courses **entièrement personnalisables** (listes/catégories, pas seulement items).
+
+- [x] **Paramètres du voyage** — modal ⚙️ sur la carte héros de l'accueil : ville
+  de départ, étape, destination, date de départ, date de retour. Persisté
+  (`trip`), tout le reste en dérive : compte à rebours J-, textes des cartes
+  (accueil, trajet, météo, planning), notifications (mois/année dynamiques).
+- [x] **Trajet aller/retour** — toggle Aller · Retour sur l'écran Trajet, chaque
+  direction avec ses étapes éditables (CRUD existant réutilisé). Défauts :
+  Beauvais → Laschamps (nuit) → Mandailles à l'aller, inverse au retour.
+  Store migré `trajetSteps` → `trajets.{aller,retour}` (migration auto au
+  chargement d'un ancien store).
+- [x] **Préparatifs personnalisables** — bouton « + Nouvelle liste » (logistique,
+  nom + emoji) et « + Nouvelle catégorie » (courses), en plus des items déjà
+  éditables ; suppression avec undo et nettoyage des checks orphelins.
+- [x] **Planning : ajouter un jour** — bouton ＋ dans la rangée des onglets
+  jours ; 11 jours par défaut (Mer 5 → Sam 15 août), avec les 2 jours d'étape
+  à Laschamps (aller et retour) inclus dans le planning par défaut.
+- [x] Tests RTL pour les 4 nouvelles fonctionnalités (54 tests verts au total).
+
+## ✅ Complété — écran « Aujourd'hui »
+
+- [x] **Écran « Aujourd'hui »** — carte tableau de bord sur l'accueil, visible
+  uniquement quand la date réelle tombe dans la fenêtre du voyage (`trip.start`
+  → `trip.end`) : titre/sous-titre du jour, activités du planning du jour,
+  météo (icône + hi/lo), repas du soir, bouton vers le planning complet du jour.
+  Aucun impact hors période de voyage (carte masquée). 3 tests RTL avec date
+  système mockée (`vi.setSystemTime`) — 57 tests verts.
+
+## ✅ Complété — partage natif de la sauvegarde
+
+- [x] **Partage natif** (`@capacitor/share` + `@capacitor/filesystem`) — bouton
+  « 📤 Envoyer vers Telegram / WhatsApp… » dans la modal export : écrit le
+  JSON dans le cache natif puis ouvre le sheet de partage Android (fichier
+  `.json` réel, pas un pavé de texte). Fallback Web Share API (fichier ou
+  texte) hors app native, sinon téléchargement classique. 58 tests verts.
+
+## 📅 Backlog suivant
+
+_Aucun item restant — voir avec l'utilisateur pour la suite (release, tests
+device réel, ou nouvelle demande)._
+
+---
+
 ## 📋 Backlog confirmé
 
 ### Notifications
 - [x] Rappels **30 min avant** chaque activité planning (schedulés au démarrage si permission accordée)
-- [x] Rappels **étapes trajet** (J-1 : 10 juillet 20 h · matin départ : 11 juillet 7 h)
+- [x] Rappels **étapes trajet** (veille 20 h + matin du départ 7 h, dates dérivées de `trip.start`/`trip.end` — voir voyage paramétrable ci-dessus)
 - [x] Rappels **repas du jour** (8 h chaque matin de séjour)
 - [x] Alerte **budget** si dépensé > 80 % du total
 

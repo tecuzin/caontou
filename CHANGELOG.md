@@ -2,6 +2,30 @@
 
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
+## [0.4.0] - 2026-07-04
+### Ajouté
+- **Voyage paramétrable** — modal ⚙️ sur l'accueil : ville de départ,
+  étape, destination, dates de départ/retour. Tout en dérive (compte à
+  rebours, textes des cartes, notifications). Défaut : Beauvais →
+  Laschamps (nuit) → Mandailles (Cantal), 5 → 15 août 2026.
+- **Trajet aller/retour** — toggle Aller · Retour, étapes éditables par
+  direction (store migré `trajetSteps` → `trajets.{aller,retour}`).
+- **Préparatifs et courses personnalisables** — ajout/suppression de
+  listes logistique (nom + emoji) et de catégories de courses, pas
+  seulement des items.
+- **Planning : ajout de jour** — bouton ＋ dans la rangée des onglets
+  jours ; 11 jours par défaut avec les étapes Laschamps incluses.
+- **Écran « Aujourd'hui »** — tableau de bord du jour (planning, météo,
+  repas du soir) sur l'accueil, visible uniquement pendant la fenêtre
+  du voyage configurée.
+- **Partage natif de la sauvegarde** (`@capacitor/share` +
+  `@capacitor/filesystem`) — bouton pour envoyer l'export JSON
+  directement dans Telegram/WhatsApp depuis la modal export.
+
+### Tests
+- 58 tests unitaires/intégration verts (dont dates système mockées
+  pour l'écran Aujourd'hui).
+
 ## [0.3.1] - 2026-07-02
 ### Corrigé
 - **Signature APK stable** : `cantou.keystore` committé et réutilisé à
