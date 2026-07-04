@@ -27,8 +27,13 @@ export function exportFilename(date = new Date()) {
  * reconnu (enveloppé { app:'cantou', data:{…} } ou store brut), sinon
  * { error } avec un message explicite pour l'utilisateur.
  */
+const MAX_IMPORT_SIZE = 5 * 1024 * 1024 // 5 Mo — un export Cantou légitime pèse quelques Ko
+
 export function parseImport(text) {
   if (!text.trim()) return { data: null, error: '' }
+  if (text.length > MAX_IMPORT_SIZE) {
+    return { data: null, error: 'Fichier trop volumineux (> 5 Mo) — ce n\'est probablement pas un export Cantou.' }
+  }
   let parsed
   try {
     parsed = JSON.parse(text)

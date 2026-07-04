@@ -212,7 +212,7 @@ function loadStore() {
 /* ------------------------------------------------------------------ *
  * Utilitaires
  * ------------------------------------------------------------------ */
-const catColor = (n) => (CATS.find((x) => x.name === n) || {}).color || '#8a8273'
+const catColor = (n) => (CATS.find((x) => x.name === n) || {}).color || '#6b6354'
 
 /* ------------------------------------------------------------------ *
  * Brique réutilisable : ligne cochable (trajet / logistique / courses)
@@ -236,7 +236,7 @@ function CheckRow({ label, checked, onToggle }) {
 }
 
 const SectionLabel = ({ children }) => (
-  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>{children}</div>
+  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>{children}</div>
 )
 
 /* ================================================================== */
@@ -882,7 +882,7 @@ export default function App() {
 
   /* ---------------------------------------------------------------- */
   return (
-    <div style={s("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;")}>
+    <main style={s("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;")}>
 
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (
@@ -915,7 +915,7 @@ export default function App() {
                   <button data-testid="btn-trajet-retour" onClick={() => setTrajetDir('retour')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'retour' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'retour' ? '#fffaf0' : '#6b6354'};`)}>Retour</button>
                 </div>
                 <div style={s('margin-top:14px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>👶 Avec les enfants : une pause toutes les 1 h 30, et la playlist d’histoires audio prête pour la route.</div>
-                <div style={s('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Les etapes · {trajetDir}</div>
+                <div style={s('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Les etapes · {trajetDir}</div>
                 {trajets[trajetDir].map((st, i) => (
                   <div key={i} style={s('display:flex;gap:12px;')}>
                     <div style={s('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{st.time}</div>
@@ -927,7 +927,7 @@ export default function App() {
                       <div style={s('display:flex;align-items:center;gap:8px;')}>
                         <div style={s('flex:1;')}>
                           <div style={s('font-weight:700;font-size:15px;')}>{st.place}</div>
-                          <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{st.note}</div>
+                          <div style={s('font-size:13px;color:#6b6354;margin-top:2px;')}>{st.note}</div>
                         </div>
                         <button onClick={() => editTrajetStep(i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
                         <button onClick={() => deleteTrajetStep(i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
@@ -937,7 +937,7 @@ export default function App() {
                 ))}
                 <button onClick={() => { setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042'); setShowTrajetEdit(true) }} style={s('width:100%;margin:4px 0 16px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter une étape</button>
                 <div style={s('display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;')}>
-                  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Avant de partir · {tr.done}/{tr.total}</div>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Avant de partir · {tr.done}/{tr.total}</div>
                   <button onClick={() => setShowAddTrajetCheck(true)} style={s('border:none;background:transparent;cursor:pointer;font-size:18px;padding:2px 4px;color:#9c6b4a;')}>＋</button>
                 </div>
                 <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
@@ -965,7 +965,7 @@ export default function App() {
                       <div style={s('display:flex;align-items:center;gap:9px;margin-bottom:8px;')}>
                         <span style={s('font-size:18px;')}>{L.emoji}</span>
                         <span style={s('font-family:Quicksand;font-weight:700;font-size:16px;flex:1;')}>{L.name}</span>
-                        <span style={s('font-size:12px;color:#8a8273;font-weight:700;')}>{b.done}/{b.total}</span>
+                        <span style={s('font-size:12px;color:#6b6354;font-weight:700;')}>{b.done}/{b.total}</span>
                         <button onClick={() => deleteLogiList(L.key)} style={s('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
                       </div>
                       <div style={s('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={s(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
@@ -1007,13 +1007,13 @@ export default function App() {
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;flex:1;')}>{hebergement.nom}</div>
                   <button onClick={openHebEdit} style={s('border:none;background:transparent;cursor:pointer;font-size:18px;padding:4px;')}>✏️</button>
                 </div>
-                <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>📍 {hebergement.adresse}</div>
+                <div style={s('font-size:13px;color:#6b6354;margin-top:2px;')}>📍 {hebergement.adresse}</div>
                 <div style={s('display:flex;gap:10px;margin-top:14px;')}>
-                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#8a8273;')}>Arrivée</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.arrivee}</div></div>
-                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#8a8273;')}>Départ</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.depart}</div></div>
+                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#6b6354;')}>Arrivée</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.arrivee}</div></div>
+                  <div style={s('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={s('font-size:12px;color:#6b6354;')}>Départ</div><div style={s('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.depart}</div></div>
                 </div>
                 <div style={s('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>🛏️ {hebergement.capacite}</div>
-                <div style={s('margin:18px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Équipements</div>
+                <div style={s('margin:18px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Équipements</div>
                 <div style={s('display:flex;flex-wrap:wrap;gap:8px;')}>
                   {HEB_EQUIP.map((eq) => <span key={eq} style={s('background:#fffdf8;border:1px solid #e3d8c2;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:#6b6354;')}>{eq}</span>)}
                 </div>
@@ -1091,7 +1091,7 @@ export default function App() {
                       {today.w && <div style={s('font-family:Quicksand;font-weight:700;font-size:14px;')}>{today.w.icon} {today.w.hi}° <span style={s('color:#b3a892;')}>{today.w.lo}°</span></div>}
                     </div>
                     <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-top:6px;')}>{today.d.title}</div>
-                    <div style={s('font-size:13px;color:#8a8273;margin-top:1px;')}>{today.d.sub}</div>
+                    <div style={s('font-size:13px;color:#6b6354;margin-top:1px;')}>{today.d.sub}</div>
                     {today.d.items.length > 0 && (
                       <div style={s('margin-top:12px;display:flex;flex-direction:column;gap:8px;')}>
                         {today.d.items.map((it, i) => (
@@ -1115,7 +1115,7 @@ export default function App() {
                     <div style={s('width:44px;height:44px;border-radius:14px;background:#dfeae6;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🚗</div>
                     <div style={s('flex:1;')}>
                       <div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>Le grand départ</div>
-                      <div style={s('font-size:13px;color:#8a8273;margin-top:1px;')}>{fmtDayShort(trip.start)} · depuis {trip.origin}{trip.etape ? ` · via ${trip.etape}` : ''}</div>
+                      <div style={s('font-size:13px;color:#6b6354;margin-top:1px;')}>{fmtDayShort(trip.start)} · depuis {trip.origin}{trip.etape ? ` · via ${trip.etape}` : ''}</div>
                     </div>
                   </div>
                   <button onClick={() => setSub('trajet')} style={s('margin-top:13px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le trajet →</button>
@@ -1124,27 +1124,27 @@ export default function App() {
                 <button onClick={() => setSub('logistique')} style={s('margin:0 18px 14px;width:calc(100% - 36px);text-align:left;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
                   <div style={s('display:flex;justify-content:space-between;align-items:center;')}>
                     <div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>🧳 Valises &amp; préparatifs</div>
-                    <div style={s('font-size:13px;color:#8a8273;font-weight:700;')}>{packDone}/{packTotal}</div>
+                    <div style={s('font-size:13px;color:#6b6354;font-weight:700;')}>{packDone}/{packTotal}</div>
                   </div>
                   <div style={s('margin-top:11px;height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={s(`height:100%;border-radius:9px;background:#cf7d3c;width:${packPct}%;`)} /></div>
                 </button>
 
-                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Tout le séjour</div>
+                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Tout le séjour</div>
                 <div style={s('padding:0 18px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;')}>
                   {MODULES.map((m) => (
                     <button key={m.name} onClick={() => openModule(m.action)} style={s('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
                       <div style={s(`width:42px;height:42px;border-radius:13px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:21px;`)}>{m.emoji}</div>
                       <div>
                         <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{m.name}</div>
-                        <div style={s('font-size:12px;color:#8a8273;margin-top:1px;')}>{m.sub}</div>
+                        <div style={s('font-size:12px;color:#6b6354;margin-top:1px;')}>{m.sub}</div>
                       </div>
                     </button>
                   ))}
                 </div>
 
-                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>💡 Suggestions</div>
+                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>💡 Suggestions</div>
                 <div style={s('padding:0 18px 12px;')}>
-                  <div style={s('font-size:12px;color:#8a8273;margin-bottom:8px;')}>Une idée de fonctionnalité, une consigne pour les prochaines données ? Notez-la ici puis envoyez-la.</div>
+                  <div style={s('font-size:12px;color:#6b6354;margin-bottom:8px;')}>Une idée de fonctionnalité, une consigne pour les prochaines données ? Notez-la ici puis envoyez-la.</div>
                   <div style={s('display:flex;gap:8px;')}>
                     <input data-testid="input-suggestion" value={newSuggestionText} onChange={(e) => setNewSuggestionText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitSuggestion()} placeholder="Ex : ajouter un mode sombre…" style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:10px 12px;font-size:14px;')} />
                     <button data-testid="btn-add-suggestion" onClick={submitSuggestion} style={s('border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:0 16px;cursor:pointer;')}>+ Ajouter</button>
@@ -1162,7 +1162,7 @@ export default function App() {
                   )}
                 </div>
 
-                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Sauvegarde</div>
+                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Sauvegarde</div>
                 <div style={s('padding:0 18px 12px;display:flex;gap:12px;')}>
                   <button data-testid="btn-export" onClick={() => { setExportCopied(false); setShowExport(true) }} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#4a5d3a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬇️ Exporter (JSON)</button>
                   <button data-testid="btn-import" onClick={() => setShowImport(true)} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#9c6b4a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬆️ Importer</button>
@@ -1176,7 +1176,7 @@ export default function App() {
               <div data-testid="screen-planning">
                 <div style={s('padding:54px 18px 4px;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Planning</div>
-                  <div style={s('font-size:13px;color:#8a8273;')}>{days.length} jours · {fmtDayShort(trip.start)} → {fmtDayShort(trip.end)}</div>
+                  <div style={s('font-size:13px;color:#6b6354;')}>{days.length} jours · {fmtDayShort(trip.start)} → {fmtDayShort(trip.end)}</div>
                 </div>
                 <div style={s('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 16px;')}>
                   {days.map((d, i) => (
@@ -1191,7 +1191,7 @@ export default function App() {
                   <div style={s('display:flex;align-items:center;justify-content:space-between;')}>
                     <div>
                       <div style={s('font-family:Quicksand;font-weight:700;font-size:20px;')}>{cur.title}</div>
-                      <div style={s('font-size:13px;color:#8a8273;margin-bottom:16px;')}>{cur.sub}</div>
+                      <div style={s('font-size:13px;color:#6b6354;margin-bottom:16px;')}>{cur.sub}</div>
                     </div>
                     <button onClick={() => editDay(day)} style={s('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;flex:0 0 auto;')}>✏️</button>
                   </div>
@@ -1206,7 +1206,7 @@ export default function App() {
                         <div style={s('display:flex;align-items:center;gap:8px;')}>
                           <div style={s('flex:1;')}>
                             <div style={s('font-weight:700;font-size:15px;')}>{it.title}</div>
-                            {it.note && <div style={s('font-size:13px;color:#8a8273;margin-top:2px;')}>{it.note}</div>}
+                            {it.note && <div style={s('font-size:13px;color:#6b6354;margin-top:2px;')}>{it.note}</div>}
                           </div>
                           <button onClick={() => editActivity(day, i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
                           <button onClick={() => deleteActivity(day, i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
@@ -1225,7 +1225,7 @@ export default function App() {
               <div data-testid="screen-visites">
                 <div style={s('padding:54px 18px 4px;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>À faire</div>
-                  <div style={s('font-size:13px;color:#8a8273;')}>Autour du Puy Mary · {savedCount} enregistrées ♥</div>
+                  <div style={s('font-size:13px;color:#6b6354;')}>Autour du Puy Mary · {savedCount} enregistrées ♥</div>
                 </div>
                 <div style={s('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 14px;')}>
                   {FILTERS.map((f) => (
@@ -1252,7 +1252,7 @@ export default function App() {
                             <span style={s(`font-size:11px;font-weight:700;color:${VCAT[v.cat]};text-transform:uppercase;letter-spacing:0.5px;`)}>{v.cat}</span>
                           </div>
                           <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{v.name}</div>
-                          <div style={s('font-size:12px;color:#8a8273;margin-top:2px;')}>{v.dist}  ·  {v.dur}</div>
+                          <div style={s('font-size:12px;color:#6b6354;margin-top:2px;')}>{v.dist}  ·  {v.dur}</div>
                           <div style={s('display:inline-block;margin-top:7px;font-size:11px;font-weight:700;color:#6b6354;background:#f1e9da;border-radius:8px;padding:3px 8px;')}>👶 {v.age}</div>
                         </div>
                         <button onClick={() => toggleSaved(v.id)} style={s('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:24px;line-height:1;')}>
@@ -1307,7 +1307,7 @@ export default function App() {
                       <div key={g.key} style={s('margin-bottom:16px;')}>
                         <div style={s('display:flex;align-items:baseline;gap:8px;margin-bottom:7px;')}>
                           <span style={s('font-family:Quicksand;font-weight:700;font-size:15px;flex:1;')}>{g.name}</span>
-                          <span style={s('font-size:12px;color:#8a8273;')}>{g.doneStr}</span>
+                          <span style={s('font-size:12px;color:#6b6354;')}>{g.doneStr}</span>
                           <button onClick={() => deleteCourseCategory(g.key)} style={s('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
                         </div>
                         <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
@@ -1335,7 +1335,7 @@ export default function App() {
                     ))}
                     <button data-testid="btn-add-course-cat" onClick={() => setShowAddCourseCat(true)} style={s('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle catégorie</button>
                     <div style={s('margin-top:20px;padding-top:16px;border-top:1px solid #efe6d4;')}>
-                      <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#8a8273;text-transform:uppercase;margin-bottom:10px;')}>Gerer les articles</div>
+                      <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>Gerer les articles</div>
                       <div style={s('display:flex;flex-direction:column;gap:8px;')}>
                         {shoppingItems.map((item) => (
                           <div key={item.id} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
@@ -1399,7 +1399,7 @@ export default function App() {
                   ).map((e) => (
                     <div key={e._i} style={s('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
                       <span style={s(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
-                      <div style={s('flex:1;min-width:0;')}><div style={s('font-weight:700;font-size:14px;')}>{e.label}</div><div style={s('font-size:12px;color:#8a8273;')}>{e.cat}</div></div>
+                      <div style={s('flex:1;min-width:0;')}><div style={s('font-weight:700;font-size:14px;')}>{e.label}</div><div style={s('font-size:12px;color:#6b6354;')}>{e.cat}</div></div>
                       <div style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
                       <button onClick={() => startEditExpense(e._i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
                       <button onClick={() => deleteExpense(e._i)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
@@ -1430,11 +1430,11 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Montant</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Montant</div>
             <input data-testid="input-montant" value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:18px;font-family:Quicksand;font-weight:700;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Libellé</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Libellé</div>
             <input data-testid="input-label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Catégorie</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Catégorie</div>
             <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:7px;margin-bottom:20px;')}>
               {CATS.map((c) => (
                 <button key={c.name} onClick={() => setNewCat(c.name)} style={s(`border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
@@ -1454,9 +1454,9 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealId === null ? 'Ajouter un repas' : `Repas du ${newMealDay}`}</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Jour</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
             <input value={newMealDay} onChange={(e) => setNewMealDay(e.target.value)} placeholder="Ex : Sam 11" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Plat</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Plat</div>
             <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeMealEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1472,9 +1472,9 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer activite</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Horaire</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
             <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Titre</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
             <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeActivityEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1490,9 +1490,9 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer jour</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Titre</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
             <input value={newDayTitle} onChange={(e) => setNewDayTitle(e.target.value)} placeholder="Ex : Le grand depart" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Sous-titre</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
             <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Lyon -> Mandailles" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeDayEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1509,11 +1509,11 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter activite</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Horaire</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
             <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Titre</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
             <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Couleur</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
             <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
               {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
                 <button key={c} onClick={() => setNewActivityColor(c)} style={s(`width:32px;height:32px;border-radius:50%;background:${c};border:${newActivityColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
@@ -1533,7 +1533,7 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Description</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
             <input value={newLogiItem} onChange={(e) => setNewLogiItem(e.target.value)} placeholder="Ex : Chaussettes" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeAddLogiItem} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1549,7 +1549,7 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Description</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
             <input value={newCourseItem} onChange={(e) => setNewCourseItem(e.target.value)} placeholder="Ex : Fromage" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeAddCourseItem} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1567,21 +1567,21 @@ export default function App() {
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMeteoIdx === null ? 'Ajouter un jour' : 'Meteo'}</div>
             <div style={s('display:flex;gap:10px;')}>
               <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Jour</div>
+                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
                 <input value={newMeteoDay} onChange={(e) => setNewMeteoDay(e.target.value)} placeholder="Sam" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
               <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Numero</div>
+                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Numero</div>
                 <input value={newMeteoNum} onChange={(e) => setNewMeteoNum(e.target.value)} placeholder="11" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
             </div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Icone</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Icone</div>
             <input value={newMeteoIcon} onChange={(e) => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Temp max</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Temp max</div>
             <input value={newMeteoHi} onChange={(e) => setNewMeteoHi(e.target.value)} placeholder="24" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Temp min</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Temp min</div>
             <input value={newMeteoLo} onChange={(e) => setNewMeteoLo(e.target.value)} placeholder="12" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Pluie</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Pluie</div>
             <input value={newMeteoRain} onChange={(e) => setNewMeteoRain(e.target.value)} placeholder="10 %" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeMeteoEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1597,13 +1597,13 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer etape</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Horaire</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
             <input value={newTrajetTime} onChange={(e) => setNewTrajetTime(e.target.value)} placeholder="Ex : 08:30" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Lieu</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Lieu</div>
             <input value={newTrajetPlace} onChange={(e) => setNewTrajetPlace(e.target.value)} placeholder="Ex : Lyon" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Note</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Note</div>
             <input value={newTrajetNote} onChange={(e) => setNewTrajetNote(e.target.value)} placeholder="Ex : Pause cafe" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Couleur</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
             <div style={s('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
               {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
                 <button key={c} onClick={() => setNewTrajetColor(c)} style={s(`width:32px;height:32px;border-radius:50%;background:${c};border:${newTrajetColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
@@ -1623,9 +1623,9 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingVisitId === null ? 'Ajouter une visite' : 'Editer visite'}</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Nom</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
             <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Puy Mary" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Categorie</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Categorie</div>
             <select value={newVisitCat} onChange={(e) => setNewVisitCat(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
               <option>Nature</option>
               <option>Famille</option>
@@ -1634,11 +1634,11 @@ export default function App() {
               <option>Gourmand</option>
               <option>Marche</option>
             </select>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Distance</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Distance</div>
             <input value={newVisitDist} onChange={(e) => setNewVisitDist(e.target.value)} placeholder="Ex : 25 min" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Duree</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Duree</div>
             <input value={newVisitDur} onChange={(e) => setNewVisitDur(e.target.value)} placeholder="Ex : 2 h" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Age recommande</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Age recommande</div>
             <input value={newVisitAge} onChange={(e) => setNewVisitAge(e.target.value)} placeholder="Ex : Des 3 ans" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={closeVisitEdit} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1654,7 +1654,7 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Budget total</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Montant (€)</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Montant (€)</div>
             <input type="number" value={newBudgetTotal} onChange={(e) => setNewBudgetTotal(e.target.value)} placeholder={String(budgetTotal)} style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && saveBudgetTotal()} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={() => setShowBudgetTotalEdit(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1681,7 +1681,7 @@ export default function App() {
               ['Contact', newHebContact, setNewHebContact, 'Mme Vidal · 06 12 34 56 78'],
             ].map(([label, val, setter, ph]) => (
               <div key={label}>
-                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>{label}</div>
+                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>{label}</div>
                 <input value={val} onChange={(e) => setter(e.target.value)} placeholder={ph} style={s('width:100%;margin-top:6px;margin-bottom:12px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
             ))}
@@ -1699,7 +1699,7 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un item</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Description</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
             <input value={newTrajetCheckItem} onChange={(e) => setNewTrajetCheckItem(e.target.value)} placeholder="Ex : Chargeur téléphone" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addTrajetCheckItem()} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={() => setShowAddTrajetCheck(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1715,7 +1715,7 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Exporter les données</div>
-            <div style={s('font-size:13px;color:#8a8273;margin-bottom:14px;')}>Toutes les données de l'app (planning, dépenses, listes, favoris…) au format JSON. À garder en lieu sûr ou à envoyer sur un autre téléphone.</div>
+            <div style={s('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Toutes les données de l'app (planning, dépenses, listes, favoris…) au format JSON. À garder en lieu sûr ou à envoyer sur un autre téléphone.</div>
             <textarea data-testid="export-json" readOnly value={buildExport(currentStoreData(), STORE_KEY)} onFocus={(e) => e.target.select()} style={s('width:100%;height:180px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
             <button data-testid="btn-share-export" onClick={doShareExport} style={s('width:100%;margin-top:14px;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>📤 Envoyer vers Telegram / WhatsApp…</button>
             <div style={s('display:flex;gap:10px;margin-top:10px;')}>
@@ -1733,7 +1733,7 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Importer des données</div>
-            <div style={s('font-size:13px;color:#8a8273;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
+            <div style={s('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
             <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); doParseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={s('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
             <label style={s('display:block;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;text-align:center;')}>
               📂 Choisir un fichier…
@@ -1749,7 +1749,7 @@ export default function App() {
               <button onClick={closeImport} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={s(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
             </div>
-            <div style={s('margin-top:10px;font-size:12px;color:#8a8273;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
+            <div style={s('margin-top:10px;font-size:12px;color:#6b6354;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
           </div>
         </div>
       )}
@@ -1760,22 +1760,22 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Paramètres du voyage</div>
-            <div style={s('font-size:13px;color:#8a8273;margin-bottom:14px;')}>Ces réglages pilotent le compte à rebours, les cartes et les notifications.</div>
+            <div style={s('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Ces réglages pilotent le compte à rebours, les cartes et les notifications.</div>
             <div style={s('display:flex;gap:10px;')}>
               <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Date de départ</div>
+                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Date de départ</div>
                 <input data-testid="input-trip-start" type="date" value={newTripStart} onChange={(e) => setNewTripStart(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
               <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Date de retour</div>
+                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Date de retour</div>
                 <input data-testid="input-trip-end" type="date" value={newTripEnd} onChange={(e) => setNewTripEnd(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
             </div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Ville de départ</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Ville de départ</div>
             <input data-testid="input-trip-origin" value={newTripOrigin} onChange={(e) => setNewTripOrigin(e.target.value)} placeholder="Ex : Beauvais" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Étape (nuit) — optionnel</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Étape (nuit) — optionnel</div>
             <input value={newTripEtape} onChange={(e) => setNewTripEtape(e.target.value)} placeholder="Ex : Laschamps" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Destination</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Destination</div>
             <input data-testid="input-trip-dest" value={newTripDest} onChange={(e) => setNewTripDest(e.target.value)} placeholder="Ex : Mandailles (Cantal)" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={() => setShowTripEdit(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1791,9 +1791,9 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle liste</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Emoji</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Emoji</div>
             <input value={newLogiListEmoji} onChange={(e) => setNewLogiListEmoji(e.target.value)} placeholder="📦" maxLength="2" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Nom</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
             <input data-testid="input-logi-list-name" value={newLogiListName} onChange={(e) => setNewLogiListName(e.target.value)} placeholder="Ex : Sac de plage" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addLogiList()} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={() => setShowAddLogiList(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1809,7 +1809,7 @@ export default function App() {
           <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle catégorie</div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Nom</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
             <input data-testid="input-course-cat-name" value={newCourseCatName} onChange={(e) => setNewCourseCatName(e.target.value)} placeholder="Ex : Apéro" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addCourseCategory()} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={() => setShowAddCourseCat(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1827,17 +1827,17 @@ export default function App() {
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un jour</div>
             <div style={s('display:flex;gap:10px;')}>
               <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Jour (abrégé)</div>
+                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Jour (abrégé)</div>
                 <input data-testid="input-day-dow" value={newDayDow} onChange={(e) => setNewDayDow(e.target.value)} placeholder="Ex : Dim" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
               <div style={s('flex:1;')}>
-                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Numéro</div>
+                <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Numéro</div>
                 <input data-testid="input-day-num" value={newDayNum} onChange={(e) => setNewDayNum(e.target.value)} placeholder="Ex : 16" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
               </div>
             </div>
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Titre</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
             <input data-testid="input-day-title" value={newDayTitle2} onChange={(e) => setNewDayTitle2(e.target.value)} placeholder="Ex : Journée détente" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Sous-titre</div>
+            <div style={s('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
             <input value={newDaySub2} onChange={(e) => setNewDaySub2(e.target.value)} placeholder="Ex : Au gré de l'envie" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('display:flex;gap:10px;')}>
               <button onClick={() => setShowDayAdd(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
@@ -1855,6 +1855,6 @@ export default function App() {
         </div>
       )}
 
-    </div>
+    </main>
   )
 }

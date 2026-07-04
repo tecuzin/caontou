@@ -59,6 +59,20 @@ describe('parseImport()', () => {
     expect(error).toMatch(/JSON invalide/)
   })
 
+  it('rejette un texte de plus de 5 Mo avant même de tenter le JSON.parse (audit sécurité)', () => {
+    const huge = '{"a":"' + 'x'.repeat(6 * 1024 * 1024) + '"}'
+    const { data, error } = parseImport(huge)
+    expect(data).toBeNull()
+    expect(error).toMatch(/trop volumineux/)
+  })
+
+  it('accepte un export de taille normale sous la limite', () => {
+    const normal = JSON.stringify({ app: 'cantou', data: { expenses: Array(50).fill({ label: 'x', cat: 'y', amt: 1 }) } })
+    const { data, error } = parseImport(normal)
+    expect(error).toBe('')
+    expect(data).toBeTruthy()
+  })
+
   it('retourne une erreur pour un JSON valide mais étranger à Cantou', () => {
     const { data, error } = parseImport(JSON.stringify({ foo: 'bar' }))
     expect(data).toBeNull()
