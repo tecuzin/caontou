@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { s, eur, buildList, sortItemsByTime, parseDist } from '../utils.js'
+import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, fmtMonthYear } from '../utils.js'
 
 describe('s() — CSS string to React style object', () => {
   it('converts a single property', () => {
@@ -155,5 +155,37 @@ describe('parseDist()', () => {
 
   it('handles leading text before number', () => {
     expect(parseDist('env. 30 min')).toBe(30)
+  })
+})
+
+describe('tripDate() — construit une date locale depuis un ISO', () => {
+  it('parse une date ISO yyyy-mm-dd à midi par défaut', () => {
+    const d = tripDate('2026-08-05')
+    expect(d.getFullYear()).toBe(2026)
+    expect(d.getMonth()).toBe(7) // août = index 7
+    expect(d.getDate()).toBe(5)
+    expect(d.getHours()).toBe(12)
+  })
+
+  it('accepte une heure/minute explicite', () => {
+    const d = tripDate('2026-08-05', 20, 30)
+    expect(d.getHours()).toBe(20)
+    expect(d.getMinutes()).toBe(30)
+  })
+
+  it('heure 0 pour début de journée', () => {
+    const d = tripDate('2026-08-05', 0)
+    expect(d.getHours()).toBe(0)
+  })
+})
+
+describe('fmtDayShort() / fmtMonthYear()', () => {
+  it('formate le jour court en français', () => {
+    expect(fmtDayShort('2026-08-05')).toMatch(/5/)
+  })
+
+  it('formate le mois/année en français', () => {
+    expect(fmtMonthYear('2026-08-05')).toMatch(/août/i)
+    expect(fmtMonthYear('2026-08-05')).toMatch(/2026/)
   })
 })

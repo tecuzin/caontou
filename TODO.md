@@ -101,10 +101,38 @@
   `.json` réel, pas un pavé de texte). Fallback Web Share API (fichier ou
   texte) hors app native, sinon téléchargement classique. 58 tests verts.
 
+## ✅ Complété — release v0.4.0 + refactor (4 juillet, soirée)
+
+- [x] **Release Git Flow v0.4.0** taguée sur `main` (voyage paramétrable,
+  écran Aujourd'hui, partage natif). APK `cantou-v0.4.0-build14` envoyé
+  sur Telegram (digest keystore stable vérifié, 4 plugins Capacitor).
+- [x] **Skill `refactor`** créé (`.claude/skills/refactor/SKILL.md`) —
+  codifie les cibles prioritaires, les règles à ne pas casser
+  (data-testid, schéma localStorage, pattern `s()`) et la boucle
+  petits-pas-tests-verts.
+- [x] **Extraction `src/notifications.js`** — logique de rappels pure,
+  sortie de App.jsx. 80% de couverture, 16 tests dédiés.
+- [x] **Extraction `src/backup.js`** — export/import JSON pur (validation,
+  téléchargement, partage natif avec mocks Capacitor). 97% de couverture,
+  15 tests dédiés.
+- [x] **Extraction `src/hooks/useVisits.js`** — premier hook de domaine
+  (visites + favoris), 100% de couverture, 8 tests `renderHook()`.
+  Nettoyage au passage : suppression de `addVisit`/`closeVisitAdd`
+  (code mort dans App.jsx, jamais appelés).
+- [x] Couverture globale : **46% → 50.13%** statements, 99 tests verts
+  (0 régression sur les 91 tests existants).
+
 ## 📅 Backlog suivant
 
-_Aucun item restant — voir avec l'utilisateur pour la suite (release, tests
-device réel, ou nouvelle demande)._
+- [ ] **Poursuivre l'extraction de hooks** (voir skill `refactor`, priorité 1) :
+  `useExpenses`, `useMeals`, `useTrajets`, `useLogi`, `useCourses`,
+  `useMeteo`, `usePlanning`, `useTripConfig` — même pattern que
+  `useVisits` (état + actions pures, haptic/undo restent des wrappers
+  côté App.jsx). App.jsx fait encore ~1870 lignes.
+- [ ] **Extraire les écrans en composants** (priorité 2 du skill) une fois
+  les hooks sortis — Budget, Repas, Planning, Trajet, Logistique,
+  Hébergement, Météo, Visites, Accueil.
+- [ ] Tests device réel (notifications natives, écran Aujourd'hui).
 
 ---
 
