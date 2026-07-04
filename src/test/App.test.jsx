@@ -316,3 +316,30 @@ describe('Planning : ajout de jour', () => {
     expect(stored.days.some((d) => d.title === 'Journée bonus')).toBe(true)
   })
 })
+
+describe('Écran Aujourd\'hui', () => {
+  it('n\'affiche pas la carte Aujourd\'hui hors des dates du voyage', () => {
+    vi.setSystemTime(new Date(2020, 0, 1))
+    render(<App />)
+    expect(screen.queryByTestId('today-card')).not.toBeInTheDocument()
+    vi.useRealTimers()
+  })
+
+  it('affiche la carte Aujourd\'hui pendant le voyage avec planning/météo/repas du jour', () => {
+    vi.setSystemTime(new Date(2026, 7, 6, 10, 0, 0)) // 6 août 2026, dans la fenêtre par défaut (5-15 août)
+    render(<App />)
+    const card = screen.getByTestId('today-card')
+    expect(card).toBeInTheDocument()
+    expect(within(card).getByText(/Jeu 6/)).toBeInTheDocument()
+    vi.useRealTimers()
+  })
+
+  it('navigue vers le planning du jour au clic', async () => {
+    vi.setSystemTime(new Date(2026, 7, 6, 10, 0, 0))
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Voir le planning du jour →'))
+    expect(screen.getByTestId('screen-planning')).toBeInTheDocument()
+    vi.useRealTimers()
+  })
+})

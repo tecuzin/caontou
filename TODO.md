@@ -84,10 +84,17 @@
   à Laschamps (aller et retour) inclus dans le planning par défaut.
 - [x] Tests RTL pour les 4 nouvelles fonctionnalités (54 tests verts au total).
 
+## ✅ Complété — écran « Aujourd'hui »
+
+- [x] **Écran « Aujourd'hui »** — carte tableau de bord sur l'accueil, visible
+  uniquement quand la date réelle tombe dans la fenêtre du voyage (`trip.start`
+  → `trip.end`) : titre/sous-titre du jour, activités du planning du jour,
+  météo (icône + hi/lo), repas du soir, bouton vers le planning complet du jour.
+  Aucun impact hors période de voyage (carte masquée). 3 tests RTL avec date
+  système mockée (`vi.setSystemTime`) — 57 tests verts.
+
 ## 📅 Backlog suivant
 
-- [ ] **Écran « Aujourd'hui »** — tableau de bord du jour pendant le séjour
-  (planning du jour + météo + repas du soir), affiché par défaut pendant le voyage
 - [ ] **Partage natif de la sauvegarde** (`@capacitor/share`) — envoyer l'export JSON
   directement dans Telegram/WhatsApp pour synchroniser deux téléphones
 

@@ -488,6 +488,27 @@ export default function App() {
     return Math.max(0, Math.round((tripDate(trip.start, 0) - new Date()) / 86400000))
   }, [trip.start])
 
+  // Tableau de bord « Aujourd'hui » — actif si la date du jour tombe dans
+  // la fenêtre du voyage. Le jour de planning correspondant est retrouvé
+  // par date calendaire réelle (mois/année dérivés de trip.start, comme
+  // pour les notifications), la météo/le repas par numéro/libellé du jour.
+  const today = useMemo(() => {
+    const now = new Date()
+    const start = tripDate(trip.start, 0)
+    const end = tripDate(trip.end, 23, 59)
+    if (now < start || now > end) return null
+    const [ty, tm] = trip.start.split('-').map(Number)
+    const dayIdx = days.findIndex((d) => {
+      const dd = new Date(ty, tm - 1, d.num)
+      return dd.getFullYear() === now.getFullYear() && dd.getMonth() === now.getMonth() && dd.getDate() === now.getDate()
+    })
+    if (dayIdx === -1) return null
+    const d = days[dayIdx]
+    const w = meteo.find((m) => m.n === d.num) || null
+    const meal = meals.find((m) => m.day === `${d.dow} ${d.num}`) || null
+    return { dayIdx, d, w, meal }
+  }, [trip.start, trip.end, days, meteo, meals])
+
   // dérivés préparatifs
   let packDone = 0, packTotal = 0
   logi.forEach((L) => { const b = buildList(checks, L.key, L.items); packDone += b.done; packTotal += b.total })
@@ -1152,6 +1173,32 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+
+                {today && (
+                  <div data-testid="today-card" style={s('margin:0 18px 14px;background:#fffdf8;border:2px solid #cf7d3c;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(207,125,60,0.18);')}>
+                    <div style={s('display:flex;align-items:center;justify-content:space-between;')}>
+                      <div style={s('font-size:12px;letter-spacing:1px;font-weight:700;color:#cf7d3c;')}>🗓️ AUJOURD'HUI · {today.d.dow} {today.d.num}</div>
+                      {today.w && <div style={s('font-family:Quicksand;font-weight:700;font-size:14px;')}>{today.w.icon} {today.w.hi}° <span style={s('color:#b3a892;')}>{today.w.lo}°</span></div>}
+                    </div>
+                    <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-top:6px;')}>{today.d.title}</div>
+                    <div style={s('font-size:13px;color:#8a8273;margin-top:1px;')}>{today.d.sub}</div>
+                    {today.d.items.length > 0 && (
+                      <div style={s('margin-top:12px;display:flex;flex-direction:column;gap:8px;')}>
+                        {today.d.items.map((it, i) => (
+                          <div key={i} style={s('display:flex;align-items:center;gap:10px;')}>
+                            <span style={s(`width:8px;height:8px;border-radius:50%;background:${it.color};flex:0 0 auto;`)} />
+                            <span style={s('font-size:13px;font-weight:700;color:#9a917f;width:44px;flex:0 0 auto;')}>{it.time}</span>
+                            <span style={s('font-size:14px;flex:1;')}>{it.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {today.meal && (
+                      <div style={s('margin-top:12px;background:#f1e4d4;border-radius:12px;padding:10px 13px;font-size:13px;color:#6b5a45;')}>🍽️ Ce soir : <b>{today.meal.dish}</b></div>
+                    )}
+                    <button onClick={() => { setTab('planning'); setDay(today.dayIdx) }} style={s('margin-top:13px;width:100%;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le planning du jour →</button>
+                  </div>
+                )}
 
                 <div style={s('margin:0 18px 14px;border-radius:20px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.08);')}>
                   <Panorama />
