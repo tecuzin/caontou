@@ -343,3 +343,12 @@ describe('Écran Aujourd\'hui', () => {
     vi.useRealTimers()
   })
 })
+
+describe('Partage natif de la sauvegarde', () => {
+  it('affiche le bouton de partage dans la modal export', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-export'))
+    expect(screen.getByTestId('btn-share-export')).toBeInTheDocument()
+  })
+})

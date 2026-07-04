@@ -93,10 +93,18 @@
   Aucun impact hors période de voyage (carte masquée). 3 tests RTL avec date
   système mockée (`vi.setSystemTime`) — 57 tests verts.
 
+## ✅ Complété — partage natif de la sauvegarde
+
+- [x] **Partage natif** (`@capacitor/share` + `@capacitor/filesystem`) — bouton
+  « 📤 Envoyer vers Telegram / WhatsApp… » dans la modal export : écrit le
+  JSON dans le cache natif puis ouvre le sheet de partage Android (fichier
+  `.json` réel, pas un pavé de texte). Fallback Web Share API (fichier ou
+  texte) hors app native, sinon téléchargement classique. 58 tests verts.
+
 ## 📅 Backlog suivant
 
-- [ ] **Partage natif de la sauvegarde** (`@capacitor/share`) — envoyer l'export JSON
-  directement dans Telegram/WhatsApp pour synchroniser deux téléphones
+_Aucun item restant — voir avec l'utilisateur pour la suite (release, tests
+device réel, ou nouvelle demande)._
 
 ---
 
