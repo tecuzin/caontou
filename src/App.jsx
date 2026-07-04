@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
+import { Capacitor } from '@capacitor/core'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
+import { LocalNotifications } from '@capacitor/local-notifications'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJET_STEPS_INITIAL } from './data.js'
 import { s, eur, buildList, sortItemsByTime, parseDist } from './utils.js'
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
@@ -211,33 +213,80 @@ const SectionLabel = ({ children }) => (
 )
 
 /* ================================================================== */
-// Notifications
-const scheduleNotification = (title, body, delayMs) => {
-  setTimeout(() => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, { body, icon: '/cantou-icon.png' })
+// Notifications — construit la liste de tous les rappels à venir
+// (planning 30 min avant, menu du jour à 8 h, trajet J-1 + matin du départ).
+// Ids déterministes : replanifier = annuler les pendantes + re-scheduler.
+const buildNotificationList = (daysData, mealsData) => {
+  const now = Date.now()
+  const list = []
+  let id = 1
+  daysData.forEach((d) => {
+    const dayDate = new Date(2026, 6, d.num) // juillet = mois 6
+    d.items.forEach((item) => {
+      const m = item.time.match(/^(\d{1,2}):(\d{2})$/)
+      if (!m) return
+      const t = new Date(dayDate)
+      t.setHours(parseInt(m[1]), parseInt(m[2]), 0, 0)
+      const at = new Date(t.getTime() - 30 * 60 * 1000)
+      if (at.getTime() > now) list.push({ id: id++, title: `🗓️ Dans 30 min · ${item.title}`, body: `${d.dow} ${d.num} juillet · ${item.time}`, at })
+    })
+  })
+  daysData.forEach((d, i) => {
+    const at = new Date(2026, 6, d.num, 8, 0, 0)
+    if (at.getTime() > now) {
+      const ml = mealsData[i]
+      list.push({ id: id++, title: `🍽️ Menu du jour · ${d.dow} ${d.num}`, body: ml ? ml.dish : 'Voir les menus', at })
     }
-  }, delayMs)
+  })
+  const veille = new Date(2026, 6, 10, 20, 0, 0)
+  const matin = new Date(2026, 6, 11, 7, 0, 0)
+  if (veille.getTime() > now) list.push({ id: id++, title: '🚗 Départ demain !', body: 'Checklist trajet à valider ce soir', at: veille })
+  if (matin.getTime() > now) list.push({ id: id++, title: "🚗 C'est le grand jour !", body: 'Départ à 08:30 · Lyon → Mandailles', at: matin })
+  return list
 }
 
-const requestNotificationPermission = () => {
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission()
+// Fallback web (dev navigateur) : setTimeout + Notification API.
+// Les timeouts sont suivis pour éviter les doublons à la replanification.
+let webNotifTimeouts = []
+const dispatchWebNotifications = async (list) => {
+  if (!('Notification' in window)) return
+  if (Notification.permission === 'default') await Notification.requestPermission()
+  if (Notification.permission !== 'granted') return
+  webNotifTimeouts.forEach(clearTimeout)
+  webNotifTimeouts = list.map((n) => setTimeout(() => {
+    new Notification(n.title, { body: n.body, icon: '/cantou-icon.png' })
+  }, n.at.getTime() - Date.now()))
+}
+
+// Natif Android : planification via AlarmManager — les rappels partent
+// même app fermée, téléphone verrouillé ou redémarré.
+const dispatchNativeNotifications = async (list) => {
+  const perm = await LocalNotifications.requestPermissions()
+  if (perm.display !== 'granted') return
+  const pending = await LocalNotifications.getPending()
+  if (pending.notifications.length) {
+    await LocalNotifications.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) })
   }
+  if (list.length) {
+    await LocalNotifications.schedule({
+      notifications: list.map((n) => ({
+        id: n.id,
+        title: n.title,
+        body: n.body,
+        schedule: { at: n.at, allowWhileIdle: true },
+      })),
+    })
+  }
+}
+
+const scheduleAllNotifications = async (daysData, mealsData) => {
+  const list = buildNotificationList(daysData, mealsData)
+  if (Capacitor.isNativePlatform()) await dispatchNativeNotifications(list)
+  else await dispatchWebNotifications(list)
 }
 
 /* ================================================================== */
 export default function App() {
-  useEffect(() => {
-    if (!('Notification' in window)) return
-    if (Notification.permission === 'granted') {
-      scheduleAllNotifications(days, meals)
-    } else if (Notification.permission === 'default') {
-      Notification.requestPermission().then((perm) => {
-        if (perm === 'granted') scheduleAllNotifications(days, meals)
-      })
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   // état UI (non persisté)
   const [tab, setTab] = useState('accueil')
   const [sub, setSub] = useState(null)
@@ -343,38 +392,12 @@ export default function App() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems })) } catch { }
   }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems])
 
-  // Planification de toutes les notifications
-  const scheduleAllNotifications = (daysData, mealsData) => {
-    if (!('Notification' in window) || Notification.permission !== 'granted') return
-    const now = Date.now()
-    // Planning : 30 min avant chaque activité
-    daysData.forEach((d) => {
-      const dayDate = new Date(2026, 6, d.num) // juillet = mois 6
-      d.items.forEach((item) => {
-        const m = item.time.match(/^(\d{1,2}):(\d{2})$/)
-        if (!m) return
-        const t = new Date(dayDate)
-        t.setHours(parseInt(m[1]), parseInt(m[2]), 0, 0)
-        const delay = t.getTime() - 30 * 60 * 1000 - now
-        if (delay > 0) scheduleNotification(`🗓️ Dans 30 min · ${item.title}`, `${d.dow} ${d.num} juillet · ${item.time}`, delay)
-      })
-    })
-    // Repas : rappel à 8 h chaque matin
-    daysData.forEach((d, i) => {
-      const t = new Date(2026, 6, d.num)
-      t.setHours(8, 0, 0, 0)
-      const delay = t.getTime() - now
-      if (delay > 0) {
-        const ml = mealsData[i]
-        scheduleNotification(`🍽️ Menu du jour · ${d.dow} ${d.num}`, ml ? ml.dish : 'Voir les menus', delay)
-      }
-    })
-    // Trajet : veille (10 juillet 20 h) + matin départ (11 juillet 7 h)
-    const veille = new Date(2026, 6, 10, 20, 0, 0)
-    const matin = new Date(2026, 6, 11, 7, 0, 0)
-    if (veille.getTime() > now) scheduleNotification('🚗 Départ demain !', 'Checklist trajet à valider ce soir', veille.getTime() - now)
-    if (matin.getTime() > now) scheduleNotification("🚗 C'est le grand jour !", 'Départ à 08:30 · Lyon → Mandailles', matin.getTime() - now)
-  }
+  // (Re)planifie tous les rappels au démarrage et à chaque modification
+  // du planning ou des menus — natif Android (survit à la fermeture) ou
+  // fallback web en dev.
+  useEffect(() => {
+    scheduleAllNotifications(days, meals).catch(() => { })
+  }, [days, meals])
 
   const toggleCheck = (key, label) => {
     haptic(ImpactStyle.Light)
