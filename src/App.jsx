@@ -2,64 +2,80 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { LocalNotifications } from '@capacitor/local-notifications'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJET_STEPS_INITIAL } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL } from './data.js'
 import { s, eur, buildList, sortItemsByTime, parseDist } from './utils.js'
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
+// Planning par défaut : 11 jours (5 → 15 août), étape à Laschamps à
+// l'aller (nuit du 5) comme au retour (nuit du 14).
 const DAYS_INITIAL = [
-  { dow: 'Sam', num: 11, title: 'Le grand départ', sub: 'Lyon → Mandailles', items: [
-    { time: '08:30', title: 'Départ de Lyon', note: 'Voiture chargée, c\'est parti !', color: '#5b7042' },
-    { time: '10:00', title: 'Pause à Thiers', note: 'Café & toilettes', color: '#cf7d3c' },
-    { time: '12:30', title: 'Pique-nique à Murat', note: 'Se dégourdir les jambes', color: '#4f8a86' },
-    { time: '13:30', title: 'Arrivée au gîte', note: 'Installation & goûter', color: '#9c6b4a' },
+  { dow: 'Mer', num: 5, title: 'Le grand départ', sub: 'Beauvais → Laschamps', items: [
+    { time: '09:00', title: 'Départ de Beauvais', note: 'Voiture chargée, c\'est parti !', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique en route', note: 'Se dégourdir les jambes', color: '#4f8a86' },
+    { time: '16:00', title: 'Arrivée à Laschamps', note: 'Étape pour la nuit', color: '#9c6b4a' },
+    { time: '19:30', title: 'Dîner tranquille', note: 'Tout le monde au lit tôt', color: '#b8503f' },
+  ] },
+  { dow: 'Jeu', num: 6, title: 'Cap sur le Cantal', sub: 'Laschamps → Mandailles', items: [
+    { time: '09:30', title: 'Départ de Laschamps', note: 'Volcans en vue', color: '#5b7042' },
+    { time: '11:00', title: 'Pause à Murat', note: 'Café & jambes', color: '#cf7d3c' },
+    { time: '13:00', title: 'Arrivée au gîte', note: 'Installation & goûter', color: '#9c6b4a' },
     { time: '16:00', title: 'Courses à Aurillac', note: 'Premier ravitaillement', color: '#8a8b3d' },
     { time: '19:30', title: 'Dîner au coin du cantou', note: 'Pâtes au pesto', color: '#b8503f' },
   ] },
-  { dow: 'Dim', num: 12, title: 'Mise en jambes', sub: 'Vallée de Mandailles', items: [
+  { dow: 'Ven', num: 7, title: 'Mise en jambes', sub: 'Vallée de Mandailles', items: [
     { time: '09:30', title: 'Petit-déj tranquille', note: 'On prend le temps', color: '#cf7d3c' },
     { time: '10:30', title: 'Cascade du Faillitoux', note: 'Balade facile (1 h)', color: '#5b7042' },
     { time: '12:30', title: 'Pique-nique au bord de l\'eau', note: '', color: '#4f8a86' },
     { time: '15:00', title: 'Sieste & jeux au jardin', note: '', color: '#9c6b4a' },
     { time: '18:00', title: 'Marché de producteurs', note: 'Fromages & charcuterie', color: '#8a8b3d' },
   ] },
-  { dow: 'Lun', num: 13, title: 'Ascension du Puy Mary', sub: 'Pas de Peyrol', items: [
+  { dow: 'Sam', num: 8, title: 'Ascension du Puy Mary', sub: 'Pas de Peyrol', items: [
     { time: '08:30', title: 'Départ tôt', note: 'Avant la chaleur', color: '#5b7042' },
     { time: '09:30', title: 'Parking Pas de Peyrol', note: '1 589 m', color: '#9c6b4a' },
     { time: '10:00', title: 'Montée au sommet', note: 'Porte-bébé conseillé', color: '#5b7042' },
     { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° 🏔️', color: '#4f8a86' },
     { time: '15:00', title: 'Glace à Dienne', note: 'Récompense méritée', color: '#b8503f' },
   ] },
-  { dow: 'Mar', num: 14, title: 'Fermes & fromages', sub: 'Autour de Salers', items: [
+  { dow: 'Dim', num: 9, title: 'Fermes & fromages', sub: 'Autour de Salers', items: [
     { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
     { time: '12:30', title: 'Déjeuner truffade', note: 'À l\'auberge', color: '#b8503f' },
     { time: '15:00', title: 'Buronnerie & dégustation', note: 'Cantal AOP', color: '#8a8b3d' },
     { time: '17:00', title: 'Baignade au lac', note: '', color: '#4f8a86' },
   ] },
-  { dow: 'Mer', num: 15, title: 'Cap sur Aurillac', sub: 'La ville', items: [
+  { dow: 'Lun', num: 10, title: 'Cap sur Aurillac', sub: 'La ville', items: [
     { time: '10:00', title: 'Château Saint-Étienne', note: '', color: '#9c6b4a' },
     { time: '12:00', title: 'Déjeuner en ville', note: '', color: '#b8503f' },
     { time: '14:30', title: 'Maison des Volcans', note: 'Ludique pour les enfants', color: '#cf7d3c' },
     { time: '16:30', title: 'Parc & manège', note: '', color: '#5b7042' },
   ] },
-  { dow: 'Jeu', num: 16, title: 'Train & lacs', sub: 'Riom-ès-Montagnes', items: [
+  { dow: 'Mar', num: 11, title: 'Train & lacs', sub: 'Riom-ès-Montagnes', items: [
     { time: '10:00', title: 'Gentiane Express', note: 'Train touristique 🚂', color: '#cf7d3c' },
     { time: '13:00', title: 'Pique-nique au lac', note: '', color: '#4f8a86' },
     { time: '15:30', title: 'Pédalo & baignade', note: '', color: '#4f8a86' },
     { time: '18:00', title: 'Retour & repos', note: '', color: '#9c6b4a' },
   ] },
-  { dow: 'Ven', num: 17, title: 'Journée libre', sub: 'Au gré de l\'envie', items: [
+  { dow: 'Mer', num: 12, title: 'Journée libre', sub: 'Au gré de l\'envie', items: [
     { time: 'Matin', title: 'Grasse matinée', note: 'On souffle', color: '#cf7d3c' },
-    { time: '11:00', title: 'Dernière balade douce', note: '', color: '#5b7042' },
-    { time: '16:00', title: 'Souvenirs & fromages', note: 'À ramener', color: '#b8503f' },
+    { time: '11:00', title: 'Balade douce', note: '', color: '#5b7042' },
+    { time: '16:00', title: 'Jeux au jardin', note: '', color: '#9c6b4a' },
+  ] },
+  { dow: 'Jeu', num: 13, title: 'Marché & baignade', sub: 'Dernier jour complet', items: [
+    { time: '10:00', title: 'Marché de Salers', note: 'Souvenirs & fromages à ramener', color: '#8a8b3d' },
+    { time: '15:00', title: 'Baignade au lac', note: 'Une dernière fois', color: '#4f8a86' },
     { time: '18:00', title: 'Rangement des valises', note: '', color: '#9c6b4a' },
   ] },
-  { dow: 'Sam', num: 18, title: 'Le retour', sub: 'Mandailles → Lyon', items: [
+  { dow: 'Ven', num: 14, title: 'Retour — étape 1', sub: 'Mandailles → Laschamps', items: [
     { time: '09:30', title: 'Check-out du gîte', note: 'État des lieux', color: '#9c6b4a' },
-    { time: '10:00', title: 'Route du retour', note: '', color: '#5b7042' },
+    { time: '10:00', title: 'Route vers Laschamps', note: '', color: '#5b7042' },
+    { time: '12:30', title: 'Pause déjeuner', note: '', color: '#b8503f' },
+    { time: '16:00', title: 'Arrivée à Laschamps', note: 'Étape pour la nuit', color: '#9c6b4a' },
+  ] },
+  { dow: 'Sam', num: 15, title: 'Retour — étape 2', sub: 'Laschamps → Beauvais', items: [
+    { time: '09:30', title: 'Départ de Laschamps', note: '', color: '#5b7042' },
     { time: '13:00', title: 'Pause déjeuner', note: '', color: '#b8503f' },
-    { time: '16:00', title: 'Arrivée à Lyon', note: 'Des souvenirs plein la tête 💛', color: '#4f8a86' },
+    { time: '17:00', title: 'Arrivée à Beauvais', note: 'Des souvenirs plein la tête 💛', color: '#4f8a86' },
   ] },
 ]
 
@@ -83,7 +99,7 @@ const VCAT = { Nature: '#5b7042', Famille: '#cf7d3c', Patrimoine: '#9c6b4a', Bai
 const FILTERS = ['Tous', 'Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché']
 
 const MODULES = [
-  { emoji: '🚗', name: 'Trajet', sub: 'Lyon → Puy Mary', bg: '#dfeae6', action: 'sub:trajet' },
+  { emoji: '🚗', name: 'Trajet', sub: 'Aller & retour', bg: '#dfeae6', action: 'sub:trajet' },
   { emoji: '🏡', name: 'Hébergement', sub: 'La Grange, Mandailles', bg: '#f1e4d4', action: 'sub:hebergement' },
   { emoji: '🧳', name: 'Préparatifs', sub: 'Valises & listes', bg: '#e7ecdf', action: 'sub:logistique' },
   { emoji: '⛅', name: 'Météo', sub: '7 jours sur place', bg: '#eee7d4', action: 'sub:meteo' },
@@ -170,7 +186,11 @@ function loadStore() {
       days: p.days ?? structuredClone(DAYS_INITIAL),
       visits: p.visits ?? structuredClone(VISITS_INITIAL),
       meteo: p.meteo ?? structuredClone(METEO_INITIAL),
-      trajetSteps: p.trajetSteps ?? structuredClone(TRAJET_STEPS_INITIAL),
+      // Migration : l'ancien store n'avait qu'un trajet aller (trajetSteps)
+      trajets: p.trajets ?? (p.trajetSteps
+        ? { aller: p.trajetSteps, retour: structuredClone(TRAJETS_INITIAL.retour) }
+        : structuredClone(TRAJETS_INITIAL)),
+      trip: p.trip ?? { ...TRIP_INITIAL },
       logi: p.logi ?? structuredClone(LOGI_INITIAL),
       courses: p.courses ?? structuredClone(COURSES_INITIAL),
       budgetTotal: p.budgetTotal ?? BUDGET_INITIAL,
@@ -213,35 +233,52 @@ const SectionLabel = ({ children }) => (
 )
 
 /* ================================================================== */
+// Helpers dates du voyage — trip.start/end sont des ISO (yyyy-mm-dd).
+const tripDate = (iso, h = 12, min = 0) => {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d, h, min, 0)
+}
+const fmtDayShort = (iso) => tripDate(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' })
+const fmtMonthYear = (iso) => tripDate(iso).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+
 // Notifications — construit la liste de tous les rappels à venir
 // (planning 30 min avant, menu du jour à 8 h, trajet J-1 + matin du départ).
 // Ids déterministes : replanifier = annuler les pendantes + re-scheduler.
-const buildNotificationList = (daysData, mealsData) => {
+// Le mois/année des jours de planning est déduit de trip.start (les jours
+// portent un numéro de jour du mois) ; le nom du mois vient du voyage.
+const buildNotificationList = (daysData, mealsData, trip) => {
   const now = Date.now()
   const list = []
   let id = 1
+  const [ty, tm] = trip.start.split('-').map(Number)
+  const monthName = tripDate(trip.start).toLocaleDateString('fr-FR', { month: 'long' })
   daysData.forEach((d) => {
-    const dayDate = new Date(2026, 6, d.num) // juillet = mois 6
+    const dayDate = new Date(ty, tm - 1, d.num)
     d.items.forEach((item) => {
       const m = item.time.match(/^(\d{1,2}):(\d{2})$/)
       if (!m) return
       const t = new Date(dayDate)
       t.setHours(parseInt(m[1]), parseInt(m[2]), 0, 0)
       const at = new Date(t.getTime() - 30 * 60 * 1000)
-      if (at.getTime() > now) list.push({ id: id++, title: `🗓️ Dans 30 min · ${item.title}`, body: `${d.dow} ${d.num} juillet · ${item.time}`, at })
+      if (at.getTime() > now) list.push({ id: id++, title: `🗓️ Dans 30 min · ${item.title}`, body: `${d.dow} ${d.num} ${monthName} · ${item.time}`, at })
     })
   })
-  daysData.forEach((d, i) => {
-    const at = new Date(2026, 6, d.num, 8, 0, 0)
+  daysData.forEach((d) => {
+    const at = new Date(ty, tm - 1, d.num, 8, 0, 0)
     if (at.getTime() > now) {
-      const ml = mealsData[i]
+      const ml = mealsData.find((m) => m.day === `${d.dow} ${d.num}`)
       list.push({ id: id++, title: `🍽️ Menu du jour · ${d.dow} ${d.num}`, body: ml ? ml.dish : 'Voir les menus', at })
     }
   })
-  const veille = new Date(2026, 6, 10, 20, 0, 0)
-  const matin = new Date(2026, 6, 11, 7, 0, 0)
+  const start = tripDate(trip.start)
+  const veille = new Date(start.getFullYear(), start.getMonth(), start.getDate() - 1, 20, 0, 0)
+  const matin = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 7, 0, 0)
+  const end = tripDate(trip.end)
+  const veilleRetour = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 1, 20, 0, 0)
+  const via = trip.etape ? ` (via ${trip.etape})` : ''
   if (veille.getTime() > now) list.push({ id: id++, title: '🚗 Départ demain !', body: 'Checklist trajet à valider ce soir', at: veille })
-  if (matin.getTime() > now) list.push({ id: id++, title: "🚗 C'est le grand jour !", body: 'Départ à 08:30 · Lyon → Mandailles', at: matin })
+  if (matin.getTime() > now) list.push({ id: id++, title: "🚗 C'est le grand jour !", body: `${trip.origin} → ${trip.destination}${via}`, at: matin })
+  if (veilleRetour.getTime() > now) list.push({ id: id++, title: '🏠 Demain : fin du séjour', body: `Route du retour vers ${trip.origin}${via}`, at: veilleRetour })
   return list
 }
 
@@ -279,8 +316,8 @@ const dispatchNativeNotifications = async (list) => {
   }
 }
 
-const scheduleAllNotifications = async (daysData, mealsData) => {
-  const list = buildNotificationList(daysData, mealsData)
+const scheduleAllNotifications = async (daysData, mealsData, trip) => {
+  const list = buildNotificationList(daysData, mealsData, trip)
   if (Capacitor.isNativePlatform()) await dispatchNativeNotifications(list)
   else await dispatchWebNotifications(list)
 }
@@ -340,6 +377,23 @@ export default function App() {
   const [editingCourseKey, setEditingCourseKey] = useState(null)
   const [newCourseItem, setNewCourseItem] = useState('')
   const [newShoppingItem, setNewShoppingItem] = useState('')
+  const [trajetDir, setTrajetDir] = useState('aller')
+  const [showTripEdit, setShowTripEdit] = useState(false)
+  const [newTripStart, setNewTripStart] = useState('')
+  const [newTripEnd, setNewTripEnd] = useState('')
+  const [newTripOrigin, setNewTripOrigin] = useState('')
+  const [newTripEtape, setNewTripEtape] = useState('')
+  const [newTripDest, setNewTripDest] = useState('')
+  const [showAddLogiList, setShowAddLogiList] = useState(false)
+  const [newLogiListName, setNewLogiListName] = useState('')
+  const [newLogiListEmoji, setNewLogiListEmoji] = useState('')
+  const [showAddCourseCat, setShowAddCourseCat] = useState(false)
+  const [newCourseCatName, setNewCourseCatName] = useState('')
+  const [showDayAdd, setShowDayAdd] = useState(false)
+  const [newDayDow, setNewDayDow] = useState('')
+  const [newDayNum, setNewDayNum] = useState('')
+  const [newDayTitle2, setNewDayTitle2] = useState('')
+  const [newDaySub2, setNewDaySub2] = useState('')
   const [showExport, setShowExport] = useState(false)
   const [exportCopied, setExportCopied] = useState(false)
   const [showImport, setShowImport] = useState(false)
@@ -357,7 +411,8 @@ export default function App() {
   const [days, setDays] = useState(initial.days || structuredClone(DAYS_INITIAL))
   const [visits, setVisits] = useState(initial.visits || structuredClone(VISITS_INITIAL))
   const [meteo, setMeteo] = useState(initial.meteo || structuredClone(METEO_INITIAL))
-  const [trajetSteps, setTrajetSteps] = useState(initial.trajetSteps || structuredClone(TRAJET_STEPS_INITIAL))
+  const [trajets, setTrajets] = useState(initial.trajets || structuredClone(TRAJETS_INITIAL))
+  const [trip, setTrip] = useState(initial.trip || { ...TRIP_INITIAL })
   const [logi, setLogi] = useState(initial.logi || structuredClone(LOGI_INITIAL))
   const [courses, setCourses] = useState(initial.courses || structuredClone(COURSES_INITIAL))
   const [budgetTotal, setBudgetTotal] = useState(initial.budgetTotal || BUDGET_INITIAL)
@@ -370,7 +425,7 @@ export default function App() {
   const undoSnapRef = useRef(null)
   const undoTimerRef = useRef(null)
   const offerUndo = (msg) => {
-    undoSnapRef.current = { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems }
+    undoSnapRef.current = { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems }
     setUndoMsg(msg)
     clearTimeout(undoTimerRef.current)
     undoTimerRef.current = setTimeout(() => setUndoMsg(null), 5000)
@@ -381,7 +436,7 @@ export default function App() {
     haptic(ImpactStyle.Medium)
     setSaved(s0.saved); setChecks(s0.checks); setExpenses(s0.expenses); setMeals(s0.meals)
     setShoppingItems(s0.shoppingItems); setDays(s0.days); setVisits(s0.visits); setMeteo(s0.meteo)
-    setTrajetSteps(s0.trajetSteps); setLogi(s0.logi); setCourses(s0.courses)
+    setTrajets(s0.trajets); setTrip(s0.trip); setLogi(s0.logi); setCourses(s0.courses)
     setBudgetTotal(s0.budgetTotal); setHebergement(s0.hebergement); setTrajetCheckItems(s0.trajetCheckItems)
     setUndoMsg(null)
     undoSnapRef.current = null
@@ -412,15 +467,15 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
   // fallback web en dev.
   useEffect(() => {
-    scheduleAllNotifications(days, meals).catch(() => { })
-  }, [days, meals])
+    scheduleAllNotifications(days, meals, trip).catch(() => { })
+  }, [days, meals, trip])
 
   const toggleCheck = (key, label) => {
     haptic(ImpactStyle.Light)
@@ -428,11 +483,10 @@ export default function App() {
   }
   const toggleSaved = (id) => { haptic(ImpactStyle.Medium); setSaved((sv) => ({ ...sv, [id]: !sv[id] })) }
 
-  // compte à rebours (date réelle)
+  // compte à rebours depuis la date de départ paramétrée
   const countdown = useMemo(() => {
-    const start = new Date(2026, 6, 11)
-    return Math.max(0, Math.round((start - new Date()) / 86400000))
-  }, [])
+    return Math.max(0, Math.round((tripDate(trip.start, 0) - new Date()) / 86400000))
+  }, [trip.start])
 
   // dérivés préparatifs
   let packDone = 0, packTotal = 0
@@ -646,8 +700,9 @@ export default function App() {
   }
   const closeVisitAdd = () => { setShowVisitEdit(false); setEditingVisitId(null); setNewVisitName(''); setNewVisitDist(''); setNewVisitDur(''); setNewVisitAge(''); setNewVisitCat('Nature') }
 
+  // Trajet : les étapes sont éditées par direction (aller / retour)
   const editTrajetStep = (idx) => {
-    const st = trajetSteps[idx]
+    const st = trajets[trajetDir][idx]
     setNewTrajetTime(st.time)
     setNewTrajetPlace(st.place)
     setNewTrajetNote(st.note)
@@ -658,19 +713,81 @@ export default function App() {
   const saveTrajetStep = () => {
     if (!newTrajetTime.trim() || !newTrajetPlace.trim()) return
     haptic(ImpactStyle.Medium)
-    if (editingTrajetIdx === null) {
-      setTrajetSteps((list) => [...list, { time: newTrajetTime, place: newTrajetPlace, note: newTrajetNote, color: newTrajetColor }])
-    } else {
-      setTrajetSteps((list) => list.map((st, i) => i === editingTrajetIdx ? { time: newTrajetTime, place: newTrajetPlace, note: newTrajetNote, color: newTrajetColor } : st))
-    }
+    const step = { time: newTrajetTime, place: newTrajetPlace, note: newTrajetNote, color: newTrajetColor }
+    setTrajets((t) => ({
+      ...t,
+      [trajetDir]: editingTrajetIdx === null
+        ? [...t[trajetDir], step]
+        : t[trajetDir].map((st, i) => i === editingTrajetIdx ? step : st),
+    }))
     closeTrajetEdit()
   }
   const closeTrajetEdit = () => { setShowTrajetEdit(false); setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042') }
   const deleteTrajetStep = (idx) => {
-    if (trajetSteps.length <= 1) return
+    if (trajets[trajetDir].length <= 1) return
     haptic(ImpactStyle.Medium)
     offerUndo('Étape supprimée')
-    setTrajetSteps((list) => list.filter((_, i) => i !== idx))
+    setTrajets((t) => ({ ...t, [trajetDir]: t[trajetDir].filter((_, i) => i !== idx) }))
+  }
+
+  // Paramètres du voyage
+  const openTripEdit = () => {
+    setNewTripStart(trip.start); setNewTripEnd(trip.end)
+    setNewTripOrigin(trip.origin); setNewTripEtape(trip.etape); setNewTripDest(trip.destination)
+    setShowTripEdit(true)
+  }
+  const saveTrip = () => {
+    if (!newTripStart || !newTripEnd || !newTripOrigin.trim() || !newTripDest.trim()) return
+    if (newTripEnd < newTripStart) return
+    haptic(ImpactStyle.Medium)
+    setTrip({ start: newTripStart, end: newTripEnd, origin: newTripOrigin.trim(), etape: newTripEtape.trim(), destination: newTripDest.trim() })
+    setShowTripEdit(false)
+  }
+
+  // Listes logistique personnalisables (en plus des items)
+  const addLogiList = () => {
+    if (!newLogiListName.trim()) return
+    haptic(ImpactStyle.Medium)
+    const key = `cl_${Date.now()}`
+    setLogi((list) => [...list, { key, name: newLogiListName.trim(), emoji: newLogiListEmoji.trim() || '📦', items: [] }])
+    setNewLogiListName(''); setNewLogiListEmoji(''); setShowAddLogiList(false)
+  }
+  const deleteLogiList = (key) => {
+    if (logi.length <= 1) return
+    haptic(ImpactStyle.Medium)
+    offerUndo('Liste supprimée')
+    setLogi((list) => list.filter((L) => L.key !== key))
+    setChecks((c) => { const nc = { ...c }; delete nc[key]; return nc })
+  }
+
+  // Catégories de courses personnalisables
+  const addCourseCategory = () => {
+    if (!newCourseCatName.trim()) return
+    haptic(ImpactStyle.Medium)
+    const key = `cc_${Date.now()}`
+    setCourses((list) => [...list, { key, name: newCourseCatName.trim(), items: [] }])
+    setNewCourseCatName(''); setShowAddCourseCat(false)
+  }
+  const deleteCourseCategory = (key) => {
+    if (courses.length <= 1) return
+    haptic(ImpactStyle.Medium)
+    offerUndo('Catégorie supprimée')
+    setCourses((list) => list.filter((g) => g.key !== key))
+    setChecks((c) => { const nc = { ...c }; delete nc[key]; return nc })
+  }
+
+  // Planning : ajout d'un jour
+  const addDay = () => {
+    if (!newDayDow.trim() || !newDayNum.trim() || !newDayTitle2.trim()) return
+    haptic(ImpactStyle.Medium)
+    const num = parseInt(newDayNum, 10)
+    if (!num) return
+    setDays((list) => {
+      const next = [...list, { dow: newDayDow.trim(), num, title: newDayTitle2.trim(), sub: newDaySub2.trim(), items: [] }]
+      next.sort((a, b) => a.num - b.num)
+      return next
+    })
+    setNewDayDow(''); setNewDayNum(''); setNewDayTitle2(''); setNewDaySub2(''); setShowDayAdd(false)
   }
 
   const editMeteo = (idx) => {
@@ -773,12 +890,12 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON)
-  const STORE_KEYS = ['saved', 'checks', 'expenses', 'meals', 'shoppingItems', 'days', 'visits', 'meteo', 'trajetSteps', 'logi', 'courses', 'budgetTotal', 'hebergement', 'trajetCheckItems']
+  const STORE_KEYS = ['saved', 'checks', 'expenses', 'meals', 'shoppingItems', 'days', 'visits', 'meteo', 'trajets', 'trajetSteps', 'trip', 'logi', 'courses', 'budgetTotal', 'hebergement', 'trajetCheckItems']
   const buildExport = () => JSON.stringify({
     app: 'cantou',
     schema: STORE_KEY,
     exportedAt: new Date().toISOString(),
-    data: { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajetSteps, logi, courses, budgetTotal, hebergement, trajetCheckItems },
+    data: { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems },
   }, null, 2)
   const copyExport = async () => {
     try {
@@ -850,17 +967,24 @@ export default function App() {
                 <div style={s('background:#4a5d3a;border-radius:20px;padding:18px;color:#f3ecda;box-shadow:0 8px 20px rgba(74,93,58,0.2);position:relative;overflow:hidden;')}>
                   <Ridge />
                   <div style={s('position:relative;')}>
-                    <div style={s('display:flex;align-items:center;gap:10px;font-family:Quicksand;font-weight:700;font-size:19px;')}><span>Lyon</span><span style={s('color:#c9d2b6;')}>→</span><span>Mandailles</span></div>
-                    <div style={s('display:flex;gap:20px;margin-top:14px;')}>
-                      <div><div style={s('font-size:12px;color:#c9d2b6;')}>Durée</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>3 h 40</div></div>
-                      <div><div style={s('font-size:12px;color:#c9d2b6;')}>Distance</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>285 km</div></div>
-                      <div><div style={s('font-size:12px;color:#c9d2b6;')}>Budget</div><div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>≈ 77 €</div></div>
+                    <div style={s('display:flex;align-items:center;gap:10px;font-family:Quicksand;font-weight:700;font-size:19px;flex-wrap:wrap;')}>
+                      <span>{trajetDir === 'aller' ? trip.origin : trip.destination}</span>
+                      <span style={s('color:#c9d2b6;')}>→</span>
+                      <span>{trajetDir === 'aller' ? trip.destination : trip.origin}</span>
+                    </div>
+                    <div style={s('display:flex;gap:20px;margin-top:14px;flex-wrap:wrap;')}>
+                      <div><div style={s('font-size:12px;color:#c9d2b6;')}>{trajetDir === 'aller' ? 'Départ' : 'Retour'}</div><div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>{fmtDayShort(trajetDir === 'aller' ? trip.start : trip.end)}</div></div>
+                      {trip.etape && <div><div style={s('font-size:12px;color:#c9d2b6;')}>Étape (nuit)</div><div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>{trip.etape}</div></div>}
                     </div>
                   </div>
                 </div>
+                <div style={s('margin-top:14px;display:flex;background:#ece2cf;border-radius:14px;padding:4px;')}>
+                  <button data-testid="btn-trajet-aller" onClick={() => setTrajetDir('aller')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'aller' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'aller' ? '#fffaf0' : '#6b6354'};`)}>Aller</button>
+                  <button data-testid="btn-trajet-retour" onClick={() => setTrajetDir('retour')} style={s(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'retour' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'retour' ? '#fffaf0' : '#6b6354'};`)}>Retour</button>
+                </div>
                 <div style={s('margin-top:14px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>👶 Avec les enfants : une pause toutes les 1 h 30, et la playlist d’histoires audio prête pour la route.</div>
-                <div style={s('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Les etapes</div>
-                {trajetSteps.map((st, i) => (
+                <div style={s('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Les etapes · {trajetDir}</div>
+                {trajets[trajetDir].map((st, i) => (
                   <div key={i} style={s('display:flex;gap:12px;')}>
                     <div style={s('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{st.time}</div>
                     <div style={s('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
@@ -910,6 +1034,7 @@ export default function App() {
                         <span style={s('font-size:18px;')}>{L.emoji}</span>
                         <span style={s('font-family:Quicksand;font-weight:700;font-size:16px;flex:1;')}>{L.name}</span>
                         <span style={s('font-size:12px;color:#8a8273;font-weight:700;')}>{b.done}/{b.total}</span>
+                        <button onClick={() => deleteLogiList(L.key)} style={s('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
                       </div>
                       <div style={s('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={s(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
                       <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
@@ -936,6 +1061,7 @@ export default function App() {
                     </div>
                   )
                 })}
+                <button data-testid="btn-add-logi-list" onClick={() => setShowAddLogiList(true)} style={s('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle liste</button>
               </div>
             )}
 
@@ -976,7 +1102,7 @@ export default function App() {
                   <Ridge opacity={0.14} />
                   <div style={s('position:relative;')}>
                     <div style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>Puy Mary &amp; vallées</div>
-                    <div style={s('font-size:13px;color:#dbe2c9;margin-top:2px;')}>Prévisions du 11 au 17 juillet</div>
+                    <div style={s('font-size:13px;color:#dbe2c9;margin-top:2px;')}>Prévisions du {fmtDayShort(trip.start)} au {fmtDayShort(trip.end)}</div>
                   </div>
                 </div>
                 <div style={s('margin-top:12px;background:#eee7d4;border-radius:14px;padding:13px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧥 En altitude (Puy Mary, 1 783 m) il fait plus frais — prévoir une polaire même en été !</div>
@@ -1015,10 +1141,11 @@ export default function App() {
                 </div>
                 <div style={s('margin:8px 18px 14px;background:#4a5d3a;border-radius:26px;padding:20px;color:#f3ecda;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;')}>
                   <Ridge />
+                  <button data-testid="btn-trip-settings" onClick={openTripEdit} style={s('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.15);color:#f3ecda;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
                   <div style={s('position:relative;')}>
                     <div style={s('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#c9d2b6;')}>PROCHAINE AVENTURE</div>
                     <div style={s('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;')}>Puy Mary,<br />Cantal</div>
-                    <div style={s('margin-top:9px;font-size:14px;color:#dbe2c9;')}>Sam 11 → Sam 18 juillet 2026</div>
+                    <div style={s('margin-top:9px;font-size:14px;color:#dbe2c9;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
                     <div style={s('display:flex;gap:8px;margin-top:16px;')}>
                       <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
                       <div style={s('background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
@@ -1035,7 +1162,7 @@ export default function App() {
                     <div style={s('width:44px;height:44px;border-radius:14px;background:#dfeae6;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🚗</div>
                     <div style={s('flex:1;')}>
                       <div style={s('font-family:Quicksand;font-weight:700;font-size:16px;')}>Le grand départ</div>
-                      <div style={s('font-size:13px;color:#8a8273;margin-top:1px;')}>Sam 11 · 08:30 depuis Lyon · ≈ 3 h 40</div>
+                      <div style={s('font-size:13px;color:#8a8273;margin-top:1px;')}>{fmtDayShort(trip.start)} · depuis {trip.origin}{trip.etape ? ` · via ${trip.etape}` : ''}</div>
                     </div>
                   </div>
                   <button onClick={() => setSub('trajet')} style={s('margin-top:13px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le trajet →</button>
@@ -1076,7 +1203,7 @@ export default function App() {
               <div data-testid="screen-planning">
                 <div style={s('padding:54px 18px 4px;')}>
                   <div style={s('font-family:Quicksand;font-weight:700;font-size:26px;')}>Planning</div>
-                  <div style={s('font-size:13px;color:#8a8273;')}>8 jours · 11 → 18 juillet</div>
+                  <div style={s('font-size:13px;color:#8a8273;')}>{days.length} jours · {fmtDayShort(trip.start)} → {fmtDayShort(trip.end)}</div>
                 </div>
                 <div style={s('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 16px;')}>
                   {days.map((d, i) => (
@@ -1085,6 +1212,7 @@ export default function App() {
                       <span style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>{d.num}</span>
                     </button>
                   ))}
+                  <button data-testid="btn-add-day" onClick={() => setShowDayAdd(true)} style={s('flex:0 0 auto;width:54px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:20px;font-weight:700;')}>＋</button>
                 </div>
                 <div style={s('padding:0 18px 8px;')}>
                   <div style={s('display:flex;align-items:center;justify-content:space-between;')}>
@@ -1204,9 +1332,10 @@ export default function App() {
                     </div>
                     {coursesGroups.map((g) => (
                       <div key={g.key} style={s('margin-bottom:16px;')}>
-                        <div style={s('display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;')}>
-                          <span style={s('font-family:Quicksand;font-weight:700;font-size:15px;')}>{g.name}</span>
+                        <div style={s('display:flex;align-items:baseline;gap:8px;margin-bottom:7px;')}>
+                          <span style={s('font-family:Quicksand;font-weight:700;font-size:15px;flex:1;')}>{g.name}</span>
                           <span style={s('font-size:12px;color:#8a8273;')}>{g.doneStr}</span>
+                          <button onClick={() => deleteCourseCategory(g.key)} style={s('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
                         </div>
                         <div style={s('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
                           {(coursesSorted ? [...g.items].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)) : g.items).map((it) => (
@@ -1231,6 +1360,7 @@ export default function App() {
                         <button onClick={() => { setEditingCourseKey(g.key); setShowAddCourseItem(true) }} style={s('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
                       </div>
                     ))}
+                    <button data-testid="btn-add-course-cat" onClick={() => setShowAddCourseCat(true)} style={s('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle catégorie</button>
                     <div style={s('margin-top:20px;padding-top:16px;border-top:1px solid #efe6d4;')}>
                       <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;color:#8a8273;text-transform:uppercase;margin-bottom:10px;')}>Gerer les articles</div>
                       <div style={s('display:flex;flex-direction:column;gap:8px;')}>
@@ -1646,6 +1776,99 @@ export default function App() {
               <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={s(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
             </div>
             <div style={s('margin-top:10px;font-size:12px;color:#8a8273;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Paramètres du voyage */}
+      {showTripEdit && (
+        <div onClick={() => setShowTripEdit(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Paramètres du voyage</div>
+            <div style={s('font-size:13px;color:#8a8273;margin-bottom:14px;')}>Ces réglages pilotent le compte à rebours, les cartes et les notifications.</div>
+            <div style={s('display:flex;gap:10px;')}>
+              <div style={s('flex:1;')}>
+                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Date de départ</div>
+                <input data-testid="input-trip-start" type="date" value={newTripStart} onChange={(e) => setNewTripStart(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              </div>
+              <div style={s('flex:1;')}>
+                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Date de retour</div>
+                <input data-testid="input-trip-end" type="date" value={newTripEnd} onChange={(e) => setNewTripEnd(e.target.value)} style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              </div>
+            </div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Ville de départ</div>
+            <input data-testid="input-trip-origin" value={newTripOrigin} onChange={(e) => setNewTripOrigin(e.target.value)} placeholder="Ex : Beauvais" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Étape (nuit) — optionnel</div>
+            <input value={newTripEtape} onChange={(e) => setNewTripEtape(e.target.value)} placeholder="Ex : Laschamps" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Destination</div>
+            <input data-testid="input-trip-dest" value={newTripDest} onChange={(e) => setNewTripDest(e.target.value)} placeholder="Ex : Mandailles (Cantal)" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={() => setShowTripEdit(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-trip" onClick={saveTrip} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Nouvelle liste de logistique */}
+      {showAddLogiList && (
+        <div onClick={() => setShowAddLogiList(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle liste</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Emoji</div>
+            <input value={newLogiListEmoji} onChange={(e) => setNewLogiListEmoji(e.target.value)} placeholder="📦" maxLength="2" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Nom</div>
+            <input data-testid="input-logi-list-name" value={newLogiListName} onChange={(e) => setNewLogiListName(e.target.value)} placeholder="Ex : Sac de plage" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addLogiList()} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={() => setShowAddLogiList(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-logi-list" onClick={addLogiList} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Nouvelle catégorie de courses */}
+      {showAddCourseCat && (
+        <div onClick={() => setShowAddCourseCat(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle catégorie</div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Nom</div>
+            <input data-testid="input-course-cat-name" value={newCourseCatName} onChange={(e) => setNewCourseCatName(e.target.value)} placeholder="Ex : Apéro" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addCourseCategory()} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={() => setShowAddCourseCat(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-course-cat" onClick={addCourseCategory} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Ajouter un jour au planning */}
+      {showDayAdd && (
+        <div onClick={() => setShowDayAdd(false)} style={s('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={s('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un jour</div>
+            <div style={s('display:flex;gap:10px;')}>
+              <div style={s('flex:1;')}>
+                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Jour (abrégé)</div>
+                <input data-testid="input-day-dow" value={newDayDow} onChange={(e) => setNewDayDow(e.target.value)} placeholder="Ex : Dim" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              </div>
+              <div style={s('flex:1;')}>
+                <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Numéro</div>
+                <input data-testid="input-day-num" value={newDayNum} onChange={(e) => setNewDayNum(e.target.value)} placeholder="Ex : 16" inputMode="numeric" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+              </div>
+            </div>
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Titre</div>
+            <input data-testid="input-day-title" value={newDayTitle2} onChange={(e) => setNewDayTitle2(e.target.value)} placeholder="Ex : Journée détente" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Sous-titre</div>
+            <input value={newDaySub2} onChange={(e) => setNewDaySub2(e.target.value)} placeholder="Ex : Au gré de l'envie" style={s('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <div style={s('display:flex;gap:10px;')}>
+              <button onClick={() => setShowDayAdd(false)} style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-day-add" onClick={addDay} style={s('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+            </div>
           </div>
         </div>
       )}

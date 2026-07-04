@@ -260,3 +260,59 @@ describe('Undo suppression', () => {
     expect(screen.queryByTestId('undo-snackbar')).not.toBeInTheDocument()
   })
 })
+
+describe('Paramètres du voyage', () => {
+  it('modifie les dates et villes du voyage', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-trip-settings'))
+    await user.clear(screen.getByTestId('input-trip-origin'))
+    await user.type(screen.getByTestId('input-trip-origin'), 'Paris')
+    await user.clear(screen.getByTestId('input-trip-dest'))
+    await user.type(screen.getByTestId('input-trip-dest'), 'Marseille')
+    await user.click(screen.getByTestId('btn-save-trip'))
+    const stored = JSON.parse(window.localStorage.getItem('cantou.v1'))
+    expect(stored.trip.origin).toBe('Paris')
+    expect(stored.trip.destination).toBe('Marseille')
+  })
+})
+
+describe('Trajet aller / retour', () => {
+  it('bascule entre les étapes aller et retour', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const trajetModule = screen.getByText('Trajet')
+    await user.click(trajetModule)
+    expect(screen.getByTestId('btn-trajet-aller')).toBeInTheDocument()
+    expect(screen.getByTestId('btn-trajet-retour')).toBeInTheDocument()
+    await user.click(screen.getByTestId('btn-trajet-retour'))
+    expect(screen.getByText(/Les etapes · retour/)).toBeInTheDocument()
+  })
+})
+
+describe('Listes de préparatifs personnalisables', () => {
+  it('ajoute une nouvelle liste de logistique', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Préparatifs'))
+    await user.click(screen.getByTestId('btn-add-logi-list'))
+    await user.type(screen.getByTestId('input-logi-list-name'), 'Sac de plage')
+    await user.click(screen.getByTestId('btn-save-logi-list'))
+    expect(screen.getByText('Sac de plage')).toBeInTheDocument()
+  })
+})
+
+describe('Planning : ajout de jour', () => {
+  it('ajoute un nouveau jour au planning', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-planning'))
+    await user.click(screen.getByTestId('btn-add-day'))
+    await user.type(screen.getByTestId('input-day-dow'), 'Dim')
+    await user.type(screen.getByTestId('input-day-num'), '16')
+    await user.type(screen.getByTestId('input-day-title'), 'Journée bonus')
+    await user.click(screen.getByTestId('btn-save-day-add'))
+    const stored = JSON.parse(window.localStorage.getItem('cantou.v1'))
+    expect(stored.days.some((d) => d.title === 'Journée bonus')).toBe(true)
+  })
+})

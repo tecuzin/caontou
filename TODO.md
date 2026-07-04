@@ -60,22 +60,28 @@
 - [x] **Undo suppression** — bandeau « Supprimé · Annuler » (5 s) après chaque 🗑️
   (11 handlers), restaure un instantané complet du store
 
-## 🔄 En cours — 4 juillet : voyage paramétrable
+## ✅ Complété — 4 juillet : voyage paramétrable
 
-> Nouveau brief : trajet **Beauvais → Laschamps (étape nuit) → Cantal** aller ET
-> retour ; dates **5 → 15 août 2026 par défaut mais paramétrables** ; préparatifs
-> et courses **entièrement personnalisables** (listes/catégories, pas seulement items).
+> Brief : trajet **Beauvais → Laschamps (étape nuit) → Cantal** aller ET retour ;
+> dates **5 → 15 août 2026 par défaut mais paramétrables** ; préparatifs et
+> courses **entièrement personnalisables** (listes/catégories, pas seulement items).
 
-- [ ] **Paramètres du voyage** — modal ⚙️ : ville de départ, étape, destination,
-  date de départ, date de retour. Persisté (`trip`), tout le reste en dérive :
-  compte à rebours J-, textes des cartes, notifications (mois/année), rappels trajet.
-- [ ] **Trajet aller/retour** — deux onglets Aller · Retour, chacun avec ses étapes
-  éditables (CRUD existant). Défauts : Beauvais → Laschamps (nuit) → Mandailles,
-  et inverse au retour. Migration `trajetSteps` → `trajets.{aller,retour}`.
-- [ ] **Préparatifs personnalisables** — ajouter/supprimer des LISTES logistique
-  (nom + emoji) et des CATÉGORIES de courses, en plus des items (undo inclus).
-- [ ] **Planning : ajouter un jour** — bouton + (11 jours de séjour désormais) ;
-  défauts recalés sur août (Mer 5 → Sam 15, étapes Laschamps incluses).
+- [x] **Paramètres du voyage** — modal ⚙️ sur la carte héros de l'accueil : ville
+  de départ, étape, destination, date de départ, date de retour. Persisté
+  (`trip`), tout le reste en dérive : compte à rebours J-, textes des cartes
+  (accueil, trajet, météo, planning), notifications (mois/année dynamiques).
+- [x] **Trajet aller/retour** — toggle Aller · Retour sur l'écran Trajet, chaque
+  direction avec ses étapes éditables (CRUD existant réutilisé). Défauts :
+  Beauvais → Laschamps (nuit) → Mandailles à l'aller, inverse au retour.
+  Store migré `trajetSteps` → `trajets.{aller,retour}` (migration auto au
+  chargement d'un ancien store).
+- [x] **Préparatifs personnalisables** — bouton « + Nouvelle liste » (logistique,
+  nom + emoji) et « + Nouvelle catégorie » (courses), en plus des items déjà
+  éditables ; suppression avec undo et nettoyage des checks orphelins.
+- [x] **Planning : ajouter un jour** — bouton ＋ dans la rangée des onglets
+  jours ; 11 jours par défaut (Mer 5 → Sam 15 août), avec les 2 jours d'étape
+  à Laschamps (aller et retour) inclus dans le planning par défaut.
+- [x] Tests RTL pour les 4 nouvelles fonctionnalités (54 tests verts au total).
 
 ## 📅 Backlog suivant
 

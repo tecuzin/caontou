@@ -1,14 +1,28 @@
 // Mutable data - meals, shopping, planning
 // Separated from DEFAULTS to avoid encoding issues
 
+// Parametres du voyage — tout est modifiable dans l'app (modal ⚙️).
+// Dates ISO (yyyy-mm-dd) ; etape = halte pour la nuit (aller ET retour).
+export const TRIP_INITIAL = {
+  start: '2026-08-05',
+  end: '2026-08-15',
+  origin: 'Beauvais',
+  etape: 'Laschamps',
+  destination: 'Mandailles (Cantal)',
+}
+
 export const MEALS_INITIAL = [
-  { id: 1, day: 'Sam 11', dish: 'Pates au pesto (soir arrivee)' },
-  { id: 2, day: 'Dim 12', dish: 'Truffade maison + salade' },
-  { id: 3, day: 'Lun 13', dish: 'Poulet roti & legumes' },
-  { id: 4, day: 'Mar 14', dish: 'Aligot & saucisse de Cantal' },
-  { id: 5, day: 'Mer 15', dish: 'Pizzeria a Murat' },
-  { id: 6, day: 'Jeu 16', dish: 'Omelette aux cepes' },
-  { id: 7, day: 'Ven 17', dish: 'Grillades au jardin' },
+  { id: 1, day: 'Mer 5', dish: 'Etape a Laschamps — resto simple' },
+  { id: 2, day: 'Jeu 6', dish: 'Pates au pesto (soir arrivee)' },
+  { id: 3, day: 'Ven 7', dish: 'Truffade maison + salade' },
+  { id: 4, day: 'Sam 8', dish: 'Poulet roti & legumes' },
+  { id: 5, day: 'Dim 9', dish: 'Aligot & saucisse de Cantal' },
+  { id: 6, day: 'Lun 10', dish: 'Pizzeria a Murat' },
+  { id: 7, day: 'Mar 11', dish: 'Omelette aux cepes' },
+  { id: 8, day: 'Mer 12', dish: 'Grillades au jardin' },
+  { id: 9, day: 'Jeu 13', dish: 'Soupe au fromage & salade' },
+  { id: 10, day: 'Ven 14', dish: 'Etape a Laschamps — resto simple' },
+  { id: 11, day: 'Sam 15', dish: 'Retour a la maison' },
 ]
 
 export const SHOPPING_INITIAL = {
@@ -50,13 +64,26 @@ export const COURSES_INITIAL = [
   { key: 'co_autre', name: 'Autres', items: ['Pain', 'Eau (pack)', 'Sacs poubelle', 'Charbon BBQ', 'Essuie-tout'] },
 ]
 
-export const TRAJET_STEPS_INITIAL = [
-  { time: '08:30', place: 'Lyon', note: 'Depart, voiture chargee', color: '#5b7042' },
-  { time: '10:00', place: 'Thiers', note: 'Pause cafe & toilettes', color: '#cf7d3c' },
-  { time: '11:15', place: 'Massiac (A75)', note: 'On quitte l\'autoroute', color: '#4f8a86' },
-  { time: '12:30', place: 'Murat', note: 'Pique-nique & jambes', color: '#8a8b3d' },
-  { time: '13:30', place: 'Mandailles', note: 'Arrivee au gite', color: '#b8503f' },
-]
+// Trajet en deux directions, chacune avec ses etapes editables.
+// Aller comme retour font halte une nuit a Laschamps (Puy-de-Dome).
+export const TRAJETS_INITIAL = {
+  aller: [
+    { time: 'Mer 5 · 09:00', place: 'Depart de Beauvais', note: 'Voiture chargee, c\'est parti !', color: '#5b7042' },
+    { time: '12:30', place: 'Pause dejeuner', note: 'Aire ou village en route', color: '#cf7d3c' },
+    { time: '16:00', place: 'Arrivee a Laschamps', note: 'Etape pour la nuit (Puy-de-Dome)', color: '#9c6b4a' },
+    { time: 'Jeu 6 · 09:30', place: 'Depart de Laschamps', note: 'Cap au sud, volcans en vue', color: '#5b7042' },
+    { time: '11:00', place: 'Pause a Murat', note: 'Cafe & jambes', color: '#8a8b3d' },
+    { time: '13:00', place: 'Arrivee a Mandailles', note: 'Installation au gite', color: '#b8503f' },
+  ],
+  retour: [
+    { time: 'Ven 14 · 09:30', place: 'Depart de Mandailles', note: 'Check-out du gite', color: '#9c6b4a' },
+    { time: '12:30', place: 'Pause dejeuner', note: '', color: '#cf7d3c' },
+    { time: '16:00', place: 'Arrivee a Laschamps', note: 'Etape pour la nuit', color: '#5b7042' },
+    { time: 'Sam 15 · 09:30', place: 'Depart de Laschamps', note: '', color: '#5b7042' },
+    { time: '13:00', place: 'Pause dejeuner', note: '', color: '#8a8b3d' },
+    { time: '17:00', place: 'Arrivee a Beauvais', note: 'Des souvenirs plein la tete 💛', color: '#4f8a86' },
+  ],
+}
 
 export const VISITS_INITIAL = [
   { id: 1, emoji: '⛰️', name: 'Puy Mary — Pas de Peyrol', cat: 'Nature', dist: '25 min', dur: '2 h', age: 'Des 4 ans (porte-bebe)' },
@@ -71,11 +98,15 @@ export const VISITS_INITIAL = [
 ]
 
 export const METEO_INITIAL = [
-  { d: 'Sam', n: 11, icon: '☀️', hi: 24, lo: 12, rain: '10 %' },
-  { d: 'Dim', n: 12, icon: '⛅', hi: 22, lo: 11, rain: '20 %' },
-  { d: 'Lun', n: 13, icon: '🌧️', hi: 17, lo: 9, rain: '80 %' },
-  { d: 'Mar', n: 14, icon: '☀️', hi: 23, lo: 12, rain: '5 %' },
-  { d: 'Mer', n: 15, icon: '⛅', hi: 21, lo: 11, rain: '30 %' },
-  { d: 'Jeu', n: 16, icon: '⛅', hi: 20, lo: 10, rain: '40 %' },
-  { d: 'Ven', n: 17, icon: '☀️', hi: 25, lo: 13, rain: '5 %' },
+  { d: 'Mer', n: 5, icon: '☀️', hi: 26, lo: 14, rain: '5 %' },
+  { d: 'Jeu', n: 6, icon: '⛅', hi: 24, lo: 13, rain: '15 %' },
+  { d: 'Ven', n: 7, icon: '☀️', hi: 25, lo: 13, rain: '10 %' },
+  { d: 'Sam', n: 8, icon: '⛅', hi: 23, lo: 12, rain: '20 %' },
+  { d: 'Dim', n: 9, icon: '🌧️', hi: 18, lo: 10, rain: '70 %' },
+  { d: 'Lun', n: 10, icon: '⛅', hi: 21, lo: 11, rain: '30 %' },
+  { d: 'Mar', n: 11, icon: '☀️', hi: 24, lo: 12, rain: '5 %' },
+  { d: 'Mer', n: 12, icon: '☀️', hi: 26, lo: 14, rain: '5 %' },
+  { d: 'Jeu', n: 13, icon: '⛅', hi: 23, lo: 12, rain: '25 %' },
+  { d: 'Ven', n: 14, icon: '☀️', hi: 25, lo: 13, rain: '10 %' },
+  { d: 'Sam', n: 15, icon: '⛅', hi: 24, lo: 13, rain: '15 %' },
 ]
