@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { Capacitor } from '@capacitor/core'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
-import { Share } from '@capacitor/share'
-import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL } from './data.js'
 import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
+import { buildExport, exportFilename, parseImport, downloadExport, shareExport } from './backup.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
@@ -822,74 +820,27 @@ export default function App() {
     setChecks((c) => { const nr = { ...(c.tr_dep || {}) }; delete nr[label]; return { ...c, tr_dep: nr } })
   }
 
-  // Export / import complet des données (JSON)
-  const STORE_KEYS = ['saved', 'checks', 'expenses', 'meals', 'shoppingItems', 'days', 'visits', 'meteo', 'trajets', 'trajetSteps', 'trip', 'logi', 'courses', 'budgetTotal', 'hebergement', 'trajetCheckItems']
-  const buildExport = () => JSON.stringify({
-    app: 'cantou',
-    schema: STORE_KEY,
-    exportedAt: new Date().toISOString(),
-    data: { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems },
-  }, null, 2)
+  // Export / import complet des données (JSON) — logique pure dans backup.js
+  const currentStoreData = () => ({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems })
   const copyExport = async () => {
     try {
-      await navigator.clipboard.writeText(buildExport())
+      await navigator.clipboard.writeText(buildExport(currentStoreData(), STORE_KEY))
       setExportCopied(true)
       setTimeout(() => setExportCopied(false), 2500)
     } catch { }
   }
-  const downloadExport = () => {
-    try {
-      const ts = new Date().toISOString().slice(0, 16).replace(/[T:]/g, '-')
-      const blob = new Blob([buildExport()], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `cantou-export-${ts}.json`
-      a.click()
-      setTimeout(() => URL.revokeObjectURL(url), 5000)
-    } catch { }
-  }
-  // Partage natif du fichier d'export vers Telegram/WhatsApp/etc., pour
-  // synchroniser deux téléphones sans passer par un copier-coller manuel.
-  const shareExport = async () => {
-    const ts = new Date().toISOString().slice(0, 16).replace(/[T:]/g, '-')
-    const filename = `cantou-export-${ts}.json`
-    const content = buildExport()
-    try {
-      if (Capacitor.isNativePlatform()) {
-        await Filesystem.writeFile({ path: filename, data: content, directory: Directory.Cache, encoding: Encoding.UTF8 })
-        const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache })
-        await Share.share({ title: 'Export Cantou', text: 'Sauvegarde des données Cantou', url: uri, dialogTitle: 'Envoyer la sauvegarde' })
-      } else if (navigator.canShare && navigator.share) {
-        const file = new File([content], filename, { type: 'application/json' })
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: 'Export Cantou' })
-        } else {
-          await navigator.share({ title: 'Export Cantou', text: content })
-        }
-      } else {
-        downloadExport()
-      }
-    } catch { }
-  }
-  const parseImport = (text) => {
-    setImportError(''); setImportPreview(null)
-    if (!text.trim()) return
-    let parsed
-    try { parsed = JSON.parse(text) } catch { setImportError('JSON invalide — vérifier le contenu collé.'); return }
-    // Accepte l'export enveloppé ({app:'cantou', data:{…}}) ou le store brut
-    const data = parsed && parsed.app === 'cantou' && parsed.data ? parsed.data : parsed
-    if (!data || typeof data !== 'object' || !STORE_KEYS.some((k) => k in data)) {
-      setImportError('Ce JSON ne ressemble pas à un export Cantou.')
-      return
-    }
+  const doDownloadExport = () => downloadExport(buildExport(currentStoreData(), STORE_KEY), exportFilename())
+  const doShareExport = () => shareExport(buildExport(currentStoreData(), STORE_KEY), exportFilename())
+  const doParseImport = (text) => {
+    const { data, error } = parseImport(text)
+    setImportError(error)
     setImportPreview(data)
   }
   const handleImportFile = (e) => {
     const f = e.target.files && e.target.files[0]
     if (!f) return
     const reader = new FileReader()
-    reader.onload = () => { setImportText(String(reader.result)); parseImport(String(reader.result)) }
+    reader.onload = () => { setImportText(String(reader.result)); doParseImport(String(reader.result)) }
     reader.readAsText(f)
     e.target.value = ''
   }
@@ -1725,11 +1676,11 @@ export default function App() {
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Exporter les données</div>
             <div style={s('font-size:13px;color:#8a8273;margin-bottom:14px;')}>Toutes les données de l'app (planning, dépenses, listes, favoris…) au format JSON. À garder en lieu sûr ou à envoyer sur un autre téléphone.</div>
-            <textarea data-testid="export-json" readOnly value={buildExport()} onFocus={(e) => e.target.select()} style={s('width:100%;height:180px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
-            <button data-testid="btn-share-export" onClick={shareExport} style={s('width:100%;margin-top:14px;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>📤 Envoyer vers Telegram / WhatsApp…</button>
+            <textarea data-testid="export-json" readOnly value={buildExport(currentStoreData(), STORE_KEY)} onFocus={(e) => e.target.select()} style={s('width:100%;height:180px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
+            <button data-testid="btn-share-export" onClick={doShareExport} style={s('width:100%;margin-top:14px;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>📤 Envoyer vers Telegram / WhatsApp…</button>
             <div style={s('display:flex;gap:10px;margin-top:10px;')}>
               <button onClick={copyExport} style={s(`flex:1;border:none;background:${exportCopied ? '#5b7042' : '#4a5d3a'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;`)}>{exportCopied ? '✓ Copié !' : '📋 Copier'}</button>
-              <button onClick={downloadExport} style={s('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>💾 Télécharger</button>
+              <button onClick={doDownloadExport} style={s('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>💾 Télécharger</button>
             </div>
             <button onClick={() => setShowExport(false)} style={s('width:100%;margin-top:10px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
           </div>
@@ -1743,7 +1694,7 @@ export default function App() {
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Importer des données</div>
             <div style={s('font-size:13px;color:#8a8273;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
-            <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); parseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={s('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
+            <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); doParseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={s('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
             <label style={s('display:block;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;text-align:center;')}>
               📂 Choisir un fichier…
               <input type="file" accept=".json,application/json" onChange={handleImportFile} style={s('display:none;')} />
