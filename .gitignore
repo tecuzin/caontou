@@ -3,6 +3,7 @@ node_modules/
 
 # Sorties de build web
 dist/
+coverage/
 
 # Projet natif Android (régénéré par `npx cap add android`)
 android/
