@@ -39,6 +39,36 @@
 
 ---
 
+## ✅ Complété depuis la v0.3.0 (2-3 juillet)
+
+- [x] **Release Git Flow v0.3.0** (main taguée) puis **hotfix v0.3.1**
+- [x] **Signature APK stable** — `cantou.keystore` committé, fini le conflit de package à la mise à jour
+- [x] **Icône Android Cantou** — remplace le logo Capacitor (legacy + adaptive icon, générée au build)
+- [x] **Illustrations montagne & vacances** — `src/Scenery.jsx` (panorama accueil, crêtes filigrane, scène gîte)
+- [x] **Export complet JSON** — copie presse-papiers + téléchargement (accueil > Sauvegarde)
+- [x] **Import complet** — collage ou fichier, validation + aperçu, remplace le store et recharge
+- [x] **CRUD météo complet** + fixes CRUD (repas id stable, checks orphelins, add shopping)
+
+---
+
+## 🔄 En cours — soirée du 3 juillet
+
+- [ ] **Notifications natives** (`@capacitor/local-notifications`) — les rappels actuels
+  (`setTimeout`) meurent à la fermeture de l'app ; planification native Android qui
+  survit à la fermeture/verrouillage/redémarrage. Annule+replanifie à chaque
+  changement de planning/repas. Fallback web (Notification API) conservé en dev.
+- [ ] **Undo suppression** — bandeau « Supprimé · Annuler » (5 s) après chaque 🗑️
+  (si le temps le permet ce soir)
+
+## 📅 Backlog suivant
+
+- [ ] **Écran « Aujourd'hui »** — tableau de bord du jour pendant le séjour
+  (planning du jour + météo + repas du soir), affiché par défaut du 11 au 18 juillet
+- [ ] **Partage natif de la sauvegarde** (`@capacitor/share`) — envoyer l'export JSON
+  directement dans Telegram/WhatsApp pour synchroniser deux téléphones
+
+---
+
 ## 📋 Backlog confirmé
 
 ### Notifications
