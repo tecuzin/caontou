@@ -173,6 +173,24 @@ describe('Visites — filtres et tri', () => {
     expect(screen.getByText(/📍.*Distance|Distance.*📍/)).toBeInTheDocument()
     expect(screen.getByText(/🏷️.*Catégorie|Catégorie.*🏷️/)).toBeInTheDocument()
   })
+
+  it('ouvre bien la modal au clic sur "+ Ajouter visite" (régression)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    await user.click(screen.getByText('+ Ajouter visite'))
+    expect(screen.getByText('Ajouter une visite')).toBeInTheDocument()
+  })
+
+  it('ajoute une nouvelle visite via la modal', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    await user.click(screen.getByText('+ Ajouter visite'))
+    await user.type(screen.getByPlaceholderText('Ex : Puy Mary'), 'Grotte du Loup')
+    await user.click(screen.getByText('Enregistrer'))
+    expect(screen.getByText('Grotte du Loup')).toBeInTheDocument()
+  })
 })
 
 describe('Persistance localStorage', () => {
@@ -350,5 +368,120 @@ describe('Partage natif de la sauvegarde', () => {
     render(<App />)
     await user.click(screen.getByTestId('btn-export'))
     expect(screen.getByTestId('btn-share-export')).toBeInTheDocument()
+  })
+})
+
+describe('Navigation par glissement (swipe)', () => {
+  const swipeLeft = (el) => {
+    fireEvent.touchStart(el, { touches: [{ clientX: 300, clientY: 400 }] })
+    fireEvent.touchEnd(el, { changedTouches: [{ clientX: 150, clientY: 400 }] })
+  }
+  const swipeRight = (el) => {
+    fireEvent.touchStart(el, { touches: [{ clientX: 100, clientY: 400 }] })
+    fireEvent.touchEnd(el, { changedTouches: [{ clientX: 250, clientY: 400 }] })
+  }
+
+  it('swipe vers la gauche sur la barre d\'onglets va à l\'écran suivant', async () => {
+    render(<App />)
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+    swipeLeft(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-planning')).toBeInTheDocument()
+  })
+
+  it('swipe vers la droite sur la barre d\'onglets revient à l\'écran précédent', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    expect(screen.getByTestId('screen-visites')).toBeInTheDocument()
+    swipeRight(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-planning')).toBeInTheDocument()
+  })
+
+  it('ne dépasse pas le dernier onglet en swipant à gauche sur Budget', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-budget'))
+    swipeLeft(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+  })
+
+  it('ne recule pas avant Accueil en swipant à droite sur le premier onglet', () => {
+    render(<App />)
+    swipeRight(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+  })
+
+  it('swipe gauche→droite sur un sous-écran revient en arrière (équivalent bouton ‹)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Trajet'))
+    expect(screen.getByTestId('sub-screen-wrapper')).toBeInTheDocument()
+    swipeRight(screen.getByTestId('sub-screen-wrapper'))
+    expect(screen.queryByTestId('sub-screen-wrapper')).not.toBeInTheDocument()
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+  })
+
+  it('un tap normal (sans déplacement) sur la barre d\'onglets ne déclenche pas de swipe', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-budget'))
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+    // clic normal (userEvent.click) simule un tap sans déplacement — ne doit rien changer d'autre
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+  })
+})
+
+describe('Suggestions', () => {
+  it('ajoute une suggestion et l\'affiche dans la liste', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'Ajouter un mode sombre')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByText('Ajouter un mode sombre')).toBeInTheDocument()
+  })
+
+  it('n\'ajoute rien si le champ est vide', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.queryByTestId('btn-send-suggestions')).not.toBeInTheDocument()
+  })
+
+  it('affiche le bouton d\'envoi seulement s\'il y a au moins une suggestion', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    expect(screen.queryByTestId('btn-send-suggestions')).not.toBeInTheDocument()
+    await user.type(screen.getByTestId('input-suggestion'), 'Une idée')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByTestId('btn-send-suggestions')).toBeInTheDocument()
+  })
+
+  it('supprime une suggestion via son bouton 🗑️', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'À supprimer')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByText('À supprimer')).toBeInTheDocument()
+    await user.click(screen.getByText('🗑️'))
+    expect(screen.queryByText('À supprimer')).not.toBeInTheDocument()
+  })
+
+  it('persiste les suggestions dans localStorage', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'Suggestion persistante')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    unmount()
+    render(<App />)
+    expect(screen.getByText('Suggestion persistante')).toBeInTheDocument()
+  })
+
+  it('vide le champ après ajout', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const input = screen.getByTestId('input-suggestion')
+    await user.type(input, 'Test')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(input.value).toBe('')
   })
 })

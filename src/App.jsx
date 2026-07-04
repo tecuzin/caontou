@@ -6,6 +6,9 @@ import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { buildExport, exportFilename, parseImport, downloadExport, shareExport } from './backup.js'
 import { useVisits } from './hooks/useVisits.js'
+import { useSwipe } from './hooks/useSwipe.js'
+import { useSuggestions } from './hooks/useSuggestions.js'
+import { shareSuggestions } from './suggestions.js'
 import { useExpenses } from './hooks/useExpenses.js'
 import { useMeals } from './hooks/useMeals.js'
 
@@ -199,6 +202,7 @@ function loadStore() {
       budgetTotal: p.budgetTotal ?? BUDGET_INITIAL,
       hebergement: p.hebergement ?? structuredClone(HEB_INITIAL),
       trajetCheckItems: p.trajetCheckItems ?? [...TRAJET_CHECK_ITEMS_INITIAL],
+      suggestions: p.suggestions ?? [],
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -307,6 +311,7 @@ export default function App() {
   const [newDayNum, setNewDayNum] = useState('')
   const [newDayTitle2, setNewDayTitle2] = useState('')
   const [newDaySub2, setNewDaySub2] = useState('')
+  const [newSuggestionText, setNewSuggestionText] = useState('')
   const [showExport, setShowExport] = useState(false)
   const [exportCopied, setExportCopied] = useState(false)
   const [showImport, setShowImport] = useState(false)
@@ -330,6 +335,7 @@ export default function App() {
   const [budgetTotal, setBudgetTotal] = useState(initial.budgetTotal || BUDGET_INITIAL)
   const [hebergement, setHebergement] = useState(initial.hebergement || structuredClone(HEB_INITIAL))
   const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
+  const { suggestions, setSuggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
   // restaurable pendant 5 s via le bandeau « Annuler »
@@ -379,8 +385,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -812,7 +818,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems })
+  const currentStoreData = () => ({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions })
   const copyExport = async () => {
     try {
       await navigator.clipboard.writeText(buildExport(currentStoreData(), STORE_KEY))
@@ -844,7 +850,35 @@ export default function App() {
   }
   const closeImport = () => { setShowImport(false); setImportText(''); setImportError(''); setImportPreview(null) }
 
+  // Suggestions : notes libres pour de futures fonctionnalités, envoyées en
+  // texte brut vers Telegram/WhatsApp (pas besoin de parser du JSON).
+  const submitSuggestion = () => {
+    if (!newSuggestionText.trim()) return
+    haptic(ImpactStyle.Medium)
+    addSuggestion(newSuggestionText)
+    setNewSuggestionText('')
+  }
+  const deleteSuggestion = (id) => {
+    haptic(ImpactStyle.Medium)
+    removeSuggestion(id)
+  }
+  const sendSuggestions = () => shareSuggestions(suggestions)
+
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
+
+  // Navigation par glissement : gauche/droite sur la barre d'onglets pour
+  // changer d'écran, glissement gauche→droite sur le contenu d'un
+  // sous-écran pour revenir en arrière (équivalent du bouton ‹).
+  const currentTabIdx = TABS.findIndex(([key]) => key === tab)
+  const goToAdjacentTab = (dir) => {
+    const nextIdx = currentTabIdx + dir
+    if (nextIdx < 0 || nextIdx >= TABS.length) return
+    haptic(ImpactStyle.Light)
+    setTab(TABS[nextIdx][0])
+    setSub(null)
+  }
+  const tabBarSwipe = useSwipe(() => goToAdjacentTab(1), () => goToAdjacentTab(-1))
+  const subScreenSwipe = useSwipe(null, () => { if (sub) { haptic(ImpactStyle.Light); setSub(null) } })
 
   /* ---------------------------------------------------------------- */
   return (
@@ -852,7 +886,7 @@ export default function App() {
 
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (
-        <div style={s('height:100%;display:flex;flex-direction:column;')}>
+        <div data-testid="sub-screen-wrapper" onTouchStart={subScreenSwipe.onTouchStart} onTouchEnd={subScreenSwipe.onTouchEnd} style={s('height:100%;display:flex;flex-direction:column;')}>
           <div style={s('display:flex;align-items:center;gap:8px;padding:54px 14px 12px;background:#fffdf8;border-bottom:1px solid #ece2cf;flex:0 0 auto;')}>
             <button onClick={() => setSub(null)} style={s('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:3px;')}>‹</button>
             <span style={s('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
@@ -1113,6 +1147,26 @@ export default function App() {
                   ))}
                 </div>
 
+                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>💡 Suggestions</div>
+                <div style={s('padding:0 18px 12px;')}>
+                  <div style={s('font-size:12px;color:#8a8273;margin-bottom:8px;')}>Une idée de fonctionnalité, une consigne pour les prochaines données ? Notez-la ici puis envoyez-la.</div>
+                  <div style={s('display:flex;gap:8px;')}>
+                    <input data-testid="input-suggestion" value={newSuggestionText} onChange={(e) => setNewSuggestionText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitSuggestion()} placeholder="Ex : ajouter un mode sombre…" style={s('flex:1;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:10px 12px;font-size:14px;')} />
+                    <button data-testid="btn-add-suggestion" onClick={submitSuggestion} style={s('border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:0 16px;cursor:pointer;')}>+ Ajouter</button>
+                  </div>
+                  {suggestions.length > 0 && (
+                    <div style={s('display:flex;flex-direction:column;gap:8px;margin-top:10px;')}>
+                      {suggestions.map((sug) => (
+                        <div key={sug.id} style={s('display:flex;align-items:center;gap:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
+                          <span style={s('font-size:13px;flex:1;')}>{sug.text}</span>
+                          <button onClick={() => deleteSuggestion(sug.id)} style={s('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:2px 4px;')}>🗑️</button>
+                        </div>
+                      ))}
+                      <button data-testid="btn-send-suggestions" onClick={sendSuggestions} style={s('width:100%;margin-top:2px;border:1px solid #cf7d3c;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📤 Envoyer sur Telegram / WhatsApp…</button>
+                    </div>
+                  )}
+                </div>
+
                 <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#8a8273;text-transform:uppercase;')}>Sauvegarde</div>
                 <div style={s('padding:0 18px 12px;display:flex;gap:12px;')}>
                   <button data-testid="btn-export" onClick={() => { setExportCopied(false); setShowExport(true) }} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#4a5d3a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬇️ Exporter (JSON)</button>
@@ -1364,7 +1418,7 @@ export default function App() {
           </div>
 
           {/* BARRE D'ONGLETS */}
-          <div style={s('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
+          <div data-testid="tab-bar" onTouchStart={tabBarSwipe.onTouchStart} onTouchEnd={tabBarSwipe.onTouchEnd} style={s('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
             {TABS.map(([key, emoji, label]) => (
               <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={s('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
                 <span style={s('font-size:20px;')}>{emoji}</span>
@@ -1569,11 +1623,11 @@ export default function App() {
       )}
 
       {/* ============ FEUILLE : EDITER VISITE ============ */}
-      {showVisitEdit && editingVisitId !== null && (
+      {showVisitEdit && (
         <div onClick={closeVisitEdit} style={s('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
           <div onClick={(e) => e.stopPropagation()} style={s('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={s('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer visite</div>
+            <div style={s('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingVisitId === null ? 'Ajouter une visite' : 'Editer visite'}</div>
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Nom</div>
             <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Puy Mary" style={s('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={s('font-size:12px;font-weight:700;color:#8a8273;')}>Categorie</div>
