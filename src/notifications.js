@@ -43,6 +43,24 @@ export function buildNotificationList(daysData, mealsData, trip) {
   return list
 }
 
+// Rappel de sauvegarde — toutes les données vivent uniquement dans le
+// localStorage de cet appareil ; sans rappel, un téléphone perdu/cassé/
+// reseté efface tout le planning. Id réservé (9000), hors de la plage
+// dynamique 1..N de buildNotificationList, pour ne jamais entrer en
+// collision lors du cancel+reschedule.
+const BACKUP_REMINDER_ID = 9000
+export function buildBackupReminder(lastBackupAt, now = new Date(), intervalDays = 5) {
+  const base = lastBackupAt ? new Date(lastBackupAt) : now
+  const graceDays = lastBackupAt ? intervalDays : 2 // jamais sauvegardé -> relance plus tôt
+  const due = new Date(base.getTime() + graceDays * 86400000)
+  const at = due > now ? due : new Date(now.getTime() + 86400000) // déjà en retard -> demain
+  at.setHours(9, 0, 0, 0)
+  const body = lastBackupAt
+    ? `Ça fait ${graceDays} jours — exporte ou partage une copie depuis l'accueil.`
+    : "Tu n'as pas encore fait de sauvegarde — exporte ou partage une copie depuis l'accueil."
+  return { id: BACKUP_REMINDER_ID, title: '💾 Pense à sauvegarder tes données', body, at }
+}
+
 // Fallback web (dev navigateur) : setTimeout + Notification API.
 // Les timeouts sont suivis pour éviter les doublons à la replanification.
 let webNotifTimeouts = []
@@ -77,8 +95,8 @@ export async function dispatchNativeNotifications(list) {
   }
 }
 
-export async function scheduleAllNotifications(daysData, mealsData, trip) {
-  const list = buildNotificationList(daysData, mealsData, trip)
+export async function scheduleAllNotifications(daysData, mealsData, trip, lastBackupAt = null) {
+  const list = [...buildNotificationList(daysData, mealsData, trip), buildBackupReminder(lastBackupAt)]
   if (Capacitor.isNativePlatform()) await dispatchNativeNotifications(list)
   else await dispatchWebNotifications(list)
 }

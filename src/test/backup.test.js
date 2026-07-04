@@ -14,7 +14,7 @@ vi.mock('@capacitor/filesystem', () => ({
 const shareNative = vi.fn(async () => {})
 vi.mock('@capacitor/share', () => ({ Share: { share: (...a) => shareNative(...a) } }))
 
-const { STORE_KEYS, buildExport, exportFilename, parseImport, downloadExport, shareExport } = await import('../backup.js')
+const { STORE_KEYS, buildExport, exportFilename, parseImport, downloadExport, shareExport, formatLastBackup } = await import('../backup.js')
 
 describe('buildExport()', () => {
   it('enveloppe les données dans { app, schema, exportedAt, data }', () => {
@@ -172,5 +172,29 @@ describe('shareExport() — web (navigator.share)', () => {
     expect(clickSpy).toHaveBeenCalled()
     clickSpy.mockRestore()
     vi.unstubAllGlobals()
+  })
+})
+
+describe('formatLastBackup()', () => {
+  it('retourne "jamais" si aucune sauvegarde n\'a été faite', () => {
+    expect(formatLastBackup(null)).toBe('jamais')
+  })
+
+  it('retourne "aujourd\'hui" pour une sauvegarde du jour même', () => {
+    const now = new Date(2026, 6, 4, 18, 0, 0)
+    const backup = new Date(2026, 6, 4, 9, 0, 0).toISOString()
+    expect(formatLastBackup(backup, now)).toBe("aujourd'hui")
+  })
+
+  it('retourne "hier" pour une sauvegarde de la veille', () => {
+    const now = new Date(2026, 6, 4, 10, 0, 0)
+    const backup = new Date(2026, 6, 3, 10, 0, 0).toISOString()
+    expect(formatLastBackup(backup, now)).toBe('hier')
+  })
+
+  it('retourne "il y a N jours" au-delà', () => {
+    const now = new Date(2026, 6, 10, 10, 0, 0)
+    const backup = new Date(2026, 6, 4, 10, 0, 0).toISOString()
+    expect(formatLastBackup(backup, now)).toBe('il y a 6 jours')
   })
 })

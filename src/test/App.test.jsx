@@ -386,6 +386,31 @@ describe('Partage natif de la sauvegarde', () => {
   })
 })
 
+describe('Rappel de sauvegarde', () => {
+  it('affiche "jamais" avant toute sauvegarde', () => {
+    render(<App />)
+    expect(screen.getByTestId('last-backup-label')).toHaveTextContent('jamais')
+  })
+
+  it('passe à "aujourd\'hui" après un export copié', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-export'))
+    await user.click(screen.getByText('📋 Copier'))
+    expect(screen.getByTestId('last-backup-label')).toHaveTextContent("aujourd'hui")
+  })
+
+  it('persiste la date de dernière sauvegarde dans localStorage', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await user.click(screen.getByTestId('btn-export'))
+    await user.click(screen.getByText('📋 Copier'))
+    unmount()
+    render(<App />)
+    expect(screen.getByTestId('last-backup-label')).toHaveTextContent("aujourd'hui")
+  })
+})
+
 describe('Navigation par glissement (swipe)', () => {
   const swipeLeft = (el) => {
     fireEvent.touchStart(el, { touches: [{ clientX: 300, clientY: 400 }] })

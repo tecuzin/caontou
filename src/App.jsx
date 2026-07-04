@@ -4,7 +4,7 @@ import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOG
 import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
-import { buildExport, exportFilename, parseImport, downloadExport, shareExport } from './backup.js'
+import { buildExport, exportFilename, parseImport, downloadExport, shareExport, formatLastBackup } from './backup.js'
 import { useVisits } from './hooks/useVisits.js'
 import { useSwipe } from './hooks/useSwipe.js'
 import { useSuggestions } from './hooks/useSuggestions.js'
@@ -203,6 +203,7 @@ function loadStore() {
       hebergement: p.hebergement ?? structuredClone(HEB_INITIAL),
       trajetCheckItems: p.trajetCheckItems ?? [...TRAJET_CHECK_ITEMS_INITIAL],
       suggestions: p.suggestions ?? [],
+      lastBackupAt: p.lastBackupAt ?? null,
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -336,6 +337,7 @@ export default function App() {
   const [hebergement, setHebergement] = useState(initial.hebergement || structuredClone(HEB_INITIAL))
   const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
   const { suggestions, setSuggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
+  const [lastBackupAt, setLastBackupAt] = useState(initial.lastBackupAt || null)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
   // restaurable pendant 5 s via le bandeau « Annuler »
@@ -385,15 +387,15 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
   // fallback web en dev.
   useEffect(() => {
-    scheduleAllNotifications(days, meals, trip).catch(() => { })
-  }, [days, meals, trip])
+    scheduleAllNotifications(days, meals, trip, lastBackupAt).catch(() => { })
+  }, [days, meals, trip, lastBackupAt])
 
   const toggleCheck = (key, label) => {
     haptic(ImpactStyle.Light)
@@ -818,16 +820,18 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions })
+  const currentStoreData = () => ({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt })
+  const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const copyExport = async () => {
     try {
       await navigator.clipboard.writeText(buildExport(currentStoreData(), STORE_KEY))
       setExportCopied(true)
+      markBackedUp()
       setTimeout(() => setExportCopied(false), 2500)
     } catch { }
   }
-  const doDownloadExport = () => downloadExport(buildExport(currentStoreData(), STORE_KEY), exportFilename())
-  const doShareExport = () => shareExport(buildExport(currentStoreData(), STORE_KEY), exportFilename())
+  const doDownloadExport = () => { downloadExport(buildExport(currentStoreData(), STORE_KEY), exportFilename()); markBackedUp() }
+  const doShareExport = () => { shareExport(buildExport(currentStoreData(), STORE_KEY), exportFilename()); markBackedUp() }
   const doParseImport = (text) => {
     const { data, error } = parseImport(text)
     setImportError(error)
@@ -1162,8 +1166,11 @@ export default function App() {
                   )}
                 </div>
 
-                <div style={s('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Sauvegarde</div>
-                <div style={s('padding:0 18px 12px;display:flex;gap:12px;')}>
+                <div style={s('padding:6px 18px 4px;display:flex;align-items:baseline;justify-content:space-between;')}>
+                  <div style={s('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Sauvegarde</div>
+                  <div data-testid="last-backup-label" style={s('font-size:12px;color:#6b6354;')}>Dernière : {formatLastBackup(lastBackupAt)}</div>
+                </div>
+                <div style={s('padding:6px 18px 12px;display:flex;gap:12px;')}>
                   <button data-testid="btn-export" onClick={() => { setExportCopied(false); setShowExport(true) }} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#4a5d3a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬇️ Exporter (JSON)</button>
                   <button data-testid="btn-import" onClick={() => setShowImport(true)} style={s('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#9c6b4a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬆️ Importer</button>
                 </div>
