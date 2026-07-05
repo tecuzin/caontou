@@ -35,6 +35,77 @@ export const SHOPPING_INITIAL = {
 
 export const PLANNING_INITIAL = []
 
+// Planning par défaut : 11 jours (5 → 15 août), étape à Laschamps à
+// l'aller (nuit du 5) comme au retour (nuit du 14).
+export const DAYS_INITIAL = [
+  { dow: 'Mer', num: 5, title: 'Le grand départ', sub: 'Beauvais → Laschamps', items: [
+    { time: '09:00', title: 'Départ de Beauvais', note: 'Voiture chargée, c\'est parti !', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique en route', note: 'Se dégourdir les jambes', color: '#4f8a86' },
+    { time: '16:00', title: 'Arrivée à Laschamps', note: 'Étape pour la nuit', color: '#9c6b4a' },
+    { time: '19:30', title: 'Dîner tranquille', note: 'Tout le monde au lit tôt', color: '#b8503f' },
+  ] },
+  { dow: 'Jeu', num: 6, title: 'Cap sur le Cantal', sub: 'Laschamps → Mandailles', items: [
+    { time: '09:30', title: 'Départ de Laschamps', note: 'Volcans en vue', color: '#5b7042' },
+    { time: '11:00', title: 'Pause à Murat', note: 'Café & jambes', color: '#cf7d3c' },
+    { time: '13:00', title: 'Arrivée au gîte', note: 'Installation & goûter', color: '#9c6b4a' },
+    { time: '16:00', title: 'Courses à Aurillac', note: 'Premier ravitaillement', color: '#8a8b3d' },
+    { time: '19:30', title: 'Dîner au coin du cantou', note: 'Pâtes au pesto', color: '#b8503f' },
+  ] },
+  { dow: 'Ven', num: 7, title: 'Mise en jambes', sub: 'Vallée de Mandailles', items: [
+    { time: '09:30', title: 'Petit-déj tranquille', note: 'On prend le temps', color: '#cf7d3c' },
+    { time: '10:30', title: 'Cascade du Faillitoux', note: 'Balade facile (1 h)', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique au bord de l\'eau', note: '', color: '#4f8a86' },
+    { time: '15:00', title: 'Sieste & jeux au jardin', note: '', color: '#9c6b4a' },
+    { time: '18:00', title: 'Marché de producteurs', note: 'Fromages & charcuterie', color: '#8a8b3d' },
+  ] },
+  { dow: 'Sam', num: 8, title: 'Ascension du Puy Mary', sub: 'Pas de Peyrol', items: [
+    { time: '08:30', title: 'Départ tôt', note: 'Avant la chaleur', color: '#5b7042' },
+    { time: '09:30', title: 'Parking Pas de Peyrol', note: '1 589 m', color: '#9c6b4a' },
+    { time: '10:00', title: 'Montée au sommet', note: 'Porte-bébé conseillé', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° 🏔️', color: '#4f8a86' },
+    { time: '15:00', title: 'Glace à Dienne', note: 'Récompense méritée', color: '#b8503f' },
+  ] },
+  { dow: 'Dim', num: 9, title: 'Fermes & fromages', sub: 'Autour de Salers', items: [
+    { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
+    { time: '12:30', title: 'Déjeuner truffade', note: 'À l\'auberge', color: '#b8503f' },
+    { time: '15:00', title: 'Buronnerie & dégustation', note: 'Cantal AOP', color: '#8a8b3d' },
+    { time: '17:00', title: 'Baignade au lac', note: '', color: '#4f8a86' },
+  ] },
+  { dow: 'Lun', num: 10, title: 'Cap sur Aurillac', sub: 'La ville', items: [
+    { time: '10:00', title: 'Château Saint-Étienne', note: '', color: '#9c6b4a' },
+    { time: '12:00', title: 'Déjeuner en ville', note: '', color: '#b8503f' },
+    { time: '14:30', title: 'Maison des Volcans', note: 'Ludique pour les enfants', color: '#cf7d3c' },
+    { time: '16:30', title: 'Parc & manège', note: '', color: '#5b7042' },
+  ] },
+  { dow: 'Mar', num: 11, title: 'Train & lacs', sub: 'Riom-ès-Montagnes', items: [
+    { time: '10:00', title: 'Gentiane Express', note: 'Train touristique 🚂', color: '#cf7d3c' },
+    { time: '13:00', title: 'Pique-nique au lac', note: '', color: '#4f8a86' },
+    { time: '15:30', title: 'Pédalo & baignade', note: '', color: '#4f8a86' },
+    { time: '18:00', title: 'Retour & repos', note: '', color: '#9c6b4a' },
+  ] },
+  { dow: 'Mer', num: 12, title: 'Journée libre', sub: 'Au gré de l\'envie', items: [
+    { time: 'Matin', title: 'Grasse matinée', note: 'On souffle', color: '#cf7d3c' },
+    { time: '11:00', title: 'Balade douce', note: '', color: '#5b7042' },
+    { time: '16:00', title: 'Jeux au jardin', note: '', color: '#9c6b4a' },
+  ] },
+  { dow: 'Jeu', num: 13, title: 'Marché & baignade', sub: 'Dernier jour complet', items: [
+    { time: '10:00', title: 'Marché de Salers', note: 'Souvenirs & fromages à ramener', color: '#8a8b3d' },
+    { time: '15:00', title: 'Baignade au lac', note: 'Une dernière fois', color: '#4f8a86' },
+    { time: '18:00', title: 'Rangement des valises', note: '', color: '#9c6b4a' },
+  ] },
+  { dow: 'Ven', num: 14, title: 'Retour — étape 1', sub: 'Mandailles → Laschamps', items: [
+    { time: '09:30', title: 'Check-out du gîte', note: 'État des lieux', color: '#9c6b4a' },
+    { time: '10:00', title: 'Route vers Laschamps', note: '', color: '#5b7042' },
+    { time: '12:30', title: 'Pause déjeuner', note: '', color: '#b8503f' },
+    { time: '16:00', title: 'Arrivée à Laschamps', note: 'Étape pour la nuit', color: '#9c6b4a' },
+  ] },
+  { dow: 'Sam', num: 15, title: 'Retour — étape 2', sub: 'Laschamps → Beauvais', items: [
+    { time: '09:30', title: 'Départ de Laschamps', note: '', color: '#5b7042' },
+    { time: '13:00', title: 'Pause déjeuner', note: '', color: '#b8503f' },
+    { time: '17:00', title: 'Arrivée à Beauvais', note: 'Des souvenirs plein la tête 💛', color: '#4f8a86' },
+  ] },
+]
+
 // Shopping items stored as flat list with category + checked state
 export const SHOPPING_ITEMS_INITIAL = [
   { id: 1, cat: 'co_frais', label: 'Lait', checked: true },
