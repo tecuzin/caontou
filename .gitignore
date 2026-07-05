@@ -37,3 +37,7 @@ local.properties
 
 # Credentials de déploiement (ne jamais committer)
 .env.deploy
+
+# [epiq]: local hydrated state is never committed
+.epiq/events/
+.epiq/log/
