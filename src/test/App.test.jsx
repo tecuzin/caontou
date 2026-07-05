@@ -561,3 +561,24 @@ describe('Mode sombre', () => {
     expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
   })
 })
+
+describe('Auto-diagnostic', () => {
+  it('ouvre une modale avec les résultats, tous au vert', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-selftest'))
+    expect(screen.getByTestId('selftest-results')).toBeInTheDocument()
+    const summary = screen.getByTestId('selftest-summary').textContent
+    const [ok, total] = summary.match(/\d+/g).map(Number)
+    expect(total).toBeGreaterThan(5)
+    expect(ok).toBe(total)
+  })
+
+  it('se ferme au clic sur Fermer', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-selftest'))
+    await user.click(screen.getByText('Fermer'))
+    expect(screen.queryByTestId('selftest-results')).not.toBeInTheDocument()
+  })
+})
