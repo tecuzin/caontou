@@ -2,6 +2,41 @@
 
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
+## [1.0.0] - 2026-07-06
+### Ajouté
+- **Itinéraire réel du trajet** — étapes aller/retour recherchées sur
+  Google Maps/ViaMichelin (Beauvais → Orléans → Bourges → Laschamps,
+  puis Laschamps → Murat → Mandailles), distances et temps de route
+  réels.
+- **Suggestions** — champ sur l'accueil pour laisser des consignes,
+  exportées vers Telegram pour suivi en dehors de l'app.
+- **Navigation par glissement (swipe)** — changer d'onglet en glissant
+  sur la barre de menu, retour en arrière en glissant sur un
+  sous-écran.
+- **Panorama montagnes** en fond de la carte héro de l'accueil (retrait
+  du bandeau « Bonjour »).
+- **Mode sombre** — bouton 🌙/☀️, préférence locale persistée.
+- **Rappel automatique de sauvegarde** — notification périodique +
+  indicateur « Dernière sauvegarde : … » sur l'accueil.
+- **Audit complet** sécurité (dépendances, stockage local, import JSON
+  borné en taille), performance et accessibilité (Lighthouse mobile :
+  Performance 94/100, Accessibilité 91/100, Bonnes pratiques 92/100).
+
+### Corrigé
+- Le bouton « + Ajouter visite » n'ouvrait pas la modale de création.
+- Dates d'arrivée/départ de l'hébergement obsolètes (juillet → août).
+
+### Technique
+- Refactor complet de `App.jsx` en hooks de domaine isolés et testés
+  (`useVisits`, `useExpenses`, `useMeals`, `useMeteo`, `useTrajets`,
+  `useLogi`, `useCourses`, `usePlanning`, `useTripConfig`,
+  `useSuggestions`, `useSwipe`) ainsi que des modules purs
+  (`backup.js`, `notifications.js`).
+- 216 tests unitaires/intégration + 15 tests E2E Playwright, tous
+  verts. Couverture de code mesurée pour Vitest (64% statements) et
+  Playwright (nouveau : collecte de couverture V8 par fonction
+  invoquée).
+
 ## [0.4.0] - 2026-07-04
 ### Ajouté
 - **Voyage paramétrable** — modal ⚙️ sur l'accueil : ville de départ,
