@@ -66,22 +66,29 @@ export const COURSES_INITIAL = [
 
 // Trajet en deux directions, chacune avec ses etapes editables.
 // Aller comme retour font halte une nuit a Laschamps (Puy-de-Dome).
+// Étapes basées sur l'itinéraire réel (recherché sur Google Maps/ViaMichelin) :
+// Beauvais -> Laschamps (Orcines, 63) : 502 km, ~5h35 via A16 puis A71
+//   (Orléans, Vierzon, Bourges, Montluçon, Riom).
+// Laschamps -> Mandailles-Saint-Julien (15) : 137,7 km, ~2h04 via A75
+//   (68,6 km d'autoroute, sortie vers Murat puis routes de vallée).
 export const TRAJETS_INITIAL = {
   aller: [
-    { time: 'Mer 5 · 09:00', place: 'Depart de Beauvais', note: 'Voiture chargee, c\'est parti !', color: '#5b7042' },
-    { time: '12:30', place: 'Pause dejeuner', note: 'Aire ou village en route', color: '#cf7d3c' },
-    { time: '16:00', place: 'Arrivee a Laschamps', note: 'Etape pour la nuit (Puy-de-Dome)', color: '#9c6b4a' },
-    { time: 'Jeu 6 · 09:30', place: 'Depart de Laschamps', note: 'Cap au sud, volcans en vue', color: '#5b7042' },
-    { time: '11:00', place: 'Pause a Murat', note: 'Cafe & jambes', color: '#8a8b3d' },
-    { time: '13:00', place: 'Arrivee a Mandailles', note: 'Installation au gite', color: '#b8503f' },
+    { time: 'Mer 5 · 08:00', place: 'Depart de Beauvais', note: 'Voiture chargee, c\'est parti !', color: '#5b7042' },
+    { time: '10:30', place: 'Pause a Orleans', note: '215 km, via A16 (contournement Paris) puis A10', color: '#4f8a86' },
+    { time: '13:00', place: 'Pause dejeuner a Bourges', note: '~350 km, via A71', color: '#cf7d3c' },
+    { time: '17:00', place: 'Arrivee a Laschamps', note: '502 km au total (~5h35 de route + pauses) - etape pour la nuit (Orcines, Puy-de-Dome)', color: '#9c6b4a' },
+    { time: 'Jeu 6 · 09:30', place: 'Depart de Laschamps', note: 'Cap au sud par l\'A75, volcans en vue', color: '#5b7042' },
+    { time: '11:00', place: 'Pause a Murat', note: 'Sortie A75, derniere etape avant les vallees du Cantal', color: '#8a8b3d' },
+    { time: '12:30', place: 'Arrivee a Mandailles', note: '137,7 km depuis Laschamps (~2h04 de route) - installation au gite', color: '#b8503f' },
   ],
   retour: [
     { time: 'Ven 14 · 09:30', place: 'Depart de Mandailles', note: 'Check-out du gite', color: '#9c6b4a' },
-    { time: '12:30', place: 'Pause dejeuner', note: '', color: '#cf7d3c' },
-    { time: '16:00', place: 'Arrivee a Laschamps', note: 'Etape pour la nuit', color: '#5b7042' },
-    { time: 'Sam 15 · 09:30', place: 'Depart de Laschamps', note: '', color: '#5b7042' },
-    { time: '13:00', place: 'Pause dejeuner', note: '', color: '#8a8b3d' },
-    { time: '17:00', place: 'Arrivee a Beauvais', note: 'Des souvenirs plein la tete 💛', color: '#4f8a86' },
+    { time: '11:00', place: 'Pause a Murat', note: '', color: '#8a8b3d' },
+    { time: '12:30', place: 'Arrivee a Laschamps', note: '137,7 km, etape pour la nuit', color: '#5b7042' },
+    { time: 'Sam 15 · 09:00', place: 'Depart de Laschamps', note: 'Retour par l\'A71 puis A16', color: '#5b7042' },
+    { time: '12:30', place: 'Pause dejeuner a Bourges', note: '~150 km', color: '#cf7d3c' },
+    { time: '15:00', place: 'Pause a Orleans', note: '~285 km', color: '#4f8a86' },
+    { time: '17:30', place: 'Arrivee a Beauvais', note: '502 km au total - des souvenirs plein la tete 💛', color: '#4f8a86' },
   ],
 }
 
