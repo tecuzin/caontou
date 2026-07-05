@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL } from './data.js'
-import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL } from './data.js'
+import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme } from './theme.js'
@@ -14,79 +14,12 @@ import { useTrajets } from './hooks/useTrajets.js'
 import { shareSuggestions } from './suggestions.js'
 import { useExpenses } from './hooks/useExpenses.js'
 import { useMeals } from './hooks/useMeals.js'
+import { useLogi } from './hooks/useLogi.js'
+import { useCourses } from './hooks/useCourses.js'
+import { usePlanning } from './hooks/usePlanning.js'
+import { useTripConfig } from './hooks/useTripConfig.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
-
-// Planning par défaut : 11 jours (5 → 15 août), étape à Laschamps à
-// l'aller (nuit du 5) comme au retour (nuit du 14).
-const DAYS_INITIAL = [
-  { dow: 'Mer', num: 5, title: 'Le grand départ', sub: 'Beauvais → Laschamps', items: [
-    { time: '09:00', title: 'Départ de Beauvais', note: 'Voiture chargée, c\'est parti !', color: '#5b7042' },
-    { time: '12:30', title: 'Pique-nique en route', note: 'Se dégourdir les jambes', color: '#4f8a86' },
-    { time: '16:00', title: 'Arrivée à Laschamps', note: 'Étape pour la nuit', color: '#9c6b4a' },
-    { time: '19:30', title: 'Dîner tranquille', note: 'Tout le monde au lit tôt', color: '#b8503f' },
-  ] },
-  { dow: 'Jeu', num: 6, title: 'Cap sur le Cantal', sub: 'Laschamps → Mandailles', items: [
-    { time: '09:30', title: 'Départ de Laschamps', note: 'Volcans en vue', color: '#5b7042' },
-    { time: '11:00', title: 'Pause à Murat', note: 'Café & jambes', color: '#cf7d3c' },
-    { time: '13:00', title: 'Arrivée au gîte', note: 'Installation & goûter', color: '#9c6b4a' },
-    { time: '16:00', title: 'Courses à Aurillac', note: 'Premier ravitaillement', color: '#8a8b3d' },
-    { time: '19:30', title: 'Dîner au coin du cantou', note: 'Pâtes au pesto', color: '#b8503f' },
-  ] },
-  { dow: 'Ven', num: 7, title: 'Mise en jambes', sub: 'Vallée de Mandailles', items: [
-    { time: '09:30', title: 'Petit-déj tranquille', note: 'On prend le temps', color: '#cf7d3c' },
-    { time: '10:30', title: 'Cascade du Faillitoux', note: 'Balade facile (1 h)', color: '#5b7042' },
-    { time: '12:30', title: 'Pique-nique au bord de l\'eau', note: '', color: '#4f8a86' },
-    { time: '15:00', title: 'Sieste & jeux au jardin', note: '', color: '#9c6b4a' },
-    { time: '18:00', title: 'Marché de producteurs', note: 'Fromages & charcuterie', color: '#8a8b3d' },
-  ] },
-  { dow: 'Sam', num: 8, title: 'Ascension du Puy Mary', sub: 'Pas de Peyrol', items: [
-    { time: '08:30', title: 'Départ tôt', note: 'Avant la chaleur', color: '#5b7042' },
-    { time: '09:30', title: 'Parking Pas de Peyrol', note: '1 589 m', color: '#9c6b4a' },
-    { time: '10:00', title: 'Montée au sommet', note: 'Porte-bébé conseillé', color: '#5b7042' },
-    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° 🏔️', color: '#4f8a86' },
-    { time: '15:00', title: 'Glace à Dienne', note: 'Récompense méritée', color: '#b8503f' },
-  ] },
-  { dow: 'Dim', num: 9, title: 'Fermes & fromages', sub: 'Autour de Salers', items: [
-    { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
-    { time: '12:30', title: 'Déjeuner truffade', note: 'À l\'auberge', color: '#b8503f' },
-    { time: '15:00', title: 'Buronnerie & dégustation', note: 'Cantal AOP', color: '#8a8b3d' },
-    { time: '17:00', title: 'Baignade au lac', note: '', color: '#4f8a86' },
-  ] },
-  { dow: 'Lun', num: 10, title: 'Cap sur Aurillac', sub: 'La ville', items: [
-    { time: '10:00', title: 'Château Saint-Étienne', note: '', color: '#9c6b4a' },
-    { time: '12:00', title: 'Déjeuner en ville', note: '', color: '#b8503f' },
-    { time: '14:30', title: 'Maison des Volcans', note: 'Ludique pour les enfants', color: '#cf7d3c' },
-    { time: '16:30', title: 'Parc & manège', note: '', color: '#5b7042' },
-  ] },
-  { dow: 'Mar', num: 11, title: 'Train & lacs', sub: 'Riom-ès-Montagnes', items: [
-    { time: '10:00', title: 'Gentiane Express', note: 'Train touristique 🚂', color: '#cf7d3c' },
-    { time: '13:00', title: 'Pique-nique au lac', note: '', color: '#4f8a86' },
-    { time: '15:30', title: 'Pédalo & baignade', note: '', color: '#4f8a86' },
-    { time: '18:00', title: 'Retour & repos', note: '', color: '#9c6b4a' },
-  ] },
-  { dow: 'Mer', num: 12, title: 'Journée libre', sub: 'Au gré de l\'envie', items: [
-    { time: 'Matin', title: 'Grasse matinée', note: 'On souffle', color: '#cf7d3c' },
-    { time: '11:00', title: 'Balade douce', note: '', color: '#5b7042' },
-    { time: '16:00', title: 'Jeux au jardin', note: '', color: '#9c6b4a' },
-  ] },
-  { dow: 'Jeu', num: 13, title: 'Marché & baignade', sub: 'Dernier jour complet', items: [
-    { time: '10:00', title: 'Marché de Salers', note: 'Souvenirs & fromages à ramener', color: '#8a8b3d' },
-    { time: '15:00', title: 'Baignade au lac', note: 'Une dernière fois', color: '#4f8a86' },
-    { time: '18:00', title: 'Rangement des valises', note: '', color: '#9c6b4a' },
-  ] },
-  { dow: 'Ven', num: 14, title: 'Retour — étape 1', sub: 'Mandailles → Laschamps', items: [
-    { time: '09:30', title: 'Check-out du gîte', note: 'État des lieux', color: '#9c6b4a' },
-    { time: '10:00', title: 'Route vers Laschamps', note: '', color: '#5b7042' },
-    { time: '12:30', title: 'Pause déjeuner', note: '', color: '#b8503f' },
-    { time: '16:00', title: 'Arrivée à Laschamps', note: 'Étape pour la nuit', color: '#9c6b4a' },
-  ] },
-  { dow: 'Sam', num: 15, title: 'Retour — étape 2', sub: 'Laschamps → Beauvais', items: [
-    { time: '09:30', title: 'Départ de Laschamps', note: '', color: '#5b7042' },
-    { time: '13:00', title: 'Pause déjeuner', note: '', color: '#b8503f' },
-    { time: '17:00', title: 'Arrivée à Beauvais', note: 'Des souvenirs plein la tête 💛', color: '#4f8a86' },
-  ] },
-]
 
 /* ------------------------------------------------------------------ *
  * Helper : transforme une chaîne CSS (issue du prototype) en objet de
@@ -345,12 +278,12 @@ export default function App() {
   const { meals, setMeals, addMeal: hookAddMeal, updateMeal, removeMeal } = useMeals(initial.meals)
   const [checks, setChecks] = useState(initial.checks)
   const [shoppingItems, setShoppingItems] = useState(initial.shoppingItems || structuredClone(SHOPPING_ITEMS_INITIAL))
-  const [days, setDays] = useState(initial.days || structuredClone(DAYS_INITIAL))
+  const { days, setDays, addDay: hookAddDay, updateDay, removeDay, addActivity, updateActivity, removeActivity } = usePlanning(initial.days)
   const { meteo, setMeteo, addMeteoDay, updateMeteoDay, removeMeteoDay } = useMeteo(initial.meteo)
   const { trajets, setTrajets, addTrajetStep, updateTrajetStep, removeTrajetStep } = useTrajets(initial.trajets)
-  const [trip, setTrip] = useState(initial.trip || { ...TRIP_INITIAL })
-  const [logi, setLogi] = useState(initial.logi || structuredClone(LOGI_INITIAL))
-  const [courses, setCourses] = useState(initial.courses || structuredClone(COURSES_INITIAL))
+  const { trip, setTrip, updateTrip } = useTripConfig(initial.trip)
+  const { logi, setLogi, addLogiList: hookAddLogiList, removeLogiList, addLogiItem: hookAddLogiItem, removeLogiItem } = useLogi(initial.logi)
+  const { courses, setCourses, addCourseCategory: hookAddCourseCategory, removeCourseCategory, addCourseItem: hookAddCourseItem, removeCourseItem } = useCourses(initial.courses)
   const [budgetTotal, setBudgetTotal] = useState(initial.budgetTotal || BUDGET_INITIAL)
   const [hebergement, setHebergement] = useState(initial.hebergement || structuredClone(HEB_INITIAL))
   const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
@@ -573,7 +506,7 @@ export default function App() {
   const saveDay = () => {
     if (!newDayTitle.trim() || !newDaySub.trim() || editingDayIdx === null) return
     haptic(ImpactStyle.Medium)
-    setDays((list) => list.map((d, i) => i === editingDayIdx ? { ...d, title: newDayTitle, sub: newDaySub } : d))
+    updateDay(editingDayIdx, { title: newDayTitle, sub: newDaySub })
     closeDayEdit()
   }
   const closeDayEdit = () => { setShowDayEdit(false); setEditingDayIdx(null); setNewDayTitle(''); setNewDaySub('') }
@@ -581,7 +514,7 @@ export default function App() {
     if (days.length <= 1) return
     haptic(ImpactStyle.Medium)
     offerUndo('Jour supprimé')
-    setDays((list) => list.filter((_, i) => i !== dayIdx))
+    if (!removeDay(dayIdx)) return
     if (day === dayIdx) setDay(Math.max(0, day - 1))
   }
 
@@ -597,19 +530,11 @@ export default function App() {
     haptic(ImpactStyle.Medium)
     if (editingActivityIdx) {
       const { dayIdx, itemIdx } = editingActivityIdx
-      setDays((list) => list.map((d, di) => {
-        if (di !== dayIdx) return d
-        const updated = d.items.map((it, ii) => ii === itemIdx ? { time: newActivityTime, title: newActivityTitle, note: it.note, color: newActivityColor } : it)
-        return { ...d, items: sortItemsByTime(updated) }
-      }))
+      updateActivity(dayIdx, itemIdx, { time: newActivityTime, title: newActivityTitle, color: newActivityColor })
       setShowActivityEdit(false)
       setEditingActivityIdx(null)
     } else {
-      setDays((list) => list.map((d, di) => {
-        if (di !== editingActivityDayIdx) return d
-        const updated = [...d.items, { time: newActivityTime, title: newActivityTitle, note: '', color: newActivityColor }]
-        return { ...d, items: sortItemsByTime(updated) }
-      }))
+      addActivity(editingActivityDayIdx, { time: newActivityTime, title: newActivityTitle, note: '', color: newActivityColor })
       closeActivityAdd()
     }
   }
@@ -617,7 +542,7 @@ export default function App() {
   const deleteActivity = (dayIdx, itemIdx) => {
     haptic(ImpactStyle.Medium)
     offerUndo('Activité supprimée')
-    setDays((list) => list.map((d, di) => di === dayIdx ? { ...d, items: d.items.filter((_, ii) => ii !== itemIdx) } : d))
+    removeActivity(dayIdx, itemIdx)
   }
 
   const editVisit = (visitId) => {
@@ -684,7 +609,7 @@ export default function App() {
     if (!newTripStart || !newTripEnd || !newTripOrigin.trim() || !newTripDest.trim()) return
     if (newTripEnd < newTripStart) return
     haptic(ImpactStyle.Medium)
-    setTrip({ start: newTripStart, end: newTripEnd, origin: newTripOrigin.trim(), etape: newTripEtape.trim(), destination: newTripDest.trim() })
+    updateTrip({ start: newTripStart, end: newTripEnd, origin: newTripOrigin.trim(), etape: newTripEtape.trim(), destination: newTripDest.trim() })
     setShowTripEdit(false)
   }
 
@@ -692,15 +617,14 @@ export default function App() {
   const addLogiList = () => {
     if (!newLogiListName.trim()) return
     haptic(ImpactStyle.Medium)
-    const key = `cl_${Date.now()}`
-    setLogi((list) => [...list, { key, name: newLogiListName.trim(), emoji: newLogiListEmoji.trim() || '📦', items: [] }])
+    hookAddLogiList(newLogiListName.trim(), newLogiListEmoji.trim())
     setNewLogiListName(''); setNewLogiListEmoji(''); setShowAddLogiList(false)
   }
   const deleteLogiList = (key) => {
     if (logi.length <= 1) return
     haptic(ImpactStyle.Medium)
     offerUndo('Liste supprimée')
-    setLogi((list) => list.filter((L) => L.key !== key))
+    if (!removeLogiList(key)) return
     setChecks((c) => { const nc = { ...c }; delete nc[key]; return nc })
   }
 
@@ -708,15 +632,14 @@ export default function App() {
   const addCourseCategory = () => {
     if (!newCourseCatName.trim()) return
     haptic(ImpactStyle.Medium)
-    const key = `cc_${Date.now()}`
-    setCourses((list) => [...list, { key, name: newCourseCatName.trim(), items: [] }])
+    hookAddCourseCategory(newCourseCatName.trim())
     setNewCourseCatName(''); setShowAddCourseCat(false)
   }
   const deleteCourseCategory = (key) => {
     if (courses.length <= 1) return
     haptic(ImpactStyle.Medium)
     offerUndo('Catégorie supprimée')
-    setCourses((list) => list.filter((g) => g.key !== key))
+    if (!removeCourseCategory(key)) return
     setChecks((c) => { const nc = { ...c }; delete nc[key]; return nc })
   }
 
@@ -726,11 +649,7 @@ export default function App() {
     haptic(ImpactStyle.Medium)
     const num = parseInt(newDayNum, 10)
     if (!num) return
-    setDays((list) => {
-      const next = [...list, { dow: newDayDow.trim(), num, title: newDayTitle2.trim(), sub: newDaySub2.trim(), items: [] }]
-      next.sort((a, b) => a.num - b.num)
-      return next
-    })
+    hookAddDay({ dow: newDayDow.trim(), num, title: newDayTitle2.trim(), sub: newDaySub2.trim() })
     setNewDayDow(''); setNewDayNum(''); setNewDayTitle2(''); setNewDaySub2(''); setShowDayAdd(false)
   }
 
@@ -772,28 +691,28 @@ export default function App() {
   const addLogiItem = () => {
     if (!newLogiItem.trim() || !editingLogiKey) return
     haptic(ImpactStyle.Medium)
-    setLogi((list) => list.map((L) => L.key === editingLogiKey ? { ...L, items: [...L.items, newLogiItem] } : L))
+    hookAddLogiItem(editingLogiKey, newLogiItem)
     closeAddLogiItem()
   }
   const closeAddLogiItem = () => { setShowAddLogiItem(false); setEditingLogiKey(null); setNewLogiItem('') }
   const deleteLogiItem = (key, item) => {
     haptic(ImpactStyle.Medium)
     offerUndo('Article supprimé')
-    setLogi((list) => list.map((L) => L.key === key ? { ...L, items: L.items.filter((i) => i !== item) } : L))
+    removeLogiItem(key, item)
     setChecks((c) => { const nr = { ...(c[key] || {}) }; delete nr[item]; return { ...c, [key]: nr } })
   }
 
   const addCourseItem = () => {
     if (!newCourseItem.trim() || !editingCourseKey) return
     haptic(ImpactStyle.Medium)
-    setCourses((list) => list.map((g) => g.key === editingCourseKey ? { ...g, items: [...g.items, newCourseItem] } : g))
+    hookAddCourseItem(editingCourseKey, newCourseItem)
     closeAddCourseItem()
   }
   const closeAddCourseItem = () => { setShowAddCourseItem(false); setEditingCourseKey(null); setNewCourseItem('') }
   const deleteCourseItem = (key, item) => {
     haptic(ImpactStyle.Medium)
     offerUndo('Article supprimé')
-    setCourses((list) => list.map((g) => g.key === key ? { ...g, items: g.items.filter((i) => i !== item) } : g))
+    removeCourseItem(key, item)
     setChecks((c) => { const nr = { ...(c[key] || {}) }; delete nr[item]; return { ...c, [key]: nr } })
   }
 
