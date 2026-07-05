@@ -141,8 +141,8 @@ const HEB_EQUIP = ['Wi-Fi', 'Cheminée (cantou)', 'Lave-linge', 'Lit bébé', 'J
 const HEB_INITIAL = {
   nom: 'La Grange du Puy Mary',
   adresse: 'Mandailles-Saint-Julien (15590)',
-  arrivee: 'Sam 11 · dès 16 h',
-  depart: 'Sam 18 · avant 10 h',
+  arrivee: 'Mer 5 · dès 16 h',
+  depart: 'Sam 15 · avant 10 h',
   capacite: '4–5 personnes · 2 chambres · lit bébé fourni',
   wifiNom: 'LaGrange-Gite',
   wifiPass: 'puymary15',
