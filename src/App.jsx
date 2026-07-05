@@ -4,7 +4,7 @@ import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOG
 import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
-import { applyDarkTheme } from './theme.js'
+import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
 import { buildExport, exportFilename, parseImport, downloadExport, shareExport, formatLastBackup } from './backup.js'
 import { runSelfTests } from './selftest.js'
 import { useVisits } from './hooks/useVisits.js'
@@ -825,7 +825,10 @@ export default function App() {
 
   /* ---------------------------------------------------------------- */
   return (
-    <main style={sx("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;")}>
+    <main data-testid="app-root" style={{
+      ...sx("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;"),
+      ...(darkMode ? { backgroundImage: STARRY_BACKGROUND_IMAGE, backgroundRepeat: 'no-repeat' } : {}),
+    }}>
 
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (

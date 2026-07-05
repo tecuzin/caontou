@@ -560,6 +560,24 @@ describe('Mode sombre', () => {
     await user.click(screen.getByTestId('tab-budget'))
     expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
   })
+
+  it('applique un fond bleu nuit étoilé (pas de noir) une fois activé', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const root = screen.getByTestId('app-root')
+    expect(root.style.backgroundImage).toBe('none')
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    expect(root.style.backgroundImage).toContain('radial-gradient')
+    expect(root.style.backgroundColor.toLowerCase()).not.toBe('rgb(0, 0, 0)')
+  })
+
+  it('éclaircit le texte d\'un bouton dont le fond devient sombre (régression contraste)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    const exportBtn = screen.getByTestId('btn-export')
+    expect(exportBtn.style.color.toLowerCase()).not.toBe('rgb(74, 93, 58)') // #4a5d3a non éclairci = bug
+  })
 })
 
 describe('Auto-diagnostic', () => {
