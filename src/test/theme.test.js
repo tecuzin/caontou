@@ -74,4 +74,13 @@ describe('applyDarkTheme()', () => {
       expect(luminance).toBeGreaterThan(0.5)
     }
   })
+
+  it('ne touche pas #fffaf0 — texte blanc sur bouton actif coloré, jamais un fond dans ce codebase (régression : rendait tous les boutons "Enregistrer/Ajouter" illisibles)', () => {
+    const css = 'background:#4a5d3a;color:#fffaf0;font-weight:700;'
+    expect(applyDarkTheme(css)).toBe(css)
+  })
+
+  it('DARK_COLOR_MAP ne contient pas #fffaf0', () => {
+    expect(DARK_COLOR_MAP).not.toHaveProperty('#fffaf0')
+  })
 })
