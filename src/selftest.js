@@ -78,7 +78,7 @@ export function runSelfTests() {
 
   results.push(check('applyDarkTheme() substitue les couleurs connues', () => {
     const out = applyDarkTheme('background:#f4ecdc;color:#2f2a22;')
-    assert(out.includes('#1c1a16') && out.includes('#f3ecda'), `résultat: ${out}`)
+    assert(out.includes('#10162b') && out.includes('#f3ecda'), `résultat: ${out}`)
   }))
 
   results.push(check('localStorage : écriture/lecture/suppression', () => {
