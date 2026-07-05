@@ -6,6 +6,7 @@ import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme } from './theme.js'
 import { buildExport, exportFilename, parseImport, downloadExport, shareExport, formatLastBackup } from './backup.js'
+import { runSelfTests } from './selftest.js'
 import { useVisits } from './hooks/useVisits.js'
 import { useSwipe } from './hooks/useSwipe.js'
 import { useSuggestions } from './hooks/useSuggestions.js'
@@ -270,6 +271,8 @@ export default function App() {
   const [importText, setImportText] = useState('')
   const [importError, setImportError] = useState('')
   const [importPreview, setImportPreview] = useState(null)
+  const [showSelftest, setShowSelftest] = useState(false)
+  const [selftestResults, setSelftestResults] = useState([])
 
   // état persisté (sur le téléphone)
   const initial = useMemo(loadStore, [])
@@ -763,6 +766,11 @@ export default function App() {
   }
   const doDownloadExport = () => { downloadExport(buildExport(currentStoreData(), STORE_KEY), exportFilename()); markBackedUp() }
   const doShareExport = () => { shareExport(buildExport(currentStoreData(), STORE_KEY), exportFilename()); markBackedUp() }
+  const runSelfTestAndShow = () => {
+    haptic(ImpactStyle.Light)
+    setSelftestResults(runSelfTests())
+    setShowSelftest(true)
+  }
   const doParseImport = (text) => {
     const { data, error } = parseImport(text)
     setImportError(error)
@@ -1105,6 +1113,9 @@ export default function App() {
                 <div style={sx('padding:6px 18px 12px;display:flex;gap:12px;')}>
                   <button data-testid="btn-export" onClick={() => { setExportCopied(false); setShowExport(true) }} style={sx('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#4a5d3a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬇️ Exporter (JSON)</button>
                   <button data-testid="btn-import" onClick={() => setShowImport(true)} style={sx('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:13px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#9c6b4a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬆️ Importer</button>
+                </div>
+                <div style={sx('padding:0 18px 12px;')}>
+                  <button data-testid="btn-selftest" onClick={runSelfTestAndShow} style={sx('width:100%;border:1px dashed #d8cbb0;background:transparent;border-radius:14px;padding:10px;cursor:pointer;font-family:Quicksand;font-weight:600;font-size:12px;color:#9a917f;')}>🔧 Auto-diagnostic</button>
                 </div>
                 <div style={sx('height:16px;')} />
               </div>
@@ -1689,6 +1700,32 @@ export default function App() {
               <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={sx(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
             </div>
             <div style={sx('margin-top:10px;font-size:12px;color:#6b6354;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Auto-diagnostic */}
+      {showSelftest && (
+        <div onClick={() => setShowSelftest(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Auto-diagnostic</div>
+            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Vérifications rapides exécutées directement sur ce téléphone (pas la suite de tests complète du build — voir le skill « release »).</div>
+            <div data-testid="selftest-summary" style={sx(`font-family:Quicksand;font-weight:700;font-size:15px;margin-bottom:10px;color:${selftestResults.every((r) => r.pass) ? '#4a5d3a' : '#b8503f'};`)}>
+              {selftestResults.filter((r) => r.pass).length} / {selftestResults.length} vérifications OK
+            </div>
+            <div data-testid="selftest-results">
+              {selftestResults.map((r, i) => (
+                <div key={i} style={sx(`display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #ece2cf;font-size:13px;color:${r.pass ? '#4a5d3a' : '#b8503f'};`)}>
+                  <span>{r.pass ? '✅' : '❌'}</span>
+                  <div>
+                    <div style={sx('font-weight:600;')}>{r.name}</div>
+                    {!r.pass && <div style={sx('font-size:12px;color:#6b6354;')}>{r.detail}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setShowSelftest(false)} style={sx('width:100%;margin-top:14px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
           </div>
         </div>
       )}
