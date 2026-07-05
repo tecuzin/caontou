@@ -9,6 +9,8 @@ import { buildExport, exportFilename, parseImport, downloadExport, shareExport, 
 import { useVisits } from './hooks/useVisits.js'
 import { useSwipe } from './hooks/useSwipe.js'
 import { useSuggestions } from './hooks/useSuggestions.js'
+import { useMeteo } from './hooks/useMeteo.js'
+import { useTrajets } from './hooks/useTrajets.js'
 import { shareSuggestions } from './suggestions.js'
 import { useExpenses } from './hooks/useExpenses.js'
 import { useMeals } from './hooks/useMeals.js'
@@ -344,8 +346,8 @@ export default function App() {
   const [checks, setChecks] = useState(initial.checks)
   const [shoppingItems, setShoppingItems] = useState(initial.shoppingItems || structuredClone(SHOPPING_ITEMS_INITIAL))
   const [days, setDays] = useState(initial.days || structuredClone(DAYS_INITIAL))
-  const [meteo, setMeteo] = useState(initial.meteo || structuredClone(METEO_INITIAL))
-  const [trajets, setTrajets] = useState(initial.trajets || structuredClone(TRAJETS_INITIAL))
+  const { meteo, setMeteo, addMeteoDay, updateMeteoDay, removeMeteoDay } = useMeteo(initial.meteo)
+  const { trajets, setTrajets, addTrajetStep, updateTrajetStep, removeTrajetStep } = useTrajets(initial.trajets)
   const [trip, setTrip] = useState(initial.trip || { ...TRIP_INITIAL })
   const [logi, setLogi] = useState(initial.logi || structuredClone(LOGI_INITIAL))
   const [courses, setCourses] = useState(initial.courses || structuredClone(COURSES_INITIAL))
@@ -660,12 +662,8 @@ export default function App() {
     if (!newTrajetTime.trim() || !newTrajetPlace.trim()) return
     haptic(ImpactStyle.Medium)
     const step = { time: newTrajetTime, place: newTrajetPlace, note: newTrajetNote, color: newTrajetColor }
-    setTrajets((t) => ({
-      ...t,
-      [trajetDir]: editingTrajetIdx === null
-        ? [...t[trajetDir], step]
-        : t[trajetDir].map((st, i) => i === editingTrajetIdx ? step : st),
-    }))
+    if (editingTrajetIdx === null) addTrajetStep(trajetDir, step)
+    else updateTrajetStep(trajetDir, editingTrajetIdx, step)
     closeTrajetEdit()
   }
   const closeTrajetEdit = () => { setShowTrajetEdit(false); setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042') }
@@ -673,7 +671,7 @@ export default function App() {
     if (trajets[trajetDir].length <= 1) return
     haptic(ImpactStyle.Medium)
     offerUndo('Étape supprimée')
-    setTrajets((t) => ({ ...t, [trajetDir]: t[trajetDir].filter((_, i) => i !== idx) }))
+    removeTrajetStep(trajetDir, idx)
   }
 
   // Paramètres du voyage
@@ -758,11 +756,9 @@ export default function App() {
     const n = parseInt(newMeteoNum, 10)
     if (!hi || !lo || !newMeteoDay.trim() || !n) return
     haptic(ImpactStyle.Medium)
-    if (editingMeteoIdx === null) {
-      setMeteo((list) => [...list, { d: newMeteoDay.trim(), n, hi, lo, rain: newMeteoRain, icon: newMeteoIcon }])
-    } else {
-      setMeteo((list) => list.map((w, i) => i === editingMeteoIdx ? { ...w, d: newMeteoDay.trim(), n, hi, lo, rain: newMeteoRain, icon: newMeteoIcon } : w))
-    }
+    const data = { d: newMeteoDay.trim(), n, hi, lo, rain: newMeteoRain, icon: newMeteoIcon }
+    if (editingMeteoIdx === null) addMeteoDay(data)
+    else updateMeteoDay(editingMeteoIdx, data)
     closeMeteoEdit()
   }
   const closeMeteoEdit = () => { setShowMeteoEdit(false); setEditingMeteoIdx(null); setNewMeteoDay(''); setNewMeteoNum(''); setNewMeteoHi(''); setNewMeteoLo(''); setNewMeteoRain(''); setNewMeteoIcon('☀️') }
@@ -770,7 +766,7 @@ export default function App() {
     if (meteo.length <= 1) return
     haptic(ImpactStyle.Medium)
     offerUndo('Jour météo supprimé')
-    setMeteo((list) => list.filter((_, i) => i !== idx))
+    removeMeteoDay(idx)
   }
 
   const addLogiItem = () => {

@@ -207,13 +207,22 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 - [x] 3 tests de régression ajoutés (garde-fou taille import, landmark
   main) — 154 tests verts au total, 0 régression.
 
+## ✅ Complété — rappel de sauvegarde, mode sombre, refacto (4-5 juillet)
+
+- [x] **Rappel automatique de sauvegarde** — notification J+5/J+2 +
+  indicateur "Dernière : …" sur l'accueil (`src/notifications.js`
+  buildBackupReminder, `src/backup.js` formatLastBackup).
+- [x] **Mode sombre** — substitution de couleurs de surface à l'exécution
+  (`src/theme.js`), bouton 🌙/☀️ sur l'accueil, préférence locale
+  persistée séparément (clé `cantou.darkMode`, pas dans l'export/import).
+- [x] **`useMeteo`** et **`useTrajets`** extraits (même pattern que
+  `useVisits`/`useExpenses`/`useMeals`) — 100% de couverture chacun.
+- [x] 189 tests verts, couverture globale 57.01% → **60.11%**.
+
 ## 📅 Backlog suivant
 
 - [ ] **Poursuivre l'extraction de hooks** (voir skill `refactor`, priorité 1) :
-  `useTrajets`, `useLogi`, `useCourses`, `useMeteo`, `usePlanning`,
-  `useTripConfig` — même pattern que `useVisits`/`useExpenses`/`useMeals`
-  (état + actions pures, haptic/undo restent des wrappers côté App.jsx).
-  `useSuggestions` déjà fait sur ce modèle.
+  `useLogi`, `useCourses`, `usePlanning`, `useTripConfig` — même pattern.
 - [ ] **Extraire les écrans en composants** (priorité 2 du skill) une fois
   les hooks sortis — Budget, Repas, Planning, Trajet, Logistique,
   Hébergement, Météo, Visites, Accueil.
