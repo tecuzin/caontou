@@ -10,6 +10,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:coverage": "rm -rf coverage-e2e && playwright test && node scripts/report-e2e-coverage.js",
     "test:appium": "wdio run tests/appium/wdio.conf.js"
   },
   "dependencies": {
