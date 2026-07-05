@@ -9,8 +9,13 @@
 export const DARK_COLOR_MAP = {
   '#f4ecdc': '#10162b', // fond de page (crème clair -> bleu nuit)
   '#fffdf8': '#1a2140', // fond des cartes (blanc cassé -> surface bleu nuit)
-  '#fffaf0': '#1a2140', // fond des modales/sheets
   '#f6efe2': '#1c2444', // fond des sheets (variante)
+  // NB : #fffaf0 n'est PAS mappé ici — dans ce codebase il n'est jamais
+  // utilisé comme fond (0 occurrence `background:#fffaf0`), uniquement comme
+  // texte blanc sur bouton/onglet actif coloré (`background:#4a5d3a;
+  // color:#fffaf0`). Le remplacer aveuglément rendait ce texte illisible
+  // (texte bleu nuit sur fond vert bleu nuit) sur des dizaines de boutons —
+  // c'était le bug principal derrière « textes sombres illisibles ».
   '#2f2a22': '#f3ecda', // texte principal (brun foncé -> crème clair)
   '#6b6354': '#b8ac96', // texte secondaire / bordures foncées
   '#efe6d4': '#2a3358', // bordures claires

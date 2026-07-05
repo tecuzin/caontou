@@ -578,6 +578,15 @@ describe('Mode sombre', () => {
     const exportBtn = screen.getByTestId('btn-export')
     expect(exportBtn.style.color.toLowerCase()).not.toBe('rgb(74, 93, 58)') // #4a5d3a non éclairci = bug
   })
+
+  it('garde le texte blanc lisible sur un bouton actif coloré (régression : "+ Ajouter" illisible)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    const addSuggestionBtn = screen.getByTestId('btn-add-suggestion')
+    // #fffaf0 (blanc cassé) ne doit pas être assombri : le bouton reste vert avec texte clair
+    expect(addSuggestionBtn.style.color.toLowerCase()).not.toMatch(/rgb\(2[0-9], ?3[0-9], ?6[0-9]\)/)
+  })
 })
 
 describe('Auto-diagnostic', () => {
