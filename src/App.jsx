@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL } from './data.js'
 import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
-import { Ridge, Panorama, GiteScene } from './Scenery.jsx'
+import { Ridge, Panorama } from './Scenery.jsx'
 import { Meteo } from './screens/Meteo.jsx'
+import { Hebergement } from './screens/Hebergement.jsx'
+import { Logistique } from './screens/Logistique.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
 import { buildExport, exportFilename, parseImport, downloadExport, shareExport, formatLastBackup } from './backup.js'
@@ -71,7 +73,6 @@ const COURSES = [
 
 const TRAJET_CHECK_ITEMS_INITIAL = ['Pleins faits', 'Sièges auto installés', 'Eau & en-cas à portée', 'Doudous accessibles', 'Itinéraire chargé hors-ligne', 'Sac de change bébé']
 
-const HEB_EQUIP = ['Wi-Fi', 'Cheminée (cantou)', 'Lave-linge', 'Lit bébé', 'Jardin clos', 'Parking', 'Lave-vaisselle', 'Barbecue']
 
 const HEB_INITIAL = {
   nom: 'La Grange du Puy Mary',
@@ -900,78 +901,18 @@ export default function App() {
 
             {/* LOGISTIQUE */}
             {sub === 'logistique' && (
-              <div style={sx('padding:16px 18px 40px;')}>
-                <div style={sx('display:flex;justify-content:flex-end;margin-bottom:12px;')}>
-                  <button onClick={() => setLogiSorted(!logiSorted)} style={sx(`border:1px solid ${logiSorted ? '#4a5d3a' : '#ece2cf'};background:${logiSorted ? '#4a5d3a' : '#fffdf8'};color:${logiSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
-                </div>
-                {logi.map((L) => {
-                  const b = buildList(checks, L.key, L.items)
-                  const displayItems = logiSorted ? [...b.items].sort((a, b) => (a.checked ? 1 : 0) - (b.checked ? 1 : 0)) : b.items
-                  return (
-                    <div key={L.key} style={sx('margin-bottom:18px;')}>
-                      <div style={sx('display:flex;align-items:center;gap:9px;margin-bottom:8px;')}>
-                        <span style={sx('font-size:18px;')}>{L.emoji}</span>
-                        <span style={sx('font-family:Quicksand;font-weight:700;font-size:16px;flex:1;')}>{L.name}</span>
-                        <span style={sx('font-size:12px;color:#6b6354;font-weight:700;')}>{b.done}/{b.total}</span>
-                        <button onClick={() => deleteLogiList(L.key)} style={sx('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
-                      </div>
-                      <div style={sx('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={sx(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
-                      <div style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
-                        {displayItems.map((it) => (
-                          <div key={it.label} style={sx('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>
-                            <button onClick={() => toggleCheck(L.key, it.label)} style={sx('flex:1;text-align:left;border:none;background:transparent;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;')}>
-                              {it.checked ? (
-                                <>
-                                  <span style={sx('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
-                                  <span style={sx('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{it.label}</span>
-                                </>
-                              ) : (
-                                <>
-                                  <span style={sx('width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid #d8cbb0;background:#fff;')} />
-                                  <span style={sx('font-size:14px;color:#2f2a22;')}>{it.label}</span>
-                                </>
-                              )}
-                            </button>
-                            <button onClick={() => deleteLogiItem(L.key, it.label)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 8px;color:#b8503f;flex:0 0 auto;')}>🗑️</button>
-                          </div>
-                        ))}
-                      </div>
-                      <button onClick={() => { setEditingLogiKey(L.key); setShowAddLogiItem(true) }} style={sx('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
-                    </div>
-                  )
-                })}
-                <button data-testid="btn-add-logi-list" onClick={() => setShowAddLogiList(true)} style={sx('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle liste</button>
-              </div>
+              <Logistique
+                sx={sx} logi={logi} logiSorted={logiSorted} setLogiSorted={setLogiSorted}
+                checks={checks} buildList={buildList} toggleCheck={toggleCheck}
+                deleteLogiList={deleteLogiList} deleteLogiItem={deleteLogiItem}
+                setEditingLogiKey={setEditingLogiKey} setShowAddLogiItem={setShowAddLogiItem}
+                setShowAddLogiList={setShowAddLogiList}
+              />
             )}
 
             {/* HEBERGEMENT */}
             {sub === 'hebergement' && (
-              <div style={sx('padding:16px 18px 40px;')}>
-                <div style={sx('height:150px;border-radius:18px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.1);')}>
-                  <GiteScene />
-                </div>
-                <div style={sx('display:flex;align-items:center;margin-top:14px;gap:10px;')}>
-                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:20px;flex:1;')}>{hebergement.nom}</div>
-                  <button onClick={openHebEdit} style={sx('border:none;background:transparent;cursor:pointer;font-size:18px;padding:4px;')}>✏️</button>
-                </div>
-                <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>📍 {hebergement.adresse}</div>
-                <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
-                  <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Arrivée</div><div style={sx('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.arrivee}</div></div>
-                  <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Départ</div><div style={sx('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.depart}</div></div>
-                </div>
-                <div style={sx('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>🛏️ {hebergement.capacite}</div>
-                <div style={sx('margin:18px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Équipements</div>
-                <div style={sx('display:flex;flex-wrap:wrap;gap:8px;')}>
-                  {HEB_EQUIP.map((eq) => <span key={eq} style={sx('background:#fffdf8;border:1px solid #e3d8c2;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:#6b6354;')}>{eq}</span>)}
-                </div>
-                <div style={sx('margin-top:16px;background:#e7ecdf;border-radius:14px;padding:14px;')}>
-                  <div style={sx('font-weight:700;font-family:Quicksand;')}>📶 Wi-Fi</div>
-                  <div style={sx('font-size:13px;color:#4a5d3a;margin-top:5px;')}>Réseau : <b>{hebergement.wifiNom}</b></div>
-                  <div style={sx('font-size:13px;color:#4a5d3a;margin-top:2px;')}>Code : <b>{hebergement.wifiPass}</b></div>
-                </div>
-                <div style={sx('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 {hebergement.contact}</div>
-                <div style={sx('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>{hebergement.note}</div>
-              </div>
+              <Hebergement sx={sx} hebergement={hebergement} openHebEdit={openHebEdit} />
             )}
 
             {/* METEO */}
