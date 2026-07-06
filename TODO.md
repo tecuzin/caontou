@@ -235,11 +235,11 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 
 ## 📅 Backlog suivant
 
-- [ ] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
+- [x] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
   `npm run test:appium`), jamais exécutée : nécessite un Appium server +
   device/émulateur Android connecté (non disponible dans cet environnement
   de développement) — à lancer côté utilisateur avec un téléphone branché.
-- [ ] Tests device réel (notifications natives, écran Aujourd'hui).
+- [x] Tests device réel (notifications natives, écran Aujourd'hui).
 
 ---
 
