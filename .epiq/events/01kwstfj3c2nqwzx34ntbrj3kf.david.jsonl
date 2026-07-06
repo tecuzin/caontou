@@ -36,3 +36,4 @@
 {"v":1,"id":["01KWW653WWYA12HJ1QV760YR1V","01KWW64XVBM86XC8BB2HBJNBM5"],"move.node":{"id":"01KWTYC0B9V4ZRFZ9HZ5M329FZ","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","rank":"7fffffffffffffffffffffff"}}
 {"v":1,"id":["01KWWGBCFE2YQ1EM6T1PPARV73","01KWW653WWYA12HJ1QV760YR1V"],"move.node":{"id":"01KWTYC0B9V4ZRFZ9HZ5M329FZ","parent":"01KWSTHN7AKWFJT9N28CGWDPXM","rank":"ffefffffffffffffffffffff"}}
 {"v":1,"id":["01KWWGBCZTD5GAHGPRW6Q9ZQRY","01KWWGBCFE2YQ1EM6T1PPARV73"],"move.node":{"id":"01KWTYC0CX0JSH6NFB4WB0ZAP7","parent":"01KWSTHN7AKWFJT9N28CGWDPXM","rank":"fff7ffffffffffffffffffff"}}
+{"v":1,"id":["01KWWGBHZCJXS3RQ1QQZQADF1A","01KWWGBCZTD5GAHGPRW6Q9ZQRY"],"add.issue":{"id":"01KWWGBHZB3KX56J71VDK8Z4T5","parent":"01KWSTHN7AKWFJT9N28CGWDPXM","name":"Hook Git Flow automatique — build+déploiement Telegram après merge dans develop","rank":"fffbffffffffffffffffffff"}}
