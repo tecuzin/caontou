@@ -219,13 +219,22 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
   `useVisits`/`useExpenses`/`useMeals`) — 100% de couverture chacun.
 - [x] 189 tests verts, couverture globale 57.01% → **60.11%**.
 
+## ✅ Complété — extraction complète des écrans (6 juillet)
+
+- [x] **Poursuivre l'extraction de hooks** (skill `refactor`, priorité 1) :
+  `useLogi`, `useCourses`, `usePlanning`, `useTripConfig` extraits, même
+  pattern que `useVisits`/`useExpenses`/`useMeals`/`useMeteo`/`useTrajets`.
+- [x] **Extraire les écrans en composants** (priorité 2 du skill) — les 9
+  écrans sortis de `App.jsx` vers `src/screens/` : Hébergement, Logistique,
+  Météo, Trajet, Budget, Repas, Planning, Visites, **Accueil** (dernier,
+  6 juillet — carte héro, carte Aujourd'hui, préparatifs, modules,
+  suggestions, sauvegarde). 231 tests verts, 0 régression.
+- [x] **Hook Git Flow automatique** — `.claude/settings.json` : tout merge
+  amenant sur `develop` déclenche `./build-docker.sh --deploy` (build APK +
+  envoi Telegram) sans confirmation manuelle. Testé en conditions réelles.
+
 ## 📅 Backlog suivant
 
-- [ ] **Poursuivre l'extraction de hooks** (voir skill `refactor`, priorité 1) :
-  `useLogi`, `useCourses`, `usePlanning`, `useTripConfig` — même pattern.
-- [ ] **Extraire les écrans en composants** (priorité 2 du skill) une fois
-  les hooks sortis — Budget, Repas, Planning, Trajet, Logistique,
-  Hébergement, Météo, Visites, Accueil.
 - [ ] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
   `npm run test:appium`), jamais exécutée : nécessite un Appium server +
   device/émulateur Android connecté (non disponible dans cet environnement
