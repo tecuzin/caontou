@@ -178,6 +178,9 @@ export const VISITS_INITIAL = [
   { id: 12, emoji: '🚵', name: 'VTT & parapente — base de loisirs', cat: 'Sport', dist: 'Sur place', dur: '2 h', age: 'Selon activite' },
   { id: 13, emoji: '🚐', name: 'Navette ete Puy Mary — Pas de Peyrol', cat: 'Nature', dist: 'Depuis Mandailles', dur: '11/07 → 23/08', age: 'Evite le parking' },
   { id: 14, emoji: '🧺', name: 'Marche fermier de Mandailles', cat: 'Marché', dist: 'Sur place', dur: 'Dim. matin', age: 'Place du Bourg' },
+  { id: 15, emoji: '🌉', name: 'Gorges de la Jordanne (passerelles bois)', cat: 'Famille', dist: 'Vallee', dur: '1 h', age: 'Sans poussette' },
+  { id: 16, emoji: '🌲', name: 'Sources de la Jordanne — cirque de Mandailles', cat: 'Nature', dist: 'Route des Volcans', dur: '1 h 30 – 2 h', age: 'Des 5 ans' },
+  { id: 17, emoji: '💦', name: 'Cascade du Luc (coin frais en foret)', cat: 'Nature', dist: 'Vallee', dur: '1 h', age: 'Tous ages' },
 ]
 
 export const METEO_INITIAL = [
