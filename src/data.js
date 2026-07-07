@@ -169,10 +169,13 @@ export const VISITS_INITIAL = [
   { id: 3, emoji: '🐄', name: 'Ferme pedagogique des burons', cat: 'Famille', dist: '15 min', dur: '2 h', age: 'Tous ages' },
   { id: 4, emoji: '🌋', name: 'Maison des Volcans, Aurillac', cat: 'Patrimoine', dist: '40 min', dur: '1 h 30', age: 'Des 3 ans' },
   { id: 5, emoji: '🚂', name: 'Gentiane Express', cat: 'Famille', dist: '35 min', dur: '3 h', age: 'Tous ages' },
-  { id: 6, emoji: '🧺', name: 'Marche de Salers', cat: 'Marche', dist: '30 min', dur: '1 h', age: 'Tous ages' },
+  { id: 6, emoji: '🧺', name: 'Marche de Salers', cat: 'Marché', dist: '30 min', dur: '1 h', age: 'Tous ages' },
   { id: 7, emoji: '🏊', name: 'Lac de Saint-Etienne-Cantalès', cat: 'Baignade', dist: '45 min', dur: '½ journee', age: 'Tous ages' },
   { id: 8, emoji: '🏘️', name: 'Village de Salers', cat: 'Patrimoine', dist: '30 min', dur: '2 h', age: 'Poussette ok' },
   { id: 9, emoji: '🧀', name: 'Buronnerie & degustation Cantal', cat: 'Gourmand', dist: '20 min', dur: '1 h', age: 'Tous ages' },
+  { id: 10, emoji: '🧗', name: 'Via ferrata & escalade — Mandailles', cat: 'Sport', dist: 'Sur place', dur: '½ journee', age: 'Des 8 ans' },
+  { id: 11, emoji: '🌊', name: 'Canyoning — vallee de la Jordanne', cat: 'Sport', dist: 'Sur place', dur: '½ journee', age: 'Ados & adultes' },
+  { id: 12, emoji: '🚵', name: 'VTT & parapente — base de loisirs', cat: 'Sport', dist: 'Sur place', dur: '2 h', age: 'Selon activite' },
 ]
 
 export const METEO_INITIAL = [

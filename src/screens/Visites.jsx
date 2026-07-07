@@ -1,5 +1,5 @@
-const VCAT = { Nature: '#5b7042', Famille: '#cf7d3c', Patrimoine: '#9c6b4a', Baignade: '#4f8a86', Gourmand: '#b8503f', Marché: '#8a8b3d' }
-const FILTERS = ['Tous', 'Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché']
+const VCAT = { Nature: '#5b7042', Famille: '#cf7d3c', Patrimoine: '#9c6b4a', Baignade: '#4f8a86', Gourmand: '#b8503f', Marché: '#8a8b3d', Sport: '#4a6d9c' }
+const FILTERS = ['Tous', 'Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Sport']
 
 /** Écran Visites — liste des idées de sorties, filtrable et triable. */
 export function Visites({

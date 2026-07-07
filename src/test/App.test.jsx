@@ -197,6 +197,20 @@ describe('Visites — filtres et tri', () => {
     expect(screen.getByText('Ajouter une visite')).toBeInTheDocument()
   })
 
+  it('le filtre Sport isole les activités de la vallée de la Jordanne', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    // Une activité Sport (Mandailles) et un POI Patrimoine sont visibles sans filtre
+    expect(screen.getByText(/Canyoning/)).toBeInTheDocument()
+    expect(screen.getByText('Village de Salers')).toBeInTheDocument()
+    // Clic sur le filtre Sport → ne garde que les activités Sport
+    await user.click(screen.getByRole('button', { name: 'Sport' }))
+    expect(screen.getByText(/Canyoning/)).toBeInTheDocument()
+    expect(screen.getByText(/Via ferrata/)).toBeInTheDocument()
+    expect(screen.queryByText('Village de Salers')).not.toBeInTheDocument()
+  })
+
   it('ajoute une nouvelle visite via la modal', async () => {
     const user = userEvent.setup()
     render(<App />)
