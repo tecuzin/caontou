@@ -13,8 +13,11 @@
       html, body { margin: 0; height: 100%; }
       body { background: #f4ecdc; font-family: 'Nunito Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
       #app { height: 100%; }
-      button { font-family: inherit; }
-      input { font-family: inherit; outline: none; }
+      /* color: inherit — sinon boutons/champs utilisent le noir UA par défaut,
+         illisible sur fond sombre (les titres de cartes et le JSON export/import
+         héritent alors du texte thémé clair de la racine en mode sombre). */
+      button { font-family: inherit; color: inherit; }
+      input, textarea { font-family: inherit; outline: none; color: inherit; }
       ::-webkit-scrollbar { width: 0; height: 0; }
       @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
