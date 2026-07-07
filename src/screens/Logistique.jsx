@@ -27,7 +27,7 @@ export function Logistique({
                     {it.checked ? (
                       <>
                         <span style={sx('width:24px;height:24px;flex:0 0 auto;border-radius:8px;background:#5b7042;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;')}>✓</span>
-                        <span style={sx('font-size:14px;color:#b3a892;text-decoration:line-through;')}>{it.label}</span>
+                        <span style={sx('font-size:14px;color:#6b6354;text-decoration:line-through;')}>{it.label}</span>
                       </>
                     ) : (
                       <>
