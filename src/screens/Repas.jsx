@@ -29,7 +29,12 @@ export function Repas({
             ))}
           </div>
           <button onClick={openAddMeal} style={sx('display:block;width:calc(100% - 36px);margin:10px 18px 0;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:14px;padding:10px;cursor:pointer;')}>+ Ajouter un repas</button>
-          <div style={sx('margin:14px 18px 16px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>🧀 Spécialités à goûter : Cantal AOP, Salers, Saint-Nectaire, truffade &amp; aligot maison.</div>
+          <div style={sx('margin:14px 18px 16px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.6;color:#6b5a45;')}>
+            <div style={sx('font-weight:700;font-family:Quicksand;margin-bottom:4px;')}>🧀 Spécialités à goûter sur place</div>
+            <div><b>Fromages</b> : Cantal AOP, Salers, Saint-Nectaire (ferme de Lavaissière).</div>
+            <div><b>Plats</b> : truffade, aligot, pounti (cake viande-blettes-pruneaux), chou farci.</div>
+            <div><b>Douceurs &amp; boissons</b> : crème de châtaigne, liqueur de gentiane.</div>
+          </div>
         </>
       )}
 
