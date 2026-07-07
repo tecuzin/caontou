@@ -244,6 +244,23 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
   develop (marqueur `.git/.last-auto-deploy-sha`) pour éviter un double
   build. Contenu main/develop en parité (diff = `build.number` seul).
 
+## ✅ Complété — drainage du backlog produit + qualité (7 juillet)
+
+- [x] **Contacts d'urgence** (Hébergement) — bloc 🚨 avec numéros FR (112/15/18/17/114)
+  en liens `tel:`, consultable hors ligne.
+- [x] **Navette estivale Puy Mary** + **marché fermier de Mandailles** ajoutés aux visites.
+- [x] **Spécialités Cantal enrichies** (Repas) — pounti, chou farci, crème de châtaigne, gentiane.
+- [x] **Rappel météo avant sortie plein air** — notification la veille 20h30 des journées
+  avec rando/canyoning/via ferrata… (`buildWeatherReminders`, 4 tests).
+- [x] **ADR-008** — livraison APK Capacitor vs PWA (pas de service worker).
+- [x] **Audit Lighthouse rejoué** (mobile) : Perf 91 · A11y 91→**100** · BP 92.
+- [x] **Fix contraste WCAG AA** — `#b3a892` (ratio 2,29) → `#6b6354`, accessibilité **100/100**.
+- [x] **Prune Docker `[0/5]`** au début du build (évite « no space left on device »).
+- [x] **Alerte Telegram en cas d'échec de build** (trap + `deploy-telegram.sh --message`).
+- [x] Tags de priorité (p1/p2/p3) sur le board Epiq. APK `cantou-v1.0.0-build29/30` déployés.
+- [ ] **Clarifier le lieu réel dans le Cantal** (Telegram #48) — **bloqué** : nécessite
+  l'info côté utilisateur (message reçu dans le canal). Seul item restant du Todo.
+
 ## 📅 Backlog suivant
 
 - [x] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
