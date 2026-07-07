@@ -2,7 +2,7 @@
 
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
-## [1.0.0] - 2026-07-06
+## [1.0.0] - 2026-07-07
 ### Ajouté
 - **Itinéraire réel du trajet** — étapes aller/retour recherchées sur
   Google Maps/ViaMichelin (Beauvais → Orléans → Bourges → Laschamps,
@@ -32,10 +32,16 @@ Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
   `useLogi`, `useCourses`, `usePlanning`, `useTripConfig`,
   `useSuggestions`, `useSwipe`) ainsi que des modules purs
   (`backup.js`, `notifications.js`).
-- 216 tests unitaires/intégration + 15 tests E2E Playwright, tous
-  verts. Couverture de code mesurée pour Vitest (64% statements) et
-  Playwright (nouveau : collecte de couverture V8 par fonction
-  invoquée).
+- **Extraction des 9 écrans** en composants dédiés sous `src/screens/`
+  (Accueil, Planning, Visites, Repas, Budget, Trajet, Hébergement,
+  Logistique, Météo) — `App.jsx` réduit à l'orchestration de l'état et
+  du routage par onglets.
+- **Hook Git Flow automatique** (`.claude/settings.json`) : tout merge
+  réel dans `develop` (commit à 2 parents) déclenche
+  `build-docker.sh --deploy` (build APK + envoi Telegram) en arrière-plan.
+- 231 tests unitaires/intégration + 15 tests E2E Playwright, tous
+  verts. Couverture de code mesurée pour Vitest et Playwright
+  (collecte de couverture V8 par fonction invoquée).
 
 ## [0.4.0] - 2026-07-04
 ### Ajouté
