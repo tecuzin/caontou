@@ -175,3 +175,5 @@
 {"v":1,"id":["01KWXEV43KXF1QMF381YAKAZKF","01KWXEV3K4ZE6XWJQV04H6NY5P"],"add.issue.tag":{"id":"01KWXESSGVA8WREAEV6CTF55BJ","tag":"01KWWGM5ZC6JBAAQ7GXE54Y7KT"}}
 {"v":1,"id":["01KWXEV4NRMZXXXCPMXNZQ3Y00","01KWXEV43KXF1QMF381YAKAZKF"],"add.issue.tag":{"id":"01KWXESSGVA8WREAEV6CTF55BJ","tag":"01KWWGM0ZBV1DTDPADAM9NMJFM"}}
 {"v":1,"id":["01KWXF0CTG48YE8ZQGRVFKFEZX","01KWXEV4NRMZXXXCPMXNZQ3Y00"],"add.issue":{"id":"01KWXF0CTFCX7T2ZQNJRAYH3MA","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","name":"Audit Lighthouse en mode sombre + fix contrastes dark","rank":"7fffffffffffffffffffffff"}}
+{"v":1,"id":["01KWYT6Z586QQB5NQGDBY651T0","01KWXF0CTG48YE8ZQGRVFKFEZX"],"add.issue":{"id":"01KWYT6Z57PQQ4F0Q4CH7FP4JQ","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","name":"Fix mode sombre : textes des champs (JSON export/import) noir sur fond sombre","rank":"bfffffffffffffffffffffff"}}
+{"v":1,"id":["01KWYT703E8VSZTJPMNWZY5J8Q","01KWYT6Z586QQB5NQGDBY651T0"],"add.issue":{"id":"01KWYT703D2V7EH187MMMW2GFC","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","name":"Situer le gîte de manière précise (adresse exacte + coordonnées GPS)","rank":"feffffffffffffffffffffff"}}
