@@ -89,6 +89,21 @@ describe('Accueil — contenu', () => {
     // Budget appears in tab bar + module card — both are fine
     expect(screen.getAllByText('Budget').length).toBeGreaterThanOrEqual(1)
   })
+
+  it('n\'affiche plus la ligne "Bonjour" ni l\'avatar (nettoyage demandé)', () => {
+    render(<App />)
+    expect(screen.queryByText(/Bonjour/)).not.toBeInTheDocument()
+  })
+
+  it('affiche le panorama montagnes en fond de la carte héro', () => {
+    render(<App />)
+    expect(screen.getByTestId('hero-panorama-bg')).toBeInTheDocument()
+  })
+
+  it('expose un landmark <main> pour l\'accessibilité (audit Lighthouse)', () => {
+    render(<App />)
+    expect(screen.getByRole('main')).toBeInTheDocument()
+  })
 })
 
 describe('Budget — ajout d\'une dépense', () => {
@@ -172,6 +187,24 @@ describe('Visites — filtres et tri', () => {
     await user.click(screen.getByTestId('tab-visites'))
     expect(screen.getByText(/📍.*Distance|Distance.*📍/)).toBeInTheDocument()
     expect(screen.getByText(/🏷️.*Catégorie|Catégorie.*🏷️/)).toBeInTheDocument()
+  })
+
+  it('ouvre bien la modal au clic sur "+ Ajouter visite" (régression)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    await user.click(screen.getByText('+ Ajouter visite'))
+    expect(screen.getByText('Ajouter une visite')).toBeInTheDocument()
+  })
+
+  it('ajoute une nouvelle visite via la modal', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    await user.click(screen.getByText('+ Ajouter visite'))
+    await user.type(screen.getByPlaceholderText('Ex : Puy Mary'), 'Grotte du Loup')
+    await user.click(screen.getByText('Enregistrer'))
+    expect(screen.getByText('Grotte du Loup')).toBeInTheDocument()
   })
 })
 
@@ -350,5 +383,229 @@ describe('Partage natif de la sauvegarde', () => {
     render(<App />)
     await user.click(screen.getByTestId('btn-export'))
     expect(screen.getByTestId('btn-share-export')).toBeInTheDocument()
+  })
+})
+
+describe('Rappel de sauvegarde', () => {
+  it('affiche "jamais" avant toute sauvegarde', () => {
+    render(<App />)
+    expect(screen.getByTestId('last-backup-label')).toHaveTextContent('jamais')
+  })
+
+  it('passe à "aujourd\'hui" après un export copié', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-export'))
+    await user.click(screen.getByText('📋 Copier'))
+    expect(screen.getByTestId('last-backup-label')).toHaveTextContent("aujourd'hui")
+  })
+
+  it('persiste la date de dernière sauvegarde dans localStorage', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await user.click(screen.getByTestId('btn-export'))
+    await user.click(screen.getByText('📋 Copier'))
+    unmount()
+    render(<App />)
+    expect(screen.getByTestId('last-backup-label')).toHaveTextContent("aujourd'hui")
+  })
+})
+
+describe('Navigation par glissement (swipe)', () => {
+  const swipeLeft = (el) => {
+    fireEvent.touchStart(el, { touches: [{ clientX: 300, clientY: 400 }] })
+    fireEvent.touchEnd(el, { changedTouches: [{ clientX: 150, clientY: 400 }] })
+  }
+  const swipeRight = (el) => {
+    fireEvent.touchStart(el, { touches: [{ clientX: 100, clientY: 400 }] })
+    fireEvent.touchEnd(el, { changedTouches: [{ clientX: 250, clientY: 400 }] })
+  }
+
+  it('swipe vers la gauche sur la barre d\'onglets va à l\'écran suivant', async () => {
+    render(<App />)
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+    swipeLeft(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-planning')).toBeInTheDocument()
+  })
+
+  it('swipe vers la droite sur la barre d\'onglets revient à l\'écran précédent', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    expect(screen.getByTestId('screen-visites')).toBeInTheDocument()
+    swipeRight(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-planning')).toBeInTheDocument()
+  })
+
+  it('ne dépasse pas le dernier onglet en swipant à gauche sur Budget', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-budget'))
+    swipeLeft(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+  })
+
+  it('ne recule pas avant Accueil en swipant à droite sur le premier onglet', () => {
+    render(<App />)
+    swipeRight(screen.getByTestId('tab-bar'))
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+  })
+
+  it('swipe gauche→droite sur un sous-écran revient en arrière (équivalent bouton ‹)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Trajet'))
+    expect(screen.getByTestId('sub-screen-wrapper')).toBeInTheDocument()
+    swipeRight(screen.getByTestId('sub-screen-wrapper'))
+    expect(screen.queryByTestId('sub-screen-wrapper')).not.toBeInTheDocument()
+    expect(screen.getByTestId('screen-accueil')).toBeInTheDocument()
+  })
+
+  it('un tap normal (sans déplacement) sur la barre d\'onglets ne déclenche pas de swipe', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-budget'))
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+    // clic normal (userEvent.click) simule un tap sans déplacement — ne doit rien changer d'autre
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+  })
+})
+
+describe('Suggestions', () => {
+  it('ajoute une suggestion et l\'affiche dans la liste', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'Ajouter un mode sombre')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByText('Ajouter un mode sombre')).toBeInTheDocument()
+  })
+
+  it('n\'ajoute rien si le champ est vide', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.queryByTestId('btn-send-suggestions')).not.toBeInTheDocument()
+  })
+
+  it('affiche le bouton d\'envoi seulement s\'il y a au moins une suggestion', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    expect(screen.queryByTestId('btn-send-suggestions')).not.toBeInTheDocument()
+    await user.type(screen.getByTestId('input-suggestion'), 'Une idée')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByTestId('btn-send-suggestions')).toBeInTheDocument()
+  })
+
+  it('supprime une suggestion via son bouton 🗑️', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'À supprimer')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByText('À supprimer')).toBeInTheDocument()
+    await user.click(screen.getByText('🗑️'))
+    expect(screen.queryByText('À supprimer')).not.toBeInTheDocument()
+  })
+
+  it('persiste les suggestions dans localStorage', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'Suggestion persistante')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    unmount()
+    render(<App />)
+    expect(screen.getByText('Suggestion persistante')).toBeInTheDocument()
+  })
+
+  it('vide le champ après ajout', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const input = screen.getByTestId('input-suggestion')
+    await user.type(input, 'Test')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(input.value).toBe('')
+  })
+})
+
+describe('Mode sombre', () => {
+  it('affiche le bouton de bascule sur l\'accueil', () => {
+    render(<App />)
+    expect(screen.getByTestId('btn-dark-mode-toggle')).toBeInTheDocument()
+  })
+
+  it('bascule l\'icône lune/soleil au clic', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const btn = screen.getByTestId('btn-dark-mode-toggle')
+    expect(btn.textContent).toBe('🌙')
+    await user.click(btn)
+    expect(btn.textContent).toBe('☀️')
+    await user.click(btn)
+    expect(btn.textContent).toBe('🌙')
+  })
+
+  it('persiste la préférence dans localStorage sous une clé dédiée', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App />)
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    expect(window.localStorage.getItem('cantou.darkMode')).toBe('true')
+    unmount()
+    render(<App />)
+    expect(screen.getByTestId('btn-dark-mode-toggle').textContent).toBe('☀️')
+  })
+
+  it('n\'affecte pas le fonctionnement du reste de l\'app (navigation toujours ok)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    await user.click(screen.getByTestId('tab-budget'))
+    expect(screen.getByTestId('screen-budget')).toBeInTheDocument()
+  })
+
+  it('applique un fond bleu nuit étoilé (pas de noir) une fois activé', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    const root = screen.getByTestId('app-root')
+    expect(root.style.backgroundImage).toBe('none')
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    expect(root.style.backgroundImage).toContain('radial-gradient')
+    expect(root.style.backgroundColor.toLowerCase()).not.toBe('rgb(0, 0, 0)')
+  })
+
+  it('éclaircit le texte d\'un bouton dont le fond devient sombre (régression contraste)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    const exportBtn = screen.getByTestId('btn-export')
+    expect(exportBtn.style.color.toLowerCase()).not.toBe('rgb(74, 93, 58)') // #4a5d3a non éclairci = bug
+  })
+
+  it('garde le texte blanc lisible sur un bouton actif coloré (régression : "+ Ajouter" illisible)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-dark-mode-toggle'))
+    const addSuggestionBtn = screen.getByTestId('btn-add-suggestion')
+    // #fffaf0 (blanc cassé) ne doit pas être assombri : le bouton reste vert avec texte clair
+    expect(addSuggestionBtn.style.color.toLowerCase()).not.toMatch(/rgb\(2[0-9], ?3[0-9], ?6[0-9]\)/)
+  })
+})
+
+describe('Auto-diagnostic', () => {
+  it('ouvre une modale avec les résultats, tous au vert', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-selftest'))
+    expect(screen.getByTestId('selftest-results')).toBeInTheDocument()
+    const summary = screen.getByTestId('selftest-summary').textContent
+    const [ok, total] = summary.match(/\d+/g).map(Number)
+    expect(total).toBeGreaterThan(5)
+    expect(ok).toBe(total)
+  })
+
+  it('se ferme au clic sur Fermer', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-selftest'))
+    await user.click(screen.getByText('Fermer'))
+    expect(screen.queryByTestId('selftest-results')).not.toBeInTheDocument()
   })
 })

@@ -1,7 +1,7 @@
 {
   "name": "cantou",
   "private": true,
-  "version": "0.4.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -10,7 +10,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:appium": "wdio run tests/appium/wdio.conf.js"
+    "test:e2e:coverage": "rm -rf coverage-e2e && playwright test && node scripts/report-e2e-coverage.js",
+    "test:appium": "wdio run tests/appium/wdio.conf.js",
+    "package:qa-bundle": "bash scripts/package-appium-bundle.sh"
   },
   "dependencies": {
     "@capacitor/android": "^6.0.0",

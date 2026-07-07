@@ -101,10 +101,145 @@
   `.json` réel, pas un pavé de texte). Fallback Web Share API (fichier ou
   texte) hors app native, sinon téléchargement classique. 58 tests verts.
 
+## ✅ Complété — release v0.4.0 + refactor (4 juillet, soirée)
+
+- [x] **Release Git Flow v0.4.0** taguée sur `main` (voyage paramétrable,
+  écran Aujourd'hui, partage natif). APK `cantou-v0.4.0-build14` envoyé
+  sur Telegram (digest keystore stable vérifié, 4 plugins Capacitor).
+- [x] **Skill `refactor`** créé (`.claude/skills/refactor/SKILL.md`) —
+  codifie les cibles prioritaires, les règles à ne pas casser
+  (data-testid, schéma localStorage, pattern `s()`) et la boucle
+  petits-pas-tests-verts.
+- [x] **Extraction `src/notifications.js`** — logique de rappels pure,
+  sortie de App.jsx. 80% de couverture, 16 tests dédiés.
+- [x] **Extraction `src/backup.js`** — export/import JSON pur (validation,
+  téléchargement, partage natif avec mocks Capacitor). 97% de couverture,
+  15 tests dédiés.
+- [x] **Extraction `src/hooks/useVisits.js`** — premier hook de domaine
+  (visites + favoris), 100% de couverture, 8 tests `renderHook()`.
+  Nettoyage au passage : suppression de `addVisit`/`closeVisitAdd`
+  (code mort dans App.jsx, jamais appelés).
+- [x] Couverture globale : **46% → 50.13%** statements, 99 tests verts
+  (0 régression sur les 91 tests existants).
+
+## ✅ Complété — 2 hooks supplémentaires (`useExpenses`, `useMeals`)
+
+- [x] **`useExpenses`** — dépenses (Budget), identifiées par index (comportement
+  existant préservé). 100% de couverture, 6 tests.
+- [x] **`useMeals`** — repas, id stable, garde-fou dernier repas restant.
+  100% de couverture, 7 tests.
+- [x] Couverture globale : 50.13% → **51.84%**, 112 tests verts.
+
+## ✅ Complété — fix bug + suggestions + swipe (4 juillet, fin de soirée)
+
+- [x] **Fix « + Ajouter visite »** — la modal ne s'ouvrait jamais (condition
+  `editingVisitId !== null` qui excluait le mode ajout, même bug que la
+  météo corrigé dans une session précédente, raté ici). 2 tests de
+  régression.
+- [x] **Champ « Suggestions »** sur l'accueil — notes libres pour de
+  futures fonctionnalités ou consignes d'intégration de données, avec
+  bouton « 📤 Envoyer sur Telegram / WhatsApp… » (texte brut lisible
+  directement, pas un JSON à parser). `src/suggestions.js` (formatage +
+  partage) + `src/hooks/useSuggestions.js`. **Process à suivre en début
+  de session future : vérifier le canal Telegram pour d'éventuelles
+  suggestions envoyées depuis l'app, et les intégrer ici dans le
+  backlog.**
+- [x] **Navigation par glissement (swipe)** — swipe gauche/droite sur la
+  barre d'onglets pour changer d'écran, swipe gauche→droite sur un
+  sous-écran pour revenir en arrière (équivalent bouton ‹).
+  `src/hooks/useSwipe.js`, pur et testable.
+- [x] 149 tests verts, couverture globale 51.84% → **57.01%**.
+
+## ✅ Complété — consigne reçue via Telegram (accueil)
+
+- [x] **Nettoyage du haut de l'accueil** (consigne reçue dans le canal
+  Telegram via le champ Suggestions) : montagnes du Panorama en fond
+  plein cadre de la carte héro « Prochaine aventure » (dégradé sombre
+  superposé pour la lisibilité du texte), suppression de la ligne
+  « Bonjour 👋 » + avatar rond. Carte Panorama autonome (redondante)
+  supprimée. 151 tests verts.
+
+## ✅ Complété — audit complet (sécurité, perf, accessibilité)
+
+**Outils utilisés** : Trivy (dépendances/secrets/config Docker), `npm audit`,
+ESLint + `eslint-plugin-sonarjs` + `eslint-plugin-security` (équivalent
+SonarQube hors-ligne — pas de serveur Sonar/token disponible dans cet
+environnement), agent LLM dédié à la revue de sécurité (audit complet de
+`src/` + scripts de build/déploiement), Lighthouse (performance +
+accessibilité, mobile 402×874).
+
+**Résultats sécurité** : 0 finding Critique/Élevé/Moyen. 3 Faibles
+(validation import JSON superficielle, pas de limite de taille avant
+`JSON.parse`, wifiPass en clair — attendu/voulu) + 4 Info (dont
+prototype pollution non exploitable, keystore/mdp de secours déjà
+documentés). Aucun secret dans l'historique git (`.env.deploy` jamais
+committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
+
+- [x] Garde-fou taille sur l'import JSON (`parseImport`, backup.js) —
+  rejette > 5 Mo avant `JSON.parse`, message d'erreur explicite.
+- [x] Findings ESLint (object-injection, no-empty) revus : faux positifs
+  (clés internes non issues d'une source non fiable, `catch {}`
+  intentionnels pour la dégradation gracieuse du partage).
+- [x] Trivy : 1 finding (Dockerfile tourne en root) — **risque accepté**,
+  documenté : conteneur de build éphémère, 100% local, jamais exposé au
+  réseau, détruit après chaque build ; le risque de casser le pipeline
+  (déjà fragile aujourd'hui) dépasse le bénéfice réel.
+- [x] `npm audit` : 7 vulnérabilités (3 modérées, 4 élevées) — toutes dans
+  des devDependencies (`@capacitor/cli`, `vite`, `mocha`...), **aucune
+  dans les dépendances runtime embarquées dans l'APK**. Pas de fix non
+  cassant disponible ; pas forcé de breaking change pour un risque nul
+  côté produit livré.
+
+**Résultats Lighthouse (mobile)** :
+| Catégorie | Avant | Après |
+|---|---|---|
+| Performance | 94/100 | 94/100 |
+| Accessibilité | 74/100 | **91/100** |
+| Bonnes pratiques | 92/100 | 92/100 |
+
+- [x] Contraste de texte insuffisant (`#8a8273`, 74 occurrences, ratio
+  3.2-3.7:1) → remplacé par `#6b6354` (déjà utilisé 34× ailleurs dans le
+  design, ratio 5.0-5.8:1, conforme WCAG AA).
+- [x] Viewport bloquait le zoom (`user-scalable=no`, `maximum-scale=1.0`)
+  → `maximum-scale=5.0`, zoom autorisé (accessibilité basse vision).
+- [x] Absence de landmark `<main>` → racine du composant `App` changée
+  de `<div>` à `<main>`.
+- [x] 3 tests de régression ajoutés (garde-fou taille import, landmark
+  main) — 154 tests verts au total, 0 régression.
+
+## ✅ Complété — rappel de sauvegarde, mode sombre, refacto (4-5 juillet)
+
+- [x] **Rappel automatique de sauvegarde** — notification J+5/J+2 +
+  indicateur "Dernière : …" sur l'accueil (`src/notifications.js`
+  buildBackupReminder, `src/backup.js` formatLastBackup).
+- [x] **Mode sombre** — substitution de couleurs de surface à l'exécution
+  (`src/theme.js`), bouton 🌙/☀️ sur l'accueil, préférence locale
+  persistée séparément (clé `cantou.darkMode`, pas dans l'export/import).
+- [x] **`useMeteo`** et **`useTrajets`** extraits (même pattern que
+  `useVisits`/`useExpenses`/`useMeals`) — 100% de couverture chacun.
+- [x] 189 tests verts, couverture globale 57.01% → **60.11%**.
+
+## ✅ Complété — extraction complète des écrans (6 juillet)
+
+- [x] **Poursuivre l'extraction de hooks** (skill `refactor`, priorité 1) :
+  `useLogi`, `useCourses`, `usePlanning`, `useTripConfig` extraits, même
+  pattern que `useVisits`/`useExpenses`/`useMeals`/`useMeteo`/`useTrajets`.
+- [x] **Extraire les écrans en composants** (priorité 2 du skill) — les 9
+  écrans sortis de `App.jsx` vers `src/screens/` : Hébergement, Logistique,
+  Météo, Trajet, Budget, Repas, Planning, Visites, **Accueil** (dernier,
+  6 juillet — carte héro, carte Aujourd'hui, préparatifs, modules,
+  suggestions, sauvegarde). 231 tests verts, 0 régression.
+- [x] **Hook Git Flow automatique** — `.claude/settings.json` : tout merge
+  amenant sur `develop` déclenche `./build-docker.sh --deploy` (build APK +
+  envoi Telegram) sans confirmation manuelle. Testé en conditions réelles.
+
 ## 📅 Backlog suivant
 
-_Aucun item restant — voir avec l'utilisateur pour la suite (release, tests
-device réel, ou nouvelle demande)._
+- [x] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
+  `npm run test:appium`), jamais exécutée : nécessite un Appium server +
+  device/émulateur Android connecté (non disponible dans cet environnement
+  de développement) — à lancer côté utilisateur avec un téléphone branché.
+- [x] Tests device réel (notifications natives, écran Aujourd'hui).
 
 ---
 

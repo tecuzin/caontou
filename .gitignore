@@ -3,6 +3,9 @@ node_modules/
 
 # Sorties de build web
 dist/
+coverage/
+coverage-e2e/
+test-results/
 
 # Projet natif Android (régénéré par `npx cap add android`)
 android/
@@ -34,3 +37,7 @@ local.properties
 
 # Credentials de déploiement (ne jamais committer)
 .env.deploy
+
+# [epiq]: local hydrated state is never committed
+.epiq/events/
+.epiq/log/

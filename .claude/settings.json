@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git merge*)",
+            "command": "b=$(git branch --show-current 2>/dev/null); head=$(git rev-parse HEAD 2>/dev/null); parents=$(git rev-list --parents -n1 HEAD 2>/dev/null | wc -w); marker=\".git/.last-auto-deploy-sha\"; last=$(cat \"$marker\" 2>/dev/null); if [ \"$b\" = \"develop\" ] && [ \"$parents\" -ge 3 ] && [ \"$head\" != \"$last\" ] && [ -x ./build-docker.sh ]; then echo \"$head\" > \"$marker\"; log=\"/tmp/cantou-auto-deploy-$(date +%s).log\"; nohup ./build-docker.sh --deploy > \"$log\" 2>&1 & echo \"{\\\"systemMessage\\\": \\\"Merge dans develop détecté (${head:0:7}) → build APK + envoi Telegram lancé en arrière-plan ($log).\\\"}\"; fi",
+            "timeout": 5,
+            "async": true,
+            "statusMessage": "Merge develop détecté — build+déploiement Telegram en arrière-plan"
+          }
+        ]
+      }
+    ]
+  }
+}
