@@ -1,16 +1,12 @@
 #!/bin/bash
 # Envoie l'APK sur un canal Telegram via le Bot API.
 # Usage : scripts/deploy-telegram.sh <apk_path> <version_name> <build_number> <build_date>
+#         scripts/deploy-telegram.sh --message "<texte>"   (message texte seul)
 #
 # Variables d'env requises (dans .env.deploy) :
 #   TELEGRAM_BOT_TOKEN  — token du bot (ex: 123456:ABCdef…)
 #   TELEGRAM_CHAT_ID    — ID du canal (ex: @cantoubuilds ou -1001234567890)
 set -e
-
-APK_PATH="${1:?Usage: $0 <apk_path> <version_name> <build_number> <build_date>}"
-VERSION_NAME="${2:-unknown}"
-BUILD_NUMBER="${3:-0}"
-BUILD_DATE="${4:-$(date '+%Y-%m-%d %H:%M')}"
 
 # ── Charger les credentials ───────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
@@ -26,6 +22,30 @@ if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
   echo "   Créer ${ENV_FILE} (voir .env.deploy.example)"
   exit 1
 fi
+
+# ── Mode message texte seul (ex: alerte d'échec de build) ─────────────────────
+if [ "$1" = "--message" ]; then
+  MSG="${2:?Usage: $0 --message \"<texte>\"}"
+  echo "📣 Envoi d'un message Telegram…"
+  MRESPONSE=$(curl -s -w "\n%{http_code}" \
+    -F "chat_id=${TELEGRAM_CHAT_ID}" \
+    -F "text=${MSG}" \
+    -F "parse_mode=Markdown" \
+    "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage")
+  MCODE=$(echo "$MRESPONSE" | tail -1)
+  if [ "$MCODE" = "200" ]; then
+    echo "✅ Message envoyé sur Telegram."
+  else
+    echo "❌ Erreur Telegram (HTTP ${MCODE}) : $(echo "$MRESPONSE" | head -1)"
+    exit 1
+  fi
+  exit 0
+fi
+
+APK_PATH="${1:?Usage: $0 <apk_path> <version_name> <build_number> <build_date>}"
+VERSION_NAME="${2:-unknown}"
+BUILD_NUMBER="${3:-0}"
+BUILD_DATE="${4:-$(date '+%Y-%m-%d %H:%M')}"
 
 if [ ! -f "$APK_PATH" ]; then
   echo "❌ APK introuvable : $APK_PATH"
