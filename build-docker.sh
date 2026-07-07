@@ -50,6 +50,16 @@ echo "  Build N° : ${BUILD_NUMBER}"
 echo "  Date     : ${BUILD_DATE}"
 echo "────────────────────────────────────────────"
 
+# ── [0/5] Hygiène disque ─────────────────────────────────────────────────────
+# Chaque build re-tague cantou-builder:amd64 → l'ancienne image devient dangling.
+# Sans nettoyage, l'accumulation sature la VM Colima (« no space left on device »).
+# Prune non fatal des images danglings + conteneurs arrêtés (jamais les images
+# nommées). Voir l'incident du 07/07 (build feature Jordanne).
+echo "🧽 [0/5] Nettoyage images danglings + conteneurs arrêtés…"
+docker container prune -f >/dev/null 2>&1 || true
+RECLAIMED=$(docker image prune -f 2>/dev/null | grep -i "reclaimed" || true)
+[ -n "$RECLAIMED" ] && echo "   ${RECLAIMED}"
+
 # ── [1/5] Build image ────────────────────────────────────────────────────────
 echo ""
 echo "🐳 [1/5] Build image amd64 (Rosetta)…"
