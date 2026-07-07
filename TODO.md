@@ -297,3 +297,4 @@ Voir `docs/adr/` pour toutes les décisions techniques.
 | [ADR-005](docs/adr/005-pwa-notifications.md) | Notifications via PWA `Notification` API | Accepté |
 | [ADR-006](docs/adr/006-inline-styles.md) | Styles inline via helper `s()` | Accepté |
 | [ADR-007](docs/adr/007-testing-strategy.md) | Stratégie tests : Vitest + RTL + Playwright | Accepté |
+| [ADR-008](docs/adr/008-apk-vs-pwa.md) | Livraison APK Capacitor (pas de service worker PWA) | Accepté |
