@@ -176,6 +176,8 @@ export const VISITS_INITIAL = [
   { id: 10, emoji: '🧗', name: 'Via ferrata & escalade — Mandailles', cat: 'Sport', dist: 'Sur place', dur: '½ journee', age: 'Des 8 ans' },
   { id: 11, emoji: '🌊', name: 'Canyoning — vallee de la Jordanne', cat: 'Sport', dist: 'Sur place', dur: '½ journee', age: 'Ados & adultes' },
   { id: 12, emoji: '🚵', name: 'VTT & parapente — base de loisirs', cat: 'Sport', dist: 'Sur place', dur: '2 h', age: 'Selon activite' },
+  { id: 13, emoji: '🚐', name: 'Navette ete Puy Mary — Pas de Peyrol', cat: 'Nature', dist: 'Depuis Mandailles', dur: '11/07 → 23/08', age: 'Evite le parking' },
+  { id: 14, emoji: '🧺', name: 'Marche fermier de Mandailles', cat: 'Marché', dist: 'Sur place', dur: 'Dim. matin', age: 'Place du Bourg' },
 ]
 
 export const METEO_INITIAL = [

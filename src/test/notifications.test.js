@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { buildNotificationList, buildBackupReminder } from '../notifications.js'
+import { buildNotificationList, buildBackupReminder, buildWeatherReminders } from '../notifications.js'
 
 const trip = { start: '2026-08-05', end: '2026-08-15', origin: 'Beauvais', etape: 'Laschamps', destination: 'Mandailles (Cantal)' }
 
@@ -81,6 +81,44 @@ describe('buildNotificationList()', () => {
     const list = buildNotificationList(days, meals, tripNoEtape)
     const departReminder = list.find((n) => n.title.includes("C'est le grand jour"))
     expect(departReminder.body).not.toMatch(/via/)
+  })
+})
+
+describe('buildWeatherReminders()', () => {
+  const randoDays = [
+    { dow: 'Mer', num: 5, items: [{ time: '09:00', title: 'Départ' }] }, // pas plein air
+    { dow: 'Jeu', num: 6, items: [{ time: '10:00', title: 'Rando au Puy Mary' }] }, // plein air
+    { dow: 'Ven', num: 7, items: [{ time: '14:00', title: 'Canyoning' }] }, // plein air
+  ]
+
+  it('planifie un rappel la veille au soir des journées plein air uniquement', () => {
+    const now = new Date(2026, 7, 1).getTime() // avant le voyage
+    const list = buildWeatherReminders(randoDays, trip, now)
+    expect(list).toHaveLength(2)
+    // Rando le 6 -> rappel la veille (5) à 20h30
+    const r6 = list.find((n) => n.body.includes('Jeu 6'))
+    expect(r6.at.getDate()).toBe(5)
+    expect(r6.at.getHours()).toBe(20)
+    expect(r6.at.getMinutes()).toBe(30)
+    expect(r6.title).toMatch(/météo/i)
+  })
+
+  it('ne planifie rien pour un jour sans activité de plein air', () => {
+    const now = new Date(2026, 7, 1).getTime()
+    const list = buildWeatherReminders([randoDays[0]], trip, now)
+    expect(list).toEqual([])
+  })
+
+  it('ignore les rappels déjà passés', () => {
+    const now = new Date(2026, 11, 31).getTime() // après le voyage
+    expect(buildWeatherReminders(randoDays, trip, now)).toEqual([])
+  })
+
+  it('ids réservés hors des plages dynamiques (>= 9100)', () => {
+    const now = new Date(2026, 7, 1).getTime()
+    const list = buildWeatherReminders(randoDays, trip, now)
+    expect(list.every((n) => n.id >= 9100)).toBe(true)
+    expect(new Set(list.map((n) => n.id)).size).toBe(list.length)
   })
 })
 
