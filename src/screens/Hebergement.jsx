@@ -2,6 +2,17 @@ import { GiteScene } from '../Scenery.jsx'
 
 const HEB_EQUIP = ['Wi-Fi', 'Cheminée (cantou)', 'Lave-linge', 'Lit bébé', 'Jardin clos', 'Parking', 'Lave-vaisselle', 'Barbecue']
 
+// Numéros d'urgence français — utiles en zone de montagne isolée, où le réseau
+// mobile est parfois limité ; l'app étant 100 % offline, ce bloc reste consultable
+// sans connexion. Le 112 fonctionne même sans carte SIM / réseau de l'opérateur.
+const URGENCES = [
+  { n: '112', label: 'Urgence européenne (tous secours)' },
+  { n: '15', label: 'SAMU (urgence médicale)' },
+  { n: '18', label: 'Pompiers' },
+  { n: '17', label: 'Police / Gendarmerie' },
+  { n: '114', label: 'Urgence par SMS (sourds/malentendants)' },
+]
+
 /** Sous-écran Hébergement — infos du gîte, éditables. */
 export function Hebergement({ sx, hebergement, openHebEdit }) {
   return (
@@ -30,6 +41,18 @@ export function Hebergement({ sx, hebergement, openHebEdit }) {
       </div>
       <div style={sx('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 {hebergement.contact}</div>
       <div style={sx('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>{hebergement.note}</div>
+      <div data-testid="heb-urgences" style={sx('margin-top:16px;background:#fbe9e6;border:1px solid #e6bcb2;border-radius:14px;padding:14px;')}>
+        <div style={sx('font-weight:700;font-family:Quicksand;color:#b8503f;')}>🚨 Urgences</div>
+        <div style={sx('display:flex;flex-direction:column;gap:6px;margin-top:9px;')}>
+          {URGENCES.map((u) => (
+            <a key={u.n} href={`tel:${u.n}`} style={sx('display:flex;align-items:center;gap:10px;text-decoration:none;color:#6b5a45;')}>
+              <span style={sx('flex:0 0 auto;min-width:42px;text-align:center;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;border-radius:8px;padding:4px 8px;font-size:14px;')}>{u.n}</span>
+              <span style={sx('font-size:13px;')}>{u.label}</span>
+            </a>
+          ))}
+        </div>
+        <div style={sx('font-size:12px;color:#8a6f5c;margin-top:9px;line-height:1.4;')}>💊 Pharmacie / médecin le plus proche : à noter dans « ✏️ » ci-dessus (champ notes).</div>
+      </div>
     </div>
   )
 }

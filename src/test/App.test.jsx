@@ -222,6 +222,19 @@ describe('Visites — filtres et tri', () => {
   })
 })
 
+describe('Hébergement — contacts d\'urgence', () => {
+  it('affiche le bloc urgences avec les numéros clés', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Hébergement'))
+    const urg = screen.getByTestId('heb-urgences')
+    expect(within(urg).getByText('112')).toBeInTheDocument()
+    expect(within(urg).getByText('SAMU (urgence médicale)')).toBeInTheDocument()
+    // Le 112 est un lien tel: cliquable
+    expect(within(urg).getByText('112').closest('a')).toHaveAttribute('href', 'tel:112')
+  })
+})
+
 describe('Persistance localStorage', () => {
   it('recharge les dépenses sauvegardées au remontage', async () => {
     const user = userEvent.setup()
