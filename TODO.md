@@ -233,6 +233,17 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
   amenant sur `develop` déclenche `./build-docker.sh --deploy` (build APK +
   envoi Telegram) sans confirmation manuelle. Testé en conditions réelles.
 
+## ✅ Complété — Release v1.0.0 (7 juillet)
+
+- [x] **Release Git Flow v1.0.0** — première version majeure. Régression
+  complète verte (231 Vitest + 15 E2E Playwright), CHANGELOG [1.0.0]
+  finalisé, bump `package.json` 0.4.0 → 1.0.0, merge `--no-ff` dans `main`,
+  tag `v1.0.0`, merge retour dans `develop`. APK `cantou-v1.0.0-build27`
+  buildé depuis `main` (digest keystore stable `28ce1e58…` vérifié) et
+  envoyé sur Telegram. Hook auto-déploiement neutralisé sur le merge
+  develop (marqueur `.git/.last-auto-deploy-sha`) pour éviter un double
+  build. Contenu main/develop en parité (diff = `build.number` seul).
+
 ## 📅 Backlog suivant
 
 - [x] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
