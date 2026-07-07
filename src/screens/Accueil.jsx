@@ -40,7 +40,7 @@ export function Accueil({
         <div data-testid="today-card" style={sx('margin:0 18px 14px;background:#fffdf8;border:2px solid #cf7d3c;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(207,125,60,0.18);')}>
           <div style={sx('display:flex;align-items:center;justify-content:space-between;')}>
             <div style={sx('font-size:12px;letter-spacing:1px;font-weight:700;color:#cf7d3c;')}>🗓️ AUJOURD'HUI · {today.d.dow} {today.d.num}</div>
-            {today.w && <div style={sx('font-family:Quicksand;font-weight:700;font-size:14px;')}>{today.w.icon} {today.w.hi}° <span style={sx('color:#b3a892;')}>{today.w.lo}°</span></div>}
+            {today.w && <div style={sx('font-family:Quicksand;font-weight:700;font-size:14px;')}>{today.w.icon} {today.w.hi}° <span style={sx('color:#6b6354;')}>{today.w.lo}°</span></div>}
           </div>
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-top:6px;')}>{today.d.title}</div>
           <div style={sx('font-size:13px;color:#6b6354;margin-top:1px;')}>{today.d.sub}</div>
