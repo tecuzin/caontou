@@ -31,6 +31,9 @@ $(date '+%Y-%m-%d %H:%M')" 2>/dev/null || true
 }
 trap on_exit EXIT
 
+# ── Chrono (mesure du temps total de build) ──────────────────────────────────
+SECONDS=0
+
 # ── Numéro de build (auto-incrémenté) ────────────────────────────────────────
 BUILD_FILE="build.number"
 BUILD_NUMBER=$(( $(cat "$BUILD_FILE" 2>/dev/null || echo 0) + 1 ))
@@ -93,7 +96,7 @@ mv build/outputs/apk/cantou-release.apk "build/outputs/apk/${APK_NAME}" 2>/dev/n
 APK_PATH="build/outputs/apk/${APK_NAME}"
 
 echo ""
-echo "✅ [5/5] APK prêt :"
+echo "✅ [5/5] APK prêt (durée totale : $((SECONDS / 60)) min $((SECONDS % 60)) s) :"
 ls -lh "$APK_PATH"
 
 # ── [5/5] Envoi Telegram (optionnel) ─────────────────────────────────────────
