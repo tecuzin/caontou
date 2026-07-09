@@ -57,6 +57,70 @@ les Proposal.
 
 ---
 
+## Cycle de vie d'une carte Epiq (détail complet)
+
+### Phase 1 : Proposal (idée Claude)
+Créée par Claude lors d'un audit ou une proposition. Description auto-suffisante avec
+contexte et raison. David la lit, la trie mentalement.
+
+**Exemple** : "Error Boundary React + export de secours (p1, audit robustesse 09/07)"
+
+### Phase 2 : Todo (GO David)
+David déplace la carte de Proposal vers Todo quand il veut que Claude l'implémente.
+**C'est le seul signal valide d'implémentation.**
+
+**Commande Claude** :
+```bash
+mcp epiq_issue_move <issueId> --parentId 01KWSTHN7AKWFJT9N28CGWDPXJ
+```
+
+### Phase 3 : In progress (en cours Claude)
+Dès que Claude commence le travail, la carte doit passer en In progress.
+
+**Commande Claude** :
+```bash
+mcp epiq_issue_move <issueId> --parentId 01KWSTHN7AKWFJT9N28CGWDPXK
+```
+
+### Phase 4 : Code + build
+Claude implémente, teste localement, committe. Ensuite : `./build-docker.sh --deploy`
+qui fabrique un APK numéroté avec tags.
+
+### Phase 5 : UAT/EUA (tests David)
+À la livraison, Claude déplace la carte en UAT/EUA avec :
+- Tag `buildNN` (numéro du build qui embarque la feature)
+- Tag `vX.Y.Z` (version sémantique)
+- Commentaire Epiq résumant la livraison (« Livré en build 41 : StatusBar thémée crème/bleu nuit, splash Cantou, generate-icon.py écrit 11 splash.png »)
+
+**Commandes Claude** :
+```bash
+mcp epiq_issue_move <issueId> --parentId 01KX43H1Z2K4EWCCG0TV8CC8P5
+mcp epiq_issue_tag_add <issueId> --tagName buildNN
+mcp epiq_issue_tag_add <issueId> --tagName vX.Y.Z
+mcp epiq_issue_comment_add <issueId> --body "..."
+```
+
+### Phase 6a : Test OK → Done (David)
+David teste l'APK, valide. Déplace UAT/EUA → Done. **Ne jamais le faire à sa place.**
+
+### Phase 6b : Test KO → Todo (David + rapport)
+David trouve un bug. Remet la carte en Todo + ajoute un commentaire détaillant le
+problème (ex: « StatusBar ne change pas au toggle 🌙 en mode sombre »).
+
+**Claude lit ce rapport**, l'ajoute au titre ou le note, puis :
+1. La carte est déjà en Todo → passe en In progress
+2. Implémente le fix
+3. Re-livre : In progress → build → UAT/EUA avec **nouveau tag de build** (ex: build42)
+
+Cycle continue jusqu'à test OK → Done.
+
+### Phase 7 : Done → main (optionnel, David)
+David merge le commit de la branche dans `main` (ou `release/`) quand il prépare
+une release. Le code d'une carte en Done peut toujours être mergé — la validation
+est terminée.
+
+---
+
 ## Mise à jour du TODO
 
 Après chaque tâche complétée :
