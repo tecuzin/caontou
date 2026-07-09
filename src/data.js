@@ -15,7 +15,7 @@ export const MEALS_INITIAL = [
   { id: 1, day: 'Mer 5', dish: 'Etape a Laschamps — resto simple' },
   { id: 2, day: 'Jeu 6', dish: 'Pates au pesto (soir arrivee)' },
   { id: 3, day: 'Ven 7', dish: 'Truffade maison + salade' },
-  { id: 4, day: 'Sam 8', dish: 'Poulet roti & legumes' },
+  { id: 4, day: 'Sam 8', dish: 'Repas sur place a Riom (apres la course)' },
   { id: 5, day: 'Dim 9', dish: 'Aligot & saucisse de Cantal' },
   { id: 6, day: 'Lun 10', dish: 'Pizzeria a Vic-sur-Cere' },
   { id: 7, day: 'Mar 11', dish: 'Omelette aux cepes' },
@@ -63,8 +63,8 @@ export const DAYS_INITIAL = [
     { time: '06:00', title: 'Retrait du dossard', note: 'Préparation & échauffement', color: '#9c6b4a' },
     { time: '07:00', title: 'Départ de la course', note: '79 km · 3 000 m D+ 🏃', color: '#b8503f' },
     { time: '18:30', title: 'Arrivée estimée', note: '11–12 h d\'effort — bravo !', color: '#cf7d3c' },
-    { time: '19:30', title: 'Retour vers le gîte', note: '~1 h 15 de route', color: '#5b7042' },
-    { time: '20:45', title: 'Retour au gîte', note: 'Récupération & repas', color: '#9c6b4a' },
+    { time: '19:30', title: 'Retour vers le gîte', note: 'Repas sur place avant de reprendre la route', color: '#5b7042' },
+    { time: '20:45', title: 'Retour au gîte', note: 'Douche & récupération', color: '#9c6b4a' },
   ] },
   { dow: 'Dim', num: 9, title: 'Fermes & fromages', sub: 'Vallée du Carladès', items: [
     { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
@@ -84,10 +84,12 @@ export const DAYS_INITIAL = [
     { time: '15:00', title: 'Cascade de la Conche', note: 'Balade courte depuis Vic', color: '#5b7042' },
     { time: '18:00', title: 'Retour & repos', note: '', color: '#9c6b4a' },
   ] },
-  { dow: 'Mer', num: 12, title: 'Journée libre', sub: 'Au gré de l\'envie', items: [
-    { time: 'Matin', title: 'Grasse matinée', note: 'On souffle', color: '#cf7d3c' },
-    { time: '11:00', title: 'Balade douce', note: '', color: '#5b7042' },
-    { time: '16:00', title: 'Jeux au jardin', note: '', color: '#9c6b4a' },
+  { dow: 'Mer', num: 12, title: 'Le Lioran en famille', sub: 'Plomb du Cantal', items: [
+    { time: '09:00', title: 'Départ vers Le Lioran', note: '~45 min par la vallée de la Cère', color: '#5b7042' },
+    { time: '10:00', title: 'Télécabine du Plomb', note: 'Montée au Plomb du Cantal (1 855 m)', color: '#9c6b4a' },
+    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° sur le massif 🏔️', color: '#4f8a86' },
+    { time: '14:30', title: 'Accrobranche « jungle verte »', note: 'Parcours dès 3 ans', color: '#5b7042' },
+    { time: '17:00', title: 'Glace à Vic-sur-Cère', note: 'Récompense méritée', color: '#b8503f' },
   ] },
   { dow: 'Jeu', num: 13, title: 'Marché & baignade', sub: 'Dernier jour complet', items: [
     { time: '10:00', title: 'Marché de Vic-sur-Cère', note: 'Souvenirs & fromages à ramener', color: '#8a8b3d' },
