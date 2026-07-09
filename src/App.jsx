@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
+import { StatusBar, Style } from '@capacitor/status-bar'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL } from './data.js'
 import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Meteo } from './screens/Meteo.jsx'
@@ -162,6 +163,11 @@ export default function App() {
   })
   useEffect(() => {
     try { localStorage.setItem('cantou.darkMode', String(darkMode)) } catch { }
+    // Barre de statut Android synchronisée avec le thème (crème/bleu nuit).
+    // Style.Light = fond clair (icônes sombres), Style.Dark = l'inverse.
+    // No-op silencieux hors app native (web/tests : promesse rejetée, catch).
+    StatusBar.setStyle({ style: darkMode ? Style.Dark : Style.Light }).catch(() => {})
+    StatusBar.setBackgroundColor({ color: darkMode ? '#10162b' : '#f4ecdc' }).catch(() => {})
   }, [darkMode])
   const sx = (css) => s(darkMode ? applyDarkTheme(css) : css)
 
