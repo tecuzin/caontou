@@ -1,8 +1,18 @@
 /**
  * Parse CSS shorthand string into a React style object.
  * e.g. "color:red;font-size:14px" → { color: 'red', fontSize: '14px' }
+ *
+ * Mémoïsé : s() est appelé pour chaque élément à chaque render (des centaines
+ * de fois) sur des chaînes stables — le re-parse était du CPU gaspillé sur le
+ * téléphone. Les objets retournés sont partagés : ne jamais les muter (React
+ * les traite comme immuables). Borne de sécurité contre les chaînes très
+ * dynamiques (interpolations) : on vide le cache s'il explose.
  */
+const S_CACHE = new Map()
+
 export function s(css) {
+  const hit = S_CACHE.get(css)
+  if (hit) return hit
   const o = {}
   css.split(';').forEach((decl) => {
     const i = decl.indexOf(':')
@@ -12,6 +22,8 @@ export function s(css) {
     if (!k) return
     o[k.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = v
   })
+  if (S_CACHE.size > 4000) S_CACHE.clear()
+  S_CACHE.set(css, o)
   return o
 }
 
