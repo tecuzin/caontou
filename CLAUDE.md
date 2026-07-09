@@ -69,6 +69,11 @@ Voir le skill **build-apk** pour le détail.
   prototype en objets de style React → reproduction fidèle au pixel.
 - Données de référence (planning, visites, repas, météo…) en constantes statiques.
 - Compte à rebours « J- » calculé depuis la date réelle (départ 11/07/2026).
-- Note : l'en-tête « trajet » du prototype affichait « Beauvais → Mandailles »
-  (coquille isolée) ; corrigé en « Lyon → Mandailles » par cohérence avec tout le
-  reste du design (carte d'accueil, étapes, README).
+- **Lieu réel du séjour** : le gîte est à **Vezels-Roussy (15130)**, dans le
+  **Carladès** (sud-est d'Aurillac), et non à Mandailles / vallée de la Jordanne
+  comme le supposait le prototype initial. Tout le contenu de référence (visites,
+  planning, trajet, météo, hébergement) a été **re-basé sur le Carladès** :
+  destination Vezels-Roussy, sorties de proximité (Pas de Cère, Le Lioran / Plomb
+  du Cantal, château de Messilhac, Raulhac, rocher de Ronesque, Aurillac ~25 min),
+  et les sites du nord (Puy Mary, Salers) conservés en « grandes sorties » (~1 h).
+  Distances de route indicatives depuis Vezels-Roussy.

@@ -27,7 +27,7 @@ L'app a **5 onglets principaux** (barre du bas) + des **sous-écrans** ouverts d
 - **But :** vue d'ensemble du séjour, accès rapide à tout.
 - **Layout :** scroll vertical. De haut en bas :
   1. En-tête « Bonjour 👋 » + pastille avatar (cercle 38px, fond `#cf7d3c`).
-  2. **Carte héro** « Prochaine aventure » (fond `#4a5d3a`, radius 26px, texte crème) : titre « Puy Mary, Cantal », dates, puces J-N (compte à rebours calculé) et météo.
+  2. **Carte héro** « Prochaine aventure » (fond `#4a5d3a`, radius 26px, texte crème) : titre « Carladès, Cantal », dates, puces J-N (compte à rebours calculé) et météo.
   3. **Carte « Le grand départ »** avec bouton → ouvre le sous-écran Trajet.
   4. **Carte « Valises & préparatifs »** avec barre de progression (N/Total cochés) → ouvre Logistique.
   5. **Grille 2 colonnes de modules** : Trajet, Hébergement, Préparatifs, Météo, Repas, Budget.
@@ -56,7 +56,7 @@ L'app a **5 onglets principaux** (barre du bas) + des **sous-écrans** ouverts d
 - **État :** `expenses` (tableau {label, cat, amt}), total budget (prop `budget`).
 
 ### Sous-écrans (ouverts depuis l'accueil, avec bouton retour ‹)
-- **Trajet :** carte résumé (Lyon → Mandailles, durée/distance/budget), étapes en timeline, checklist « Avant de partir ».
+- **Trajet :** carte résumé (Laschamps → Vezels-Roussy, durée/distance/budget), étapes en timeline, checklist « Avant de partir ».
 - **Logistique :** plusieurs listes (Valise enfants, Valise adultes, Pharmacie, Voiture, Maison) avec barres de progression et items cochables.
 - **Hébergement :** photo (placeholder), nom, dates arrivée/départ, capacité, équipements (chips), Wi-Fi, contact.
 - **Météo :** prévisions 7 jours (jour, icône, pluie %, max/min).

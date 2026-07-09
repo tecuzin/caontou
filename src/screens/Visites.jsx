@@ -11,7 +11,7 @@ export function Visites({
     <div data-testid="screen-visites">
       <div style={sx('padding:54px 18px 4px;')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>À faire</div>
-        <div style={sx('font-size:13px;color:#6b6354;')}>Autour du Puy Mary · {savedCount} enregistrées ♥</div>
+        <div style={sx('font-size:13px;color:#6b6354;')}>Autour du Carladès · {savedCount} enregistrées ♥</div>
       </div>
       <div style={sx('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 14px;')}>
         {FILTERS.map((f) => (
