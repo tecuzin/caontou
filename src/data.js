@@ -58,12 +58,13 @@ export const DAYS_INITIAL = [
     { time: '15:00', title: 'Sieste & jeux au jardin', note: '', color: '#9c6b4a' },
     { time: '18:00', title: 'Marché de producteurs', note: 'Fromages & charcuterie', color: '#8a8b3d' },
   ] },
-  { dow: 'Sam', num: 8, title: 'Le Lioran en famille', sub: 'Plomb du Cantal', items: [
-    { time: '09:00', title: 'Départ vers Le Lioran', note: '~45 min par la vallée de la Cère', color: '#5b7042' },
-    { time: '10:00', title: 'Télécabine du Plomb', note: 'Montée au Plomb du Cantal (1 855 m)', color: '#9c6b4a' },
-    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° sur le massif 🏔️', color: '#4f8a86' },
-    { time: '14:30', title: 'Accrobranche « jungle verte »', note: 'Parcours dès 3 ans', color: '#5b7042' },
-    { time: '17:00', title: 'Glace à Vic-sur-Cère', note: 'Récompense méritée', color: '#b8503f' },
+  { dow: 'Sam', num: 8, title: 'Trail de Riom-ès-Montagnes', sub: 'Course · 79 km / 3 000 m D+', items: [
+    { time: '04:45', title: 'Départ du gîte', note: 'Route vers Riom-ès-Montagnes (~1 h 15)', color: '#5b7042' },
+    { time: '06:00', title: 'Retrait du dossard', note: 'Préparation & échauffement', color: '#9c6b4a' },
+    { time: '07:00', title: 'Départ de la course', note: '79 km · 3 000 m D+ 🏃', color: '#b8503f' },
+    { time: '18:30', title: 'Arrivée estimée', note: '11–12 h d\'effort — bravo !', color: '#cf7d3c' },
+    { time: '19:30', title: 'Retour vers le gîte', note: '~1 h 15 de route', color: '#5b7042' },
+    { time: '20:45', title: 'Retour au gîte', note: 'Récupération & repas', color: '#9c6b4a' },
   ] },
   { dow: 'Dim', num: 9, title: 'Fermes & fromages', sub: 'Vallée du Carladès', items: [
     { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
