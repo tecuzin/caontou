@@ -104,7 +104,11 @@ docker create \
   --env BUILD_TIMESTAMP="${BUILD_TIMESTAMP}" \
   --env VERSION_NAME="${VERSION_NAME}" \
   cantou-builder:amd64 >/dev/null
+# --no-xattrs/--no-mac-metadata : le tar BSD embarque sinon les attributs
+# étendus macOS (com.apple.provenance…) que le daemon Linux ne sait pas poser
+# (lsetxattr: operation not supported → docker cp échoue). Vu au build 39.
 tar -cf - \
+  --no-xattrs --no-mac-metadata --no-acls --no-fflags \
   --exclude ./node_modules --exclude ./dist --exclude ./android \
   --exclude ./build --exclude ./.git --exclude ./.gradle \
   --exclude "*.apk" --exclude "*.aab" --exclude "*.log" --exclude "*.bak" \
