@@ -298,3 +298,4 @@
 {"v":1,"id":["01KX45NBBDFFA9KNTWNB5W6JFZ","01KX45J0JYZ498M1WR6WWWKRW1"],"move.node":{"id":"01KX3AKMNPN72MK2EWG5XTNMVZ","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","rank":"7fffffffffffffffffffffff"}}
 {"v":1,"id":["01KX45NCFWFTA7ZCYQ26G1T1WH","01KX45NBBDFFA9KNTWNB5W6JFZ"],"move.node":{"id":"01KX3AKP1GR0QKK0MPYHVD7C85","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","rank":"bfffffffffffffffffffffff"}}
 {"v":1,"id":["01KX45P69ZQR2WY931YJ4BZY9F","01KX45NCFWFTA7ZCYQ26G1T1WH"],"move.node":{"id":"01KX3AKMNPN72MK2EWG5XTNMVZ","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","rank":"7fffffffffffffffffffffff"}}
+{"v":1,"id":["01KX45R3NJHSFP74GXKMZTDDR7","01KX45P69ZQR2WY931YJ4BZY9F"],"add.issue":{"id":"01KX45R3NH66T0HV0MB08AKWTJ","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"Refactor modales — pass 2 : remaining ~5 modales + consolidation","rank":"7fffffffffffffffffffffff"}}
