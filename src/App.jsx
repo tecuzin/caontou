@@ -69,8 +69,8 @@ const TRAJET_CHECK_ITEMS_INITIAL = ['Pleins faits', 'Sièges auto installés', '
 
 
 const HEB_INITIAL = {
-  nom: 'La Grange du Puy Mary',
-  adresse: 'Mandailles-Saint-Julien (15590)',
+  nom: 'Notre gîte en Carladès',
+  adresse: 'Vezels-Roussy (15130)',
   arrivee: 'Mer 5 · dès 16 h',
   depart: 'Sam 15 · avant 10 h',
   capacite: '4–5 personnes · 2 chambres · lit bébé fourni',
@@ -987,7 +987,7 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
             <input value={newDayTitle} onChange={(e) => setNewDayTitle(e.target.value)} placeholder="Ex : Le grand depart" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
-            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Lyon -> Mandailles" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Laschamps -> Vezels-Roussy" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('display:flex;gap:10px;')}>
               <button onClick={closeDayEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={saveDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
@@ -1118,7 +1118,7 @@ export default function App() {
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingVisitId === null ? 'Ajouter une visite' : 'Editer visite'}</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
-            <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Puy Mary" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Pas de Cère" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Categorie</div>
             <select value={newVisitCat} onChange={(e) => setNewVisitCat(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
               <option>Nature</option>
@@ -1165,8 +1165,8 @@ export default function App() {
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Modifier l'hébergement</div>
             {[
-              ['Nom', newHebNom, setNewHebNom, 'La Grange du Puy Mary'],
-              ['Adresse', newHebAdresse, setNewHebAdresse, 'Mandailles-Saint-Julien (15590)'],
+              ['Nom', newHebNom, setNewHebNom, 'Notre gîte en Carladès'],
+              ['Adresse', newHebAdresse, setNewHebAdresse, 'Vezels-Roussy (15130)'],
               ['Arrivée', newHebArrivee, setNewHebArrivee, 'Sam 11 · dès 16 h'],
               ['Départ', newHebDepart, setNewHebDepart, 'Sam 18 · avant 10 h'],
               ['Capacité', newHebCapacite, setNewHebCapacite, '4–5 personnes · 2 chambres'],
@@ -1296,7 +1296,7 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Étape (nuit) — optionnel</div>
             <input value={newTripEtape} onChange={(e) => setNewTripEtape(e.target.value)} placeholder="Ex : Laschamps" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Destination</div>
-            <input data-testid="input-trip-dest" value={newTripDest} onChange={(e) => setNewTripDest(e.target.value)} placeholder="Ex : Mandailles (Cantal)" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <input data-testid="input-trip-dest" value={newTripDest} onChange={(e) => setNewTripDest(e.target.value)} placeholder="Ex : Vezels-Roussy (Cantal)" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('display:flex;gap:10px;')}>
               <button onClick={() => setShowTripEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button data-testid="btn-save-trip" onClick={saveTrip} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>

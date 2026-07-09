@@ -8,7 +8,7 @@ export const TRIP_INITIAL = {
   end: '2026-08-15',
   origin: 'Beauvais',
   etape: 'Laschamps',
-  destination: 'Mandailles (Cantal)',
+  destination: 'Vezels-Roussy (Cantal)',
 }
 
 export const MEALS_INITIAL = [
@@ -17,7 +17,7 @@ export const MEALS_INITIAL = [
   { id: 3, day: 'Ven 7', dish: 'Truffade maison + salade' },
   { id: 4, day: 'Sam 8', dish: 'Poulet roti & legumes' },
   { id: 5, day: 'Dim 9', dish: 'Aligot & saucisse de Cantal' },
-  { id: 6, day: 'Lun 10', dish: 'Pizzeria a Murat' },
+  { id: 6, day: 'Lun 10', dish: 'Pizzeria a Vic-sur-Cere' },
   { id: 7, day: 'Mar 11', dish: 'Omelette aux cepes' },
   { id: 8, day: 'Mer 12', dish: 'Grillades au jardin' },
   { id: 9, day: 'Jeu 13', dish: 'Soupe au fromage & salade' },
@@ -44,43 +44,43 @@ export const DAYS_INITIAL = [
     { time: '16:00', title: 'Arrivée à Laschamps', note: 'Étape pour la nuit', color: '#9c6b4a' },
     { time: '19:30', title: 'Dîner tranquille', note: 'Tout le monde au lit tôt', color: '#b8503f' },
   ] },
-  { dow: 'Jeu', num: 6, title: 'Cap sur le Cantal', sub: 'Laschamps → Mandailles', items: [
+  { dow: 'Jeu', num: 6, title: 'Cap sur le Cantal', sub: 'Laschamps → Vezels-Roussy', items: [
     { time: '09:30', title: 'Départ de Laschamps', note: 'Volcans en vue', color: '#5b7042' },
     { time: '11:00', title: 'Pause à Murat', note: 'Café & jambes', color: '#cf7d3c' },
-    { time: '13:00', title: 'Arrivée au gîte', note: 'Installation & goûter', color: '#9c6b4a' },
-    { time: '16:00', title: 'Courses à Aurillac', note: 'Premier ravitaillement', color: '#8a8b3d' },
+    { time: '13:30', title: 'Arrivée au gîte', note: 'Vezels-Roussy · installation & goûter', color: '#9c6b4a' },
+    { time: '16:00', title: 'Courses à Aurillac', note: 'Premier ravitaillement (~25 min)', color: '#8a8b3d' },
     { time: '19:30', title: 'Dîner au coin du cantou', note: 'Pâtes au pesto', color: '#b8503f' },
   ] },
-  { dow: 'Ven', num: 7, title: 'Mise en jambes', sub: 'Vallée de Mandailles', items: [
+  { dow: 'Ven', num: 7, title: 'Mise en jambes', sub: 'Autour du gîte · Carladès', items: [
     { time: '09:30', title: 'Petit-déj tranquille', note: 'On prend le temps', color: '#cf7d3c' },
-    { time: '10:30', title: 'Cascade du Faillitoux', note: 'Balade facile (1 h)', color: '#5b7042' },
-    { time: '12:30', title: 'Pique-nique au bord de l\'eau', note: '', color: '#4f8a86' },
+    { time: '10:30', title: 'Rocher de Ronesque', note: 'Table basaltique, panorama 360° (tout près)', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique au sommet', note: '', color: '#4f8a86' },
     { time: '15:00', title: 'Sieste & jeux au jardin', note: '', color: '#9c6b4a' },
     { time: '18:00', title: 'Marché de producteurs', note: 'Fromages & charcuterie', color: '#8a8b3d' },
   ] },
-  { dow: 'Sam', num: 8, title: 'Ascension du Puy Mary', sub: 'Pas de Peyrol', items: [
-    { time: '08:30', title: 'Départ tôt', note: 'Avant la chaleur', color: '#5b7042' },
-    { time: '09:30', title: 'Parking Pas de Peyrol', note: '1 589 m', color: '#9c6b4a' },
-    { time: '10:00', title: 'Montée au sommet', note: 'Porte-bébé conseillé', color: '#5b7042' },
-    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° 🏔️', color: '#4f8a86' },
-    { time: '15:00', title: 'Glace à Dienne', note: 'Récompense méritée', color: '#b8503f' },
+  { dow: 'Sam', num: 8, title: 'Le Lioran en famille', sub: 'Plomb du Cantal', items: [
+    { time: '09:00', title: 'Départ vers Le Lioran', note: '~45 min par la vallée de la Cère', color: '#5b7042' },
+    { time: '10:00', title: 'Télécabine du Plomb', note: 'Montée au Plomb du Cantal (1 855 m)', color: '#9c6b4a' },
+    { time: '12:30', title: 'Pique-nique panorama', note: 'Vue à 360° sur le massif 🏔️', color: '#4f8a86' },
+    { time: '14:30', title: 'Accrobranche « jungle verte »', note: 'Parcours dès 3 ans', color: '#5b7042' },
+    { time: '17:00', title: 'Glace à Vic-sur-Cère', note: 'Récompense méritée', color: '#b8503f' },
   ] },
-  { dow: 'Dim', num: 9, title: 'Fermes & fromages', sub: 'Autour de Salers', items: [
+  { dow: 'Dim', num: 9, title: 'Fermes & fromages', sub: 'Vallée du Carladès', items: [
     { time: '10:00', title: 'Ferme pédagogique', note: 'Traite & petits animaux', color: '#5b7042' },
     { time: '12:30', title: 'Déjeuner truffade', note: 'À l\'auberge', color: '#b8503f' },
     { time: '15:00', title: 'Buronnerie & dégustation', note: 'Cantal AOP', color: '#8a8b3d' },
-    { time: '17:00', title: 'Baignade au lac', note: '', color: '#4f8a86' },
+    { time: '17:00', title: 'Parc de loisirs à Vic', note: 'Piscine & rosalies', color: '#4f8a86' },
   ] },
-  { dow: 'Lun', num: 10, title: 'Cap sur Aurillac', sub: 'La ville', items: [
+  { dow: 'Lun', num: 10, title: 'Cap sur Aurillac', sub: 'La ville (~25 min)', items: [
     { time: '10:00', title: 'Château Saint-Étienne', note: '', color: '#9c6b4a' },
     { time: '12:00', title: 'Déjeuner en ville', note: '', color: '#b8503f' },
     { time: '14:30', title: 'Maison des Volcans', note: 'Ludique pour les enfants', color: '#cf7d3c' },
     { time: '16:30', title: 'Parc & manège', note: '', color: '#5b7042' },
   ] },
-  { dow: 'Mar', num: 11, title: 'Train & lacs', sub: 'Riom-ès-Montagnes', items: [
-    { time: '10:00', title: 'Gentiane Express', note: 'Train touristique 🚂', color: '#cf7d3c' },
-    { time: '13:00', title: 'Pique-nique au lac', note: '', color: '#4f8a86' },
-    { time: '15:30', title: 'Pédalo & baignade', note: '', color: '#4f8a86' },
+  { dow: 'Mar', num: 11, title: 'Gorges & cascades', sub: 'Pas de Cère · Vic-sur-Cère', items: [
+    { time: '10:00', title: 'Pas de Cère', note: 'Sentier des passerelles 🌉', color: '#5b7042' },
+    { time: '12:30', title: 'Pique-nique au bord de l\'eau', note: '', color: '#4f8a86' },
+    { time: '15:00', title: 'Cascade de la Conche', note: 'Balade courte depuis Vic', color: '#5b7042' },
     { time: '18:00', title: 'Retour & repos', note: '', color: '#9c6b4a' },
   ] },
   { dow: 'Mer', num: 12, title: 'Journée libre', sub: 'Au gré de l\'envie', items: [
@@ -89,11 +89,11 @@ export const DAYS_INITIAL = [
     { time: '16:00', title: 'Jeux au jardin', note: '', color: '#9c6b4a' },
   ] },
   { dow: 'Jeu', num: 13, title: 'Marché & baignade', sub: 'Dernier jour complet', items: [
-    { time: '10:00', title: 'Marché de Salers', note: 'Souvenirs & fromages à ramener', color: '#8a8b3d' },
+    { time: '10:00', title: 'Marché de Vic-sur-Cère', note: 'Souvenirs & fromages à ramener', color: '#8a8b3d' },
     { time: '15:00', title: 'Baignade au lac', note: 'Une dernière fois', color: '#4f8a86' },
     { time: '18:00', title: 'Rangement des valises', note: '', color: '#9c6b4a' },
   ] },
-  { dow: 'Ven', num: 14, title: 'Retour — étape 1', sub: 'Mandailles → Laschamps', items: [
+  { dow: 'Ven', num: 14, title: 'Retour — étape 1', sub: 'Vezels-Roussy → Laschamps', items: [
     { time: '09:30', title: 'Check-out du gîte', note: 'État des lieux', color: '#9c6b4a' },
     { time: '10:00', title: 'Route vers Laschamps', note: '', color: '#5b7042' },
     { time: '12:30', title: 'Pause déjeuner', note: '', color: '#b8503f' },
@@ -140,8 +140,9 @@ export const COURSES_INITIAL = [
 // Étapes basées sur l'itinéraire réel (recherché sur Google Maps/ViaMichelin) :
 // Beauvais -> Laschamps (Orcines, 63) : 502 km, ~5h35 via A16 puis A71
 //   (Orléans, Vierzon, Bourges, Montluçon, Riom).
-// Laschamps -> Mandailles-Saint-Julien (15) : 137,7 km, ~2h04 via A75
-//   (68,6 km d'autoroute, sortie vers Murat puis routes de vallée).
+// Laschamps -> Vezels-Roussy (15130) : ~170 km, ~2h30 via A75 puis N122
+//   (sortie A75 vers Massiac, N122 par Murat / Le Lioran / Vic-sur-Cère,
+//   contournement d'Aurillac puis routes du Carladès jusqu'au gîte).
 export const TRAJETS_INITIAL = {
   aller: [
     { time: 'Mer 5 · 08:00', place: 'Depart de Beauvais', note: 'Voiture chargee, c\'est parti !', color: '#5b7042' },
@@ -149,13 +150,13 @@ export const TRAJETS_INITIAL = {
     { time: '13:00', place: 'Pause dejeuner a Bourges', note: '~350 km, via A71', color: '#cf7d3c' },
     { time: '17:00', place: 'Arrivee a Laschamps', note: '502 km au total (~5h35 de route + pauses) - etape pour la nuit (Orcines, Puy-de-Dome)', color: '#9c6b4a' },
     { time: 'Jeu 6 · 09:30', place: 'Depart de Laschamps', note: 'Cap au sud par l\'A75, volcans en vue', color: '#5b7042' },
-    { time: '11:00', place: 'Pause a Murat', note: 'Sortie A75, derniere etape avant les vallees du Cantal', color: '#8a8b3d' },
-    { time: '12:30', place: 'Arrivee a Mandailles', note: '137,7 km depuis Laschamps (~2h04 de route) - installation au gite', color: '#b8503f' },
+    { time: '11:00', place: 'Pause a Murat', note: 'Sortie A75 puis N122, derniere etape avant Aurillac', color: '#8a8b3d' },
+    { time: '13:00', place: 'Arrivee a Vezels-Roussy', note: '~170 km depuis Laschamps (~2h30 de route) - installation au gite (Carlades)', color: '#b8503f' },
   ],
   retour: [
-    { time: 'Ven 14 · 09:30', place: 'Depart de Mandailles', note: 'Check-out du gite', color: '#9c6b4a' },
-    { time: '11:00', place: 'Pause a Murat', note: '', color: '#8a8b3d' },
-    { time: '12:30', place: 'Arrivee a Laschamps', note: '137,7 km, etape pour la nuit', color: '#5b7042' },
+    { time: 'Ven 14 · 09:30', place: 'Depart de Vezels-Roussy', note: 'Check-out du gite', color: '#9c6b4a' },
+    { time: '11:00', place: 'Pause a Murat', note: 'N122 puis A75 vers le nord', color: '#8a8b3d' },
+    { time: '12:30', place: 'Arrivee a Laschamps', note: '~170 km, etape pour la nuit', color: '#5b7042' },
     { time: 'Sam 15 · 09:00', place: 'Depart de Laschamps', note: 'Retour par l\'A71 puis A16', color: '#5b7042' },
     { time: '12:30', place: 'Pause dejeuner a Bourges', note: '~150 km', color: '#cf7d3c' },
     { time: '15:00', place: 'Pause a Orleans', note: '~285 km', color: '#4f8a86' },
@@ -163,24 +164,28 @@ export const TRAJETS_INITIAL = {
   ],
 }
 
+// Visites re-basées autour du gîte réel (Vezels-Roussy, Carladès, sud-est
+// d'Aurillac). Distances de route indicatives depuis Vezels-Roussy. Les sites
+// emblématiques du nord (Puy Mary, Salers) sont conservés mais étiquetés
+// « grande sortie » (~1 h de route), plus à « 25 min » comme avant.
 export const VISITS_INITIAL = [
-  { id: 1, emoji: '⛰️', name: 'Puy Mary — Pas de Peyrol', cat: 'Nature', dist: '25 min', dur: '2 h', age: 'Des 4 ans (porte-bebe)' },
-  { id: 2, emoji: '💧', name: 'Cascade du Faillitoux', cat: 'Nature', dist: '10 min', dur: '1 h', age: 'Poussette non' },
-  { id: 3, emoji: '🐄', name: 'Ferme pedagogique des burons', cat: 'Famille', dist: '15 min', dur: '2 h', age: 'Tous ages' },
-  { id: 4, emoji: '🌋', name: 'Maison des Volcans, Aurillac', cat: 'Patrimoine', dist: '40 min', dur: '1 h 30', age: 'Des 3 ans' },
-  { id: 5, emoji: '🚂', name: 'Gentiane Express', cat: 'Famille', dist: '35 min', dur: '3 h', age: 'Tous ages' },
-  { id: 6, emoji: '🧺', name: 'Marche de Salers', cat: 'Marché', dist: '30 min', dur: '1 h', age: 'Tous ages' },
-  { id: 7, emoji: '🏊', name: 'Lac de Saint-Etienne-Cantalès', cat: 'Baignade', dist: '45 min', dur: '½ journee', age: 'Tous ages' },
-  { id: 8, emoji: '🏘️', name: 'Village de Salers', cat: 'Patrimoine', dist: '30 min', dur: '2 h', age: 'Poussette ok' },
-  { id: 9, emoji: '🧀', name: 'Buronnerie & degustation Cantal', cat: 'Gourmand', dist: '20 min', dur: '1 h', age: 'Tous ages' },
-  { id: 10, emoji: '🧗', name: 'Via ferrata & escalade — Mandailles', cat: 'Sport', dist: 'Sur place', dur: '½ journee', age: 'Des 8 ans' },
-  { id: 11, emoji: '🌊', name: 'Canyoning — vallee de la Jordanne', cat: 'Sport', dist: 'Sur place', dur: '½ journee', age: 'Ados & adultes' },
-  { id: 12, emoji: '🚵', name: 'VTT & parapente — base de loisirs', cat: 'Sport', dist: 'Sur place', dur: '2 h', age: 'Selon activite' },
-  { id: 13, emoji: '🚐', name: 'Navette ete Puy Mary — Pas de Peyrol', cat: 'Nature', dist: 'Depuis Mandailles', dur: '11/07 → 23/08', age: 'Evite le parking' },
-  { id: 14, emoji: '🧺', name: 'Marche fermier de Mandailles', cat: 'Marché', dist: 'Sur place', dur: 'Dim. matin', age: 'Place du Bourg' },
-  { id: 15, emoji: '🌉', name: 'Gorges de la Jordanne (passerelles bois)', cat: 'Famille', dist: 'Vallee', dur: '1 h', age: 'Sans poussette' },
-  { id: 16, emoji: '🌲', name: 'Sources de la Jordanne — cirque de Mandailles', cat: 'Nature', dist: 'Route des Volcans', dur: '1 h 30 – 2 h', age: 'Des 5 ans' },
-  { id: 17, emoji: '💦', name: 'Cascade du Luc (coin frais en foret)', cat: 'Nature', dist: 'Vallee', dur: '1 h', age: 'Tous ages' },
+  { id: 1, emoji: '🌉', name: 'Pas de Cère — sentier des passerelles', cat: 'Nature', dist: '30 min', dur: '1 h 30', age: 'Des 4 ans' },
+  { id: 2, emoji: '🚠', name: 'Le Lioran — télécabine du Plomb du Cantal', cat: 'Nature', dist: '45 min', dur: '½ journee', age: 'Tous ages' },
+  { id: 3, emoji: '🌲', name: 'Accrobranche « jungle verte » du Lioran', cat: 'Sport', dist: '45 min', dur: '½ journee', age: 'Des 3 ans' },
+  { id: 4, emoji: '💧', name: 'Cascade de la Conche (Vic-sur-Cère)', cat: 'Nature', dist: '30 min', dur: '45 min', age: 'Tous ages' },
+  { id: 5, emoji: '💦', name: 'Cascade du Faillitoux (Thiézac)', cat: 'Nature', dist: '35 min', dur: '1 h', age: 'Poussette non' },
+  { id: 6, emoji: '🏰', name: 'Château de Messilhac (Renaissance)', cat: 'Patrimoine', dist: '15 min', dur: '1 h', age: 'Des 5 ans' },
+  { id: 7, emoji: '🏘️', name: 'Village de Raulhac (Carladès)', cat: 'Patrimoine', dist: '15 min', dur: '1 h', age: 'Tous ages' },
+  { id: 8, emoji: '⛰️', name: 'Rocher de Ronesque (panorama 360°)', cat: 'Nature', dist: '12 min', dur: '1 h 30', age: 'Des 6 ans' },
+  { id: 9, emoji: '🪨', name: 'Site de Carlat (rocher historique)', cat: 'Patrimoine', dist: '20 min', dur: '1 h', age: 'Des 5 ans' },
+  { id: 10, emoji: '🎡', name: 'Parc de loisirs de Vic-sur-Cère', cat: 'Famille', dist: '30 min', dur: '½ journee', age: 'Tous ages' },
+  { id: 11, emoji: '🌋', name: 'Maison des Volcans, Aurillac', cat: 'Patrimoine', dist: '25 min', dur: '1 h 30', age: 'Des 3 ans' },
+  { id: 12, emoji: '🧺', name: 'Marché de Vic-sur-Cère', cat: 'Marché', dist: '30 min', dur: 'Matinée', age: 'Tous ages' },
+  { id: 13, emoji: '🏊', name: 'Lac de Saint-Etienne-Cantalès', cat: 'Baignade', dist: '50 min', dur: '½ journee', age: 'Tous ages' },
+  { id: 14, emoji: '🧀', name: 'Buronnerie & degustation Cantal', cat: 'Gourmand', dist: '30 min', dur: '1 h', age: 'Tous ages' },
+  { id: 15, emoji: '⛰️', name: 'Puy Mary — Pas de Peyrol (grande sortie)', cat: 'Nature', dist: '1 h 15', dur: 'Journée', age: 'Des 4 ans (porte-bebe)' },
+  { id: 16, emoji: '🏘️', name: 'Village de Salers (grande sortie)', cat: 'Patrimoine', dist: '1 h 20', dur: '½ journee', age: 'Poussette ok' },
+  { id: 17, emoji: '🚂', name: 'Gentiane Express (grande sortie)', cat: 'Famille', dist: '1 h 10', dur: '½ journee', age: 'Tous ages' },
 ]
 
 export const METEO_INITIAL = [

@@ -78,7 +78,7 @@ describe('Accueil — contenu', () => {
   it('affiche la destination', () => {
     render(<App />)
     const accueil = screen.getByTestId('screen-accueil')
-    expect(within(accueil).getAllByText(/Puy Mary/)[0]).toBeInTheDocument()
+    expect(within(accueil).getAllByText(/Carladès/)[0]).toBeInTheDocument()
   })
 
   it('affiche les modules de navigation', () => {
@@ -212,18 +212,17 @@ describe('Visites — filtres et tri', () => {
     expect(screen.getByText('Ajouter une visite')).toBeInTheDocument()
   })
 
-  it('le filtre Sport isole les activités de la vallée de la Jordanne', async () => {
+  it('le filtre Sport isole les activités Sport (Carladès)', async () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('tab-visites'))
-    // Une activité Sport (Mandailles) et un POI Patrimoine sont visibles sans filtre
-    expect(screen.getByText(/Canyoning/)).toBeInTheDocument()
-    expect(screen.getByText('Village de Salers')).toBeInTheDocument()
+    // Une activité Sport (accrobranche du Lioran) et un POI Patrimoine sont visibles sans filtre
+    expect(screen.getByText(/Accrobranche/)).toBeInTheDocument()
+    expect(screen.getByText(/Village de Salers/)).toBeInTheDocument()
     // Clic sur le filtre Sport → ne garde que les activités Sport
     await user.click(screen.getByRole('button', { name: 'Sport' }))
-    expect(screen.getByText(/Canyoning/)).toBeInTheDocument()
-    expect(screen.getByText(/Via ferrata/)).toBeInTheDocument()
-    expect(screen.queryByText('Village de Salers')).not.toBeInTheDocument()
+    expect(screen.getByText(/Accrobranche/)).toBeInTheDocument()
+    expect(screen.queryByText(/Village de Salers/)).not.toBeInTheDocument()
   })
 
   it('ajoute une nouvelle visite via la modal', async () => {
@@ -231,7 +230,7 @@ describe('Visites — filtres et tri', () => {
     render(<App />)
     await user.click(screen.getByTestId('tab-visites'))
     await user.click(screen.getByText('+ Ajouter visite'))
-    await user.type(screen.getByPlaceholderText('Ex : Puy Mary'), 'Grotte du Loup')
+    await user.type(screen.getByPlaceholderText('Ex : Pas de Cère'), 'Grotte du Loup')
     await user.click(screen.getByText('Enregistrer'))
     expect(screen.getByText('Grotte du Loup')).toBeInTheDocument()
   })

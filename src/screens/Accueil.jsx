@@ -4,7 +4,7 @@ import { KIDS_GAMES } from '../data.js'
 
 const MODULES = [
   { emoji: '🚗', name: 'Trajet', sub: 'Aller & retour', bg: '#dfeae6', action: 'sub:trajet' },
-  { emoji: '🏡', name: 'Hébergement', sub: 'La Grange, Mandailles', bg: '#f1e4d4', action: 'sub:hebergement' },
+  { emoji: '🏡', name: 'Hébergement', sub: 'Vezels-Roussy', bg: '#f1e4d4', action: 'sub:hebergement' },
   { emoji: '🧳', name: 'Préparatifs', sub: 'Valises & listes', bg: '#e7ecdf', action: 'sub:logistique' },
   { emoji: '⛅', name: 'Météo', sub: '7 jours sur place', bg: '#eee7d4', action: 'sub:meteo' },
   { emoji: '🍽️', name: 'Repas', sub: 'Menus & courses', bg: '#f3e2d6', action: 'tab:repas' },
@@ -30,7 +30,7 @@ export function Accueil({
         <button data-testid="btn-trip-settings" onClick={openTripEdit} style={sx('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
         <div style={sx('position:relative;z-index:1;')}>
           <div style={sx('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#e8e2cf;')}>PROCHAINE AVENTURE</div>
-          <div style={sx('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;text-shadow:0 2px 8px rgba(0,0,0,0.25);')}>Puy Mary,<br />Cantal</div>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;text-shadow:0 2px 8px rgba(0,0,0,0.25);')}>Carladès,<br />Cantal</div>
           <div style={sx('margin-top:9px;font-size:14px;color:#e8e2cf;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
           <div style={sx('display:flex;gap:8px;margin-top:16px;')}>
             <div style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>

@@ -61,12 +61,12 @@ export function buildBackupReminder(lastBackupAt, now = new Date(), intervalDays
   return { id: BACKUP_REMINDER_ID, title: '💾 Pense à sauvegarder tes données', body, at }
 }
 
-// Rappel météo montagne — la météo du massif cantalien (Puy Mary, GR400)
-// change vite ; l'app n'a pas de prévisions temps réel (pas de backend), mais
-// un rappel la veille au soir des journées « plein air » incite à vérifier la
-// météo avant de partir. Ids réservés (9100+), hors des plages 1..N et 9000.
+// Rappel météo montagne — la météo du massif cantalien (Carladès, Plomb du
+// Cantal, Puy Mary) change vite ; l'app n'a pas de prévisions temps réel (pas de
+// backend), mais un rappel la veille au soir des journées « plein air » incite à
+// vérifier la météo avant de partir. Ids réservés (9100+), hors des plages 1..N et 9000.
 const WEATHER_REMINDER_BASE = 9100
-const OUTDOOR_RE = /puy mary|rando|sentier|\bGR\b|cascade|\blac\b|via ferrata|canyon|sommet|\bcol\b|crête|crete|balade|marche|montagne|ferrata|parapente/i
+const OUTDOOR_RE = /puy mary|plomb du cantal|lioran|rando|sentier|\bGR\b|cascade|\blac\b|gorges|passerelle|via ferrata|canyon|sommet|\bcol\b|crête|crete|balade|marche|montagne|ferrata|parapente|télécabine|telecabine|accrobranche|rocher|panorama/i
 export function buildWeatherReminders(daysData, trip, now = Date.now()) {
   const [ty, tm] = trip.start.split('-').map(Number)
   const monthName = tripDate(trip.start).toLocaleDateString('fr-FR', { month: 'long' })
