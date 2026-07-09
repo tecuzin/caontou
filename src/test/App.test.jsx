@@ -104,6 +104,21 @@ describe('Accueil — contenu', () => {
     render(<App />)
     expect(screen.getByRole('main')).toBeInTheDocument()
   })
+
+  it('affiche la section repliable "Jeux avec les enfants", fermée par défaut', () => {
+    render(<App />)
+    expect(screen.getByTestId('btn-toggle-games')).toBeInTheDocument()
+    expect(screen.queryByTestId('games-list')).not.toBeInTheDocument()
+  })
+
+  it('déplie la liste de jeux au clic et affiche les idées', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-toggle-games'))
+    const list = screen.getByTestId('games-list')
+    expect(within(list).getByText('Chasse au trésor nature')).toBeInTheDocument()
+    expect(within(list).getByText('Observation des étoiles')).toBeInTheDocument()
+  })
 })
 
 describe('Budget — ajout d\'une dépense', () => {

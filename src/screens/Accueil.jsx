@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Panorama } from '../Scenery.jsx'
+import { KIDS_GAMES } from '../data.js'
 
 const MODULES = [
   { emoji: '🚗', name: 'Trajet', sub: 'Aller & retour', bg: '#dfeae6', action: 'sub:trajet' },
@@ -16,6 +18,7 @@ export function Accueil({
   newSuggestionText, setNewSuggestionText, submitSuggestion, suggestions, deleteSuggestion, sendSuggestions,
   lastBackupAt, formatLastBackup, setExportCopied, setShowExport, setShowImport, runSelfTestAndShow,
 }) {
+  const [gamesOpen, setGamesOpen] = useState(false)
   return (
     <div data-testid="screen-accueil">
       <div style={sx('margin:54px 18px 14px 18px;border-radius:26px;padding:20px;color:#fffaf0;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;min-height:190px;')}>
@@ -92,6 +95,32 @@ export function Accueil({
             </div>
           </button>
         ))}
+      </div>
+
+      <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🎲 Jeux avec les enfants</div>
+      <div style={sx('padding:0 18px 12px;')}>
+        <button data-testid="btn-toggle-games" onClick={() => setGamesOpen((o) => !o)} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:13px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🎲</div>
+          <div style={sx('flex:1;')}>
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Idées de jeux</div>
+            <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>{KIDS_GAMES.length} activités nature, au gîte et le soir</div>
+          </div>
+          <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>{gamesOpen ? '▲' : '▼'}</div>
+        </button>
+        {gamesOpen && (
+          <div data-testid="games-list" style={sx('margin-top:10px;display:flex;flex-direction:column;gap:10px;')}>
+            {KIDS_GAMES.map((g, i) => (
+              <div key={i} style={sx('display:flex;gap:12px;align-items:flex-start;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+                <div style={sx('width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:22px;')}>{g.emoji}</div>
+                <div style={sx('flex:1;min-width:0;')}>
+                  <div style={sx(`font-size:11px;font-weight:700;color:${g.color};text-transform:uppercase;letter-spacing:0.5px;`)}>{g.place}</div>
+                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{g.name}</div>
+                  <div style={sx('font-size:12px;color:#6b6354;margin-top:3px;line-height:1.4;')}>{g.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>💡 Suggestions</div>
