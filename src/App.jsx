@@ -28,6 +28,7 @@ import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
 import { useTripConfig } from './hooks/useTripConfig.js'
+import { Confetti } from './Confetti.jsx'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
@@ -180,6 +181,7 @@ export default function App() {
   const [showAdd, setShowAdd] = useState(false)
   const [showMealEdit, setShowMealEdit] = useState(false)
   const [editingExpenseIdx, setEditingExpenseIdx] = useState(null)
+  const [confettiTrigger, setConfettiTrigger] = useState(false)
   const [editingMealId, setEditingMealId] = useState(null)
   const [editingActivityIdx, setEditingActivityIdx] = useState(null)
   const [showActivityEdit, setShowActivityEdit] = useState(false)
@@ -392,6 +394,15 @@ export default function App() {
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
   const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo' }[sub] || ''
+
+  // confetti si une checklist atteint 100%
+  useEffect(() => {
+    const has100pct = packPct === 100 || coursesPct === 100 || tr.pct === 100
+    if (has100pct && !confettiTrigger) {
+      setConfettiTrigger(true)
+      setTimeout(() => setConfettiTrigger(false), 2500)
+    }
+  }, [packPct, coursesPct, tr.pct, confettiTrigger])
 
   const openModule = (action) =>
     action.indexOf('sub:') === 0 ? setSub(action.slice(4)) : (setTab(action.slice(4)), setSub(null))
@@ -806,6 +817,7 @@ export default function App() {
       ...sx("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;"),
       ...(darkMode ? { backgroundImage: STARRY_BACKGROUND_IMAGE, backgroundRepeat: 'no-repeat' } : {}),
     }}>
+      <Confetti trigger={confettiTrigger} />
 
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (
