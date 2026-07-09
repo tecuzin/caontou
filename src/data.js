@@ -196,3 +196,19 @@ export const METEO_INITIAL = [
   { d: 'Ven', n: 14, icon: '☀️', hi: 25, lo: 13, rain: '10 %' },
   { d: 'Sam', n: 15, icon: '⛅', hi: 24, lo: 13, rain: '15 %' },
 ]
+
+// Idées de jeux à faire avec les enfants pendant le séjour. Contenu statique
+// (non éditable pour l'instant) affiché en section repliable sur l'Accueil.
+// `place` sert de libellé + couleur de tag ; les couleurs sont choisies parmi
+// celles gérées par le mode sombre (theme.js DARK_TEXT_COLOR_MAP).
+export const KIDS_GAMES = [
+  { emoji: '🔎', place: 'Nature', color: '#5b7042', name: 'Chasse au trésor nature', desc: 'Une liste à cocher : pomme de pin, plume, caillou blanc, fleur jaune, trèfle à quatre feuilles.' },
+  { emoji: '🐄', place: 'Nature', color: '#5b7042', name: "Cartes d'observation", desc: 'Repérer les animaux du Cantal : vaches Salers, marmottes, rapaces, papillons.' },
+  { emoji: '🌿', place: 'Nature', color: '#5b7042', name: 'Cabane & land art', desc: 'Construire une cabane de branches ou une œuvre avec cailloux, feuilles et bois.' },
+  { emoji: '🧭', place: 'Nature', color: '#5b7042', name: "Course d'orientation", desc: 'Un petit parcours autour du gîte avec des indices dessinés à retrouver.' },
+  { emoji: '🌙', place: 'Le soir', color: '#cf7d3c', name: 'Observation des étoiles', desc: 'Le ciel du Cantal est très sombre : repérer la Grande Ourse et les étoiles filantes du mois d\'août.' },
+  { emoji: '📖', place: 'Le soir', color: '#cf7d3c', name: 'Veillée histoires de volcans', desc: 'Inventer des légendes sur le Puy Mary et les burons, à la lueur d\'une lampe.' },
+  { emoji: '🃏', place: 'Au gîte', color: '#4f8a86', name: 'Jeux de pluie', desc: 'Memory des animaux, bataille, jeu du dictionnaire — pour les après-midis gris.' },
+  { emoji: '🍳', place: 'Au gîte', color: '#4f8a86', name: 'Cuisiner en famille', desc: "Préparer l'aligot ou un gâteau à la châtaigne tous ensemble." },
+  { emoji: '🎨', place: 'Au gîte', color: '#4f8a86', name: 'Carnet de vacances', desc: 'Dessiner la journée, coller un ticket, écrire un mot chaque soir.' },
+]
