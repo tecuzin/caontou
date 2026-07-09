@@ -37,12 +37,18 @@ empaquetée en **APK Android via Capacitor**, compilée **entièrement dans Dock
 6. **Android SDK** : `platforms;android-34` (cible Capacitor 6) **et** `android-35`,
    `build-tools;34.0.0`/`35.0.0`. Licences acceptées dans l'image.
 
-7. **Cache de layers Docker = vitesse du build.** Le Dockerfile bake `npm install`
-   (layer invalidée par `package*.json` seulement) puis un **warm-up Gradle**
-   (cap add + assembleRelease factice → peuple `/root/.gradle` et pré-génère
-   `android/`) **avant** le `COPY . /workspace`. Ne jamais remonter `COPY .`
-   au-dessus de ces layers, et ne pas exclure `package-lock.json` du contexte :
-   c'est ce qui fait passer un build de ~13 min à ~4 min.
+7. **Vitesse du build : réutilisation d'image, PAS cache de layers.** Le builder
+   legacy **ignore le cache de layers en cross-platform** (daemon ARM64 → image
+   amd64, limitation moby) : chaque `docker build` re-fait tout (~6 min). Donc :
+   - le Dockerfile bake `npm install` + un **warm-up Gradle** (cap add +
+     assembleRelease factice → `/root/.gradle` peuplé, `android/` pré-généré) ;
+   - `build-docker.sh` ne rebuilde l'image **que si la toolchain change**
+     (empreinte de Dockerfile/entrypoint/package*.json/capacitor.config dans
+     `.git/.builder-image-stamp`) ; sinon l'image taguée est réutilisée et le
+     source frais est injecté par `docker create` + `tar | docker cp` (pas un
+     volume — la règle 3 reste respectée), puis `docker start -a`.
+   Build avec toolchain inchangée ≈ 2-3 min ; avec changement de deps ≈ 6-7 min
+   (vs ~13 min avant).
 
 8. **APK signé avec un keystore STABLE** : l'APK release de Gradle est *non signé*.
    L'entrypoint signe avec **`cantou.keystore` committé à la racine** (alias `cantou` /
