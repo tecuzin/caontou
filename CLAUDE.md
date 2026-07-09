@@ -37,7 +37,14 @@ empaquetée en **APK Android via Capacitor**, compilée **entièrement dans Dock
 6. **Android SDK** : `platforms;android-34` (cible Capacitor 6) **et** `android-35`,
    `build-tools;34.0.0`/`35.0.0`. Licences acceptées dans l'image.
 
-7. **APK signé avec un keystore STABLE** : l'APK release de Gradle est *non signé*.
+7. **Cache de layers Docker = vitesse du build.** Le Dockerfile bake `npm install`
+   (layer invalidée par `package*.json` seulement) puis un **warm-up Gradle**
+   (cap add + assembleRelease factice → peuple `/root/.gradle` et pré-génère
+   `android/`) **avant** le `COPY . /workspace`. Ne jamais remonter `COPY .`
+   au-dessus de ces layers, et ne pas exclure `package-lock.json` du contexte :
+   c'est ce qui fait passer un build de ~13 min à ~4 min.
+
+8. **APK signé avec un keystore STABLE** : l'APK release de Gradle est *non signé*.
    L'entrypoint signe avec **`cantou.keystore` committé à la racine** (alias `cantou` /
    mdp `cantou123`) + `zipalign` + `apksigner` → `cantou-release.apk` installable.
    **Ne jamais régénérer ce keystore** : une clé différente = Android refuse la mise à
