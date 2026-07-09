@@ -4,7 +4,7 @@ Génère les icônes Android (legacy + adaptive icon) depuis un dessin vectoriel
 codé en dur, via un encodeur PNG maison (stdlib pure — aucune dépendance).
 Écrit dans les dossiers mipmap Android + public/ (PWA favicon/manifest).
 """
-import struct, zlib, math, os
+import struct, zlib, math, os, glob
 
 def make_png(pixels, w, h):
     """Encode pixels (liste de (R,G,B,A)) en PNG brut."""
@@ -247,4 +247,20 @@ print('  ✅ couleur de fond adaptive icon → ic_launcher_background.xml')
 # Aussi écrire un PNG 512x512 pour public/ (PWA favicon/manifest)
 os.makedirs('public', exist_ok=True)
 write_legacy('public/cantou-icon.png', 512)
+
+# ── Splash screen Cantou ─────────────────────────────────────────────────────
+# Écrase les splash.png du template Capacitor (logo Capacitor par défaut) par
+# la même scène montagne que l'icône. CENTER_CROP (capacitor.config.json)
+# cadre le carré au centre de l'écran ; 640 px suffisent pour ~1 s d'affichage.
+splash_files = sorted(glob.glob('android/app/src/main/res/drawable*/splash.png'))
+if splash_files:
+    print('🌄 Génération du splash screen Cantou...')
+    splash_png = make_png(render_icon(640, foreground=False), 640, 640)
+    for sp in splash_files:
+        with open(sp, 'wb') as f:
+            f.write(splash_png)
+        print(f'  ✅ splash → {sp}')
+else:
+    print('  ⚠️ aucun splash.png trouvé (android/ absent ? splash non remplacé)')
+
 print('\n✅ Toutes les icônes générées !')
