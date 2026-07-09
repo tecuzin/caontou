@@ -68,7 +68,14 @@ export const DARK_TEXT_COLOR_MAP = {
  * lorsqu'elles suivent `color:`). Ne touche pas aux couleurs d'accent
  * utilisées comme fond/bordure/marqueur.
  */
+// Cache chaîne claire → chaîne sombre : ~40 split/join par appel sur des
+// chaînes stables, appelé pour chaque élément à chaque render en mode sombre.
+// Même stratégie de borne que le cache de s() (utils.js).
+const DARK_CACHE = new Map()
+
 export function applyDarkTheme(css) {
+  const hit = DARK_CACHE.get(css)
+  if (hit !== undefined) return hit
   let out = css
   for (const [light, dark] of Object.entries(DARK_COLOR_MAP)) {
     out = out.split(light).join(dark)
@@ -76,6 +83,8 @@ export function applyDarkTheme(css) {
   for (const [light, dark] of Object.entries(DARK_TEXT_COLOR_MAP)) {
     out = out.split(`color:${light}`).join(`color:${dark}`)
   }
+  if (DARK_CACHE.size > 4000) DARK_CACHE.clear()
+  DARK_CACHE.set(css, out)
   return out
 }
 

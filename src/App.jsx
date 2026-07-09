@@ -808,7 +808,8 @@ export default function App() {
             <button onClick={() => setSub(null)} style={sx('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:3px;')}>‹</button>
             <span style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
           </div>
-          <div style={sx('flex:1;overflow-y:auto;')}>
+          {/* key={sub} remonte le conteneur à chaque navigation → rejoue screenIn */}
+          <div key={sub} className="screen-in" style={sx('flex:1;overflow-y:auto;')}>
 
             {/* TRAJET */}
             {sub === 'trajet' && (
@@ -849,7 +850,8 @@ export default function App() {
       {/* ============ ÉCRANS PRINCIPAUX (onglets) ============ */}
       {!sub && (
         <div style={sx('height:100%;display:flex;flex-direction:column;')}>
-          <div style={sx('flex:1;overflow-y:auto;')}>
+          {/* key={tab} remonte le conteneur à chaque changement d'onglet → rejoue screenIn */}
+          <div key={tab} className="screen-in" style={sx('flex:1;overflow-y:auto;')}>
 
             {/* ACCUEIL */}
             {tab === 'accueil' && (
