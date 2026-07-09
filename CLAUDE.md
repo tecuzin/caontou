@@ -50,7 +50,13 @@ empaquetée en **APK Android via Capacitor**, compilée **entièrement dans Dock
    Build avec toolchain inchangée ≈ 2-3 min ; avec changement de deps ≈ 6-7 min
    (vs ~13 min avant).
 
-8. **APK signé avec un keystore STABLE** : l'APK release de Gradle est *non signé*.
+8. **`build.number` ne doit JAMAIS reculer.** Il devient le `versionCode`
+   Android : un APK avec un numéro inférieur à celui installé est refusé en
+   mise à jour (downgrade). Ne jamais faire `git checkout -- build.number` ni
+   restaurer une vieille valeur ; en cas de doute, prendre le max connu + 1
+   (incident du faux « build 40 » parti en build32, 09/07).
+
+9. **APK signé avec un keystore STABLE** : l'APK release de Gradle est *non signé*.
    L'entrypoint signe avec **`cantou.keystore` committé à la racine** (alias `cantou` /
    mdp `cantou123`) + `zipalign` + `apksigner` → `cantou-release.apk` installable.
    **Ne jamais régénérer ce keystore** : une clé différente = Android refuse la mise à
