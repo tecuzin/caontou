@@ -22,10 +22,14 @@ const MIGRATIONS = [
  * @returns {object} store migré
  */
 export function applyMigrations(store, currentVersion = 1) {
-  const LATEST = 1 // incrémenter quand on ajoute une migration
-  if (currentVersion >= LATEST) return store // à jour
-
+  const LATEST = 1
   let result = { ...store }
+
+  if (result.saved) {
+    result = { ...result.saved, ...result }
+    delete result.saved
+  }
+
   for (const m of MIGRATIONS) {
     if (m.from === currentVersion && m.to <= LATEST) {
       result = m.apply(result)
@@ -40,5 +44,6 @@ export function applyMigrations(store, currentVersion = 1) {
  * Valide que le store a un schemaVersion valide.
  */
 export function isValidSchema(store) {
-  return store && typeof store === 'object' && (store.schemaVersion === undefined || typeof store.schemaVersion === 'number')
+  if (!store || typeof store !== 'object') return false
+  return store.schemaVersion === undefined || typeof store.schemaVersion === 'number'
 }

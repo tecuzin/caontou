@@ -31,6 +31,14 @@ import { useTripConfig } from './hooks/useTripConfig.js'
 import { Confetti } from './Confetti.jsx'
 import { ExportModal } from './modals/ExportModal.jsx'
 import { ImportModal } from './modals/ImportModal.jsx'
+import { EditExpenseModal } from './modals/EditExpenseModal.jsx'
+import { EditActivityModal } from './modals/EditActivityModal.jsx'
+import { EditDayModal } from './modals/EditDayModal.jsx'
+import { EditMeteoModal } from './modals/EditMeteoModal.jsx'
+import { EditVisitModal } from './modals/EditVisitModal.jsx'
+import { AddLogiItemModal } from './modals/AddLogiItemModal.jsx'
+import { AddCourseItemModal } from './modals/AddCourseItemModal.jsx'
+import { AddTrajetCheckModal } from './modals/AddTrajetCheckModal.jsx'
 import { applyMigrations } from './migrations.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
@@ -1059,37 +1067,9 @@ export default function App() {
         </div>
       )}
 
-      {/* ============ FEUILLE : AJOUTER ARTICLE LOGI ============ */}
-      {showAddLogiItem && (
-        <div onClick={closeAddLogiItem} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newLogiItem} onChange={(e) => setNewLogiItem(e.target.value)} placeholder="Ex : Chaussettes" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeAddLogiItem} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addLogiItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} />
 
-      {/* ============ FEUILLE : AJOUTER ARTICLE COURSES ============ */}
-      {showAddCourseItem && (
-        <div onClick={closeAddCourseItem} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newCourseItem} onChange={(e) => setNewCourseItem(e.target.value)} placeholder="Ex : Fromage" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeAddCourseItem} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addCourseItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddCourseItemModal isOpen={showAddCourseItem} onClose={closeAddCourseItem} selectedCourseKey={editingCourseKey} newCourseItem={newCourseItem} setNewCourseItem={setNewCourseItem} courseGroups={courses} darkMode={darkMode} onSubmit={addCourseItem} />
 
       {/* ============ FEUILLE : EDITER METEO ============ */}
       {showMeteoEdit && (
@@ -1149,36 +1129,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ============ FEUILLE : EDITER VISITE ============ */}
-      {showVisitEdit && (
-        <div onClick={closeVisitEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingVisitId === null ? 'Ajouter une visite' : 'Editer visite'}</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
-            <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Pas de Cère" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Categorie</div>
-            <select value={newVisitCat} onChange={(e) => setNewVisitCat(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
-              <option>Nature</option>
-              <option>Famille</option>
-              <option>Patrimoine</option>
-              <option>Baignade</option>
-              <option>Gourmand</option>
-              <option>Marche</option>
-            </select>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Distance</div>
-            <input value={newVisitDist} onChange={(e) => setNewVisitDist(e.target.value)} placeholder="Ex : 25 min" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Duree</div>
-            <input value={newVisitDur} onChange={(e) => setNewVisitDur(e.target.value)} placeholder="Ex : 2 h" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Age recommande</div>
-            <input value={newVisitAge} onChange={(e) => setNewVisitAge(e.target.value)} placeholder="Ex : Des 3 ans" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeVisitEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveVisit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditVisitModal isOpen={showVisitEdit} onClose={closeVisitEdit} editIdx={editingVisitId} editVisitName={newVisitName} setEditVisitName={setNewVisitName} editVisitDist={newVisitDist} setEditVisitDist={setNewVisitDist} editVisitCat={newVisitCat} setEditVisitCat={setNewVisitCat} editVisitNote={newVisitAge} setEditVisitNote={setNewVisitAge} darkMode={darkMode} onSubmit={saveVisit} onDelete={() => {}} />
 
       {/* MODAL: Budget total edit */}
       {showBudgetTotalEdit && (
@@ -1225,21 +1176,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL: Trajet checklist add item */}
-      {showAddTrajetCheck && (
-        <div onClick={() => setShowAddTrajetCheck(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un item</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newTrajetCheckItem} onChange={(e) => setNewTrajetCheckItem(e.target.value)} placeholder="Ex : Chargeur téléphone" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addTrajetCheckItem()} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddTrajetCheck(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addTrajetCheckItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} />
 
       {/* MODAL: Export des données */}
       <ExportModal isOpen={showExport} onClose={() => setShowExport(false)} currentStoreData={currentStoreData} STORE_KEY={STORE_KEY} darkMode={darkMode} />
