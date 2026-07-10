@@ -1,36 +1,32 @@
 import { s } from '../utils.js'
 
 export function EditVisitModal({ isOpen, onClose, editIdx, editVisitName, setEditVisitName, editVisitDist, setEditVisitDist, editVisitCat, setEditVisitCat, editVisitNote, setEditVisitNote, darkMode, onSubmit, onDelete }) {
-  if (!isOpen || editIdx === null) return null
+  if (!isOpen) return null
   const sx = css => s(css)
-  const cats = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Marche']
+  const cats = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marche']
   return (
-    <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;')}>
-      <div onClick={e => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s;')}>
+    <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
+      <div onClick={e => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-        <div style={sx('font-family:Quicksand;font-weight:700;font-size:18px;margin-bottom:12px;')}>Éditer visite</div>
-        <div style={sx('margin-bottom:12px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Nom</label>
-          <input type="text" value={editVisitName} onChange={e => setEditVisitName(e.target.value)} style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
-        </div>
-        <div style={sx('margin-bottom:12px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Distance</label>
-          <input type="text" value={editVisitDist} onChange={e => setEditVisitDist(e.target.value)} placeholder="25 min" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
-        </div>
-        <div style={sx('margin-bottom:12px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Catégorie</label>
-          <select value={editVisitCat} onChange={e => setEditVisitCat(e.target.value)} style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')}>
-            {cats.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-        <div style={sx('margin-bottom:14px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Note</label>
-          <input type="text" value={editVisitNote} onChange={e => setEditVisitNote(e.target.value)} placeholder="À voir…" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
-        </div>
+        <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editIdx === null ? 'Ajouter une visite' : 'Editer visite'}</div>
+        <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
+        <input value={editVisitName} onChange={e => setEditVisitName(e.target.value)} placeholder="Ex : Pas de Cère" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Categorie</div>
+        <select value={editVisitCat} onChange={e => setEditVisitCat(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
+          <option>Nature</option>
+          <option>Famille</option>
+          <option>Patrimoine</option>
+          <option>Baignade</option>
+          <option>Gourmand</option>
+          <option>Marche</option>
+        </select>
+        <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Distance</div>
+        <input value={editVisitDist} onChange={e => setEditVisitDist(e.target.value)} placeholder="Ex : 25 min" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Age recommande</div>
+        <input value={editVisitNote} onChange={e => setEditVisitNote(e.target.value)} placeholder="Ex : Des 3 ans" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('display:flex;gap:10px;')}>
-          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>Annuler</button>
-          <button onClick={() => { onSubmit(); onClose() }} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>✓ Modifier</button>
-          <button onClick={onDelete} style={sx('flex:1;border:1px solid #b8503f;background:#f7e2dc;color:#b8503f;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>🗑️ Supprimer</button>
+          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
+          <button onClick={() => { onSubmit(); onClose() }} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
         </div>
       </div>
     </div>

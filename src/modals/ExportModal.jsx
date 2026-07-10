@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { s } from '../utils.js'
 import { buildExport, downloadExport, shareExport } from '../backup.js'
 
-export function ExportModal({ isOpen, onClose, currentStoreData, STORE_KEY, darkMode }) {
+export function ExportModal({ isOpen, onClose, currentStoreData, STORE_KEY, darkMode, onExportCopied }) {
   const [exportCopied, setExportCopied] = useState(false)
   const sx = (css) => s(darkMode ? css : css) // TODO: applyDarkTheme if needed
 
@@ -12,6 +12,7 @@ export function ExportModal({ isOpen, onClose, currentStoreData, STORE_KEY, dark
     const json = buildExport(currentStoreData(), STORE_KEY)
     navigator.clipboard.writeText(json).then(() => {
       setExportCopied(true)
+      if (onExportCopied) onExportCopied()
       setTimeout(() => setExportCopied(false), 2000)
     })
   }
