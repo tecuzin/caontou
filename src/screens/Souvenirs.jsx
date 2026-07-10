@@ -14,7 +14,7 @@ function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
 }
 
 /** Sous-écran Souvenirs — galerie photo du séjour regroupée par journée. */
-export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc }) {
+export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay }) {
   const [viewer, setViewer] = useState(null) // meta de la photo ouverte en plein écran
   const groups = groupPhotosByDay(photos, days)
   return (
@@ -38,7 +38,10 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
 
       {groups.map((g) => (
         <div key={g.key}>
-          <div style={sx('margin:20px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>{g.label} · {g.photos.length}</div>
+          <div style={sx('display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;')}>
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>{g.label} · {g.photos.length}</div>
+            <button data-testid={`btn-share-day-${g.key}`} onClick={() => shareDay(g.photos, g.label)} style={sx('border:none;background:transparent;cursor:pointer;font-size:15px;padding:2px 4px;color:#9c6b4a;')}>📤</button>
+          </div>
           <div style={sx('display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;')}>
             {g.photos.map((meta) => (
               <PhotoThumb key={meta.id} sx={sx} meta={meta} src={srcMap[meta.id]} loadSrc={loadSrc} onOpen={setViewer} />

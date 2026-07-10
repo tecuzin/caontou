@@ -18,7 +18,7 @@ export function Accueil({
   setTab, setDay, setSub, packDone, packTotal, packPct, openModule,
   newSuggestionText, setNewSuggestionText, submitSuggestion, suggestions, deleteSuggestion, sendSuggestions,
   lastBackupAt, formatLastBackup, setExportCopied, setShowExport, setShowImport, runSelfTestAndShow,
-  isDepartureDay,
+  isDepartureDay, quickPhoto,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   return (
@@ -28,6 +28,7 @@ export function Accueil({
           <Panorama height="100%" />
           <div style={sx('position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,40,25,0.15) 0%,rgba(25,35,20,0.55) 60%,rgba(20,28,16,0.75) 100%);')} />
         </div>
+        <button data-testid="btn-quick-photo" onClick={quickPhoto} style={sx('position:absolute;top:14px;right:98px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>📷</button>
         <button data-testid="btn-dark-mode-toggle" onClick={() => setDarkMode((d) => !d)} style={sx('position:absolute;top:14px;right:56px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>{darkMode ? '☀️' : '🌙'}</button>
         <button data-testid="btn-trip-settings" onClick={openTripEdit} style={sx('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
         <div style={sx('position:relative;z-index:1;')}>

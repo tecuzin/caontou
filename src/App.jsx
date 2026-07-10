@@ -312,7 +312,7 @@ export default function App() {
   const [lastBackupAt, setLastBackupAt] = useState(initial.lastBackupAt || null)
   const [journal, setJournal] = useState(initial.journal || {})
   const [carGames, setCarGames] = useState(initial.carGames || { cowLeft: 0, cowRight: 0 })
-  const { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc } = usePhotos(initial.photos || [], trip, days)
+  const { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
   // restaurable pendant 5 s via le bandeau « Annuler »
@@ -930,7 +930,7 @@ export default function App() {
 
             {/* SOUVENIRS */}
             {sub === 'souvenirs' && (
-              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} />
+              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} />
             )}
 
             {/* LOGISTIQUE */}
@@ -974,7 +974,7 @@ export default function App() {
                 suggestions={suggestions} deleteSuggestion={deleteSuggestion} sendSuggestions={sendSuggestions}
                 lastBackupAt={lastBackupAt} formatLastBackup={formatLastBackup} setExportCopied={setExportCopied}
                 setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow}
-                isDepartureDay={isDepartureDay}
+                isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }}
               />
             )}
 

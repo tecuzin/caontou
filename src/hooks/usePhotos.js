@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import { Filesystem, Directory } from '@capacitor/filesystem'
+import { Share } from '@capacitor/share'
 import { photoId, dayKeyForDate } from '../photos.js'
 
 const PHOTO_DIR = 'cantou-photos'
@@ -66,5 +67,23 @@ export function usePhotos(initial, trip, days) {
     } catch { }
   }, [srcMap])
 
-  return { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc }
+  /** Partage toutes les photos d'une journée (feuille système → Telegram…). */
+  const shareDay = async (metas, label) => {
+    if (!metas.length) return
+    const text = `${label} — ${metas.length} photo${metas.length > 1 ? 's' : ''} du séjour dans le Cantal 🏔️`
+    try {
+      if (Capacitor.isNativePlatform()) {
+        const files = []
+        for (const meta of metas) {
+          const { uri } = await Filesystem.getUri({ path: meta.file, directory: Directory.Data })
+          files.push(uri)
+        }
+        await Share.share({ title: 'Photos Cantou', text, files, dialogTitle: 'Partager cette journée' })
+      } else if (navigator.share) {
+        await navigator.share({ title: 'Photos Cantou', text })
+      }
+    } catch { }
+  }
+
+  return { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay }
 }
