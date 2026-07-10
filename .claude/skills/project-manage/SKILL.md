@@ -49,6 +49,9 @@ cat TODO.md
 
 # 3. Lire les ADR si on touche à l'architecture
 ls docs/adr/
+
+# 4. Rafraîchir le graphe de code (CodeGraphContext) pour les requêtes d'impact
+cgc update && cgc stats     # incrémental ; voir « Outillage obligatoire » (CLAUDE.md)
 ```
 
 **Règle** : avant de commencer à coder, lister les issues Epiq et identifier ce qui

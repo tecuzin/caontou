@@ -13,6 +13,27 @@ empaquetée en **APK Android via Capacitor**, compilée **entièrement dans Dock
   handoff initial, non utilisés.)
 - **Build** : Docker via Colima, image `node:20-slim` épinglée **amd64**.
 
+## Outillage obligatoire (graphe de code + rtk)
+
+Deux outils sont à utiliser **systématiquement**, pas au cas par cas :
+
+1. **CodeGraphContext** — le code de `src/` est indexé dans un graphe
+   (FalkorDB Lite embarqué, aucun serveur). Exposé à la fois comme serveur MCP
+   `codegraphcontext` et comme CLI `cgc` (`~/.local/bin/cgc`, sur le `PATH`).
+   **Avant toute analyse d'impact, recherche d'appelants, chasse au code mort
+   ou choix de cible de refactor : passer par le graphe** (`cgc analyze
+   callers/calls/deps/dead-code/complexity`, `cgc find name/content`, ou les
+   tools MCP `analyze_code_relationships`, `find_code`, `find_dead_code`,
+   `find_most_complex_functions`, `execute_cypher_query`). Le graphe donne les
+   appelants/dépendances **exacts** — ne pas les deviner au grep quand le
+   graphe répond. Il se resynchronise à chaque commit (hook git CGC) ; sinon
+   `cgc update` (incrémental) puis `cgc stats` pour vérifier.
+
+2. **rtk** (Rust Token Killer) — proxy CLI qui économise 60-90 % de tokens sur
+   les opérations de dev. Le hook Claude Code réécrit déjà les commandes
+   courantes (`git status` → `rtk git status`) de façon transparente ; laisser
+   faire et ne pas contourner. `rtk gain` pour les stats.
+
 ## ⚠️ Règles critiques de build (à ne jamais oublier)
 
 1. **AAPT2 n'existe qu'en x86_64.** Sur Apple Silicon (ARM64), un conteneur ARM64
