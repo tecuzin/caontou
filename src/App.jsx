@@ -1077,110 +1077,16 @@ export default function App() {
 
       <AddCourseItemModal isOpen={showAddCourseItem} onClose={closeAddCourseItem} selectedCourseKey={editingCourseKey} newCourseItem={newCourseItem} setNewCourseItem={setNewCourseItem} courseGroups={courses} darkMode={darkMode} onSubmit={addCourseItem} />
 
-      {/* ============ FEUILLE : EDITER METEO ============ */}
-      {showMeteoEdit && (
-        <div onClick={closeMeteoEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMeteoIdx === null ? 'Ajouter un jour' : 'Meteo'}</div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
-                <input value={newMeteoDay} onChange={(e) => setNewMeteoDay(e.target.value)} placeholder="Sam" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Numero</div>
-                <input value={newMeteoNum} onChange={(e) => setNewMeteoNum(e.target.value)} placeholder="11" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-            </div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Icone</div>
-            <input value={newMeteoIcon} onChange={(e) => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Temp max</div>
-            <input value={newMeteoHi} onChange={(e) => setNewMeteoHi(e.target.value)} placeholder="24" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Temp min</div>
-            <input value={newMeteoLo} onChange={(e) => setNewMeteoLo(e.target.value)} placeholder="12" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Pluie</div>
-            <input value={newMeteoRain} onChange={(e) => setNewMeteoRain(e.target.value)} placeholder="10 %" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeMeteoEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveMeteo} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditMeteoFullModal isOpen={showMeteoEdit} onClose={closeMeteoEdit} editingMeteoIdx={editingMeteoIdx} newMeteoDay={newMeteoDay} setNewMeteoDay={setNewMeteoDay} newMeteoNum={newMeteoNum} setNewMeteoNum={setNewMeteoNum} newMeteoIcon={newMeteoIcon} setNewMeteoIcon={setNewMeteoIcon} newMeteoHi={newMeteoHi} setNewMeteoHi={setNewMeteoHi} newMeteoLo={newMeteoLo} setNewMeteoLo={setNewMeteoLo} newMeteoRain={newMeteoRain} setNewMeteoRain={setNewMeteoRain} darkMode={darkMode} onSubmit={saveMeteo} />
 
-      {/* ============ FEUILLE : EDITER TRAJET ============ */}
-      {showTrajetEdit && editingTrajetIdx !== null && (
-        <div onClick={closeTrajetEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer etape</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newTrajetTime} onChange={(e) => setNewTrajetTime(e.target.value)} placeholder="Ex : 08:30" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Lieu</div>
-            <input value={newTrajetPlace} onChange={(e) => setNewTrajetPlace(e.target.value)} placeholder="Ex : Lyon" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Note</div>
-            <input value={newTrajetNote} onChange={(e) => setNewTrajetNote(e.target.value)} placeholder="Ex : Pause cafe" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
-            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
-              {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
-                <button key={c} onClick={() => setNewTrajetColor(c)} style={sx(`width:32px;height:32px;border-radius:50%;background:${c};border:${newTrajetColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
-              ))}
-            </div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeTrajetEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveTrajetStep} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditTrajetStepModal isOpen={showTrajetEdit} onClose={closeTrajetEdit} editingTrajetIdx={editingTrajetIdx} newTrajetTime={newTrajetTime} setNewTrajetTime={setNewTrajetTime} newTrajetPlace={newTrajetPlace} setNewTrajetPlace={setNewTrajetPlace} newTrajetNote={newTrajetNote} setNewTrajetNote={setNewTrajetNote} newTrajetColor={newTrajetColor} setNewTrajetColor={setNewTrajetColor} darkMode={darkMode} onSubmit={saveTrajetStep} />
 
       <EditVisitModal isOpen={showVisitEdit} onClose={closeVisitEdit} editIdx={editingVisitId} editVisitName={newVisitName} setEditVisitName={setNewVisitName} editVisitDist={newVisitDist} setEditVisitDist={setNewVisitDist} editVisitCat={newVisitCat} setEditVisitCat={setNewVisitCat} editVisitNote={newVisitAge} setEditVisitNote={setNewVisitAge} darkMode={darkMode} onSubmit={saveVisit} onDelete={() => {}} />
 
-      {/* MODAL: Budget total edit */}
-      {showBudgetTotalEdit && (
-        <div onClick={() => setShowBudgetTotalEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Budget total</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Montant (€)</div>
-            <input type="number" value={newBudgetTotal} onChange={(e) => setNewBudgetTotal(e.target.value)} placeholder={String(budgetTotal)} style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && saveBudgetTotal()} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowBudgetTotalEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveBudgetTotal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditBudgetModal isOpen={showBudgetTotalEdit} onClose={() => setShowBudgetTotalEdit(false)} newBudgetTotal={newBudgetTotal} setNewBudgetTotal={setNewBudgetTotal} budgetTotal={budgetTotal} darkMode={darkMode} onSubmit={saveBudgetTotal} />
 
       {/* MODAL: Hébergement edit */}
-      {showHebEdit && (
-        <div onClick={() => setShowHebEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Modifier l'hébergement</div>
-            {[
-              ['Nom', newHebNom, setNewHebNom, 'Notre gîte en Carladès'],
-              ['Adresse', newHebAdresse, setNewHebAdresse, 'Vezels-Roussy (15130)'],
-              ['Arrivée', newHebArrivee, setNewHebArrivee, 'Sam 11 · dès 16 h'],
-              ['Départ', newHebDepart, setNewHebDepart, 'Sam 18 · avant 10 h'],
-              ['Capacité', newHebCapacite, setNewHebCapacite, '4–5 personnes · 2 chambres'],
-              ['Wi-Fi réseau', newHebWifiNom, setNewHebWifiNom, 'LaGrange-Gite'],
-              ['Wi-Fi code', newHebWifiPass, setNewHebWifiPass, ''],
-              ['Contact', newHebContact, setNewHebContact, 'Mme Vidal · 06 12 34 56 78'],
-            ].map(([label, val, setter, ph]) => (
-              <div key={label}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>{label}</div>
-                <input value={val} onChange={(e) => setter(e.target.value)} placeholder={ph} style={sx('width:100%;margin-top:6px;margin-bottom:12px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-            ))}
-            <div style={sx('display:flex;gap:10px;margin-top:8px;')}>
-              <button onClick={() => setShowHebEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveHebergement} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditHebergementModal isOpen={showHebEdit} onClose={() => setShowHebEdit(false)} hebFields={{ nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact }} setHebFields={(update) => { Object.entries(update).forEach(([k, v]) => { if (k === 'nom') setNewHebNom(v); else if (k === 'adresse') setNewHebAdresse(v); else if (k === 'arrivee') setNewHebArrivee(v); else if (k === 'depart') setNewHebDepart(v); else if (k === 'capacite') setNewHebCapacite(v); else if (k === 'wifiNom') setNewHebWifiNom(v); else if (k === 'wifiPass') setNewHebWifiPass(v); else if (k === 'contact') setNewHebContact(v); }); }} darkMode={darkMode} onSubmit={saveHebergement} />
 
       <AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} />
 
@@ -1216,35 +1122,7 @@ export default function App() {
       )}
 
       {/* MODAL: Paramètres du voyage */}
-      {showTripEdit && (
-        <div onClick={() => setShowTripEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Paramètres du voyage</div>
-            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Ces réglages pilotent le compte à rebours, les cartes et les notifications.</div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Date de départ</div>
-                <input data-testid="input-trip-start" type="date" value={newTripStart} onChange={(e) => setNewTripStart(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Date de retour</div>
-                <input data-testid="input-trip-end" type="date" value={newTripEnd} onChange={(e) => setNewTripEnd(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-            </div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Ville de départ</div>
-            <input data-testid="input-trip-origin" value={newTripOrigin} onChange={(e) => setNewTripOrigin(e.target.value)} placeholder="Ex : Beauvais" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Étape (nuit) — optionnel</div>
-            <input value={newTripEtape} onChange={(e) => setNewTripEtape(e.target.value)} placeholder="Ex : Laschamps" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Destination</div>
-            <input data-testid="input-trip-dest" value={newTripDest} onChange={(e) => setNewTripDest(e.target.value)} placeholder="Ex : Vezels-Roussy (Cantal)" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowTripEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-trip" onClick={saveTrip} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditTripModal isOpen={showTripEdit} onClose={() => setShowTripEdit(false)} newTripStart={newTripStart} setNewTripStart={setNewTripStart} newTripEnd={newTripEnd} setNewTripEnd={setNewTripEnd} newTripOrigin={newTripOrigin} setNewTripOrigin={setNewTripOrigin} newTripEtape={newTripEtape} setNewTripEtape={setNewTripEtape} newTripDest={newTripDest} setNewTripDest={setNewTripDest} darkMode={darkMode} onSubmit={saveTrip} />
 
       {/* MODAL: Nouvelle liste de logistique */}
       {showAddLogiList && (

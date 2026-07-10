@@ -1,12 +1,8 @@
 import { s } from '../utils.js'
 
-export function EditTripModal({ isOpen, onClose, tripFields, setTripFields, darkMode, onSubmit }) {
+export function EditTripModal({ isOpen, onClose, newTripStart, setNewTripStart, newTripEnd, setNewTripEnd, newTripOrigin, setNewTripOrigin, newTripEtape, setNewTripEtape, newTripDest, setNewTripDest, darkMode, onSubmit }) {
   if (!isOpen) return null
   const sx = css => s(css)
-
-  const handleChange = (field, value) => {
-    setTripFields(prev => ({ ...prev, [field]: value }))
-  }
 
   return (
     <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
@@ -17,19 +13,19 @@ export function EditTripModal({ isOpen, onClose, tripFields, setTripFields, dark
         <div style={sx('display:flex;gap:10px;')}>
           <div style={sx('flex:1;')}>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Date de départ</div>
-            <input data-testid="input-trip-start" type="date" value={tripFields.start || ''} onChange={e => handleChange('start', e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <input data-testid="input-trip-start" type="date" value={newTripStart || ''} onChange={e => setNewTripStart(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
           </div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Date de retour</div>
-            <input data-testid="input-trip-end" type="date" value={tripFields.end || ''} onChange={e => handleChange('end', e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <input data-testid="input-trip-end" type="date" value={newTripEnd || ''} onChange={e => setNewTripEnd(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
           </div>
         </div>
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Ville de départ</div>
-        <input data-testid="input-trip-origin" value={tripFields.origin || ''} onChange={e => handleChange('origin', e.target.value)} placeholder="Ex : Beauvais" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <input data-testid="input-trip-origin" value={newTripOrigin || ''} onChange={e => setNewTripOrigin(e.target.value)} placeholder="Ex : Beauvais" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Étape (nuit) — optionnel</div>
-        <input value={tripFields.etape || ''} onChange={e => handleChange('etape', e.target.value)} placeholder="Ex : Laschamps" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <input value={newTripEtape || ''} onChange={e => setNewTripEtape(e.target.value)} placeholder="Ex : Laschamps" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Destination</div>
-        <input data-testid="input-trip-dest" value={tripFields.dest || ''} onChange={e => handleChange('dest', e.target.value)} placeholder="Ex : Vezels-Roussy (Cantal)" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <input data-testid="input-trip-dest" value={newTripDest || ''} onChange={e => setNewTripDest(e.target.value)} placeholder="Ex : Vezels-Roussy (Cantal)" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('display:flex;gap:10px;')}>
           <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
           <button data-testid="btn-save-trip" onClick={onSubmit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
