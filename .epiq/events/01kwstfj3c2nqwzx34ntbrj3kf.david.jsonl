@@ -385,3 +385,4 @@
 {"v":1,"id":["01KX57SVS9RGS7CA486PKBGAFF","01KX57SSV2GN66ECPE2JQZE99N"],"move.node":{"id":"01KX576KBMCK0N2YD5J997SXWC","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","rank":"bfffffffffffffffffffffff"}}
 {"v":1,"id":["01KX57SXYE1STSHGKWBXN8QNR5","01KX57SVS9RGS7CA486PKBGAFF"],"move.node":{"id":"01KX578N50EVV1Y71D9FQD9FAX","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","rank":"dfffffffffffffffffffffff"}}
 {"v":1,"id":["01KX57T0DEV196D1V2PP6902W2","01KX57SXYE1STSHGKWBXN8QNR5"],"move.node":{"id":"01KX576GJ7BWQGEWMYDX8W4PGJ","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","rank":"efffffffffffffffffffffff"}}
+{"v":1,"id":["01KX6K0KV0F5XS8M2EEEH7ZVBD","01KX57T0DEV196D1V2PP6902W2"],"add.issue":{"id":"01KX6K0KTYQ8HND5HS6K1CQAZA","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🆕 « Quoi de neuf ? » à la 1ʳᵉ ouverture d'un build + page historique des versions","rank":"f7ffffffffffffffffffffff"}}
