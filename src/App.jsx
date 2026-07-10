@@ -31,8 +31,24 @@ import { useTripConfig } from './hooks/useTripConfig.js'
 import { Confetti } from './Confetti.jsx'
 import { ExportModal } from './modals/ExportModal.jsx'
 import { ImportModal } from './modals/ImportModal.jsx'
+import { applyMigrations } from './migrations.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
+
+// Boot : charge + migre le store une seule fois au démarrage
+const ensureStoreIsUpToDate = () => {
+  if (typeof window === 'undefined') return
+  try {
+    const raw = localStorage.getItem('cantou.v1')
+    if (!raw) return // premier lancement, rien à migrer
+    const store = JSON.parse(raw)
+    const migrated = applyMigrations(store, store.schemaVersion ?? 1)
+    localStorage.setItem('cantou.v1', JSON.stringify(migrated))
+  } catch (e) {
+    console.warn('[Store] Migration failed:', e)
+  }
+}
+ensureStoreIsUpToDate()
 
 /* ------------------------------------------------------------------ *
  * Helper : transforme une chaîne CSS (issue du prototype) en objet de
@@ -744,7 +760,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt })
+  const currentStoreData = () => ({ schemaVersion: 1, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const copyExport = async () => {
     try {
