@@ -44,6 +44,11 @@ import { EditTripModal } from './modals/EditTripModal.jsx'
 import { EditTrajetStepModal } from './modals/EditTrajetStepModal.jsx'
 import { EditBudgetModal } from './modals/EditBudgetModal.jsx'
 import { EditHebergementModal } from './modals/EditHebergementModal.jsx'
+import { JournalModal } from './modals/JournalModal.jsx'
+import { Souvenirs } from './screens/Souvenirs.jsx'
+import { usePhotos } from './hooks/usePhotos.js'
+import { buildJournalText, shareJournal } from './journal.js'
+import { buildIcs, shareIcs } from './ics.js'
 import { applyMigrations } from './migrations.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
@@ -171,6 +176,9 @@ function loadStore() {
       trajetCheckItems: flattened.trajetCheckItems ?? [...TRAJET_CHECK_ITEMS_INITIAL],
       suggestions: flattened.suggestions ?? [],
       lastBackupAt: flattened.lastBackupAt ?? null,
+      journal: flattened.journal ?? {},
+      carGames: flattened.carGames ?? { cowLeft: 0, cowRight: 0 },
+      photos: flattened.photos ?? [],
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -303,6 +311,9 @@ export default function App() {
   const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
   const { suggestions, setSuggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
   const [lastBackupAt, setLastBackupAt] = useState(initial.lastBackupAt || null)
+  const [journal, setJournal] = useState(initial.journal || {})
+  const [carGames, setCarGames] = useState(initial.carGames || { cowLeft: 0, cowRight: 0 })
+  const { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc } = usePhotos(initial.photos || [], trip, days)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
   // restaurable pendant 5 s via le bandeau « Annuler »
@@ -352,8 +363,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -394,6 +405,51 @@ export default function App() {
     return { dayIdx, d, w, meal }
   }, [trip.start, trip.end, days, meteo, meals])
 
+  // Jour J : la date du jour est le jour de départ paramétré
+  const isDepartureDay = useMemo(() => {
+    const now = new Date()
+    const start = tripDate(trip.start, 0)
+    return now.getFullYear() === start.getFullYear() && now.getMonth() === start.getMonth() && now.getDate() === start.getDate()
+  }, [trip.start])
+
+  // Confetti de célébration à l'ouverture le matin du départ (une seule fois)
+  const departureCelebrated = useRef(false)
+  useEffect(() => {
+    if (isDepartureDay && !departureCelebrated.current) {
+      departureCelebrated.current = true
+      setConfettiTrigger(true)
+      setTimeout(() => setConfettiTrigger(false), 2500)
+    }
+  }, [isDepartureDay])
+
+  // Journal de bord — une entrée par jour, sauvée au fil de la saisie
+  const [showJournal, setShowJournal] = useState(false)
+  const [journalDayIdx, setJournalDayIdx] = useState(0)
+  const openJournal = (dayIdx) => { setJournalDayIdx(dayIdx); setShowJournal(true) }
+  const journalDayKey = days[journalDayIdx] ? `${days[journalDayIdx].dow} ${days[journalDayIdx].num}` : ''
+  const updateJournalEntry = (field, value) => setJournal((j) => ({ ...j, [journalDayKey]: { ...(j[journalDayKey] || {}), [field]: value } }))
+  const doShareJournal = () => { haptic(ImpactStyle.Medium); shareJournal(days, journal) }
+
+  // Partage d'une activité du planning en .ics (Google Calendar & co)
+  const shareActivity = (dayIdx, itemIdx) => {
+    const d = days[dayIdx]
+    const it = d?.items?.[itemIdx]
+    if (!d || !it) return
+    haptic(ImpactStyle.Light)
+    const [ty, tm] = trip.start.split('-').map(Number)
+    const date = new Date(ty, tm - 1, d.num)
+    const dateIso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    const ics = buildIcs({ title: it.title, dateIso, time: it.time, location: trip.destination, description: it.note || `Séjour Cantou — ${d.title}` })
+    shareIcs(ics, `cantou-${String(it.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30) || 'evenement'}.ics`)
+  }
+
+  // Compteur de vaches (jeu du trajet)
+  const bumpCow = (side) => {
+    haptic(ImpactStyle.Light)
+    setCarGames((g) => (side === 'left' ? { ...g, cowLeft: (g.cowLeft || 0) + 1 } : { ...g, cowRight: (g.cowRight || 0) + 1 }))
+  }
+  const resetCows = () => { haptic(ImpactStyle.Medium); setCarGames((g) => ({ ...g, cowLeft: 0, cowRight: 0 })) }
+
   // dérivés préparatifs
   let packDone = 0, packTotal = 0
   logi.forEach((L) => { const b = buildList(checks, L.key, L.items); packDone += b.done; packTotal += b.total })
@@ -425,7 +481,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -774,7 +830,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: 1, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt })
+  const currentStoreData = () => ({ schemaVersion: 1, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const copyExport = async () => {
     try {
@@ -869,7 +925,13 @@ export default function App() {
                 setEditingTrajetIdx={setEditingTrajetIdx} setNewTrajetTime={setNewTrajetTime} setNewTrajetPlace={setNewTrajetPlace}
                 setNewTrajetNote={setNewTrajetNote} setNewTrajetColor={setNewTrajetColor} setShowTrajetEdit={setShowTrajetEdit}
                 tr={tr} setShowAddTrajetCheck={setShowAddTrajetCheck} toggleCheck={toggleCheck} deleteTrajetCheckItem={deleteTrajetCheckItem}
+                carGames={carGames} bumpCow={bumpCow} resetCows={resetCows}
               />
+            )}
+
+            {/* SOUVENIRS */}
+            {sub === 'souvenirs' && (
+              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} />
             )}
 
             {/* LOGISTIQUE */}
@@ -913,6 +975,7 @@ export default function App() {
                 suggestions={suggestions} deleteSuggestion={deleteSuggestion} sendSuggestions={sendSuggestions}
                 lastBackupAt={lastBackupAt} formatLastBackup={formatLastBackup} setExportCopied={setExportCopied}
                 setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow}
+                isDepartureDay={isDepartureDay}
               />
             )}
 
@@ -921,6 +984,7 @@ export default function App() {
               <Planning
                 sx={sx} days={days} trip={trip} fmtDayShort={fmtDayShort} day={day} setDay={setDay} setShowDayAdd={setShowDayAdd}
                 cur={cur} editDay={editDay} editActivity={editActivity} deleteActivity={deleteActivity} startAddActivity={startAddActivity}
+                openJournal={openJournal} shareActivity={shareActivity}
               />
             )}
 
@@ -1089,6 +1153,14 @@ export default function App() {
       <EditHebergementModal isOpen={showHebEdit} onClose={() => setShowHebEdit(false)} hebFields={{ nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact }} setHebFields={(update) => { Object.entries(update).forEach(([k, v]) => { if (k === 'nom') setNewHebNom(v); else if (k === 'adresse') setNewHebAdresse(v); else if (k === 'arrivee') setNewHebArrivee(v); else if (k === 'depart') setNewHebDepart(v); else if (k === 'capacite') setNewHebCapacite(v); else if (k === 'wifiNom') setNewHebWifiNom(v); else if (k === 'wifiPass') setNewHebWifiPass(v); else if (k === 'contact') setNewHebContact(v); }); }} darkMode={darkMode} onSubmit={saveHebergement} />
 
       <AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} />
+
+      {/* MODAL: Journal de bord */}
+      <JournalModal
+        isOpen={showJournal} onClose={() => setShowJournal(false)} sx={sx}
+        dayLabel={days[journalDayIdx] ? `${days[journalDayIdx].dow} ${days[journalDayIdx].num} — ${days[journalDayIdx].title}` : ''}
+        entry={journal[journalDayKey]} updateEntry={updateJournalEntry}
+        onShare={doShareJournal} canShare={!!buildJournalText(days, journal)}
+      />
 
       {/* MODAL: Export des données */}
       <ExportModal isOpen={showExport} onClose={() => setShowExport(false)} currentStoreData={currentStoreData} STORE_KEY={STORE_KEY} darkMode={darkMode} onExportCopied={markBackedUp} />

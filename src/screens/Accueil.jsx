@@ -9,6 +9,7 @@ const MODULES = [
   { emoji: '⛅', name: 'Météo', sub: '7 jours sur place', bg: '#eee7d4', action: 'sub:meteo' },
   { emoji: '🍽️', name: 'Repas', sub: 'Menus & courses', bg: '#f3e2d6', action: 'tab:repas' },
   { emoji: '💶', name: 'Budget', sub: '1 800 € prévus', bg: '#e6ece0', action: 'tab:budget' },
+  { emoji: '📸', name: 'Souvenirs', sub: 'Photos par journée', bg: '#f3e2d6', action: 'sub:souvenirs' },
 ]
 
 /** Écran Accueil — carte de la prochaine aventure, aujourd'hui, modules, suggestions et sauvegarde. */
@@ -17,6 +18,7 @@ export function Accueil({
   setTab, setDay, setSub, packDone, packTotal, packPct, openModule,
   newSuggestionText, setNewSuggestionText, submitSuggestion, suggestions, deleteSuggestion, sendSuggestions,
   lastBackupAt, formatLastBackup, setExportCopied, setShowExport, setShowImport, runSelfTestAndShow,
+  isDepartureDay,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   return (
@@ -29,15 +31,24 @@ export function Accueil({
         <button data-testid="btn-dark-mode-toggle" onClick={() => setDarkMode((d) => !d)} style={sx('position:absolute;top:14px;right:56px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>{darkMode ? '☀️' : '🌙'}</button>
         <button data-testid="btn-trip-settings" onClick={openTripEdit} style={sx('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
         <div style={sx('position:relative;z-index:1;')}>
-          <div style={sx('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#e8e2cf;')}>PROCHAINE AVENTURE</div>
+          <div style={sx('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#e8e2cf;')}>{isDepartureDay ? "🎉 C'EST LE GRAND JOUR !" : 'PROCHAINE AVENTURE'}</div>
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;text-shadow:0 2px 8px rgba(0,0,0,0.25);')}>Carladès,<br />Cantal</div>
           <div style={sx('margin-top:9px;font-size:14px;color:#e8e2cf;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
           <div style={sx('display:flex;gap:8px;margin-top:16px;')}>
-            <div style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>J-{countdown}</div>
+            <div data-testid="countdown-pill" style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>{isDepartureDay ? 'Jour J 🎉' : `J-${countdown}`}</div>
             <div style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>
           </div>
         </div>
       </div>
+
+      {/* Bannière du jour du départ — checklist et trajet à portée de main */}
+      {isDepartureDay && (
+        <div data-testid="jour-j-banner" style={sx('margin:0 18px 14px;background:#fffdf8;border:2px solid #4a5d3a;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(74,93,58,0.18);')}>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>🚗 En route pour le Cantal !</div>
+          <div style={sx('font-size:13px;color:#6b6354;margin-top:4px;')}>Un dernier coup d'œil à la checklist avant de fermer la porte ?</div>
+          <button onClick={() => setSub('trajet')} style={sx('margin-top:12px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Checklist avant de partir →</button>
+        </div>
+      )}
 
       {today && (
         <div data-testid="today-card" style={sx('margin:0 18px 14px;background:#fffdf8;border:2px solid #cf7d3c;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(207,125,60,0.18);')}>
