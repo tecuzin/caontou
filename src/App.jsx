@@ -49,7 +49,7 @@ import { Souvenirs } from './screens/Souvenirs.jsx'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
 import { buildIcs, shareIcs } from './ics.js'
-import { applyMigrations } from './migrations.js'
+import { applyMigrations, LATEST_SCHEMA } from './migrations.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
 
@@ -154,31 +154,30 @@ function loadStore() {
     const raw = localStorage.getItem(STORE_KEY)
     if (!raw) return structuredClone(DEFAULTS)
     const p = JSON.parse(raw)
-    // Support both old format (with 'saved' key) and new format (flattened)
-    const flattened = p.saved ? { ...p.saved, ...p } : p
     return {
-      saved: flattened.saved ?? structuredClone(DEFAULTS.saved),
-      checks: flattened.checks ?? structuredClone(DEFAULTS.checks),
-      expenses: flattened.expenses ?? structuredClone(DEFAULTS.expenses),
-      meals: flattened.meals ?? structuredClone(MEALS_INITIAL),
-      shoppingItems: flattened.shoppingItems ?? structuredClone(SHOPPING_ITEMS_INITIAL),
-      days: flattened.days ?? structuredClone(DAYS_INITIAL),
-      visits: flattened.visits ?? structuredClone(VISITS_INITIAL),
-      meteo: flattened.meteo ?? structuredClone(METEO_INITIAL),
-      trajets: flattened.trajets ?? (flattened.trajetSteps
-        ? { aller: flattened.trajetSteps, retour: structuredClone(TRAJETS_INITIAL.retour) }
+      saved: p.saved ?? structuredClone(DEFAULTS.saved),
+      checks: p.checks ?? structuredClone(DEFAULTS.checks),
+      expenses: p.expenses ?? structuredClone(DEFAULTS.expenses),
+      meals: p.meals ?? structuredClone(MEALS_INITIAL),
+      shoppingItems: p.shoppingItems ?? structuredClone(SHOPPING_ITEMS_INITIAL),
+      days: p.days ?? structuredClone(DAYS_INITIAL),
+      visits: p.visits ?? structuredClone(VISITS_INITIAL),
+      meteo: p.meteo ?? structuredClone(METEO_INITIAL),
+      // Migration : l'ancien store n'avait qu'un trajet aller (trajetSteps)
+      trajets: p.trajets ?? (p.trajetSteps
+        ? { aller: p.trajetSteps, retour: structuredClone(TRAJETS_INITIAL.retour) }
         : structuredClone(TRAJETS_INITIAL)),
-      trip: flattened.trip ?? { ...TRIP_INITIAL },
-      logi: flattened.logi ?? structuredClone(LOGI_INITIAL),
-      courses: flattened.courses ?? structuredClone(COURSES_INITIAL),
-      budgetTotal: flattened.budgetTotal ?? BUDGET_INITIAL,
-      hebergement: flattened.hebergement ?? structuredClone(HEB_INITIAL),
-      trajetCheckItems: flattened.trajetCheckItems ?? [...TRAJET_CHECK_ITEMS_INITIAL],
-      suggestions: flattened.suggestions ?? [],
-      lastBackupAt: flattened.lastBackupAt ?? null,
-      journal: flattened.journal ?? {},
-      carGames: flattened.carGames ?? { cowLeft: 0, cowRight: 0 },
-      photos: flattened.photos ?? [],
+      trip: p.trip ?? { ...TRIP_INITIAL },
+      logi: p.logi ?? structuredClone(LOGI_INITIAL),
+      courses: p.courses ?? structuredClone(COURSES_INITIAL),
+      budgetTotal: p.budgetTotal ?? BUDGET_INITIAL,
+      hebergement: p.hebergement ?? structuredClone(HEB_INITIAL),
+      trajetCheckItems: p.trajetCheckItems ?? [...TRAJET_CHECK_ITEMS_INITIAL],
+      suggestions: p.suggestions ?? [],
+      lastBackupAt: p.lastBackupAt ?? null,
+      journal: p.journal ?? {},
+      carGames: p.carGames ?? { cowLeft: 0, cowRight: 0 },
+      photos: p.photos ?? [],
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -363,7 +362,7 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos })) } catch { }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos })) } catch { }
   }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
@@ -830,7 +829,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: 1, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const copyExport = async () => {
     try {

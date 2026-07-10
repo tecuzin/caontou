@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { applyMigrations, isValidSchema } from '../migrations.js'
+import { applyMigrations, isValidSchema, LATEST_SCHEMA } from '../migrations.js'
+import { TRIP_INITIAL, TRAJETS_INITIAL } from '../data.js'
 
 describe('Store migrations', () => {
   it('accepte un store sans schemaVersion (rétro-compat)', () => {
     const store = { saved: {}, checks: {} }
     const result = applyMigrations(store, 1)
-    expect(result.schemaVersion).toBe(1)
+    expect(result.schemaVersion).toBe(LATEST_SCHEMA)
   })
 
   it('valide un store avec schemaVersion valide', () => {
@@ -18,10 +19,60 @@ describe('Store migrations', () => {
     expect(isValidSchema('not an object')).toBe(false)
   })
 
-  it('préserve les données à travers les migrations', () => {
-    const store = { saved: { expenses: [{ amt: 10 }] }, checks: { key: true } }
+  it('préserve les données à travers les migrations (favoris, dépenses, checks)', () => {
+    const store = { saved: { 1: true, 5: true }, expenses: [{ amt: 10 }], checks: { tr_dep: { x: true } } }
     const result = applyMigrations(store, 1)
+    expect(result.saved).toEqual({ 1: true, 5: true })
     expect(result.expenses).toEqual([{ amt: 10 }])
-    expect(result.checks.key).toBe(true)
+    expect(result.checks.tr_dep.x).toBe(true)
+  })
+
+  describe('v1 → v2 : re-basage Carladès (incident Lyon-Mandailles)', () => {
+    it('remplace le trajet et le trip stales par les valeurs Carladès', () => {
+      const store = {
+        trip: { start: '2026-08-05', end: '2026-08-15', origin: 'Lyon', etape: '', destination: 'Mandailles' },
+        trajets: { aller: [{ time: '08:00', place: 'Depart de Lyon', note: '', color: '#5b7042' }], retour: [] },
+        saved: { 2: true },
+      }
+      const result = applyMigrations(store, 1)
+      expect(result.trip.origin).toBe(TRIP_INITIAL.origin)
+      expect(result.trip.destination).toBe(TRIP_INITIAL.destination)
+      expect(result.trip.etape).toBe(TRIP_INITIAL.etape)
+      expect(result.trip.start).toBe('2026-08-05') // dates utilisateur conservées
+      expect(result.trajets).toEqual(TRAJETS_INITIAL)
+      expect(result.saved).toEqual({ 2: true })
+      expect(result.schemaVersion).toBe(LATEST_SCHEMA)
+    })
+
+    it('migre l\'ancien format trajetSteps (route Lyon) vers trajets Carladès', () => {
+      const store = { trajetSteps: [{ place: 'Lyon Part-Dieu' }] }
+      const result = applyMigrations(store, 1)
+      expect(result.trajets).toEqual(TRAJETS_INITIAL)
+      expect(result.trajetSteps).toBeUndefined()
+    })
+
+    it('corrige l\'hébergement « Mandailles » sans toucher au Wi-Fi ni au contact', () => {
+      const store = { hebergement: { nom: 'La Grange', adresse: 'Mandailles', wifiNom: 'PersoWifi', contact: 'M. X' } }
+      const result = applyMigrations(store, 1)
+      expect(result.hebergement.adresse).toBe('Vezels-Roussy (15130)')
+      expect(result.hebergement.wifiNom).toBe('PersoWifi')
+      expect(result.hebergement.contact).toBe('M. X')
+    })
+
+    it('ne touche pas aux valeurs personnalisées non stales', () => {
+      const store = {
+        trip: { start: '2026-08-01', end: '2026-08-10', origin: 'Lille', etape: '', destination: 'Vezels-Roussy (Cantal)' },
+        trajets: { aller: [{ place: 'Depart de Lille' }], retour: [] },
+      }
+      const result = applyMigrations(store, 1)
+      expect(result.trip.origin).toBe('Lille')
+      expect(result.trajets.aller[0].place).toBe('Depart de Lille')
+    })
+
+    it('est un no-op pour un store déjà en v2', () => {
+      const store = { schemaVersion: 2, trip: { origin: 'Lyon' } } // « Lyon » choisi volontairement en v2
+      const result = applyMigrations(store, 2)
+      expect(result.trip.origin).toBe('Lyon')
+    })
   })
 })
