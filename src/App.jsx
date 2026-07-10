@@ -39,6 +39,11 @@ import { EditVisitModal } from './modals/EditVisitModal.jsx'
 import { AddLogiItemModal } from './modals/AddLogiItemModal.jsx'
 import { AddCourseItemModal } from './modals/AddCourseItemModal.jsx'
 import { AddTrajetCheckModal } from './modals/AddTrajetCheckModal.jsx'
+import { EditMeteoFullModal } from './modals/EditMeteoFullModal.jsx'
+import { EditTripModal } from './modals/EditTripModal.jsx'
+import { EditTrajetStepModal } from './modals/EditTrajetStepModal.jsx'
+import { EditBudgetModal } from './modals/EditBudgetModal.jsx'
+import { EditHebergementModal } from './modals/EditHebergementModal.jsx'
 import { applyMigrations } from './migrations.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
