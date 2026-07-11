@@ -11,6 +11,7 @@ const MODULES = [
   { emoji: '🍽️', name: 'Repas', sub: 'Menus & courses', bg: '#f3e2d6', action: 'tab:repas' },
   { emoji: '💶', name: 'Budget', sub: '1 800 € prévus', bg: '#e6ece0', action: 'tab:budget' },
   { emoji: '📸', name: 'Souvenirs', sub: 'Photos par journée', bg: '#f3e2d6', action: 'sub:souvenirs' },
+  { emoji: '🍴', name: 'Restos', sub: 'Adresses & résas', bg: '#f1e4d4', action: 'sub:restos' },
 ]
 
 /** Écran Accueil — carte de la prochaine aventure, aujourd'hui, modules, suggestions et sauvegarde. */

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { StatusBar, Style } from '@capacitor/status-bar'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL } from './data.js'
 import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Meteo } from './screens/Meteo.jsx'
 import { Hebergement } from './screens/Hebergement.jsx'
@@ -56,6 +56,8 @@ import { Historique } from './screens/Historique.jsx'
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
 import { currentPositionMapsHref } from './links.js'
+import { Restos } from './screens/Restos.jsx'
+import { RestoModal } from './modals/RestoModal.jsx'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
 import { buildIcs, shareIcs } from './ics.js'
@@ -191,6 +193,7 @@ function loadStore() {
       familyMembers: p.familyMembers ?? [],
       bingo: p.bingo ?? {},
       lastSeenBuild: p.lastSeenBuild ?? 0,
+      restos: p.restos ?? structuredClone(RESTOS_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -345,6 +348,26 @@ export default function App() {
       if (href) window.open(href, '_blank')
     } catch { /* GPS indisponible ou refusé — pas de feedback bloquant */ }
   }
+  // Carnet de restaurants (CRUD + réservations)
+  const [restos, setRestos] = useState(initial.restos || structuredClone(RESTOS_INITIAL))
+  const [showResto, setShowResto] = useState(false)
+  const [editingRestoId, setEditingRestoId] = useState(null)
+  const [restoForm, setRestoForm] = useState({ name: '', place: '', tel: '', resa: '', reserved: false })
+  const setRestoField = (k, v) => setRestoForm((f) => ({ ...f, [k]: v }))
+  const openAddResto = () => { setEditingRestoId(null); setRestoForm({ name: '', place: '', tel: '', resa: '', reserved: false }); setShowResto(true) }
+  const openEditResto = (id) => { const r = restos.find((x) => x.id === id); if (!r) return; setEditingRestoId(id); setRestoForm({ name: r.name, place: r.place || '', tel: r.tel || '', resa: r.resa || '', reserved: !!r.reserved }); setShowResto(true) }
+  const saveResto = () => {
+    if (!restoForm.name.trim()) return
+    haptic(ImpactStyle.Medium)
+    if (editingRestoId === null) {
+      const id = (restos.reduce((m, r) => Math.max(m, r.id), 0) || 0) + 1
+      setRestos((list) => [...list, { id, ...restoForm, name: restoForm.name.trim() }])
+    } else {
+      setRestos((list) => list.map((r) => r.id === editingRestoId ? { ...r, ...restoForm, name: restoForm.name.trim() } : r))
+    }
+    setShowResto(false)
+  }
+  const deleteResto = (id) => { haptic(ImpactStyle.Medium); setRestos((list) => list.filter((r) => r.id !== id)); setShowResto(false) }
   const [bingo, setBingo] = useState(initial.bingo || {})
   const toggleBingo = (idx) => {
     haptic(ImpactStyle.Light)
@@ -409,8 +432,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -538,7 +561,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', historique: 'Historique des versions' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', historique: 'Historique des versions', restos: 'Nos restos' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -887,7 +910,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const copyExport = async () => {
     try {
@@ -1004,6 +1027,11 @@ export default function App() {
             {/* HISTORIQUE DES VERSIONS */}
             {sub === 'historique' && (
               <Historique sx={sx} currentBuild={BUILD_NUMBER} />
+            )}
+
+            {/* RESTOS */}
+            {sub === 'restos' && (
+              <Restos sx={sx} restos={restos} openAddResto={openAddResto} openEditResto={openEditResto} deleteResto={deleteResto} />
             )}
 
             {/* LOGISTIQUE */}
@@ -1243,6 +1271,9 @@ export default function App() {
         days={days} addActivity={addActivity}
         onWinner={() => { haptic(ImpactStyle.Medium); setConfettiTrigger(true); setTimeout(() => setConfettiTrigger(false), 2500) }}
       />
+
+      {/* MODAL: Ajout/édition resto */}
+      <RestoModal isOpen={showResto} onClose={() => setShowResto(false)} sx={sx} editing={editingRestoId !== null} fields={restoForm} setField={setRestoField} onSubmit={saveResto} onDelete={() => deleteResto(editingRestoId)} />
 
       {/* MODAL: Quoi de neuf (premier lancement d'un build) */}
       <WhatsNewModal isOpen={showWhatsNew} onClose={closeWhatsNew} sx={sx} entries={whatsNewEntries} />
