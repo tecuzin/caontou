@@ -5,7 +5,7 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
-  { build: 57, version: '1.0.0', date: '2026-07-11', items: [
+  { build: 58, version: '1.0.0', date: '2026-07-11', items: [
     '📍 « Ma position » corrigé sous Android (géolocalisation native)',
   ] },
   { build: 56, version: '1.0.0', date: '2026-07-11', items: [
