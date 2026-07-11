@@ -4,7 +4,10 @@ import { buildExport, downloadExport, shareExport } from '../backup.js'
 
 export function ExportModal({ isOpen, onClose, currentStoreData, STORE_KEY, darkMode, onExportCopied }) {
   const [exportCopied, setExportCopied] = useState(false)
-  const sx = (css) => s(darkMode ? css : css) // TODO: applyDarkTheme if needed
+  // Le thème sombre est appliqué globalement via la classe `body.dark` +
+  // `color: inherit` (voir index.html), pas par transformation de la chaîne CSS :
+  // `sx` est donc un simple alias de `s`. (`darkMode` conservé pour l'API du composant.)
+  const sx = s
 
   if (!isOpen) return null
 
