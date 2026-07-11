@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { buildNotificationList, buildBackupReminder, buildWeatherReminders } from '../notifications.js'
+import { buildNotificationList, buildBackupReminder, buildWeatherReminders, buildMorningBrief } from '../notifications.js'
 
 const trip = { start: '2026-08-05', end: '2026-08-15', origin: 'Beauvais', etape: 'Laschamps', destination: 'Mandailles (Cantal)' }
 
@@ -37,21 +37,6 @@ describe('buildNotificationList()', () => {
     expect(depart.at.getMinutes()).toBe(30)
   })
 
-  it('planifie un rappel repas à 8h avec le plat du jour trouvé par libellé', () => {
-    vi.setSystemTime(new Date(2026, 7, 1))
-    const list = buildNotificationList(days, meals, trip)
-    const mealReminder = list.find((n) => n.title.includes('Mer 5'))
-    expect(mealReminder.body).toBe('Étape resto')
-    expect(mealReminder.at.getHours()).toBe(8)
-  })
-
-  it('utilise "Voir les menus" si aucun repas ne correspond au jour', () => {
-    vi.setSystemTime(new Date(2026, 7, 1))
-    const list = buildNotificationList(days, [], trip)
-    const mealReminder = list.find((n) => n.title.includes('Menu du jour'))
-    expect(mealReminder.body).toBe('Voir les menus')
-  })
-
   it('planifie le rappel de départ avec origine/étape/destination', () => {
     vi.setSystemTime(new Date(2026, 7, 1))
     const list = buildNotificationList(days, meals, trip)
@@ -81,6 +66,46 @@ describe('buildNotificationList()', () => {
     const list = buildNotificationList(days, meals, tripNoEtape)
     const departReminder = list.find((n) => n.title.includes("C'est le grand jour"))
     expect(departReminder.body).not.toMatch(/via/)
+  })
+})
+
+describe('buildMorningBrief()', () => {
+  const meteo = [
+    { d: 'Mer', n: 5, hi: 24, lo: 12, rain: '10 %', icon: '☀️' },
+    { d: 'Jeu', n: 6, hi: 19, lo: 11, rain: '40 %', icon: '🌧️' },
+  ]
+
+  it('compile météo + 1re activité + repas en une ligne, à 8h', () => {
+    const now = new Date(2026, 7, 1).getTime()
+    const list = buildMorningBrief(days, meals, meteo, trip, now)
+    expect(list).toHaveLength(2)
+    const mer = list.find((n) => n.title.includes('Mer 5'))
+    expect(mer.title).toBe("☀️ Aujourd'hui · Mer 5")
+    expect(mer.body).toBe('☀️ 24°/12° · 09:00 Départ · 🍽️ Étape resto')
+    expect(mer.at.getHours()).toBe(8)
+  })
+
+  it('reste robuste sans météo ni repas (activité seule)', () => {
+    const now = new Date(2026, 7, 1).getTime()
+    const list = buildMorningBrief(days, [], [], trip, now)
+    const mer = list.find((n) => n.title.includes('Mer 5'))
+    expect(mer.title).toBe("🌅 Aujourd'hui · Mer 5")
+    expect(mer.body).toBe('09:00 Départ')
+  })
+
+  it('affiche un message par défaut si journée vide', () => {
+    const now = new Date(2026, 7, 1).getTime()
+    const emptyDays = [{ dow: 'Dim', num: 9, items: [] }]
+    const list = buildMorningBrief(emptyDays, [], [], trip, now)
+    expect(list[0].body).toBe('Bonne journée dans le Cantal !')
+  })
+
+  it('ignore les jours déjà passés et n\'entre pas en collision d\'ids', () => {
+    const now = new Date(2026, 11, 31).getTime() // après le séjour
+    expect(buildMorningBrief(days, meals, meteo, trip, now)).toEqual([])
+    const list = buildMorningBrief(days, meals, meteo, trip, new Date(2026, 7, 1).getTime())
+    expect(new Set(list.map((n) => n.id)).size).toBe(list.length)
+    expect(list.every((n) => n.id >= 9200 && n.id < 9300)).toBe(true)
   })
 })
 

@@ -369,8 +369,8 @@ export default function App() {
   // du planning ou des menus — natif Android (survit à la fermeture) ou
   // fallback web en dev.
   useEffect(() => {
-    scheduleAllNotifications(days, meals, trip, lastBackupAt).catch(() => { })
-  }, [days, meals, trip, lastBackupAt])
+    scheduleAllNotifications(days, meals, meteo, trip, lastBackupAt).catch(() => { })
+  }, [days, meals, meteo, trip, lastBackupAt])
 
   const toggleCheck = (key, label) => {
     haptic(ImpactStyle.Light)

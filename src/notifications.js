@@ -24,13 +24,6 @@ export function buildNotificationList(daysData, mealsData, trip) {
       if (at.getTime() > now) list.push({ id: id++, title: `🗓️ Dans 30 min · ${item.title}`, body: `${d.dow} ${d.num} ${monthName} · ${item.time}`, at })
     })
   })
-  daysData.forEach((d) => {
-    const at = new Date(ty, tm - 1, d.num, 8, 0, 0)
-    if (at.getTime() > now) {
-      const ml = mealsData.find((m) => m.day === `${d.dow} ${d.num}`)
-      list.push({ id: id++, title: `🍽️ Menu du jour · ${d.dow} ${d.num}`, body: ml ? ml.dish : 'Voir les menus', at })
-    }
-  })
   const start = tripDate(trip.start)
   const veille = new Date(start.getFullYear(), start.getMonth(), start.getDate() - 1, 20, 0, 0)
   const matin = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 7, 0, 0)
@@ -84,6 +77,34 @@ export function buildWeatherReminders(daysData, trip, now = Date.now()) {
   return list
 }
 
+// Brief du matin — une notification à 8 h pour chaque jour du séjour, qui
+// résume la journée en une ligne : météo (icône + max/min), première activité
+// prévue et repas du jour. Remplace l'ancien rappel « Menu du jour » seul.
+// Ids réservés (9200+), hors des plages 1..N, 9000 (backup) et 9100+ (météo).
+const MORNING_BRIEF_BASE = 9200
+export function buildMorningBrief(daysData, mealsData, meteoData, trip, now = Date.now()) {
+  const [ty, tm] = trip.start.split('-').map(Number)
+  const list = []
+  daysData.forEach((d, i) => {
+    const at = new Date(ty, tm - 1, d.num, 8, 0, 0)
+    if (at.getTime() <= now) return
+    const w = (meteoData || []).find((m) => m.n === d.num)
+    const ml = mealsData.find((m) => m.day === `${d.dow} ${d.num}`)
+    const first = d.items && d.items.length ? d.items[0] : null
+    const parts = []
+    if (w) parts.push(`${w.icon} ${w.hi}°/${w.lo}°`)
+    if (first) parts.push(`${first.time} ${first.title}`)
+    if (ml) parts.push(`🍽️ ${ml.dish}`)
+    list.push({
+      id: MORNING_BRIEF_BASE + i,
+      title: `${w ? w.icon : '🌅'} Aujourd'hui · ${d.dow} ${d.num}`,
+      body: parts.length ? parts.join(' · ') : 'Bonne journée dans le Cantal !',
+      at,
+    })
+  })
+  return list
+}
+
 // Fallback web (dev navigateur) : setTimeout + Notification API.
 // Les timeouts sont suivis pour éviter les doublons à la replanification.
 let webNotifTimeouts = []
@@ -118,8 +139,13 @@ export async function dispatchNativeNotifications(list) {
   }
 }
 
-export async function scheduleAllNotifications(daysData, mealsData, trip, lastBackupAt = null) {
-  const list = [...buildNotificationList(daysData, mealsData, trip), ...buildWeatherReminders(daysData, trip), buildBackupReminder(lastBackupAt)]
+export async function scheduleAllNotifications(daysData, mealsData, meteoData, trip, lastBackupAt = null) {
+  const list = [
+    ...buildNotificationList(daysData, mealsData, trip),
+    ...buildMorningBrief(daysData, mealsData, meteoData, trip),
+    ...buildWeatherReminders(daysData, trip),
+    buildBackupReminder(lastBackupAt),
+  ]
   if (Capacitor.isNativePlatform()) await dispatchNativeNotifications(list)
   else await dispatchWebNotifications(list)
 }
