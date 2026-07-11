@@ -1,3 +1,6 @@
+import { Capacitor } from '@capacitor/core'
+import { Geolocation } from '@capacitor/geolocation'
+
 /**
  * Liens actionnables délégués à l'OS — brique transverse (restos, urgences,
  * hébergement, position). La génération des liens est 100 % offline ; seule
@@ -17,6 +20,12 @@ export function mapsHref(query) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
 }
 
+/** Ouvre un lien externe (Maps/navigateur) : `_system` sur natif, `_blank` sur web. */
+export function openExternal(href) {
+  if (!href) return
+  try { window.open(href, Capacitor.isNativePlatform() ? '_system' : '_blank') } catch { }
+}
+
 /** Lien Google Maps vers des coordonnées « lat,lng ». */
 export function mapsCoordsHref(lat, lng) {
   if (typeof lat !== 'number' || typeof lng !== 'number' || Number.isNaN(lat) || Number.isNaN(lng)) return null
@@ -24,10 +33,20 @@ export function mapsCoordsHref(lat, lng) {
 }
 
 /**
- * Récupère la position actuelle (navigator.geolocation, pas de plugin natif).
- * Résout un lien Google Maps vers les coordonnées, ou rejette si indisponible.
+ * Récupère la position actuelle et résout un lien Google Maps vers les
+ * coordonnées. Sur Android/iOS : plugin @capacitor/geolocation (permissions +
+ * GPS gérés nativement — `navigator.geolocation` n'est pas fiable dans la
+ * WebView). Sur web : `navigator.geolocation` en secours. Rejette si refusé.
  */
-export function currentPositionMapsHref() {
+export async function currentPositionMapsHref() {
+  if (Capacitor.isNativePlatform()) {
+    const perm = await Geolocation.requestPermissions()
+    if (perm.location !== 'granted' && perm.coarseLocation !== 'granted') {
+      throw new Error('Autorisation de localisation refusée')
+    }
+    const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 10000 })
+    return mapsCoordsHref(pos.coords.latitude, pos.coords.longitude)
+  }
   return new Promise((resolve, reject) => {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       reject(new Error('Géolocalisation indisponible'))

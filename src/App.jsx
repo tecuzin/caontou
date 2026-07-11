@@ -55,7 +55,7 @@ import { WhatsNewModal } from './modals/WhatsNewModal.jsx'
 import { ChangelogModal } from './modals/ChangelogModal.jsx'
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
-import { currentPositionMapsHref } from './links.js'
+import { currentPositionMapsHref, openExternal } from './links.js'
 import { Restos } from './screens/Restos.jsx'
 import { RestoModal } from './modals/RestoModal.jsx'
 import { usePhotos } from './hooks/usePhotos.js'
@@ -341,13 +341,16 @@ export default function App() {
   }, []) // au montage uniquement
   const closeWhatsNew = () => { setShowWhatsNew(false); setLastSeenBuild(BUILD_NUMBER) }
   const [showChangelog, setShowChangelog] = useState(false)
-  // « Ma position » : géoloc navigateur → ouvre Google Maps (extra non-offline)
+  // « Ma position » : géoloc native (plugin) → ouvre Google Maps (extra non-offline)
   const openMyPosition = async () => {
     haptic(ImpactStyle.Light)
     try {
       const href = await currentPositionMapsHref()
-      if (href) window.open(href, '_blank')
-    } catch { /* GPS indisponible ou refusé — pas de feedback bloquant */ }
+      if (href) openExternal(href)
+    } catch {
+      // GPS refusé/indisponible : on informe brièvement (sinon le bouton semble « mort »)
+      try { window.alert('Position indisponible — vérifie que la localisation est activée et autorisée pour Cantou.') } catch { }
+    }
   }
   // Carnet de restaurants (CRUD + réservations)
   const [restos, setRestos] = useState(initial.restos || structuredClone(RESTOS_INITIAL))
