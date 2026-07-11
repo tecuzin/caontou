@@ -533,3 +533,7 @@
 {"v":1,"id":["01KX9B51S3VRCASEN186PGMM4V","01KX9B50SBQWH284BCRS1N97WS"],"add.issue":{"id":"01KX9B51S1XYR6430Q5WDA5NH4","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","name":"✅ Best-practices : pas de demande de permission notifications au chargement + nettoyer les erreurs console","rank":"ffdfffffffffffffffffffff"}}
 {"v":1,"id":["01KX9B536RDSYNF7MCHZGHX36X","01KX9B51S3VRCASEN186PGMM4V"],"add.issue":{"id":"01KX9B536PRYBZ0P72GCHJ511S","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","name":"⚡ Perf : réduire le JS inutilisé / render-blocking + restaurer bf-cache (FCP/LCP 2,5 s)","rank":"ffefffffffffffffffffffff"}}
 {"v":1,"id":["01KX9B542TESPXSDG01Z15MJYC","01KX9B536RDSYNF7MCHZGHX36X"],"add.issue":{"id":"01KX9B542R021RD0P8RJ8HV6TN","parent":"01KWSTHN7AKWFJT9N28CGWDPXJ","name":"🛠️ Outillage : pipeline qualité automatisé (coverage + Trivy + Lighthouse + SonarQube)","rank":"fff7ffffffffffffffffffff"}}
+{"v":1,"id":["01KX9B5JCKZEW1PY9650ZTRJAC","01KX9B542TESPXSDG01Z15MJYC"],"add.issue.tag":{"id":"01KX9B4MZBG27DHEZED8P8YGKT","tag":"01KWWGKYH4JQ223AT1FRDH8WDE"}}
+{"v":1,"id":["01KX9B5KCZCFRQ82DE2HRQBKG3","01KX9B5JCKZEW1PY9650ZTRJAC"],"add.issue.tag":{"id":"01KX9B4MZBG27DHEZED8P8YGKT","tag":"01KWWGM5ZC6JBAAQ7GXE54Y7KT"}}
+{"v":1,"id":["01KX9B5MBBCHK6CA221PJ6KJZF","01KX9B5KCZCFRQ82DE2HRQBKG3"],"add.issue.tag":{"id":"01KX9B4MZBG27DHEZED8P8YGKT","tag":"01KWXE3GBG9PANYSZ8136MCPR0"}}
+{"v":1,"id":["01KX9B5MT4BD4Y1Z8B2R42W9CW","01KX9B5MBBCHK6CA221PJ6KJZF"],"add.issue.tag":{"id":"01KX9B4PF8W5A63RP4C6HTHEKC","tag":"01KWWGKYH4JQ223AT1FRDH8WDE"}}
