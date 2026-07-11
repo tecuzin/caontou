@@ -61,6 +61,15 @@ cantou-v{semver}-build{N}-{YYYYMMDD-HHMM}.apk
 ex : cantou-v0.2.0-build43-20260701-1900.apk
 ```
 
+## Avant de builder : mettre à jour le changelog (si nouveautés visibles)
+
+Si le build embarque des **nouveautés visibles par la famille**, ajouter une
+entrée en tête de `src/changelog.js` (`{ build: NN, version, date, items: [...] }`,
+plus récent d'abord). C'est la source de « Quoi de neuf ? » (1ᵉʳ lancement) et de
+la page Historique. Le numéro de build vient de `build.number` (incrémenté au
+début de `build-docker.sh`) → l'entrée `build: NN` doit correspondre au build qui
+part. Garder le changelog **synchrone avec les cartes Epiq** passées en UAT/EUA.
+
 ## Après chaque déploiement réussi : board Epiq (obligatoire)
 
 Pour **chaque carte Epiq embarquée** dans l'APK envoyé :
