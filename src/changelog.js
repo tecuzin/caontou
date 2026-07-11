@@ -5,6 +5,12 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 57, version: '1.0.0', date: '2026-07-11', items: [
+    '📍 « Ma position » corrigé sous Android (géolocalisation native)',
+  ] },
+  { build: 56, version: '1.0.0', date: '2026-07-11', items: [
+    '🗂️ Bouton « Historique des versions » (cette fenêtre)',
+  ] },
   { build: 55, version: '1.0.0', date: '2026-07-11', items: [
     '🍴 Carnet de restaurants & réservations (appel + Google Maps en 1 tap)',
     '🆘 Numéros d\'urgence cliquables (112, SAMU, pompiers…)',
