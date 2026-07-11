@@ -163,6 +163,17 @@ export function Accueil({
         )}
       </div>
 
+      <div style={sx('padding:6px 18px 12px;')}>
+        <button data-testid="btn-open-bilan" onClick={() => setSub('bilan')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:13px;background:#f3e2d6;display:flex;align-items:center;justify-content:center;font-size:21px;')}>📊</div>
+          <div style={sx('flex:1;')}>
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Bilan du séjour</div>
+            <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>Stats & récap à partager</div>
+          </div>
+          <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>›</div>
+        </button>
+      </div>
+
       <div style={sx('padding:6px 18px 4px;display:flex;align-items:baseline;justify-content:space-between;')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Sauvegarde</div>
         <div data-testid="last-backup-label" style={sx('font-size:12px;color:#6b6354;')}>Dernière : {formatLastBackup(lastBackupAt)}</div>

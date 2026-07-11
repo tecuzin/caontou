@@ -49,6 +49,8 @@ import { VoteModal } from './modals/VoteModal.jsx'
 import { Souvenirs } from './screens/Souvenirs.jsx'
 import { Bingo } from './screens/Bingo.jsx'
 import { countCompletedLines } from './bingo.js'
+import { Bilan } from './screens/Bilan.jsx'
+import { shareRecap } from './recap.js'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
 import { buildIcs, shareIcs } from './ics.js'
@@ -489,6 +491,17 @@ export default function App() {
   const coursesGroups = courses.map((g) => { const b = buildList(checks, g.key, g.items); coursesDone += b.done; coursesTotal += b.total; return { name: g.name, doneStr: `${b.done}/${b.total}`, items: b.items, key: g.key } })
   const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
 
+  // Bilan de séjour — synthèse des données existantes pour l'écran Bilan.
+  const recapData = {
+    daysCount: days.length,
+    spent, budgetTotal, spentPct,
+    topCategories: budgetCats.map((c) => ({ name: c.name, amt: c.amt })),
+    savedVisits: savedCount,
+    packPct, coursesPct,
+    mealsPlanned: meals.length,
+    photosCount: photos.length,
+  }
+
   // visites filtrées + triées
   const CAT_ORDER = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Marche']
   const filteredVisits = visits
@@ -501,7 +514,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -957,6 +970,11 @@ export default function App() {
             {/* BINGO */}
             {sub === 'bingo' && (
               <Bingo sx={sx} items={BINGO_CANTAL} checked={bingo} toggleBingo={toggleBingo} />
+            )}
+
+            {/* BILAN */}
+            {sub === 'bilan' && (
+              <Bilan sx={sx} recap={recapData} onShare={() => { haptic(ImpactStyle.Medium); shareRecap(recapData) }} />
             )}
 
             {/* LOGISTIQUE */}
