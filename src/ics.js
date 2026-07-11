@@ -31,7 +31,7 @@ function icsDateTime(dateIso, time) {
  *   durationMin (défaut 120), location, description }
  */
 export function buildIcs(ev) {
-  const uid = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}@cantou`
+  const uid = `${crypto.randomUUID()}@cantou`
   const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z'
   const lines = [
     'BEGIN:VCALENDAR',

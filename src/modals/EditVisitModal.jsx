@@ -3,7 +3,6 @@ import { s } from '../utils.js'
 export function EditVisitModal({ isOpen, onClose, editIdx, editVisitName, setEditVisitName, editVisitDist, setEditVisitDist, editVisitCat, setEditVisitCat, editVisitNote, setEditVisitNote, darkMode, onSubmit, onDelete }) {
   if (!isOpen) return null
   const sx = css => s(css)
-  const cats = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marche']
   return (
     <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
       <div onClick={e => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
