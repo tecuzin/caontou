@@ -20,7 +20,7 @@ export function Accueil({
   setTab, setDay, setSub, packDone, packTotal, packPct, openModule,
   newSuggestionText, setNewSuggestionText, submitSuggestion, suggestions, deleteSuggestion, sendSuggestions,
   lastBackupAt, formatLastBackup, setExportCopied, setShowExport, setShowImport, runSelfTestAndShow,
-  isDepartureDay, quickPhoto, openMyPosition,
+  isDepartureDay, quickPhoto, openMyPosition, openChangelog,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   return (
@@ -200,7 +200,7 @@ export function Accueil({
       </div>
       <div style={sx('padding:0 18px 12px;display:flex;gap:10px;')}>
         <button data-testid="btn-selftest" onClick={runSelfTestAndShow} style={sx('flex:1;border:1px dashed #d8cbb0;background:transparent;border-radius:14px;padding:10px;cursor:pointer;font-family:Quicksand;font-weight:600;font-size:12px;color:#9a917f;')}>🔧 Auto-diagnostic</button>
-        <button data-testid="btn-open-historique" onClick={() => setSub('historique')} style={sx('flex:1;border:1px dashed #d8cbb0;background:transparent;border-radius:14px;padding:10px;cursor:pointer;font-family:Quicksand;font-weight:600;font-size:12px;color:#9a917f;')}>🗂️ Historique des versions</button>
+        <button data-testid="btn-open-historique" onClick={openChangelog} style={sx('flex:1;border:1px dashed #d8cbb0;background:transparent;border-radius:14px;padding:10px;cursor:pointer;font-family:Quicksand;font-weight:600;font-size:12px;color:#9a917f;')}>🗂️ Historique des versions</button>
       </div>
       <div style={sx('height:16px;')} />
     </div>

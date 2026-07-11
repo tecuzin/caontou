@@ -52,7 +52,7 @@ import { countCompletedLines } from './bingo.js'
 import { Bilan } from './screens/Bilan.jsx'
 import { shareRecap } from './recap.js'
 import { WhatsNewModal } from './modals/WhatsNewModal.jsx'
-import { Historique } from './screens/Historique.jsx'
+import { ChangelogModal } from './modals/ChangelogModal.jsx'
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
 import { currentPositionMapsHref } from './links.js'
@@ -340,6 +340,7 @@ export default function App() {
     if (BUILD_NUMBER > lastSeenBuild && entriesSince(lastSeenBuild).length) setShowWhatsNew(true)
   }, []) // au montage uniquement
   const closeWhatsNew = () => { setShowWhatsNew(false); setLastSeenBuild(BUILD_NUMBER) }
+  const [showChangelog, setShowChangelog] = useState(false)
   // « Ma position » : géoloc navigateur → ouvre Google Maps (extra non-offline)
   const openMyPosition = async () => {
     haptic(ImpactStyle.Light)
@@ -561,7 +562,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', historique: 'Historique des versions', restos: 'Nos restos' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -1024,11 +1025,6 @@ export default function App() {
               <Bilan sx={sx} recap={recapData} onShare={() => { haptic(ImpactStyle.Medium); shareRecap(recapData) }} />
             )}
 
-            {/* HISTORIQUE DES VERSIONS */}
-            {sub === 'historique' && (
-              <Historique sx={sx} currentBuild={BUILD_NUMBER} />
-            )}
-
             {/* RESTOS */}
             {sub === 'restos' && (
               <Restos sx={sx} restos={restos} openAddResto={openAddResto} openEditResto={openEditResto} deleteResto={deleteResto} />
@@ -1075,7 +1071,7 @@ export default function App() {
                 suggestions={suggestions} deleteSuggestion={deleteSuggestion} sendSuggestions={sendSuggestions}
                 lastBackupAt={lastBackupAt} formatLastBackup={formatLastBackup} setExportCopied={setExportCopied}
                 setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow}
-                isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }} openMyPosition={openMyPosition}
+                isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }} openMyPosition={openMyPosition} openChangelog={() => setShowChangelog(true)}
               />
             )}
 
@@ -1277,6 +1273,9 @@ export default function App() {
 
       {/* MODAL: Quoi de neuf (premier lancement d'un build) */}
       <WhatsNewModal isOpen={showWhatsNew} onClose={closeWhatsNew} sx={sx} entries={whatsNewEntries} />
+
+      {/* MODAL: Historique des versions (bouton) */}
+      <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} sx={sx} currentBuild={BUILD_NUMBER} />
 
       {/* MODAL: Export des données */}
       <ExportModal isOpen={showExport} onClose={() => setShowExport(false)} currentStoreData={currentStoreData} STORE_KEY={STORE_KEY} darkMode={darkMode} onExportCopied={markBackedUp} />

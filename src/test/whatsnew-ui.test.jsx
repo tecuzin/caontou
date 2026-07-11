@@ -44,13 +44,15 @@ describe('« Quoi de neuf ? » au lancement', () => {
     expect(stored.lastSeenBuild).toBeGreaterThan(1)
   })
 
-  it('la page Historique liste tous les builds du changelog', async () => {
+  it('le bouton ouvre la modale Historique listant tous les builds', async () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('btn-open-historique'))
-    expect(screen.getByTestId('screen-historique')).toBeInTheDocument()
+    // modale (pas un sous-écran) listant chaque build du changelog
     for (const e of CHANGELOG) {
       expect(screen.getByTestId(`changelog-${e.build}`)).toBeInTheDocument()
     }
+    await user.click(screen.getByTestId('btn-changelog-close'))
+    expect(screen.queryByTestId('changelog-' + CHANGELOG[0].build)).not.toBeInTheDocument()
   })
 })
