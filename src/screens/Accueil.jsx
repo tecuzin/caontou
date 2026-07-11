@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Panorama } from '../Scenery.jsx'
-import { KIDS_GAMES } from '../data.js'
+import { KIDS_GAMES, EMERGENCY_NUMBERS } from '../data.js'
+import { TelLink } from '../components/Links.jsx'
 
 const MODULES = [
   { emoji: '🚗', name: 'Trajet', sub: 'Aller & retour', bg: '#dfeae6', action: 'sub:trajet' },
@@ -18,7 +19,7 @@ export function Accueil({
   setTab, setDay, setSub, packDone, packTotal, packPct, openModule,
   newSuggestionText, setNewSuggestionText, submitSuggestion, suggestions, deleteSuggestion, sendSuggestions,
   lastBackupAt, formatLastBackup, setExportCopied, setShowExport, setShowImport, runSelfTestAndShow,
-  isDepartureDay, quickPhoto,
+  isDepartureDay, quickPhoto, openMyPosition,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   return (
@@ -161,6 +162,20 @@ export function Accueil({
             <button data-testid="btn-send-suggestions" onClick={sendSuggestions} style={sx('width:100%;margin-top:2px;border:1px solid #cf7d3c;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📤 Envoyer sur Telegram / WhatsApp…</button>
           </div>
         )}
+      </div>
+
+      <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🆘 Urgences & repères</div>
+      <div style={sx('padding:0 18px 12px;')}>
+        <div data-testid="emergency-block" style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:6px 14px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+          {EMERGENCY_NUMBERS.map((e, i) => (
+            <div key={e.num} style={sx(`display:flex;align-items:center;gap:10px;padding:10px 0;${i < EMERGENCY_NUMBERS.length - 1 ? 'border-bottom:1px solid #f1e9da;' : ''}`)}>
+              <span style={sx('font-size:18px;flex:0 0 auto;')}>{e.emoji}</span>
+              <span style={sx('flex:1;font-size:14px;color:#3a352b;')}>{e.label}</span>
+              <TelLink sx={sx} num={e.num} style={'color:#b8503f;font-weight:700;text-decoration:none;font-family:Quicksand;font-size:16px;'}>📞 {e.num}</TelLink>
+            </div>
+          ))}
+        </div>
+        <button data-testid="btn-my-position" onClick={openMyPosition} style={sx('width:100%;margin-top:10px;border:1px solid #4f8a86;background:#fffdf8;color:#4f8a86;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:12px;cursor:pointer;')}>📍 Ma position → Google Maps</button>
       </div>
 
       <div style={sx('padding:6px 18px 12px;')}>

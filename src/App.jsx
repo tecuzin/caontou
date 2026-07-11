@@ -55,6 +55,7 @@ import { WhatsNewModal } from './modals/WhatsNewModal.jsx'
 import { Historique } from './screens/Historique.jsx'
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
+import { currentPositionMapsHref } from './links.js'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
 import { buildIcs, shareIcs } from './ics.js'
@@ -336,6 +337,14 @@ export default function App() {
     if (BUILD_NUMBER > lastSeenBuild && entriesSince(lastSeenBuild).length) setShowWhatsNew(true)
   }, []) // au montage uniquement
   const closeWhatsNew = () => { setShowWhatsNew(false); setLastSeenBuild(BUILD_NUMBER) }
+  // « Ma position » : géoloc navigateur → ouvre Google Maps (extra non-offline)
+  const openMyPosition = async () => {
+    haptic(ImpactStyle.Light)
+    try {
+      const href = await currentPositionMapsHref()
+      if (href) window.open(href, '_blank')
+    } catch { /* GPS indisponible ou refusé — pas de feedback bloquant */ }
+  }
   const [bingo, setBingo] = useState(initial.bingo || {})
   const toggleBingo = (idx) => {
     haptic(ImpactStyle.Light)
@@ -1038,7 +1047,7 @@ export default function App() {
                 suggestions={suggestions} deleteSuggestion={deleteSuggestion} sendSuggestions={sendSuggestions}
                 lastBackupAt={lastBackupAt} formatLastBackup={formatLastBackup} setExportCopied={setExportCopied}
                 setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow}
-                isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }}
+                isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }} openMyPosition={openMyPosition}
               />
             )}
 

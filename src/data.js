@@ -241,3 +241,19 @@ export const BINGO_CANTAL = [
   { emoji: '🥾', label: 'Un sentier de rando (GR)' },
   { emoji: '🧺', label: 'Un marché de village' },
 ]
+
+// Numéros d'urgence — contenu statique, cliquables (tel:) même hors-ligne.
+export const EMERGENCY_NUMBERS = [
+  { emoji: '🆘', label: 'Urgences (Europe)', num: '112' },
+  { emoji: '🚑', label: 'SAMU', num: '15' },
+  { emoji: '🚒', label: 'Pompiers', num: '18' },
+  { emoji: '👮', label: 'Gendarmerie', num: '17' },
+  { emoji: '💬', label: 'Urgences par SMS', num: '114' },
+]
+
+// Carnet de restaurants du séjour (éditable). resa = note de réservation,
+// reserved = statut (réservé / à réserver).
+export const RESTOS_INITIAL = [
+  { id: 1, name: 'Aligot & truffade au buron', place: 'Col de Curebourse (Carladès)', tel: '', resa: '', reserved: false },
+  { id: 2, name: 'Truite du Pas de Cère', place: 'Vic-sur-Cère', tel: '', resa: '', reserved: false },
+]
