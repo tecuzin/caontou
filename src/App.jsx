@@ -51,6 +51,10 @@ import { Bingo } from './screens/Bingo.jsx'
 import { countCompletedLines } from './bingo.js'
 import { Bilan } from './screens/Bilan.jsx'
 import { shareRecap } from './recap.js'
+import { WhatsNewModal } from './modals/WhatsNewModal.jsx'
+import { Historique } from './screens/Historique.jsx'
+import { BUILD_NUMBER } from './build-info.js'
+import { entriesSince } from './changelog.js'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
 import { buildIcs, shareIcs } from './ics.js'
@@ -185,6 +189,7 @@ function loadStore() {
       photos: p.photos ?? [],
       familyMembers: p.familyMembers ?? [],
       bingo: p.bingo ?? {},
+      lastSeenBuild: p.lastSeenBuild ?? 0,
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -321,6 +326,16 @@ export default function App() {
   const [carGames, setCarGames] = useState(initial.carGames || { cowLeft: 0, cowRight: 0 })
   const [familyMembers, setFamilyMembers] = useState(initial.familyMembers || [])
   const [showVote, setShowVote] = useState(false)
+  const [lastSeenBuild, setLastSeenBuild] = useState(initial.lastSeenBuild || 0)
+  const [showWhatsNew, setShowWhatsNew] = useState(false)
+  const whatsNewEntries = useMemo(() => entriesSince(lastSeenBuild), [lastSeenBuild])
+  useEffect(() => {
+    // 1ʳᵉ install (lastSeenBuild=0) : on cale silencieusement sur le build courant,
+    // pas de déballage du changelog. Sinon, nouveau build vu → « Quoi de neuf ».
+    if (lastSeenBuild === 0) { setLastSeenBuild(BUILD_NUMBER); return }
+    if (BUILD_NUMBER > lastSeenBuild && entriesSince(lastSeenBuild).length) setShowWhatsNew(true)
+  }, []) // au montage uniquement
+  const closeWhatsNew = () => { setShowWhatsNew(false); setLastSeenBuild(BUILD_NUMBER) }
   const [bingo, setBingo] = useState(initial.bingo || {})
   const toggleBingo = (idx) => {
     haptic(ImpactStyle.Light)
@@ -385,8 +400,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -514,7 +529,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', historique: 'Historique des versions' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -863,7 +878,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const copyExport = async () => {
     try {
@@ -975,6 +990,11 @@ export default function App() {
             {/* BILAN */}
             {sub === 'bilan' && (
               <Bilan sx={sx} recap={recapData} onShare={() => { haptic(ImpactStyle.Medium); shareRecap(recapData) }} />
+            )}
+
+            {/* HISTORIQUE DES VERSIONS */}
+            {sub === 'historique' && (
+              <Historique sx={sx} currentBuild={BUILD_NUMBER} />
             )}
 
             {/* LOGISTIQUE */}
@@ -1214,6 +1234,9 @@ export default function App() {
         days={days} addActivity={addActivity}
         onWinner={() => { haptic(ImpactStyle.Medium); setConfettiTrigger(true); setTimeout(() => setConfettiTrigger(false), 2500) }}
       />
+
+      {/* MODAL: Quoi de neuf (premier lancement d'un build) */}
+      <WhatsNewModal isOpen={showWhatsNew} onClose={closeWhatsNew} sx={sx} entries={whatsNewEntries} />
 
       {/* MODAL: Export des données */}
       <ExportModal isOpen={showExport} onClose={() => setShowExport(false)} currentStoreData={currentStoreData} STORE_KEY={STORE_KEY} darkMode={darkMode} onExportCopied={markBackedUp} />
