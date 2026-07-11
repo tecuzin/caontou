@@ -8,7 +8,7 @@ export const OTHER_DAY_KEY = 'autres'
 
 /** Identifiant unique d'une photo. */
 export function photoId() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  return crypto.randomUUID()
 }
 
 /**
