@@ -37,8 +37,8 @@ test.describe('Accueil — contenu', () => {
     await expect(page.getByText(/J-\d+/)).toBeVisible()
   })
 
-  test('affiche la destination Puy Mary', async ({ page }) => {
-    await expect(page.locator('[data-testid="screen-accueil"]').getByText(/Puy Mary/).first()).toBeVisible()
+  test('affiche la destination Carladès / Cantal', async ({ page }) => {
+    await expect(page.locator('[data-testid="screen-accueil"]').getByText(/Carladès/).first()).toBeVisible()
   })
 
   test('affiche le module Trajet', async ({ page }) => {

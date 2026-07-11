@@ -16,10 +16,14 @@ export function tallyVotes(votes) {
 
 /**
  * Désigne un gagnant à partir des votes. En cas d'égalité, tranche au hasard
- * (rng injectable pour les tests). Retourne null si aucun vote exprimé.
+ * (rng injectable pour les tests). Retourne la valeur d'origine du vote (type
+ * préservé : un id numérique reste un nombre, pas la clé string de tallyVotes)
+ * — sinon un `visits.find(v => v.id === winner)` échouerait (1 !== "1").
+ * Retourne null si aucun vote exprimé.
  */
 export function pickWinner(votes, rng = Math.random) {
   const { winners } = tallyVotes(votes)
   if (!winners.length) return null
-  return winners[Math.floor(rng() * winners.length)]
+  const winKey = winners[Math.floor(rng() * winners.length)]
+  return votes.find((v) => String(v) === winKey) ?? winKey
 }

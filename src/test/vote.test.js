@@ -28,6 +28,18 @@ describe('Vote familial — dépouillement', () => {
     expect(pickWinner(['x', 'x', 'y'], () => 0.9)).toBe('x')
   })
 
+  it('préserve le TYPE des votes numériques (régression : id 1 ≠ "1")', () => {
+    // Les ids de visite sont des nombres ; le gagnant doit rester un nombre
+    // pour que visits.find(v => v.id === winner) fonctionne.
+    const w = pickWinner([1, 5, 1])
+    expect(w).toBe(1)
+    expect(typeof w).toBe('number')
+    // égalité numérique tranchée : renvoie bien un des nombres d'origine
+    const tie = pickWinner([1, 5], () => 0.99)
+    expect(typeof tie).toBe('number')
+    expect([1, 5]).toContain(tie)
+  })
+
   it('pickWinner rend null sans vote', () => {
     expect(pickWinner([])).toBeNull()
   })
