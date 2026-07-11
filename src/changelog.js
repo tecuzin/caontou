@@ -5,6 +5,12 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 55, version: '1.0.0', date: '2026-07-11', items: [
+    '🍴 Carnet de restaurants & réservations (appel + Google Maps en 1 tap)',
+    '🆘 Numéros d\'urgence cliquables (112, SAMU, pompiers…)',
+    '📍 Bouton « Ma position → Google Maps »',
+    '🗳️ Correction du vote familial (le gagnant est désormais bien désigné)',
+  ] },
   { build: 54, version: '1.0.0', date: '2026-07-11', items: [
     '🔍 Bingo d\'observation du Cantal pour les enfants',
     '📊 Bilan de fin de séjour, à partager',
