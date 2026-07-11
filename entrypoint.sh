@@ -33,6 +33,15 @@ sed -i "s/versionCode 1$/versionCode ${BUILD_NUMBER}/" android/app/build.gradle
 sed -i "s/versionName \"1.0\"/versionName \"${VERSION_NAME}\"/" android/app/build.gradle
 grep -E "versionCode|versionName" android/app/build.gradle | head -2
 
+echo "=== [4c] Permissions localisation (le plugin @capacitor/geolocation ne les déclare pas) ==="
+# cap sync régénère AndroidManifest.xml sans les permissions GPS → sans elles,
+# Geolocation.requestPermissions() ne montre AUCUNE boîte de dialogue Android.
+MANIFEST=android/app/src/main/AndroidManifest.xml
+if ! grep -q "ACCESS_FINE_LOCATION" "$MANIFEST"; then
+    sed -i 's#</manifest>#    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n</manifest>#' "$MANIFEST"
+fi
+grep -i "ACCESS_.*_LOCATION" "$MANIFEST" || { echo "ERREUR: permissions localisation non injectées"; exit 1; }
+
 echo "=== [5/6] gradle assembleRelease ==="
 cd android
 chmod +x gradlew

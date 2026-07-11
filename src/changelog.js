@@ -5,6 +5,9 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 59, version: '1.0.0', date: '2026-07-11', items: [
+    '📍 « Ma position » : l\'app demande enfin l\'autorisation de localisation',
+  ] },
   { build: 58, version: '1.0.0', date: '2026-07-11', items: [
     '📍 « Ma position » corrigé sous Android (géolocalisation native)',
   ] },
