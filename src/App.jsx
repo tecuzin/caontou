@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { StatusBar, Style } from '@capacitor/status-bar'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL } from './data.js'
 import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Meteo } from './screens/Meteo.jsx'
 import { Hebergement } from './screens/Hebergement.jsx'
@@ -14,7 +14,7 @@ import { Visites } from './screens/Visites.jsx'
 import { Accueil } from './screens/Accueil.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
-import { buildExport, exportFilename, parseImport, downloadExport, shareExport, formatLastBackup } from './backup.js'
+import { parseImport, formatLastBackup } from './backup.js'
 import { runSelfTests } from './selftest.js'
 import { useVisits } from './hooks/useVisits.js'
 import { useSwipe } from './hooks/useSwipe.js'
@@ -31,10 +31,6 @@ import { useTripConfig } from './hooks/useTripConfig.js'
 import { Confetti } from './Confetti.jsx'
 import { ExportModal } from './modals/ExportModal.jsx'
 import { ImportModal } from './modals/ImportModal.jsx'
-import { EditExpenseModal } from './modals/EditExpenseModal.jsx'
-import { EditActivityModal } from './modals/EditActivityModal.jsx'
-import { EditDayModal } from './modals/EditDayModal.jsx'
-import { EditMeteoModal } from './modals/EditMeteoModal.jsx'
 import { EditVisitModal } from './modals/EditVisitModal.jsx'
 import { AddLogiItemModal } from './modals/AddLogiItemModal.jsx'
 import { AddCourseItemModal } from './modals/AddCourseItemModal.jsx'
@@ -300,6 +296,8 @@ export default function App() {
   const [newDaySub2, setNewDaySub2] = useState('')
   const [newSuggestionText, setNewSuggestionText] = useState('')
   const [showExport, setShowExport] = useState(false)
+  // eslint-disable-next-line no-unused-vars -- `exportCopied` n'est pas lu ici : seul
+  // le setter est transmis à l'Accueil (feedback « ✓ Copié »). Paire conservée entière.
   const [exportCopied, setExportCopied] = useState(false)
   const [showImport, setShowImport] = useState(false)
   const [importText, setImportText] = useState('')
@@ -324,7 +322,7 @@ export default function App() {
   const [budgetTotal, setBudgetTotal] = useState(initial.budgetTotal || BUDGET_INITIAL)
   const [hebergement, setHebergement] = useState(initial.hebergement || structuredClone(HEB_INITIAL))
   const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
-  const { suggestions, setSuggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
+  const { suggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
   const [lastBackupAt, setLastBackupAt] = useState(initial.lastBackupAt || null)
   const [journal, setJournal] = useState(initial.journal || {})
   const [carGames, setCarGames] = useState(initial.carGames || { cowLeft: 0, cowRight: 0 })
@@ -386,7 +384,7 @@ export default function App() {
       return next
     })
   }
-  const { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
+  const { photos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
   // restaurable pendant 5 s via le bandeau « Annuler »
@@ -916,16 +914,6 @@ export default function App() {
   // Export / import complet des données (JSON) — logique pure dans backup.js
   const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
-  const copyExport = async () => {
-    try {
-      await navigator.clipboard.writeText(buildExport(currentStoreData(), STORE_KEY))
-      setExportCopied(true)
-      markBackedUp()
-      setTimeout(() => setExportCopied(false), 2500)
-    } catch { }
-  }
-  const doDownloadExport = () => { downloadExport(buildExport(currentStoreData(), STORE_KEY), exportFilename()); markBackedUp() }
-  const doShareExport = () => { shareExport(buildExport(currentStoreData(), STORE_KEY), exportFilename()); markBackedUp() }
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
     setSelftestResults(runSelfTests())
@@ -935,14 +923,6 @@ export default function App() {
     const { data, error } = parseImport(text)
     setImportError(error)
     setImportPreview(data)
-  }
-  const handleImportFile = (e) => {
-    const f = e.target.files && e.target.files[0]
-    if (!f) return
-    const reader = new FileReader()
-    reader.onload = () => { setImportText(String(reader.result)); doParseImport(String(reader.result)) }
-    reader.readAsText(f)
-    e.target.value = ''
   }
   const applyImport = () => {
     if (!importPreview) return

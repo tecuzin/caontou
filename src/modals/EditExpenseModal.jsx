@@ -2,7 +2,6 @@ import { s } from '../utils.js'
 
 export function EditExpenseModal({ isOpen, onClose, editIdx, expenses, editLabel, setEditLabel, editCat, setEditCat, editAmt, setEditAmt, cats, darkMode, onSubmit, onDelete }) {
   if (!isOpen || editIdx === null) return null
-  const expense = expenses[editIdx]
   const sx = css => s(css)
   return (
     <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;')}>
