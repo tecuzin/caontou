@@ -5,13 +5,16 @@ const FILTERS = ['Tous', 'Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourman
 export function Visites({
   sx, savedCount, filter, setFilter, visitSort, setVisitSort, filteredVisits, saved,
   setEditingVisitId, setNewVisitName, setNewVisitDist, setNewVisitDur, setNewVisitAge, setNewVisitCat, setShowVisitEdit,
-  toggleSaved, editVisit, deleteVisit,
+  toggleSaved, editVisit, deleteVisit, openVote,
 }) {
   return (
     <div data-testid="screen-visites">
-      <div style={sx('padding:54px 18px 4px;')}>
-        <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>À faire</div>
-        <div style={sx('font-size:13px;color:#6b6354;')}>Autour du Carladès · {savedCount} enregistrées ♥</div>
+      <div style={sx('padding:54px 18px 4px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;')}>
+        <div>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>À faire</div>
+          <div style={sx('font-size:13px;color:#6b6354;')}>Autour du Carladès · {savedCount} enregistrées ♥</div>
+        </div>
+        {openVote && <button data-testid="btn-open-vote" onClick={openVote} style={sx('flex:0 0 auto;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:9px 13px;cursor:pointer;')}>🗳️ Voter</button>}
       </div>
       <div style={sx('display:flex;gap:8px;overflow-x:auto;padding:12px 18px 14px;')}>
         {FILTERS.map((f) => (

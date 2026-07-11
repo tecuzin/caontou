@@ -45,6 +45,7 @@ import { EditTrajetStepModal } from './modals/EditTrajetStepModal.jsx'
 import { EditBudgetModal } from './modals/EditBudgetModal.jsx'
 import { EditHebergementModal } from './modals/EditHebergementModal.jsx'
 import { JournalModal } from './modals/JournalModal.jsx'
+import { VoteModal } from './modals/VoteModal.jsx'
 import { Souvenirs } from './screens/Souvenirs.jsx'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
@@ -178,6 +179,7 @@ function loadStore() {
       journal: p.journal ?? {},
       carGames: p.carGames ?? { cowLeft: 0, cowRight: 0 },
       photos: p.photos ?? [],
+      familyMembers: p.familyMembers ?? [],
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -312,6 +314,8 @@ export default function App() {
   const [lastBackupAt, setLastBackupAt] = useState(initial.lastBackupAt || null)
   const [journal, setJournal] = useState(initial.journal || {})
   const [carGames, setCarGames] = useState(initial.carGames || { cowLeft: 0, cowRight: 0 })
+  const [familyMembers, setFamilyMembers] = useState(initial.familyMembers || [])
+  const [showVote, setShowVote] = useState(false)
   const { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
@@ -362,8 +366,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -829,7 +833,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const copyExport = async () => {
     try {
@@ -995,6 +999,7 @@ export default function App() {
                 setEditingVisitId={setEditingVisitId} setNewVisitName={setNewVisitName} setNewVisitDist={setNewVisitDist}
                 setNewVisitDur={setNewVisitDur} setNewVisitAge={setNewVisitAge} setNewVisitCat={setNewVisitCat} setShowVisitEdit={setShowVisitEdit}
                 toggleSaved={toggleSaved} editVisit={editVisit} deleteVisit={deleteVisit}
+                openVote={() => setShowVote(true)}
               />
             )}
 
@@ -1159,6 +1164,15 @@ export default function App() {
         dayLabel={days[journalDayIdx] ? `${days[journalDayIdx].dow} ${days[journalDayIdx].num} — ${days[journalDayIdx].title}` : ''}
         entry={journal[journalDayKey]} updateEntry={updateJournalEntry}
         onShare={doShareJournal} canShare={!!buildJournalText(days, journal)}
+      />
+
+      {/* MODAL: Vote familial « on fait quoi demain ? » */}
+      <VoteModal
+        isOpen={showVote} onClose={() => setShowVote(false)} sx={sx}
+        visits={visits} savedVisitIds={Object.keys(saved).filter((k) => saved[k]).map(Number)}
+        familyMembers={familyMembers} setFamilyMembers={setFamilyMembers}
+        days={days} addActivity={addActivity}
+        onWinner={() => { haptic(ImpactStyle.Medium); setConfettiTrigger(true); setTimeout(() => setConfettiTrigger(false), 2500) }}
       />
 
       {/* MODAL: Export des données */}
