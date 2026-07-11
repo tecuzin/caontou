@@ -220,3 +220,24 @@ export const KIDS_GAMES = [
   { emoji: '🍳', place: 'Au gîte', color: '#4f8a86', name: 'Cuisiner en famille', desc: "Préparer l'aligot ou un gâteau à la châtaigne tous ensemble." },
   { emoji: '🎨', place: 'Au gîte', color: '#4f8a86', name: 'Carnet de vacances', desc: 'Dessiner la journée, coller un ticket, écrire un mot chaque soir.' },
 ]
+
+// Bingo d'observation du Cantal — grille 4×4 à cocher pendant les balades et
+// la route. Ligne complète (rangée / colonne / diagonale) = petite célébration.
+export const BINGO_CANTAL = [
+  { emoji: '🐄', label: 'Vache de Salers' },
+  { emoji: '🏔️', label: 'Le Plomb du Cantal' },
+  { emoji: '🛖', label: 'Un buron' },
+  { emoji: '💧', label: 'Une cascade' },
+  { emoji: '🧀', label: 'Une fromagerie' },
+  { emoji: '🦅', label: 'Un rapace' },
+  { emoji: '🐟', label: 'Une truite' },
+  { emoji: '⛪', label: 'Un clocher roman' },
+  { emoji: '🌰', label: 'Un châtaignier' },
+  { emoji: '🚜', label: 'Un tracteur à foin' },
+  { emoji: '🌸', label: 'Une gentiane jaune' },
+  { emoji: '🐑', label: 'Un troupeau' },
+  { emoji: '🪨', label: 'Un mur en pierre volcanique' },
+  { emoji: '🌋', label: 'Un ancien volcan' },
+  { emoji: '🥾', label: 'Un sentier de rando (GR)' },
+  { emoji: '🧺', label: 'Un marché de village' },
+]

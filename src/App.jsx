@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { StatusBar, Style } from '@capacitor/status-bar'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL } from './data.js'
 import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { Meteo } from './screens/Meteo.jsx'
 import { Hebergement } from './screens/Hebergement.jsx'
@@ -47,6 +47,8 @@ import { EditHebergementModal } from './modals/EditHebergementModal.jsx'
 import { JournalModal } from './modals/JournalModal.jsx'
 import { VoteModal } from './modals/VoteModal.jsx'
 import { Souvenirs } from './screens/Souvenirs.jsx'
+import { Bingo } from './screens/Bingo.jsx'
+import { countCompletedLines } from './bingo.js'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
 import { buildIcs, shareIcs } from './ics.js'
@@ -180,6 +182,7 @@ function loadStore() {
       carGames: p.carGames ?? { cowLeft: 0, cowRight: 0 },
       photos: p.photos ?? [],
       familyMembers: p.familyMembers ?? [],
+      bingo: p.bingo ?? {},
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -316,6 +319,20 @@ export default function App() {
   const [carGames, setCarGames] = useState(initial.carGames || { cowLeft: 0, cowRight: 0 })
   const [familyMembers, setFamilyMembers] = useState(initial.familyMembers || [])
   const [showVote, setShowVote] = useState(false)
+  const [bingo, setBingo] = useState(initial.bingo || {})
+  const toggleBingo = (idx) => {
+    haptic(ImpactStyle.Light)
+    setBingo((b) => {
+      const next = { ...b, [idx]: !b[idx] }
+      // Célébration si cocher cette case complète une nouvelle ligne
+      if (!b[idx] && countCompletedLines(next) > countCompletedLines(b)) {
+        haptic(ImpactStyle.Medium)
+        setConfettiTrigger(true)
+        setTimeout(() => setConfettiTrigger(false), 2500)
+      }
+      return next
+    })
+  }
   const { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
@@ -366,8 +383,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -484,7 +501,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -833,7 +850,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const copyExport = async () => {
     try {
@@ -935,6 +952,11 @@ export default function App() {
             {/* SOUVENIRS */}
             {sub === 'souvenirs' && (
               <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} />
+            )}
+
+            {/* BINGO */}
+            {sub === 'bingo' && (
+              <Bingo sx={sx} items={BINGO_CANTAL} checked={bingo} toggleBingo={toggleBingo} />
             )}
 
             {/* LOGISTIQUE */}

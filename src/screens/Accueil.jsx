@@ -111,6 +111,14 @@ export function Accueil({
 
       <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🎲 Jeux avec les enfants</div>
       <div style={sx('padding:0 18px 12px;')}>
+        <button data-testid="btn-open-bingo" onClick={() => setSub('bingo')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:13px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🔍</div>
+          <div style={sx('flex:1;')}>
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Bingo du Cantal</div>
+            <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>16 trésors à repérer · une ligne complète = 🎉</div>
+          </div>
+          <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>›</div>
+        </button>
         <button data-testid="btn-toggle-games" onClick={() => setGamesOpen((o) => !o)} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
           <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:13px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🎲</div>
           <div style={sx('flex:1;')}>
