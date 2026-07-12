@@ -108,9 +108,19 @@ export function buildMorningBrief(daysData, mealsData, meteoData, trip, now = Da
 // Fallback web (dev navigateur) : setTimeout + Notification API.
 // Les timeouts sont suivis pour éviter les doublons à la replanification.
 let webNotifTimeouts = []
+// Demande explicite de permission — à câbler sur un geste utilisateur (bouton
+// « activer les rappels »), jamais au chargement (best practice Lighthouse
+// notification-on-start). Renvoie l'état de permission résultant.
+export async function requestWebNotificationPermission() {
+  if (!('Notification' in window)) return 'unsupported'
+  if (Notification.permission === 'default') return await Notification.requestPermission()
+  return Notification.permission
+}
+
 export async function dispatchWebNotifications(list) {
   if (!('Notification' in window)) return
-  if (Notification.permission === 'default') await Notification.requestPermission()
+  // On ne PROMPT pas au chargement : on planifie uniquement si la permission
+  // est déjà accordée (sinon la demande passe par requestWebNotificationPermission).
   if (Notification.permission !== 'granted') return
   webNotifTimeouts.forEach(clearTimeout)
   webNotifTimeouts = list.map((n) => setTimeout(() => {
