@@ -165,6 +165,19 @@ describe('dispatchWebNotifications() — fallback navigateur', () => {
     window.Notification = originalNotification
   })
 
+  it('ne demande PAS la permission au chargement (best practice) et ne planifie rien si default', async () => {
+    const { dispatchWebNotifications } = await import('../notifications.js')
+    const originalNotification = window.Notification
+    let requested = false
+    window.Notification = class {
+      static permission = 'default'
+      static requestPermission() { requested = true; return Promise.resolve('granted') }
+    }
+    await dispatchWebNotifications([{ id: 1, title: 'X', body: 'Y', at: new Date() }])
+    expect(requested).toBe(false)
+    window.Notification = originalNotification
+  })
+
   it('planifie un setTimeout par notification si la permission est accordée', async () => {
     vi.useRealTimers()
     const { dispatchWebNotifications } = await import('../notifications.js')
