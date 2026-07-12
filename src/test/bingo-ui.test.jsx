@@ -25,7 +25,7 @@ describe('Bingo du Cantal (UI)', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('btn-open-bingo'))
-    expect(screen.getByTestId('screen-bingo')).toBeInTheDocument()
+    expect(await screen.findByTestId('screen-bingo')).toBeInTheDocument()
     expect(screen.getByTestId('bingo-lines')).toHaveTextContent('0/10')
 
     await user.click(screen.getByTestId('bingo-cell-0'))
@@ -37,6 +37,7 @@ describe('Bingo du Cantal (UI)', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('btn-open-bingo'))
+    await screen.findByTestId('screen-bingo')
     for (const i of [0, 1, 2, 3]) await user.click(screen.getByTestId(`bingo-cell-${i}`))
     expect(screen.getByTestId('bingo-lines')).toHaveTextContent('1/10')
   })
