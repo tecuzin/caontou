@@ -9,12 +9,12 @@ export function EditDayModal({ isOpen, onClose, editIdx, editTitle, setEditTitle
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:18px;margin-bottom:12px;')}>Éditer jour</div>
         <div style={sx('margin-bottom:12px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Titre</label>
-          <input type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} placeholder="Ex: Arrivée à Vezels" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
+          <label htmlFor="edit-day-title" style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Titre</label>
+          <input id="edit-day-title" type="text" value={editTitle} onChange={e => setEditTitle(e.target.value)} placeholder="Ex: Arrivée à Vezels" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
         </div>
         <div style={sx('margin-bottom:14px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Sous-titre</label>
-          <input type="text" value={editSub} onChange={e => setEditSub(e.target.value)} placeholder="Ex: Installation au gîte" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
+          <label htmlFor="edit-day-sub" style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Sous-titre</label>
+          <input id="edit-day-sub" type="text" value={editSub} onChange={e => setEditSub(e.target.value)} placeholder="Ex: Installation au gîte" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
         </div>
         <div style={sx('display:flex;gap:10px;')}>
           <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>Annuler</button>

@@ -13,6 +13,7 @@
     "test:e2e:coverage": "rm -rf coverage-e2e && playwright test && node scripts/report-e2e-coverage.js",
     "test:appium": "wdio run tests/appium/wdio.conf.js",
     "quality": "bash scripts/quality-audit.sh",
+    "test:bdd": "cucumber-js",
     "package:qa-bundle": "bash scripts/package-appium-bundle.sh"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
+    "@cucumber/cucumber": "^13.0.0",
     "@playwright/test": "^1.61.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

@@ -8,6 +8,22 @@ import { eur } from './utils.js'
  * ouvre la feuille de partage système.
  */
 
+/**
+ * Agrège les tranches du store en objet « recap » consommé par l'écran Bilan
+ * et par buildRecapText. Fonction pure (extraite d'App.jsx) — testable isolément.
+ */
+export function computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, savedCount, packPct, coursesPct, meals, photos }) {
+  return {
+    daysCount: days.length,
+    spent, budgetTotal, spentPct,
+    topCategories: budgetCats.map((c) => ({ name: c.name, amt: c.amt })),
+    savedVisits: savedCount,
+    packPct, coursesPct,
+    mealsPlanned: meals.length,
+    photosCount: photos.length,
+  }
+}
+
 /** Formate le bilan en texte partageable (Telegram/WhatsApp). */
 export function buildRecapText(d) {
   const lines = [
