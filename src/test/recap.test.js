@@ -1,5 +1,22 @@
 import { describe, it, expect } from 'vitest'
-import { buildRecapText } from '../recap.js'
+import { buildRecapText, computeRecap } from '../recap.js'
+
+describe('computeRecap — agrégation du store (extraite d\'App.jsx)', () => {
+  const store = {
+    days: [{}, {}, {}], spent: 420, budgetTotal: 800, spentPct: 53,
+    budgetCats: [{ name: 'Restau', amt: 180, extra: 'ignoré' }, { name: 'Courses', amt: 140 }],
+    savedCount: 3, packPct: 75, coursesPct: 40,
+    meals: [{}, {}], photos: [{}, {}, {}, {}, {}],
+  }
+  it('agrège les compteurs et ne garde que name/amt des catégories', () => {
+    const r = computeRecap(store)
+    expect(r).toMatchObject({
+      daysCount: 3, spent: 420, budgetTotal: 800, spentPct: 53,
+      savedVisits: 3, packPct: 75, coursesPct: 40, mealsPlanned: 2, photosCount: 5,
+    })
+    expect(r.topCategories).toEqual([{ name: 'Restau', amt: 180 }, { name: 'Courses', amt: 140 }])
+  })
+})
 
 const base = {
   daysCount: 11,

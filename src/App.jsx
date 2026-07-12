@@ -48,7 +48,7 @@ const Souvenirs = lazy(() => import('./screens/Souvenirs.jsx').then(m => ({ defa
 const Bingo = lazy(() => import('./screens/Bingo.jsx').then(m => ({ default: m.Bingo })))
 import { countCompletedLines } from './bingo.js'
 const Bilan = lazy(() => import('./screens/Bilan.jsx').then(m => ({ default: m.Bilan })))
-import { shareRecap } from './recap.js'
+import { shareRecap, computeRecap } from './recap.js'
 import { WhatsNewModal } from './modals/WhatsNewModal.jsx'
 import { ChangelogModal } from './modals/ChangelogModal.jsx'
 import { BUILD_NUMBER } from './build-info.js'
@@ -543,15 +543,7 @@ export default function App() {
   const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
 
   // Bilan de séjour — synthèse des données existantes pour l'écran Bilan.
-  const recapData = {
-    daysCount: days.length,
-    spent, budgetTotal, spentPct,
-    topCategories: budgetCats.map((c) => ({ name: c.name, amt: c.amt })),
-    savedVisits: savedCount,
-    packPct, coursesPct,
-    mealsPlanned: meals.length,
-    photosCount: photos.length,
-  }
+  const recapData = computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, savedCount, packPct, coursesPct, meals, photos })
 
   // visites filtrées + triées
   const CAT_ORDER = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Marche']
