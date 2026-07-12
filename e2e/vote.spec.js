@@ -1,56 +1,44 @@
 import { test, expect } from './fixtures.js'
+import { App } from './pages/index.js'
 
+let app
 test.beforeEach(async ({ page }) => {
-  await page.goto('/')
-  await page.evaluate(() => localStorage.clear())
-  await page.reload()
+  app = new App(page)
+  await app.goto()
 })
 
 test.describe('Vote familial — scénario complet (pass-and-play)', () => {
   test('2 votants → gagnant réel affiché puis ajouté au planning', async ({ page }) => {
-    // Ouvrir le vote depuis Visites
-    await page.locator('[data-testid="tab-visites"]').click()
-    await page.locator('[data-testid="btn-open-vote"]').click()
+    await app.tab('visites')
+    await app.visites.openVote()
 
-    // Ajouter deux votants
-    await page.locator('[data-testid="vote-new-voter"]').fill('Papa')
-    await page.locator('[data-testid="vote-add-voter"]').click()
-    await page.locator('[data-testid="vote-new-voter"]').fill('Maman')
-    await page.locator('[data-testid="vote-add-voter"]').click()
+    await app.vote.addVoter('Papa')
+    await app.vote.addVoter('Maman')
 
-    // Les visites ♥ par défaut pré-remplissent les candidats → démarrer
-    const startBtn = page.locator('[data-testid="vote-start"]')
-    await expect(startBtn).toBeEnabled()
-    await startBtn.click()
+    await expect(app.vote.startBtn).toBeEnabled()
+    await app.vote.start()
 
-    // Premier votant : on cible le 1er candidat proposé (même testid aux 2 tours)
-    const firstPick = page.locator('[data-testid^="vote-pick-"]').first()
+    // Premier votant : cible le 1er candidat ; même choix au 2e tour → gagnant net
+    const firstPick = app.vote.firstPick()
     const pickTestId = await firstPick.getAttribute('data-testid')
     await firstPick.click()
+    await app.vote.pickByTestId(pickTestId).click()
 
-    // Deuxième votant : même choix → gagnant net
-    await page.locator(`[data-testid="${pickTestId}"]`).click()
-
-    // Résultat : un vrai nom de visite s'affiche (régression : c'était « — »)
-    const winnerEl = page.locator('[data-testid="vote-winner"]')
-    await expect(winnerEl).toBeVisible()
-    const winnerName = (await winnerEl.textContent()).trim()
+    // Résultat : un vrai nom de visite (régression : c'était « — »)
+    await expect(app.vote.winner).toBeVisible()
+    const winnerName = (await app.vote.winner.textContent()).trim()
     expect(winnerName.length).toBeGreaterThan(1)
     expect(winnerName).not.toBe('—')
 
-    // Ajouter au planning — on cible le 1er jour pour le retrouver sur la vue
-    // par défaut du Planning (qui s'ouvre sur le jour 0)
-    await page.locator('[data-testid="vote-target-day"]').selectOption('0')
-    await page.locator('[data-testid="vote-add-planning"]').click()
+    await app.vote.addToPlanning(0)
 
-    // La sortie gagnante apparaît dans le planning
-    await page.locator('[data-testid="tab-planning"]').click()
+    await app.tab('planning')
     await expect(page.getByText(winnerName).first()).toBeVisible()
   })
 
-  test('le bouton démarrer est bloqué sans votant', async ({ page }) => {
-    await page.locator('[data-testid="tab-visites"]').click()
-    await page.locator('[data-testid="btn-open-vote"]').click()
-    await expect(page.locator('[data-testid="vote-start"]')).toBeDisabled()
+  test('le bouton démarrer est bloqué sans votant', async () => {
+    await app.tab('visites')
+    await app.visites.openVote()
+    await expect(app.vote.startBtn).toBeDisabled()
   })
 })
