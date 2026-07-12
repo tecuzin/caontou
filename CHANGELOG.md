@@ -2,6 +2,23 @@
 
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
+## [1.1.0] - 2026-07-12
+Release de qualité (builds 60→67). Aucune régression fonctionnelle ; focus tests,
+performance, accessibilité, sécurité et outillage. Voir `docs/retex/` pour le détail chiffré.
+### Ajouté
+- **Tests** : couverture unitaire 65→75 % (369 tests), E2E en pattern **PCOM** + couche
+  **Cucumber/Gherkin** (`npm run test:bdd`), +11 scénarios (couverture E2E 39,7→49,3 %).
+- **Outillage** : `npm run quality` (audit Trivy + Lighthouse + SonarQube + couverture).
+- **Perf** : code-splitting des sous-écrans (démarrage allégé).
+- **Accessibilité** : associations `label`/champ sur les modales (Sonar S6853 → 0).
+- **Sécurité** : identifiants via `crypto.randomUUID` ; ADR-009 (stratégie keystore).
+- **Escalade Telegram** : notification automatique quand l'assistant a besoin d'une réponse.
+### Corrigé
+- Bug conditionnel `ExportModal` (Sonar S3923), SEO (meta-description + robots.txt),
+  favicon (404), demande de permission notifications au démarrage.
+### Modifié
+- README réécrit (vue projet complète), REX complets dans `docs/retex/`.
+
 ## [1.0.0] - 2026-07-07
 ### Ajouté
 - **Itinéraire réel du trajet** — étapes aller/retour recherchées sur
