@@ -2,6 +2,7 @@
 export function Planning({
   sx, days, trip, fmtDayShort, day, setDay, setShowDayAdd,
   cur, editDay, editActivity, deleteActivity, startAddActivity,
+  openJournal, shareActivity,
 }) {
   return (
     <div data-testid="screen-planning">
@@ -24,7 +25,10 @@ export function Planning({
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:20px;')}>{cur.title}</div>
             <div style={sx('font-size:13px;color:#6b6354;margin-bottom:16px;')}>{cur.sub}</div>
           </div>
-          <button onClick={() => editDay(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;flex:0 0 auto;')}>✏️</button>
+          <div style={sx('display:flex;gap:4px;flex:0 0 auto;')}>
+            <button data-testid="btn-journal" onClick={() => openJournal(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;')}>📔</button>
+            <button onClick={() => editDay(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;')}>✏️</button>
+          </div>
         </div>
         {cur.items.map((it, i) => (
           <div key={i} style={sx('display:flex;gap:12px;')}>
@@ -39,6 +43,7 @@ export function Planning({
                   <div style={sx('font-weight:700;font-size:15px;')}>{it.title}</div>
                   {it.note && <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>{it.note}</div>}
                 </div>
+                <button data-testid={`btn-share-activity-${i}`} onClick={() => shareActivity(day, i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>📅</button>
                 <button onClick={() => editActivity(day, i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;')}>✏️</button>
                 <button onClick={() => deleteActivity(day, i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;flex:0 0 auto;color:#b8503f;')}>🗑️</button>
               </div>

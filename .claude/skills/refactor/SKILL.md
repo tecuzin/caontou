@@ -16,11 +16,37 @@ raté — le test avait raison.
 cat TODO.md                                    # contexte, éviter de dupliquer du travail en cours
 wc -l src/*.jsx src/*.js                       # repérer les fichiers monolithiques
 npm run test:coverage                          # baseline chiffrée avant de toucher au code
+cgc update                                     # rafraîchir le graphe de code avant analyse
 ```
 
 Repère : `src/App.jsx` est un unique composant qui concentre tout (state,
 handlers CRUD, JSX de tous les écrans). C'est la cible n°1 de refactor.
 Coverage attendu en juillet 2026 : ~46 % statements, App.jsx sous la moyenne.
+
+## Explorer le graphe de code AVANT d'extraire (obligatoire)
+
+Le projet est indexé dans **CodeGraphContext** (graphe FalkorDB embarqué, MCP
+`codegraphcontext` + CLI `cgc`). **Toujours interroger le graphe avant de
+déplacer du code** — c'est ce qui garantit qu'une extraction ne casse rien :
+
+```bash
+cgc analyze callers <fonction>       # qui appelle cette fonction ? (avant de la déplacer)
+cgc analyze calls <fonction>         # ce que la fonction appelle (ses dépendances)
+cgc analyze deps <module>            # imports/dépendances d'un module
+cgc analyze dead-code                # fonctions non appelées (candidates à suppression)
+cgc analyze complexity               # complexité cyclomatique → cibles prioritaires
+cgc find name <symbole>              # localiser une définition
+cgc find content "<texte>"           # recherche plein-texte (source + docstrings)
+```
+
+Via l'outillage MCP (mêmes données) : `analyze_code_relationships`,
+`find_code`, `find_dead_code`, `find_most_complex_functions`,
+`execute_cypher_query`. **Ordre systématique : d'abord le graphe (`cgc` / MCP)
+pour cartographier l'impact, ensuite l'édition.** Ne jamais deviner les
+appelants « à la main » via grep quand le graphe donne la réponse exacte.
+
+> Le graphe se resynchronise tout seul à chaque commit (hook git CGC). En cas
+> de doute sur sa fraîcheur : `cgc update` (incrémental) ou `cgc stats`.
 
 ## Cibles de refactor (par ordre de priorité)
 

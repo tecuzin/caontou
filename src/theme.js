@@ -52,6 +52,14 @@ export const DARK_TEXT_COLOR_MAP = {
   '#cf7d3c': '#f5b06e', // orange -> orange clair
   '#9a917f': '#cbc2ae', // gris-brun neutre -> plus clair
   '#6b5a45': '#c9a883', // brun texte (encarts info) -> brun clair
+  // Couleurs de catégorie VCAT (écran Visites) utilisées comme TEXTE du libellé
+  // de catégorie : sombres sur fond clair, elles devenaient illisibles sur les
+  // cartes bleu nuit (ratios 2.9–4.4 < AA). Éclaircies uniquement en tant que
+  // texte ; la pastille (background) garde la couleur d'origine.
+  '#5b7042': '#9fce82', // Nature -> vert clair
+  '#4f8a86': '#79c3bd', // Baignade -> turquoise clair
+  '#8a8b3d': '#c6c76b', // Marché -> olive clair
+  '#4a6d9c': '#93b4e0', // Sport -> bleu clair
 }
 
 /**
@@ -60,7 +68,14 @@ export const DARK_TEXT_COLOR_MAP = {
  * lorsqu'elles suivent `color:`). Ne touche pas aux couleurs d'accent
  * utilisées comme fond/bordure/marqueur.
  */
+// Cache chaîne claire → chaîne sombre : ~40 split/join par appel sur des
+// chaînes stables, appelé pour chaque élément à chaque render en mode sombre.
+// Même stratégie de borne que le cache de s() (utils.js).
+const DARK_CACHE = new Map()
+
 export function applyDarkTheme(css) {
+  const hit = DARK_CACHE.get(css)
+  if (hit !== undefined) return hit
   let out = css
   for (const [light, dark] of Object.entries(DARK_COLOR_MAP)) {
     out = out.split(light).join(dark)
@@ -68,6 +83,8 @@ export function applyDarkTheme(css) {
   for (const [light, dark] of Object.entries(DARK_TEXT_COLOR_MAP)) {
     out = out.split(`color:${light}`).join(`color:${dark}`)
   }
+  if (DARK_CACHE.size > 4000) DARK_CACHE.clear()
+  DARK_CACHE.set(css, out)
   return out
 }
 

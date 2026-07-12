@@ -1,11 +1,14 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, PLANNING_ACTIVITIES_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL } from './data.js'
+import { StatusBar, Style } from '@capacitor/status-bar'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL } from './data.js'
 import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
-import { Meteo } from './screens/Meteo.jsx'
-import { Hebergement } from './screens/Hebergement.jsx'
-import { Logistique } from './screens/Logistique.jsx'
-import { Trajet } from './screens/Trajet.jsx'
+// Sous-écrans chargés à la demande (code-splitting) — allègent le bundle initial,
+// ils ne sont montés qu'à l'ouverture depuis l'accueil (sub === …).
+const Meteo = lazy(() => import('./screens/Meteo.jsx').then(m => ({ default: m.Meteo })))
+const Hebergement = lazy(() => import('./screens/Hebergement.jsx').then(m => ({ default: m.Hebergement })))
+const Logistique = lazy(() => import('./screens/Logistique.jsx').then(m => ({ default: m.Logistique })))
+const Trajet = lazy(() => import('./screens/Trajet.jsx').then(m => ({ default: m.Trajet })))
 import { Budget } from './screens/Budget.jsx'
 import { Repas } from './screens/Repas.jsx'
 import { Planning } from './screens/Planning.jsx'
@@ -13,7 +16,7 @@ import { Visites } from './screens/Visites.jsx'
 import { Accueil } from './screens/Accueil.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
-import { buildExport, exportFilename, parseImport, downloadExport, shareExport, formatLastBackup } from './backup.js'
+import { parseImport, formatLastBackup } from './backup.js'
 import { runSelfTests } from './selftest.js'
 import { useVisits } from './hooks/useVisits.js'
 import { useSwipe } from './hooks/useSwipe.js'
@@ -27,8 +30,53 @@ import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
 import { useTripConfig } from './hooks/useTripConfig.js'
+import { Confetti } from './Confetti.jsx'
+import { ExportModal } from './modals/ExportModal.jsx'
+import { ImportModal } from './modals/ImportModal.jsx'
+import { EditVisitModal } from './modals/EditVisitModal.jsx'
+import { AddLogiItemModal } from './modals/AddLogiItemModal.jsx'
+import { AddCourseItemModal } from './modals/AddCourseItemModal.jsx'
+import { AddTrajetCheckModal } from './modals/AddTrajetCheckModal.jsx'
+import { EditMeteoFullModal } from './modals/EditMeteoFullModal.jsx'
+import { EditTripModal } from './modals/EditTripModal.jsx'
+import { EditTrajetStepModal } from './modals/EditTrajetStepModal.jsx'
+import { EditBudgetModal } from './modals/EditBudgetModal.jsx'
+import { EditHebergementModal } from './modals/EditHebergementModal.jsx'
+import { JournalModal } from './modals/JournalModal.jsx'
+import { VoteModal } from './modals/VoteModal.jsx'
+const Souvenirs = lazy(() => import('./screens/Souvenirs.jsx').then(m => ({ default: m.Souvenirs })))
+const Bingo = lazy(() => import('./screens/Bingo.jsx').then(m => ({ default: m.Bingo })))
+import { countCompletedLines } from './bingo.js'
+const Bilan = lazy(() => import('./screens/Bilan.jsx').then(m => ({ default: m.Bilan })))
+import { shareRecap, computeRecap } from './recap.js'
+import { WhatsNewModal } from './modals/WhatsNewModal.jsx'
+import { ChangelogModal } from './modals/ChangelogModal.jsx'
+import { BUILD_NUMBER } from './build-info.js'
+import { entriesSince } from './changelog.js'
+import { currentPositionMapsHref, openExternal } from './links.js'
+const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
+import { RestoModal } from './modals/RestoModal.jsx'
+import { usePhotos } from './hooks/usePhotos.js'
+import { buildJournalText, shareJournal } from './journal.js'
+import { buildIcs, shareIcs } from './ics.js'
+import { applyMigrations, LATEST_SCHEMA } from './migrations.js'
 
 const haptic = (style = ImpactStyle.Light) => { Haptics.impact({ style }).catch(() => {}) }
+
+// Boot : charge + migre le store une seule fois au démarrage
+const ensureStoreIsUpToDate = () => {
+  if (typeof window === 'undefined') return
+  try {
+    const raw = localStorage.getItem('cantou.v1')
+    if (!raw) return // premier lancement, rien à migrer
+    const store = JSON.parse(raw)
+    const migrated = applyMigrations(store, store.schemaVersion ?? 1)
+    localStorage.setItem('cantou.v1', JSON.stringify(migrated))
+  } catch (e) {
+    console.warn('[Store] Migration failed:', e)
+  }
+}
+ensureStoreIsUpToDate()
 
 /* ------------------------------------------------------------------ *
  * Helper : transforme une chaîne CSS (issue du prototype) en objet de
@@ -69,8 +117,8 @@ const TRAJET_CHECK_ITEMS_INITIAL = ['Pleins faits', 'Sièges auto installés', '
 
 
 const HEB_INITIAL = {
-  nom: 'La Grange du Puy Mary',
-  adresse: 'Mandailles-Saint-Julien (15590)',
+  nom: 'Notre gîte en Carladès',
+  adresse: 'Vezels-Roussy (15130)',
   arrivee: 'Mer 5 · dès 16 h',
   depart: 'Sam 15 · avant 10 h',
   capacite: '4–5 personnes · 2 chambres · lit bébé fourni',
@@ -137,6 +185,13 @@ function loadStore() {
       trajetCheckItems: p.trajetCheckItems ?? [...TRAJET_CHECK_ITEMS_INITIAL],
       suggestions: p.suggestions ?? [],
       lastBackupAt: p.lastBackupAt ?? null,
+      journal: p.journal ?? {},
+      carGames: p.carGames ?? { cowLeft: 0, cowRight: 0 },
+      photos: p.photos ?? [],
+      familyMembers: p.familyMembers ?? [],
+      bingo: p.bingo ?? {},
+      lastSeenBuild: p.lastSeenBuild ?? 0,
+      restos: p.restos ?? structuredClone(RESTOS_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -162,6 +217,11 @@ export default function App() {
   })
   useEffect(() => {
     try { localStorage.setItem('cantou.darkMode', String(darkMode)) } catch { }
+    // Barre de statut Android synchronisée avec le thème (crème/bleu nuit).
+    // Style.Light = fond clair (icônes sombres), Style.Dark = l'inverse.
+    // No-op silencieux hors app native (web/tests : promesse rejetée, catch).
+    StatusBar.setStyle({ style: darkMode ? Style.Dark : Style.Light }).catch(() => {})
+    StatusBar.setBackgroundColor({ color: darkMode ? '#10162b' : '#f4ecdc' }).catch(() => {})
   }, [darkMode])
   const sx = (css) => s(darkMode ? applyDarkTheme(css) : css)
 
@@ -174,6 +234,7 @@ export default function App() {
   const [showAdd, setShowAdd] = useState(false)
   const [showMealEdit, setShowMealEdit] = useState(false)
   const [editingExpenseIdx, setEditingExpenseIdx] = useState(null)
+  const [confettiTrigger, setConfettiTrigger] = useState(false)
   const [editingMealId, setEditingMealId] = useState(null)
   const [editingActivityIdx, setEditingActivityIdx] = useState(null)
   const [showActivityEdit, setShowActivityEdit] = useState(false)
@@ -237,6 +298,8 @@ export default function App() {
   const [newDaySub2, setNewDaySub2] = useState('')
   const [newSuggestionText, setNewSuggestionText] = useState('')
   const [showExport, setShowExport] = useState(false)
+  // eslint-disable-next-line no-unused-vars -- `exportCopied` n'est pas lu ici : seul
+  // le setter est transmis à l'Accueil (feedback « ✓ Copié »). Paire conservée entière.
   const [exportCopied, setExportCopied] = useState(false)
   const [showImport, setShowImport] = useState(false)
   const [importText, setImportText] = useState('')
@@ -261,8 +324,69 @@ export default function App() {
   const [budgetTotal, setBudgetTotal] = useState(initial.budgetTotal || BUDGET_INITIAL)
   const [hebergement, setHebergement] = useState(initial.hebergement || structuredClone(HEB_INITIAL))
   const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
-  const { suggestions, setSuggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
+  const { suggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
   const [lastBackupAt, setLastBackupAt] = useState(initial.lastBackupAt || null)
+  const [journal, setJournal] = useState(initial.journal || {})
+  const [carGames, setCarGames] = useState(initial.carGames || { cowLeft: 0, cowRight: 0 })
+  const [familyMembers, setFamilyMembers] = useState(initial.familyMembers || [])
+  const [showVote, setShowVote] = useState(false)
+  const [lastSeenBuild, setLastSeenBuild] = useState(initial.lastSeenBuild || 0)
+  const [showWhatsNew, setShowWhatsNew] = useState(false)
+  const whatsNewEntries = useMemo(() => entriesSince(lastSeenBuild), [lastSeenBuild])
+  useEffect(() => {
+    // 1ʳᵉ install (lastSeenBuild=0) : on cale silencieusement sur le build courant,
+    // pas de déballage du changelog. Sinon, nouveau build vu → « Quoi de neuf ».
+    if (lastSeenBuild === 0) { setLastSeenBuild(BUILD_NUMBER); return }
+    if (BUILD_NUMBER > lastSeenBuild && entriesSince(lastSeenBuild).length) setShowWhatsNew(true)
+  }, []) // au montage uniquement
+  const closeWhatsNew = () => { setShowWhatsNew(false); setLastSeenBuild(BUILD_NUMBER) }
+  const [showChangelog, setShowChangelog] = useState(false)
+  // « Ma position » : géoloc native (plugin) → ouvre Google Maps (extra non-offline)
+  const openMyPosition = async () => {
+    haptic(ImpactStyle.Light)
+    try {
+      const href = await currentPositionMapsHref()
+      if (href) openExternal(href)
+    } catch {
+      // GPS refusé/indisponible : on informe brièvement (sinon le bouton semble « mort »)
+      try { window.alert('Position indisponible — vérifie que la localisation est activée et autorisée pour Cantou.') } catch { }
+    }
+  }
+  // Carnet de restaurants (CRUD + réservations)
+  const [restos, setRestos] = useState(initial.restos || structuredClone(RESTOS_INITIAL))
+  const [showResto, setShowResto] = useState(false)
+  const [editingRestoId, setEditingRestoId] = useState(null)
+  const [restoForm, setRestoForm] = useState({ name: '', place: '', tel: '', resa: '', reserved: false })
+  const setRestoField = (k, v) => setRestoForm((f) => ({ ...f, [k]: v }))
+  const openAddResto = () => { setEditingRestoId(null); setRestoForm({ name: '', place: '', tel: '', resa: '', reserved: false }); setShowResto(true) }
+  const openEditResto = (id) => { const r = restos.find((x) => x.id === id); if (!r) return; setEditingRestoId(id); setRestoForm({ name: r.name, place: r.place || '', tel: r.tel || '', resa: r.resa || '', reserved: !!r.reserved }); setShowResto(true) }
+  const saveResto = () => {
+    if (!restoForm.name.trim()) return
+    haptic(ImpactStyle.Medium)
+    if (editingRestoId === null) {
+      const id = (restos.reduce((m, r) => Math.max(m, r.id), 0) || 0) + 1
+      setRestos((list) => [...list, { id, ...restoForm, name: restoForm.name.trim() }])
+    } else {
+      setRestos((list) => list.map((r) => r.id === editingRestoId ? { ...r, ...restoForm, name: restoForm.name.trim() } : r))
+    }
+    setShowResto(false)
+  }
+  const deleteResto = (id) => { haptic(ImpactStyle.Medium); setRestos((list) => list.filter((r) => r.id !== id)); setShowResto(false) }
+  const [bingo, setBingo] = useState(initial.bingo || {})
+  const toggleBingo = (idx) => {
+    haptic(ImpactStyle.Light)
+    setBingo((b) => {
+      const next = { ...b, [idx]: !b[idx] }
+      // Célébration si cocher cette case complète une nouvelle ligne
+      if (!b[idx] && countCompletedLines(next) > countCompletedLines(b)) {
+        haptic(ImpactStyle.Medium)
+        setConfettiTrigger(true)
+        setTimeout(() => setConfettiTrigger(false), 2500)
+      }
+      return next
+    })
+  }
+  const { photos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
   // restaurable pendant 5 s via le bandeau « Annuler »
@@ -312,15 +436,15 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
   // fallback web en dev.
   useEffect(() => {
-    scheduleAllNotifications(days, meals, trip, lastBackupAt).catch(() => { })
-  }, [days, meals, trip, lastBackupAt])
+    scheduleAllNotifications(days, meals, meteo, trip, lastBackupAt).catch(() => { })
+  }, [days, meals, meteo, trip, lastBackupAt])
 
   const toggleCheck = (key, label) => {
     haptic(ImpactStyle.Light)
@@ -354,6 +478,51 @@ export default function App() {
     return { dayIdx, d, w, meal }
   }, [trip.start, trip.end, days, meteo, meals])
 
+  // Jour J : la date du jour est le jour de départ paramétré
+  const isDepartureDay = useMemo(() => {
+    const now = new Date()
+    const start = tripDate(trip.start, 0)
+    return now.getFullYear() === start.getFullYear() && now.getMonth() === start.getMonth() && now.getDate() === start.getDate()
+  }, [trip.start])
+
+  // Confetti de célébration à l'ouverture le matin du départ (une seule fois)
+  const departureCelebrated = useRef(false)
+  useEffect(() => {
+    if (isDepartureDay && !departureCelebrated.current) {
+      departureCelebrated.current = true
+      setConfettiTrigger(true)
+      setTimeout(() => setConfettiTrigger(false), 2500)
+    }
+  }, [isDepartureDay])
+
+  // Journal de bord — une entrée par jour, sauvée au fil de la saisie
+  const [showJournal, setShowJournal] = useState(false)
+  const [journalDayIdx, setJournalDayIdx] = useState(0)
+  const openJournal = (dayIdx) => { setJournalDayIdx(dayIdx); setShowJournal(true) }
+  const journalDayKey = days[journalDayIdx] ? `${days[journalDayIdx].dow} ${days[journalDayIdx].num}` : ''
+  const updateJournalEntry = (field, value) => setJournal((j) => ({ ...j, [journalDayKey]: { ...(j[journalDayKey] || {}), [field]: value } }))
+  const doShareJournal = () => { haptic(ImpactStyle.Medium); shareJournal(days, journal) }
+
+  // Partage d'une activité du planning en .ics (Google Calendar & co)
+  const shareActivity = (dayIdx, itemIdx) => {
+    const d = days[dayIdx]
+    const it = d?.items?.[itemIdx]
+    if (!d || !it) return
+    haptic(ImpactStyle.Light)
+    const [ty, tm] = trip.start.split('-').map(Number)
+    const date = new Date(ty, tm - 1, d.num)
+    const dateIso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    const ics = buildIcs({ title: it.title, dateIso, time: it.time, location: trip.destination, description: it.note || `Séjour Cantou — ${d.title}` })
+    shareIcs(ics, `cantou-${String(it.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30) || 'evenement'}.ics`)
+  }
+
+  // Compteur de vaches (jeu du trajet)
+  const bumpCow = (side) => {
+    haptic(ImpactStyle.Light)
+    setCarGames((g) => (side === 'left' ? { ...g, cowLeft: (g.cowLeft || 0) + 1 } : { ...g, cowRight: (g.cowRight || 0) + 1 }))
+  }
+  const resetCows = () => { haptic(ImpactStyle.Medium); setCarGames((g) => ({ ...g, cowLeft: 0, cowRight: 0 })) }
+
   // dérivés préparatifs
   let packDone = 0, packTotal = 0
   logi.forEach((L) => { const b = buildList(checks, L.key, L.items); packDone += b.done; packTotal += b.total })
@@ -373,6 +542,9 @@ export default function App() {
   const coursesGroups = courses.map((g) => { const b = buildList(checks, g.key, g.items); coursesDone += b.done; coursesTotal += b.total; return { name: g.name, doneStr: `${b.done}/${b.total}`, items: b.items, key: g.key } })
   const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
 
+  // Bilan de séjour — synthèse des données existantes pour l'écran Bilan.
+  const recapData = computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, savedCount, packPct, coursesPct, meals, photos })
+
   // visites filtrées + triées
   const CAT_ORDER = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Marche']
   const filteredVisits = visits
@@ -385,7 +557,16 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos' }[sub] || ''
+
+  // confetti si une checklist atteint 100%
+  useEffect(() => {
+    const has100pct = packPct === 100 || coursesPct === 100 || tr.pct === 100
+    if (has100pct && !confettiTrigger) {
+      setConfettiTrigger(true)
+      setTimeout(() => setConfettiTrigger(false), 2500)
+    }
+  }, [packPct, coursesPct, tr.pct, confettiTrigger])
 
   const openModule = (action) =>
     action.indexOf('sub:') === 0 ? setSub(action.slice(4)) : (setTab(action.slice(4)), setSub(null))
@@ -725,18 +906,8 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
-  const copyExport = async () => {
-    try {
-      await navigator.clipboard.writeText(buildExport(currentStoreData(), STORE_KEY))
-      setExportCopied(true)
-      markBackedUp()
-      setTimeout(() => setExportCopied(false), 2500)
-    } catch { }
-  }
-  const doDownloadExport = () => { downloadExport(buildExport(currentStoreData(), STORE_KEY), exportFilename()); markBackedUp() }
-  const doShareExport = () => { shareExport(buildExport(currentStoreData(), STORE_KEY), exportFilename()); markBackedUp() }
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
     setSelftestResults(runSelfTests())
@@ -746,14 +917,6 @@ export default function App() {
     const { data, error } = parseImport(text)
     setImportError(error)
     setImportPreview(data)
-  }
-  const handleImportFile = (e) => {
-    const f = e.target.files && e.target.files[0]
-    if (!f) return
-    const reader = new FileReader()
-    reader.onload = () => { setImportText(String(reader.result)); doParseImport(String(reader.result)) }
-    reader.readAsText(f)
-    e.target.value = ''
   }
   const applyImport = () => {
     if (!importPreview) return
@@ -800,6 +963,7 @@ export default function App() {
       ...sx("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;"),
       ...(darkMode ? { backgroundImage: STARRY_BACKGROUND_IMAGE, backgroundRepeat: 'no-repeat' } : {}),
     }}>
+      <Confetti trigger={confettiTrigger} />
 
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (
@@ -808,7 +972,9 @@ export default function App() {
             <button onClick={() => setSub(null)} style={sx('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:3px;')}>‹</button>
             <span style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
           </div>
-          <div style={sx('flex:1;overflow-y:auto;')}>
+          {/* key={sub} remonte le conteneur à chaque navigation → rejoue screenIn */}
+          <div key={sub} className="screen-in" style={sx('flex:1;overflow-y:auto;')}>
+            <Suspense fallback={null}>
 
             {/* TRAJET */}
             {sub === 'trajet' && (
@@ -818,7 +984,28 @@ export default function App() {
                 setEditingTrajetIdx={setEditingTrajetIdx} setNewTrajetTime={setNewTrajetTime} setNewTrajetPlace={setNewTrajetPlace}
                 setNewTrajetNote={setNewTrajetNote} setNewTrajetColor={setNewTrajetColor} setShowTrajetEdit={setShowTrajetEdit}
                 tr={tr} setShowAddTrajetCheck={setShowAddTrajetCheck} toggleCheck={toggleCheck} deleteTrajetCheckItem={deleteTrajetCheckItem}
+                carGames={carGames} bumpCow={bumpCow} resetCows={resetCows}
               />
+            )}
+
+            {/* SOUVENIRS */}
+            {sub === 'souvenirs' && (
+              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} />
+            )}
+
+            {/* BINGO */}
+            {sub === 'bingo' && (
+              <Bingo sx={sx} items={BINGO_CANTAL} checked={bingo} toggleBingo={toggleBingo} />
+            )}
+
+            {/* BILAN */}
+            {sub === 'bilan' && (
+              <Bilan sx={sx} recap={recapData} onShare={() => { haptic(ImpactStyle.Medium); shareRecap(recapData) }} />
+            )}
+
+            {/* RESTOS */}
+            {sub === 'restos' && (
+              <Restos sx={sx} restos={restos} openAddResto={openAddResto} openEditResto={openEditResto} deleteResto={deleteResto} />
             )}
 
             {/* LOGISTIQUE */}
@@ -842,6 +1029,7 @@ export default function App() {
               <Meteo sx={sx} meteo={meteo} trip={trip} fmtDayShort={fmtDayShort} editMeteo={editMeteo} deleteMeteo={deleteMeteo} openAddMeteo={openAddMeteo} />
             )}
 
+            </Suspense>
           </div>
         </div>
       )}
@@ -849,7 +1037,8 @@ export default function App() {
       {/* ============ ÉCRANS PRINCIPAUX (onglets) ============ */}
       {!sub && (
         <div style={sx('height:100%;display:flex;flex-direction:column;')}>
-          <div style={sx('flex:1;overflow-y:auto;')}>
+          {/* key={tab} remonte le conteneur à chaque changement d'onglet → rejoue screenIn */}
+          <div key={tab} className="screen-in" style={sx('flex:1;overflow-y:auto;')}>
 
             {/* ACCUEIL */}
             {tab === 'accueil' && (
@@ -861,6 +1050,7 @@ export default function App() {
                 suggestions={suggestions} deleteSuggestion={deleteSuggestion} sendSuggestions={sendSuggestions}
                 lastBackupAt={lastBackupAt} formatLastBackup={formatLastBackup} setExportCopied={setExportCopied}
                 setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow}
+                isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }} openMyPosition={openMyPosition} openChangelog={() => setShowChangelog(true)}
               />
             )}
 
@@ -869,6 +1059,7 @@ export default function App() {
               <Planning
                 sx={sx} days={days} trip={trip} fmtDayShort={fmtDayShort} day={day} setDay={setDay} setShowDayAdd={setShowDayAdd}
                 cur={cur} editDay={editDay} editActivity={editActivity} deleteActivity={deleteActivity} startAddActivity={startAddActivity}
+                openJournal={openJournal} shareActivity={shareActivity}
               />
             )}
 
@@ -880,6 +1071,7 @@ export default function App() {
                 setEditingVisitId={setEditingVisitId} setNewVisitName={setNewVisitName} setNewVisitDist={setNewVisitDist}
                 setNewVisitDur={setNewVisitDur} setNewVisitAge={setNewVisitAge} setNewVisitCat={setNewVisitCat} setShowVisitEdit={setShowVisitEdit}
                 toggleSaved={toggleSaved} editVisit={editVisit} deleteVisit={deleteVisit}
+                openVote={() => setShowVote(true)}
               />
             )}
 
@@ -911,7 +1103,7 @@ export default function App() {
             {TABS.map(([key, emoji, label]) => (
               <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={sx('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
                 <span style={sx('font-size:20px;')}>{emoji}</span>
-                <span style={sx(`font-size:11px;color:${tab === key ? '#4a5d3a' : '#b3a892'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
+                <span style={sx(`font-size:11px;color:${tab === key ? '#4a5d3a' : '#6b6354'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
               </button>
             ))}
           </div>
@@ -987,7 +1179,7 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
             <input value={newDayTitle} onChange={(e) => setNewDayTitle(e.target.value)} placeholder="Ex : Le grand depart" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
-            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Lyon -> Mandailles" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Laschamps -> Vezels-Roussy" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('display:flex;gap:10px;')}>
               <button onClick={closeDayEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button onClick={saveDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
@@ -1021,232 +1213,53 @@ export default function App() {
         </div>
       )}
 
-      {/* ============ FEUILLE : AJOUTER ARTICLE LOGI ============ */}
-      {showAddLogiItem && (
-        <div onClick={closeAddLogiItem} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newLogiItem} onChange={(e) => setNewLogiItem(e.target.value)} placeholder="Ex : Chaussettes" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeAddLogiItem} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addLogiItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} />
 
-      {/* ============ FEUILLE : AJOUTER ARTICLE COURSES ============ */}
-      {showAddCourseItem && (
-        <div onClick={closeAddCourseItem} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un article</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newCourseItem} onChange={(e) => setNewCourseItem(e.target.value)} placeholder="Ex : Fromage" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeAddCourseItem} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addCourseItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddCourseItemModal isOpen={showAddCourseItem} onClose={closeAddCourseItem} selectedCourseKey={editingCourseKey} newCourseItem={newCourseItem} setNewCourseItem={setNewCourseItem} courseGroups={courses} darkMode={darkMode} onSubmit={addCourseItem} />
 
-      {/* ============ FEUILLE : EDITER METEO ============ */}
-      {showMeteoEdit && (
-        <div onClick={closeMeteoEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMeteoIdx === null ? 'Ajouter un jour' : 'Meteo'}</div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
-                <input value={newMeteoDay} onChange={(e) => setNewMeteoDay(e.target.value)} placeholder="Sam" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Numero</div>
-                <input value={newMeteoNum} onChange={(e) => setNewMeteoNum(e.target.value)} placeholder="11" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-            </div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Icone</div>
-            <input value={newMeteoIcon} onChange={(e) => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Temp max</div>
-            <input value={newMeteoHi} onChange={(e) => setNewMeteoHi(e.target.value)} placeholder="24" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Temp min</div>
-            <input value={newMeteoLo} onChange={(e) => setNewMeteoLo(e.target.value)} placeholder="12" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Pluie</div>
-            <input value={newMeteoRain} onChange={(e) => setNewMeteoRain(e.target.value)} placeholder="10 %" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeMeteoEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveMeteo} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditMeteoFullModal isOpen={showMeteoEdit} onClose={closeMeteoEdit} editingMeteoIdx={editingMeteoIdx} newMeteoDay={newMeteoDay} setNewMeteoDay={setNewMeteoDay} newMeteoNum={newMeteoNum} setNewMeteoNum={setNewMeteoNum} newMeteoIcon={newMeteoIcon} setNewMeteoIcon={setNewMeteoIcon} newMeteoHi={newMeteoHi} setNewMeteoHi={setNewMeteoHi} newMeteoLo={newMeteoLo} setNewMeteoLo={setNewMeteoLo} newMeteoRain={newMeteoRain} setNewMeteoRain={setNewMeteoRain} darkMode={darkMode} onSubmit={saveMeteo} />
 
-      {/* ============ FEUILLE : EDITER TRAJET ============ */}
-      {showTrajetEdit && editingTrajetIdx !== null && (
-        <div onClick={closeTrajetEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer etape</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newTrajetTime} onChange={(e) => setNewTrajetTime(e.target.value)} placeholder="Ex : 08:30" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Lieu</div>
-            <input value={newTrajetPlace} onChange={(e) => setNewTrajetPlace(e.target.value)} placeholder="Ex : Lyon" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Note</div>
-            <input value={newTrajetNote} onChange={(e) => setNewTrajetNote(e.target.value)} placeholder="Ex : Pause cafe" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
-            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
-              {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
-                <button key={c} onClick={() => setNewTrajetColor(c)} style={sx(`width:32px;height:32px;border-radius:50%;background:${c};border:${newTrajetColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
-              ))}
-            </div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeTrajetEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveTrajetStep} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditTrajetStepModal isOpen={showTrajetEdit} onClose={closeTrajetEdit} editingTrajetIdx={editingTrajetIdx} newTrajetTime={newTrajetTime} setNewTrajetTime={setNewTrajetTime} newTrajetPlace={newTrajetPlace} setNewTrajetPlace={setNewTrajetPlace} newTrajetNote={newTrajetNote} setNewTrajetNote={setNewTrajetNote} newTrajetColor={newTrajetColor} setNewTrajetColor={setNewTrajetColor} darkMode={darkMode} onSubmit={saveTrajetStep} />
 
-      {/* ============ FEUILLE : EDITER VISITE ============ */}
-      {showVisitEdit && (
-        <div onClick={closeVisitEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingVisitId === null ? 'Ajouter une visite' : 'Editer visite'}</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
-            <input value={newVisitName} onChange={(e) => setNewVisitName(e.target.value)} placeholder="Ex : Puy Mary" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Categorie</div>
-            <select value={newVisitCat} onChange={(e) => setNewVisitCat(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
-              <option>Nature</option>
-              <option>Famille</option>
-              <option>Patrimoine</option>
-              <option>Baignade</option>
-              <option>Gourmand</option>
-              <option>Marche</option>
-            </select>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Distance</div>
-            <input value={newVisitDist} onChange={(e) => setNewVisitDist(e.target.value)} placeholder="Ex : 25 min" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Duree</div>
-            <input value={newVisitDur} onChange={(e) => setNewVisitDur(e.target.value)} placeholder="Ex : 2 h" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Age recommande</div>
-            <input value={newVisitAge} onChange={(e) => setNewVisitAge(e.target.value)} placeholder="Ex : Des 3 ans" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeVisitEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveVisit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditVisitModal isOpen={showVisitEdit} onClose={closeVisitEdit} editIdx={editingVisitId} editVisitName={newVisitName} setEditVisitName={setNewVisitName} editVisitDist={newVisitDist} setEditVisitDist={setNewVisitDist} editVisitCat={newVisitCat} setEditVisitCat={setNewVisitCat} editVisitNote={newVisitAge} setEditVisitNote={setNewVisitAge} darkMode={darkMode} onSubmit={saveVisit} onDelete={() => {}} />
 
-      {/* MODAL: Budget total edit */}
-      {showBudgetTotalEdit && (
-        <div onClick={() => setShowBudgetTotalEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Budget total</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Montant (€)</div>
-            <input type="number" value={newBudgetTotal} onChange={(e) => setNewBudgetTotal(e.target.value)} placeholder={String(budgetTotal)} style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && saveBudgetTotal()} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowBudgetTotalEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveBudgetTotal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditBudgetModal isOpen={showBudgetTotalEdit} onClose={() => setShowBudgetTotalEdit(false)} newBudgetTotal={newBudgetTotal} setNewBudgetTotal={setNewBudgetTotal} budgetTotal={budgetTotal} darkMode={darkMode} onSubmit={saveBudgetTotal} />
 
       {/* MODAL: Hébergement edit */}
-      {showHebEdit && (
-        <div onClick={() => setShowHebEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Modifier l'hébergement</div>
-            {[
-              ['Nom', newHebNom, setNewHebNom, 'La Grange du Puy Mary'],
-              ['Adresse', newHebAdresse, setNewHebAdresse, 'Mandailles-Saint-Julien (15590)'],
-              ['Arrivée', newHebArrivee, setNewHebArrivee, 'Sam 11 · dès 16 h'],
-              ['Départ', newHebDepart, setNewHebDepart, 'Sam 18 · avant 10 h'],
-              ['Capacité', newHebCapacite, setNewHebCapacite, '4–5 personnes · 2 chambres'],
-              ['Wi-Fi réseau', newHebWifiNom, setNewHebWifiNom, 'LaGrange-Gite'],
-              ['Wi-Fi code', newHebWifiPass, setNewHebWifiPass, ''],
-              ['Contact', newHebContact, setNewHebContact, 'Mme Vidal · 06 12 34 56 78'],
-            ].map(([label, val, setter, ph]) => (
-              <div key={label}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>{label}</div>
-                <input value={val} onChange={(e) => setter(e.target.value)} placeholder={ph} style={sx('width:100%;margin-top:6px;margin-bottom:12px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-            ))}
-            <div style={sx('display:flex;gap:10px;margin-top:8px;')}>
-              <button onClick={() => setShowHebEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveHebergement} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditHebergementModal isOpen={showHebEdit} onClose={() => setShowHebEdit(false)} hebFields={{ nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact }} setHebFields={(update) => { Object.entries(update).forEach(([k, v]) => { if (k === 'nom') setNewHebNom(v); else if (k === 'adresse') setNewHebAdresse(v); else if (k === 'arrivee') setNewHebArrivee(v); else if (k === 'depart') setNewHebDepart(v); else if (k === 'capacite') setNewHebCapacite(v); else if (k === 'wifiNom') setNewHebWifiNom(v); else if (k === 'wifiPass') setNewHebWifiPass(v); else if (k === 'contact') setNewHebContact(v); }); }} darkMode={darkMode} onSubmit={saveHebergement} />
 
-      {/* MODAL: Trajet checklist add item */}
-      {showAddTrajetCheck && (
-        <div onClick={() => setShowAddTrajetCheck(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un item</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Description</div>
-            <input value={newTrajetCheckItem} onChange={(e) => setNewTrajetCheckItem(e.target.value)} placeholder="Ex : Chargeur téléphone" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addTrajetCheckItem()} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddTrajetCheck(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={addTrajetCheckItem} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} />
+
+      {/* MODAL: Journal de bord */}
+      <JournalModal
+        isOpen={showJournal} onClose={() => setShowJournal(false)} sx={sx}
+        dayLabel={days[journalDayIdx] ? `${days[journalDayIdx].dow} ${days[journalDayIdx].num} — ${days[journalDayIdx].title}` : ''}
+        entry={journal[journalDayKey]} updateEntry={updateJournalEntry}
+        onShare={doShareJournal} canShare={!!buildJournalText(days, journal)}
+      />
+
+      {/* MODAL: Vote familial « on fait quoi demain ? » */}
+      <VoteModal
+        isOpen={showVote} onClose={() => setShowVote(false)} sx={sx}
+        visits={visits} savedVisitIds={Object.keys(saved).filter((k) => saved[k]).map(Number)}
+        familyMembers={familyMembers} setFamilyMembers={setFamilyMembers}
+        days={days} addActivity={addActivity}
+        onWinner={() => { haptic(ImpactStyle.Medium); setConfettiTrigger(true); setTimeout(() => setConfettiTrigger(false), 2500) }}
+      />
+
+      {/* MODAL: Ajout/édition resto */}
+      <RestoModal isOpen={showResto} onClose={() => setShowResto(false)} sx={sx} editing={editingRestoId !== null} fields={restoForm} setField={setRestoField} onSubmit={saveResto} onDelete={() => deleteResto(editingRestoId)} />
+
+      {/* MODAL: Quoi de neuf (premier lancement d'un build) */}
+      <WhatsNewModal isOpen={showWhatsNew} onClose={closeWhatsNew} sx={sx} entries={whatsNewEntries} />
+
+      {/* MODAL: Historique des versions (bouton) */}
+      <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} sx={sx} currentBuild={BUILD_NUMBER} />
 
       {/* MODAL: Export des données */}
-      {showExport && (
-        <div onClick={() => setShowExport(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Exporter les données</div>
-            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Toutes les données de l'app (planning, dépenses, listes, favoris…) au format JSON. À garder en lieu sûr ou à envoyer sur un autre téléphone.</div>
-            <textarea data-testid="export-json" readOnly value={buildExport(currentStoreData(), STORE_KEY)} onFocus={(e) => e.target.select()} style={sx('width:100%;height:180px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
-            <button data-testid="btn-share-export" onClick={doShareExport} style={sx('width:100%;margin-top:14px;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>📤 Envoyer vers Telegram / WhatsApp…</button>
-            <div style={sx('display:flex;gap:10px;margin-top:10px;')}>
-              <button onClick={copyExport} style={sx(`flex:1;border:none;background:${exportCopied ? '#5b7042' : '#4a5d3a'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;`)}>{exportCopied ? '✓ Copié !' : '📋 Copier'}</button>
-              <button onClick={doDownloadExport} style={sx('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>💾 Télécharger</button>
-            </div>
-            <button onClick={() => setShowExport(false)} style={sx('width:100%;margin-top:10px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
-          </div>
-        </div>
-      )}
+      <ExportModal isOpen={showExport} onClose={() => setShowExport(false)} currentStoreData={currentStoreData} STORE_KEY={STORE_KEY} darkMode={darkMode} onExportCopied={markBackedUp} />
 
-      {/* MODAL: Import des données */}
-      {showImport && (
-        <div onClick={closeImport} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Importer des données</div>
-            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
-            <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); doParseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={sx('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
-            <label style={sx('display:block;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;text-align:center;')}>
-              📂 Choisir un fichier…
-              <input type="file" accept=".json,application/json" onChange={handleImportFile} style={sx('display:none;')} />
-            </label>
-            {importError && <div style={sx('margin-top:10px;background:#f7e2dc;border-radius:12px;padding:11px 13px;font-size:13px;color:#b8503f;font-weight:600;')}>⚠️ {importError}</div>}
-            {importPreview && (
-              <div data-testid="import-preview" style={sx('margin-top:10px;background:#e7ecdf;border-radius:12px;padding:11px 13px;font-size:13px;color:#4a5d3a;')}>
-                ✓ Export Cantou valide — {Array.isArray(importPreview.expenses) ? importPreview.expenses.length : 0} dépenses, {Array.isArray(importPreview.meals) ? importPreview.meals.length : 0} repas, {Array.isArray(importPreview.visits) ? importPreview.visits.length : 0} visites, {Array.isArray(importPreview.days) ? importPreview.days.length : 0} jours de planning.
-              </div>
-            )}
-            <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
-              <button onClick={closeImport} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={sx(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
-            </div>
-            <div style={sx('margin-top:10px;font-size:12px;color:#6b6354;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
-          </div>
-        </div>
-      )}
+      <ImportModal isOpen={showImport} onClose={closeImport} importText={importText} setImportText={setImportText} importError={importError} importPreview={importPreview} applyImport={applyImport} doParseImport={doParseImport} darkMode={darkMode} />
 
       {/* MODAL: Auto-diagnostic */}
       {showSelftest && (
@@ -1275,35 +1288,7 @@ export default function App() {
       )}
 
       {/* MODAL: Paramètres du voyage */}
-      {showTripEdit && (
-        <div onClick={() => setShowTripEdit(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Paramètres du voyage</div>
-            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Ces réglages pilotent le compte à rebours, les cartes et les notifications.</div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Date de départ</div>
-                <input data-testid="input-trip-start" type="date" value={newTripStart} onChange={(e) => setNewTripStart(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Date de retour</div>
-                <input data-testid="input-trip-end" type="date" value={newTripEnd} onChange={(e) => setNewTripEnd(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-            </div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Ville de départ</div>
-            <input data-testid="input-trip-origin" value={newTripOrigin} onChange={(e) => setNewTripOrigin(e.target.value)} placeholder="Ex : Beauvais" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Étape (nuit) — optionnel</div>
-            <input value={newTripEtape} onChange={(e) => setNewTripEtape(e.target.value)} placeholder="Ex : Laschamps" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Destination</div>
-            <input data-testid="input-trip-dest" value={newTripDest} onChange={(e) => setNewTripDest(e.target.value)} placeholder="Ex : Mandailles (Cantal)" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowTripEdit(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-trip" onClick={saveTrip} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditTripModal isOpen={showTripEdit} onClose={() => setShowTripEdit(false)} newTripStart={newTripStart} setNewTripStart={setNewTripStart} newTripEnd={newTripEnd} setNewTripEnd={setNewTripEnd} newTripOrigin={newTripOrigin} setNewTripOrigin={setNewTripOrigin} newTripEtape={newTripEtape} setNewTripEtape={setNewTripEtape} newTripDest={newTripDest} setNewTripDest={setNewTripDest} darkMode={darkMode} onSubmit={saveTrip} />
 
       {/* MODAL: Nouvelle liste de logistique */}
       {showAddLogiList && (

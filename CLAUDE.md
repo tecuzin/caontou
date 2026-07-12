@@ -13,6 +13,27 @@ empaquetée en **APK Android via Capacitor**, compilée **entièrement dans Dock
   handoff initial, non utilisés.)
 - **Build** : Docker via Colima, image `node:20-slim` épinglée **amd64**.
 
+## Outillage obligatoire (graphe de code + rtk)
+
+Deux outils sont à utiliser **systématiquement**, pas au cas par cas :
+
+1. **CodeGraphContext** — le code de `src/` est indexé dans un graphe
+   (FalkorDB Lite embarqué, aucun serveur). Exposé à la fois comme serveur MCP
+   `codegraphcontext` et comme CLI `cgc` (`~/.local/bin/cgc`, sur le `PATH`).
+   **Avant toute analyse d'impact, recherche d'appelants, chasse au code mort
+   ou choix de cible de refactor : passer par le graphe** (`cgc analyze
+   callers/calls/deps/dead-code/complexity`, `cgc find name/content`, ou les
+   tools MCP `analyze_code_relationships`, `find_code`, `find_dead_code`,
+   `find_most_complex_functions`, `execute_cypher_query`). Le graphe donne les
+   appelants/dépendances **exacts** — ne pas les deviner au grep quand le
+   graphe répond. Il se resynchronise à chaque commit (hook git CGC) ; sinon
+   `cgc update` (incrémental) puis `cgc stats` pour vérifier.
+
+2. **rtk** (Rust Token Killer) — proxy CLI qui économise 60-90 % de tokens sur
+   les opérations de dev. Le hook Claude Code réécrit déjà les commandes
+   courantes (`git status` → `rtk git status`) de façon transparente ; laisser
+   faire et ne pas contourner. `rtk gain` pour les stats.
+
 ## ⚠️ Règles critiques de build (à ne jamais oublier)
 
 1. **AAPT2 n'existe qu'en x86_64.** Sur Apple Silicon (ARM64), un conteneur ARM64
@@ -37,7 +58,26 @@ empaquetée en **APK Android via Capacitor**, compilée **entièrement dans Dock
 6. **Android SDK** : `platforms;android-34` (cible Capacitor 6) **et** `android-35`,
    `build-tools;34.0.0`/`35.0.0`. Licences acceptées dans l'image.
 
-7. **APK signé avec un keystore STABLE** : l'APK release de Gradle est *non signé*.
+7. **Vitesse du build : réutilisation d'image, PAS cache de layers.** Le builder
+   legacy **ignore le cache de layers en cross-platform** (daemon ARM64 → image
+   amd64, limitation moby) : chaque `docker build` re-fait tout (~6 min). Donc :
+   - le Dockerfile bake `npm install` + un **warm-up Gradle** (cap add +
+     assembleRelease factice → `/root/.gradle` peuplé, `android/` pré-généré) ;
+   - `build-docker.sh` ne rebuilde l'image **que si la toolchain change**
+     (empreinte de Dockerfile/entrypoint/package*.json/capacitor.config dans
+     `.git/.builder-image-stamp`) ; sinon l'image taguée est réutilisée et le
+     source frais est injecté par `docker create` + `tar | docker cp` (pas un
+     volume — la règle 3 reste respectée), puis `docker start -a`.
+   Build avec toolchain inchangée ≈ 2-3 min ; avec changement de deps ≈ 6-7 min
+   (vs ~13 min avant).
+
+8. **`build.number` ne doit JAMAIS reculer.** Il devient le `versionCode`
+   Android : un APK avec un numéro inférieur à celui installé est refusé en
+   mise à jour (downgrade). Ne jamais faire `git checkout -- build.number` ni
+   restaurer une vieille valeur ; en cas de doute, prendre le max connu + 1
+   (incident du faux « build 40 » parti en build32, 09/07).
+
+9. **APK signé avec un keystore STABLE** : l'APK release de Gradle est *non signé*.
    L'entrypoint signe avec **`cantou.keystore` committé à la racine** (alias `cantou` /
    mdp `cantou123`) + `zipalign` + `apksigner` → `cantou-release.apk` installable.
    **Ne jamais régénérer ce keystore** : une clé différente = Android refuse la mise à
@@ -69,6 +109,11 @@ Voir le skill **build-apk** pour le détail.
   prototype en objets de style React → reproduction fidèle au pixel.
 - Données de référence (planning, visites, repas, météo…) en constantes statiques.
 - Compte à rebours « J- » calculé depuis la date réelle (départ 11/07/2026).
-- Note : l'en-tête « trajet » du prototype affichait « Beauvais → Mandailles »
-  (coquille isolée) ; corrigé en « Lyon → Mandailles » par cohérence avec tout le
-  reste du design (carte d'accueil, étapes, README).
+- **Lieu réel du séjour** : le gîte est à **Vezels-Roussy (15130)**, dans le
+  **Carladès** (sud-est d'Aurillac), et non à Mandailles / vallée de la Jordanne
+  comme le supposait le prototype initial. Tout le contenu de référence (visites,
+  planning, trajet, météo, hébergement) a été **re-basé sur le Carladès** :
+  destination Vezels-Roussy, sorties de proximité (Pas de Cère, Le Lioran / Plomb
+  du Cantal, château de Messilhac, Raulhac, rocher de Ronesque, Aurillac ~25 min),
+  et les sites du nord (Puy Mary, Salers) conservés en « grandes sorties » (~1 h).
+  Distances de route indicatives depuis Vezels-Roussy.

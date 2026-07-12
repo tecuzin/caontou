@@ -41,3 +41,10 @@ local.properties
 # [epiq]: local hydrated state is never committed
 .epiq/events/
 .epiq/log/
+
+# CodeGraphContext — graphe de code local (par machine, voir CLAUDE.md « Outillage »)
+.gitattributes
+**/.cgcignore
+*.cgc
+.codegraphcontext/
+.env.github

@@ -78,7 +78,7 @@ describe('Accueil — contenu', () => {
   it('affiche la destination', () => {
     render(<App />)
     const accueil = screen.getByTestId('screen-accueil')
-    expect(within(accueil).getAllByText(/Puy Mary/)[0]).toBeInTheDocument()
+    expect(within(accueil).getAllByText(/Carladès/)[0]).toBeInTheDocument()
   })
 
   it('affiche les modules de navigation', () => {
@@ -103,6 +103,21 @@ describe('Accueil — contenu', () => {
   it('expose un landmark <main> pour l\'accessibilité (audit Lighthouse)', () => {
     render(<App />)
     expect(screen.getByRole('main')).toBeInTheDocument()
+  })
+
+  it('affiche la section repliable "Jeux avec les enfants", fermée par défaut', () => {
+    render(<App />)
+    expect(screen.getByTestId('btn-toggle-games')).toBeInTheDocument()
+    expect(screen.queryByTestId('games-list')).not.toBeInTheDocument()
+  })
+
+  it('déplie la liste de jeux au clic et affiche les idées', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('btn-toggle-games'))
+    const list = screen.getByTestId('games-list')
+    expect(within(list).getByText('Chasse au trésor nature')).toBeInTheDocument()
+    expect(within(list).getByText('Observation des étoiles')).toBeInTheDocument()
   })
 })
 
@@ -197,14 +212,40 @@ describe('Visites — filtres et tri', () => {
     expect(screen.getByText('Ajouter une visite')).toBeInTheDocument()
   })
 
+  it('le filtre Sport isole les activités Sport (Carladès)', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByTestId('tab-visites'))
+    // Une activité Sport (accrobranche du Lioran) et un POI Patrimoine sont visibles sans filtre
+    expect(screen.getByText(/Accrobranche/)).toBeInTheDocument()
+    expect(screen.getByText(/Village de Salers/)).toBeInTheDocument()
+    // Clic sur le filtre Sport → ne garde que les activités Sport
+    await user.click(screen.getByRole('button', { name: 'Sport' }))
+    expect(screen.getByText(/Accrobranche/)).toBeInTheDocument()
+    expect(screen.queryByText(/Village de Salers/)).not.toBeInTheDocument()
+  })
+
   it('ajoute une nouvelle visite via la modal', async () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('tab-visites'))
     await user.click(screen.getByText('+ Ajouter visite'))
-    await user.type(screen.getByPlaceholderText('Ex : Puy Mary'), 'Grotte du Loup')
+    await user.type(screen.getByPlaceholderText('Ex : Pas de Cère'), 'Grotte du Loup')
     await user.click(screen.getByText('Enregistrer'))
     expect(screen.getByText('Grotte du Loup')).toBeInTheDocument()
+  })
+})
+
+describe('Hébergement — contacts d\'urgence', () => {
+  it('affiche le bloc urgences avec les numéros clés', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(screen.getByText('Hébergement'))
+    const urg = await screen.findByTestId('heb-urgences')
+    expect(within(urg).getByText('112')).toBeInTheDocument()
+    expect(within(urg).getByText('SAMU (urgence médicale)')).toBeInTheDocument()
+    // Le 112 est un lien tel: cliquable
+    expect(within(urg).getByText('112').closest('a')).toHaveAttribute('href', 'tel:112')
   })
 })
 
@@ -316,7 +357,7 @@ describe('Trajet aller / retour', () => {
     render(<App />)
     const trajetModule = screen.getByText('Trajet')
     await user.click(trajetModule)
-    expect(screen.getByTestId('btn-trajet-aller')).toBeInTheDocument()
+    expect(await screen.findByTestId('btn-trajet-aller')).toBeInTheDocument()
     expect(screen.getByTestId('btn-trajet-retour')).toBeInTheDocument()
     await user.click(screen.getByTestId('btn-trajet-retour'))
     expect(screen.getByText(/Les etapes · retour/)).toBeInTheDocument()
@@ -328,7 +369,7 @@ describe('Listes de préparatifs personnalisables', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByText('Préparatifs'))
-    await user.click(screen.getByTestId('btn-add-logi-list'))
+    await user.click(await screen.findByTestId('btn-add-logi-list'))
     await user.type(screen.getByTestId('input-logi-list-name'), 'Sac de plage')
     await user.click(screen.getByTestId('btn-save-logi-list'))
     expect(screen.getByText('Sac de plage')).toBeInTheDocument()

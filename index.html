@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0" />
     <meta name="theme-color" content="#4a5d3a" />
+    <meta name="description" content="Cantou — l'app du séjour familial dans le Cantal (Carladès) : planning, visites, repas, budget, checklists et souvenirs, 100 % hors ligne." />
+    <link rel="icon" href="/cantou-icon.svg" />
+    <link rel="apple-touch-icon" href="/cantou-icon.png" />
     <title>Cantou — Vacances Cantal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,11 +16,24 @@
       html, body { margin: 0; height: 100%; }
       body { background: #f4ecdc; font-family: 'Nunito Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
       #app { height: 100%; }
-      button { font-family: inherit; }
-      input { font-family: inherit; outline: none; }
+      /* color: inherit — sinon boutons/champs utilisent le noir UA par défaut,
+         illisible sur fond sombre (les titres de cartes et le JSON export/import
+         héritent alors du texte thémé clair de la racine en mode sombre). */
+      button { font-family: inherit; color: inherit; }
+      input, textarea { font-family: inherit; outline: none; color: inherit; }
       ::-webkit-scrollbar { width: 0; height: 0; }
       @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      /* Micro-animations (lot UI polish) : transition douce entre écrans +
+         retour visuel à l'appui des boutons. Coupées si l'utilisateur préfère
+         moins de mouvement (accessibilité). */
+      @keyframes screenIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+      .screen-in { animation: screenIn 0.18s ease-out; }
+      button { transition: transform 0.08s ease, opacity 0.08s ease; }
+      button:active { transform: scale(0.96); }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      }
       body.dark { background: #1c1a16; }
     </style>
     <script>

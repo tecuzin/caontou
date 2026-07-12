@@ -5,19 +5,122 @@ description: Gestion du projet Cantou — TODO, ADR, reprise de session
 
 # Project Management — Cantou
 
-Ce skill gère la traçabilité du projet : suivi des tâches et décisions d'architecture.
+Ce skill gère la traçabilité du projet : board Epiq (source de vérité des tâches),
+TODO.md et décisions d'architecture.
+
+## Board Epiq — workflow (source de vérité, consignes David 09/07/2026)
+
+Colonnes, dans l'ordre :
+
+```
+Proposal → Todo → In progress → UAT/EUA → Done
+```
+
+| Colonne | Qui y met les cartes | Rôle |
+|---|---|---|
+| **Proposal** | Claude | Propositions, analyses, idées issues d'audits. **Jamais implémentées directement.** |
+| **Todo** | **David uniquement** | Le « GO » : David déplace de Proposal → Todo ce qu'il veut voir implémenté. |
+| **In progress** | Claude | Déplacer la carte ici **au démarrage** du travail. |
+| **UAT/EUA** | Claude | À la livraison dans un build : la carte y attend les **tests utilisateur de David**. |
+| **Done** | **David uniquement** | David valide et déplace UAT/EUA → Done. Ne jamais le faire à sa place. |
+
+**Règles strictes** :
+1. **N'implémenter QUE ce qui est dans Todo.** Toute idée de Claude va dans
+   Proposal (avec description sourcée) et y attend le triage de David.
+2. À l'envoi d'un build contenant la carte → déplacer en **UAT/EUA** et ajouter
+   **2 tags : `buildNN`** (numéro du build qui embarque la feature) **et `vX.Y.Z`**
+   (version). Commenter la carte avec le détail de livraison.
+3. **Ne jamais déplacer UAT/EUA → Done soi-même** — attendre l'instruction de David.
+4. Si David **remet une carte de UAT/EUA en Todo**, elle contient son **rapport de
+   test utilisateur** (description ou commentaire) : le lire, corriger, re-livrer
+   (retour en In progress → UAT/EUA avec le nouveau tag de build).
+
+IDs utiles : board `01KWSTHN79VWRQB7MGPQWR153M` · Proposal `01KX43H1YZHXADB0SA2NRVC6F2`
+· Todo `01KWSTHN7AKWFJT9N28CGWDPXJ` · In progress `01KWSTHN7AKWFJT9N28CGWDPXK`
+· UAT/EUA `01KX43H1Z2K4EWCCG0TV8CC8P5` · Done `01KWSTHN7AKWFJT9N28CGWDPXM`.
 
 ## Démarrage de session (TOUJOURS faire en premier)
 
 ```bash
-# 1. Lire le backlog
+# 1. Lire le board Epiq (mcp epiq_issue_list) : cartes en Todo = travail autorisé,
+#    cartes revenues de UAT/EUA en Todo = rapports de test à corriger en priorité.
+# 2. Lire le backlog complémentaire
 cat TODO.md
 
-# 2. Lire les ADR si on touche à l'architecture
+# 3. Lire les ADR si on touche à l'architecture
 ls docs/adr/
+
+# 4. Rafraîchir le graphe de code (CodeGraphContext) pour les requêtes d'impact
+cgc update && cgc stats     # incrémental ; voir « Outillage obligatoire » (CLAUDE.md)
 ```
 
-**Règle** : avant de commencer à coder, lire `TODO.md` et identifier les tâches en cours (`🔄`) ou la prochaine tâche du backlog.
+**Règle** : avant de commencer à coder, lister les issues Epiq et identifier ce qui
+est en **Todo** (seule colonne implémentable) ; à défaut, demander à David de trier
+les Proposal.
+
+---
+
+## Cycle de vie d'une carte Epiq (détail complet)
+
+### Phase 1 : Proposal (idée Claude)
+Créée par Claude lors d'un audit ou une proposition. Description auto-suffisante avec
+contexte et raison. David la lit, la trie mentalement.
+
+**Exemple** : "Error Boundary React + export de secours (p1, audit robustesse 09/07)"
+
+### Phase 2 : Todo (GO David)
+David déplace la carte de Proposal vers Todo quand il veut que Claude l'implémente.
+**C'est le seul signal valide d'implémentation.**
+
+**Commande Claude** :
+```bash
+mcp epiq_issue_move <issueId> --parentId 01KWSTHN7AKWFJT9N28CGWDPXJ
+```
+
+### Phase 3 : In progress (en cours Claude)
+Dès que Claude commence le travail, la carte doit passer en In progress.
+
+**Commande Claude** :
+```bash
+mcp epiq_issue_move <issueId> --parentId 01KWSTHN7AKWFJT9N28CGWDPXK
+```
+
+### Phase 4 : Code + build
+Claude implémente, teste localement, committe. Ensuite : `./build-docker.sh --deploy`
+qui fabrique un APK numéroté avec tags.
+
+### Phase 5 : UAT/EUA (tests David)
+À la livraison, Claude déplace la carte en UAT/EUA avec :
+- Tag `buildNN` (numéro du build qui embarque la feature)
+- Tag `vX.Y.Z` (version sémantique)
+- Commentaire Epiq résumant la livraison (« Livré en build 41 : StatusBar thémée crème/bleu nuit, splash Cantou, generate-icon.py écrit 11 splash.png »)
+
+**Commandes Claude** :
+```bash
+mcp epiq_issue_move <issueId> --parentId 01KX43H1Z2K4EWCCG0TV8CC8P5
+mcp epiq_issue_tag_add <issueId> --tagName buildNN
+mcp epiq_issue_tag_add <issueId> --tagName vX.Y.Z
+mcp epiq_issue_comment_add <issueId> --body "..."
+```
+
+### Phase 6a : Test OK → Done (David)
+David teste l'APK, valide. Déplace UAT/EUA → Done. **Ne jamais le faire à sa place.**
+
+### Phase 6b : Test KO → Todo (David + rapport)
+David trouve un bug. Remet la carte en Todo + ajoute un commentaire détaillant le
+problème (ex: « StatusBar ne change pas au toggle 🌙 en mode sombre »).
+
+**Claude lit ce rapport**, l'ajoute au titre ou le note, puis :
+1. La carte est déjà en Todo → passe en In progress
+2. Implémente le fix
+3. Re-livre : In progress → build → UAT/EUA avec **nouveau tag de build** (ex: build42)
+
+Cycle continue jusqu'à test OK → Done.
+
+### Phase 7 : Done → main (optionnel, David)
+David merge le commit de la branche dans `main` (ou `release/`) quand il prépare
+une release. Le code d'une carte en Done peut toujours être mergé — la validation
+est terminée.
 
 ---
 
