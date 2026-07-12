@@ -17,6 +17,7 @@ beforeEach(() => { localStorageMock.clear() })
 
 const openRestos = async (user) => {
   await user.click(screen.getByText('Restos'))
+  await screen.findByTestId('screen-restos') // sous-écran lazy → attendre le chunk
 }
 
 describe('Carnet de restaurants (UI)', () => {

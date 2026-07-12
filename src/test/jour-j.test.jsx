@@ -51,7 +51,7 @@ describe('Mode « Jour J » (jour du départ)', () => {
     render(<App />)
     await user.click(screen.getByText('Checklist avant de partir →'))
     expect(screen.getByTestId('sub-screen-wrapper')).toBeInTheDocument()
-    expect(screen.getByText(/Avant de partir/)).toBeInTheDocument()
+    expect(await screen.findByText(/Avant de partir/)).toBeInTheDocument()
   })
 })
 

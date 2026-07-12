@@ -1,12 +1,14 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL } from './data.js'
 import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
-import { Meteo } from './screens/Meteo.jsx'
-import { Hebergement } from './screens/Hebergement.jsx'
-import { Logistique } from './screens/Logistique.jsx'
-import { Trajet } from './screens/Trajet.jsx'
+// Sous-écrans chargés à la demande (code-splitting) — allègent le bundle initial,
+// ils ne sont montés qu'à l'ouverture depuis l'accueil (sub === …).
+const Meteo = lazy(() => import('./screens/Meteo.jsx').then(m => ({ default: m.Meteo })))
+const Hebergement = lazy(() => import('./screens/Hebergement.jsx').then(m => ({ default: m.Hebergement })))
+const Logistique = lazy(() => import('./screens/Logistique.jsx').then(m => ({ default: m.Logistique })))
+const Trajet = lazy(() => import('./screens/Trajet.jsx').then(m => ({ default: m.Trajet })))
 import { Budget } from './screens/Budget.jsx'
 import { Repas } from './screens/Repas.jsx'
 import { Planning } from './screens/Planning.jsx'
@@ -42,17 +44,17 @@ import { EditBudgetModal } from './modals/EditBudgetModal.jsx'
 import { EditHebergementModal } from './modals/EditHebergementModal.jsx'
 import { JournalModal } from './modals/JournalModal.jsx'
 import { VoteModal } from './modals/VoteModal.jsx'
-import { Souvenirs } from './screens/Souvenirs.jsx'
-import { Bingo } from './screens/Bingo.jsx'
+const Souvenirs = lazy(() => import('./screens/Souvenirs.jsx').then(m => ({ default: m.Souvenirs })))
+const Bingo = lazy(() => import('./screens/Bingo.jsx').then(m => ({ default: m.Bingo })))
 import { countCompletedLines } from './bingo.js'
-import { Bilan } from './screens/Bilan.jsx'
+const Bilan = lazy(() => import('./screens/Bilan.jsx').then(m => ({ default: m.Bilan })))
 import { shareRecap } from './recap.js'
 import { WhatsNewModal } from './modals/WhatsNewModal.jsx'
 import { ChangelogModal } from './modals/ChangelogModal.jsx'
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
 import { currentPositionMapsHref, openExternal } from './links.js'
-import { Restos } from './screens/Restos.jsx'
+const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
 import { RestoModal } from './modals/RestoModal.jsx'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
@@ -980,6 +982,7 @@ export default function App() {
           </div>
           {/* key={sub} remonte le conteneur à chaque navigation → rejoue screenIn */}
           <div key={sub} className="screen-in" style={sx('flex:1;overflow-y:auto;')}>
+            <Suspense fallback={null}>
 
             {/* TRAJET */}
             {sub === 'trajet' && (
@@ -1034,6 +1037,7 @@ export default function App() {
               <Meteo sx={sx} meteo={meteo} trip={trip} fmtDayShort={fmtDayShort} editMeteo={editMeteo} deleteMeteo={deleteMeteo} openAddMeteo={openAddMeteo} />
             )}
 
+            </Suspense>
           </div>
         </div>
       )}
