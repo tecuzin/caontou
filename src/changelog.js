@@ -5,6 +5,9 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 68, version: '1.1.0', date: '2026-07-12', items: [
+    '🛠️ Fiabilité : logique interne extraite et testée (aucun changement visible)',
+  ] },
   { build: 67, version: '1.1.0', date: '2026-07-12', items: [
     '🎉 Version 1.1.0 — grande mise au point qualité (détail dans les builds ci-dessous)',
   ] },
