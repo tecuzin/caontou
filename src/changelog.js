@@ -5,6 +5,29 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 67, version: '1.1.0', date: '2026-07-12', items: [
+    '🎉 Version 1.1.0 — grande mise au point qualité (détail dans les builds ci-dessous)',
+  ] },
+  { build: 66, version: '1.0.0', date: '2026-07-12', items: [
+    '♿ Accessibilité améliorée (libellés des champs de formulaire)',
+    '🛠️ Fiabilité renforcée (tests bout-en-bout des écrans)',
+  ] },
+  { build: 65, version: '1.0.0', date: '2026-07-12', items: [
+    '⚡ Démarrage plus rapide (écrans chargés à la demande)',
+  ] },
+  { build: 63, version: '1.0.0', date: '2026-07-12', items: [
+    '🛠️ Couverture de tests étendue (moins de bugs)',
+  ] },
+  { build: 62, version: '1.0.0', date: '2026-07-12', items: [
+    '🔔 Plus de demande d\'autorisation notifications au démarrage',
+    '🔎 Petites corrections (icône, référencement)',
+  ] },
+  { build: 61, version: '1.0.0', date: '2026-07-11', items: [
+    '🔒 Génération d\'identifiants internes plus sûre',
+  ] },
+  { build: 60, version: '1.0.0', date: '2026-07-11', items: [
+    '🔎 Corrections diverses (bug d\'export corrigé, référencement)',
+  ] },
   { build: 59, version: '1.0.0', date: '2026-07-11', items: [
     '📍 « Ma position » : l\'app demande enfin l\'autorisation de localisation',
   ] },
