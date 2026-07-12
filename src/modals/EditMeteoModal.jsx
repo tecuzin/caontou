@@ -9,16 +9,16 @@ export function EditMeteoModal({ isOpen, onClose, editIdx, editMeteoDay, editMet
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:18px;margin-bottom:12px;')}>Éditer météo</div>
         <div style={sx('margin-bottom:12px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Température (°C)</label>
-          <input type="number" value={editMeteoTemp} onChange={e => setEditMeteoTemp(e.target.value)} style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
+          <label htmlFor="edit-meteo-temp" style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Température (°C)</label>
+          <input id="edit-meteo-temp" type="number" value={editMeteoTemp} onChange={e => setEditMeteoTemp(e.target.value)} style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
         </div>
         <div style={sx('margin-bottom:12px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Icône</label>
-          <input type="text" value={editMeteoIcon} onChange={e => setEditMeteoIcon(e.target.value)} placeholder="☀️, 🌧️, ☁️…" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
+          <label htmlFor="edit-meteo-icon" style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Icône</label>
+          <input id="edit-meteo-icon" type="text" value={editMeteoIcon} onChange={e => setEditMeteoIcon(e.target.value)} placeholder="☀️, 🌧️, ☁️…" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
         </div>
         <div style={sx('margin-bottom:14px;')}>
-          <label style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Description</label>
-          <input type="text" value={editMeteoDesc} onChange={e => setEditMeteoDesc(e.target.value)} placeholder="Couvert, dégagé…" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
+          <label htmlFor="edit-meteo-desc" style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Description</label>
+          <input id="edit-meteo-desc" type="text" value={editMeteoDesc} onChange={e => setEditMeteoDesc(e.target.value)} placeholder="Couvert, dégagé…" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
         </div>
         <div style={sx('display:flex;gap:10px;')}>
           <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>Annuler</button>
