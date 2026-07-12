@@ -2,7 +2,9 @@ import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL } from './data.js'
-import { s, eur, buildList, parseDist, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
+import { s, eur, buildList, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
+import { filterAndSortVisits } from './visits.js'
+import { computeToday } from './today.js'
 // Sous-écrans chargés à la demande (code-splitting) — allègent le bundle initial,
 // ils ne sont montés qu'à l'ouverture depuis l'accueil (sub === …).
 const Meteo = lazy(() => import('./screens/Meteo.jsx').then(m => ({ default: m.Meteo })))
@@ -461,22 +463,7 @@ export default function App() {
   // la fenêtre du voyage. Le jour de planning correspondant est retrouvé
   // par date calendaire réelle (mois/année dérivés de trip.start, comme
   // pour les notifications), la météo/le repas par numéro/libellé du jour.
-  const today = useMemo(() => {
-    const now = new Date()
-    const start = tripDate(trip.start, 0)
-    const end = tripDate(trip.end, 23, 59)
-    if (now < start || now > end) return null
-    const [ty, tm] = trip.start.split('-').map(Number)
-    const dayIdx = days.findIndex((d) => {
-      const dd = new Date(ty, tm - 1, d.num)
-      return dd.getFullYear() === now.getFullYear() && dd.getMonth() === now.getMonth() && dd.getDate() === now.getDate()
-    })
-    if (dayIdx === -1) return null
-    const d = days[dayIdx]
-    const w = meteo.find((m) => m.n === d.num) || null
-    const meal = meals.find((m) => m.day === `${d.dow} ${d.num}`) || null
-    return { dayIdx, d, w, meal }
-  }, [trip.start, trip.end, days, meteo, meals])
+  const today = useMemo(() => computeToday(trip, days, meteo, meals), [trip.start, trip.end, days, meteo, meals])
 
   // Jour J : la date du jour est le jour de départ paramétré
   const isDepartureDay = useMemo(() => {
@@ -546,14 +533,7 @@ export default function App() {
   const recapData = computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, savedCount, packPct, coursesPct, meals, photos })
 
   // visites filtrées + triées
-  const CAT_ORDER = ['Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Marche']
-  const filteredVisits = visits
-    .filter((v) => filter === 'Tous' || v.cat === filter)
-    .sort((a, b) => {
-      if (visitSort === 'dist') return parseDist(a.dist) - parseDist(b.dist)
-      if (visitSort === 'cat') return CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat)
-      return 0
-    })
+  const filteredVisits = filterAndSortVisits(visits, filter, visitSort)
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
