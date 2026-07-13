@@ -132,16 +132,22 @@ Le moteur encode cette nuance plutôt que de « corriger » à l'aveugle.
 
 ---
 
-## 5. Résultats (build 73)
+## 5. Résultats (progression pas à pas)
 
-| Métrique             | Avant | Après | Note                                    |
-|----------------------|:-----:|:-----:|-----------------------------------------|
-| Couleurs distinctes  |  80   | **72**| −8 dérives fusionnées                    |
-| Paires de dérive     |  14   | **0** | ΔE<2 non intentionnelles éliminées       |
-| Score palette        |   0   | **64**| reste = paires 2≤ΔE<5 (perceptibles)     |
-| **Score composite**  | **23**| **49**|                                          |
+| Lot | Métrique               | Avant | Après | Note                                 |
+|-----|------------------------|:-----:|:-----:|--------------------------------------|
+| B73 | Couleurs distinctes    |  80   | **72**| −8 dérives fusionnées (CIEDE2000)     |
+| B73 | Paires de dérive       |  14   | **0** | ΔE<2 non intentionnelles éliminées    |
+| B73 | Score palette          |   0   | **64**| reste = paires 2≤ΔE<5 (perceptibles)  |
+| B74 | Rayons distincts        |  16   | **9** | orphelins 6/7/9/13/18/22/26 snappés   |
+| B74 | Score rayons           |  54   | **98**| échelle honnête {4,8,12,14,16,20,28}  |
+| —   | **Score composite**    | **23**| **60**| B73 : 23→49 · B74 : 49→60             |
 
-Rendu clair **et** sombre inchangés (ΔE<2). `386` tests verts, Lighthouse
+Étape rayons (B74) : les rayons orphelins ont été ramenés sur les tokens réels
+(la carte = 14px, le sheet = 28px). Le seul résidu est `10px` (×8). À chaque
+étape, **tests + Lighthouse** restent verts (voir §7).
+
+Rendu clair **et** sombre inchangés en B73 (ΔE<2). `386` tests verts, Lighthouse
 Perf 94 / A11y 100 / BP 100 / SEO 100 : **aucune régression**.
 
 ---
@@ -151,9 +157,9 @@ Perf 94 / A11y 100 / BP 100 / SEO 100 : **aucune régression**.
 Le score reste tiré vers le bas par des leviers qui **changent les pixels** —
 donc à dérouler **pas à pas, avec QA visuelle sur device** :
 
-- **Typo** : ramener les ~19 tailles à une gamme modulaire (~7 pas).
-- **Rayons** : snapper les orphelins (`7,9,13,26px`) sur l'échelle.
+- ✅ **Rayons** (B74) : orphelins snappés sur l'échelle {4,8,12,14,16,20,28}.
 - **Espacement** : réaligner les valeurs impaires sur la grille 4 px.
+- **Typo** : ramener les ~19 tailles à une gamme modulaire (~7 pas).
 - **Élévation** : unifier les ombres ad hoc en une échelle d'élévation à 3 niveaux.
 
 ---
@@ -163,7 +169,8 @@ donc à dérouler **pas à pas, avec QA visuelle sur device** :
 À **chaque build** (discipline projet) :
 
 1. `npm test` — la suite complète doit rester **verte** (dont
-   `design-coherence.test.js` : **0 dérive**, palette ≥ 60, composite > 40) ;
+   `design-coherence.test.js`, **cliquet anti-régression** : 0 dérive, palette
+   ≥ 60, rayons ≥ 90, composite ≥ 58 — seuils remontés à chaque lot livré) ;
 2. `npm run quality -- --only lighthouse` — **Perf / A11y / BP / SEO** ne doivent
    pas régresser (référence : 94 / 100 / 100 / 100).
 

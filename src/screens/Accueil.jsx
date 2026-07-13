@@ -25,7 +25,7 @@ export function Accueil({
   const [gamesOpen, setGamesOpen] = useState(false)
   return (
     <div data-testid="screen-accueil">
-      <div style={sx('margin:54px 18px 14px 18px;border-radius:26px;padding:20px;color:#fffaf0;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;min-height:190px;')}>
+      <div style={sx('margin:54px 18px 14px 18px;border-radius:28px;padding:20px;color:#fffaf0;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;min-height:190px;')}>
         <div data-testid="hero-panorama-bg" style={sx('position:absolute;inset:0;z-index:0;')}>
           <Panorama height="100%" />
           <div style={sx('position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,40,25,0.15) 0%,rgba(25,35,20,0.55) 60%,rgba(20,28,16,0.75) 100%);')} />
@@ -49,7 +49,7 @@ export function Accueil({
         <div data-testid="jour-j-banner" style={sx('margin:0 18px 14px;background:#fffdf8;border:2px solid #4a5d3a;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(74,93,58,0.18);')}>
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>🚗 En route pour le Cantal !</div>
           <div style={sx('font-size:13px;color:#6b6354;margin-top:4px;')}>Un dernier coup d'œil à la checklist avant de fermer la porte ?</div>
-          <button onClick={() => setSub('trajet')} style={sx('margin-top:12px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Checklist avant de partir →</button>
+          <button onClick={() => setSub('trajet')} style={sx('margin-top:12px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Checklist avant de partir →</button>
         </div>
       )}
 
@@ -75,7 +75,7 @@ export function Accueil({
           {today.meal && (
             <div style={sx('margin-top:12px;background:#f1e4d4;border-radius:12px;padding:10px 13px;font-size:13px;color:#6b5a45;')}>🍽️ Ce soir : <b>{today.meal.dish}</b></div>
           )}
-          <button onClick={() => { setTab('planning'); setDay(today.dayIdx) }} style={sx('margin-top:13px;width:100%;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le planning du jour →</button>
+          <button onClick={() => { setTab('planning'); setDay(today.dayIdx) }} style={sx('margin-top:13px;width:100%;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Voir le planning du jour →</button>
         </div>
       )}
 
@@ -87,7 +87,7 @@ export function Accueil({
             <div style={sx('font-size:13px;color:#6b6354;margin-top:1px;')}>{fmtDayShort(trip.start)} · depuis {trip.origin}{trip.etape ? ` · via ${trip.etape}` : ''}</div>
           </div>
         </div>
-        <button onClick={() => setSub('trajet')} style={sx('margin-top:13px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:13px;padding:12px;cursor:pointer;')}>Voir le trajet →</button>
+        <button onClick={() => setSub('trajet')} style={sx('margin-top:13px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Voir le trajet →</button>
       </div>
 
       <button onClick={() => setSub('logistique')} style={sx('margin:0 18px 14px;width:calc(100% - 36px);text-align:left;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
@@ -95,14 +95,14 @@ export function Accueil({
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>🧳 Valises &amp; préparatifs</div>
           <div style={sx('font-size:13px;color:#6b6354;font-weight:700;')}>{packDone}/{packTotal}</div>
         </div>
-        <div style={sx('margin-top:11px;height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={sx(`height:100%;border-radius:9px;background:#cf7d3c;width:${packPct}%;`)} /></div>
+        <div style={sx('margin-top:11px;height:9px;border-radius:8px;background:#efe6d4;overflow:hidden;')}><div style={sx(`height:100%;border-radius:8px;background:#cf7d3c;width:${packPct}%;`)} /></div>
       </button>
 
       <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Tout le séjour</div>
       <div style={sx('padding:0 18px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;')}>
         {MODULES.map((m) => (
-          <button key={m.name} onClick={() => openModule(m.action)} style={sx('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-            <div style={sx(`width:42px;height:42px;border-radius:13px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:21px;`)}>{m.emoji}</div>
+          <button key={m.name} onClick={() => openModule(m.action)} style={sx('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+            <div style={sx(`width:42px;height:42px;border-radius:14px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:21px;`)}>{m.emoji}</div>
             <div>
               <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{m.name}</div>
               <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>{m.sub}</div>
@@ -114,7 +114,7 @@ export function Accueil({
       <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🎲 Jeux avec les enfants</div>
       <div style={sx('padding:0 18px 12px;')}>
         <button data-testid="btn-open-bingo" onClick={() => setSub('bingo')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:13px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🔍</div>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🔍</div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Bingo du Cantal</div>
             <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>16 trésors à repérer · une ligne complète = 🎉</div>
@@ -122,7 +122,7 @@ export function Accueil({
           <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>›</div>
         </button>
         <button data-testid="btn-toggle-games" onClick={() => setGamesOpen((o) => !o)} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:13px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🎲</div>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🎲</div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Idées de jeux</div>
             <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>{KIDS_GAMES.length} activités nature, au gîte et le soir</div>
@@ -133,7 +133,7 @@ export function Accueil({
           <div data-testid="games-list" style={sx('margin-top:10px;display:flex;flex-direction:column;gap:10px;')}>
             {KIDS_GAMES.map((g, i) => (
               <div key={i} style={sx('display:flex;gap:12px;align-items:flex-start;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-                <div style={sx('width:44px;height:44px;flex:0 0 auto;border-radius:13px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:22px;')}>{g.emoji}</div>
+                <div style={sx('width:44px;height:44px;flex:0 0 auto;border-radius:14px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:22px;')}>{g.emoji}</div>
                 <div style={sx('flex:1;min-width:0;')}>
                   <div style={sx(`font-size:11px;font-weight:700;color:${g.color};text-transform:uppercase;letter-spacing:0.5px;`)}>{g.place}</div>
                   <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{g.name}</div>
@@ -181,7 +181,7 @@ export function Accueil({
 
       <div style={sx('padding:6px 18px 12px;')}>
         <button data-testid="btn-open-bilan" onClick={() => setSub('bilan')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:13px;background:#f3e2d6;display:flex;align-items:center;justify-content:center;font-size:21px;')}>📊</div>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#f3e2d6;display:flex;align-items:center;justify-content:center;font-size:21px;')}>📊</div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Bilan du séjour</div>
             <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>Stats & récap à partager</div>

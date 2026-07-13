@@ -41,7 +41,7 @@ export function Repas({
       {mealTab === 'courses' && (
         <div style={sx('padding:0 18px 16px;')}>
           <div style={sx('display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6b6354;margin-bottom:6px;')}><span>Liste de courses</span><span>{coursesDone}/{coursesTotal}</span></div>
-          <div style={sx('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;margin-bottom:14px;')}><div style={sx(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
+          <div style={sx('height:9px;border-radius:8px;background:#efe6d4;overflow:hidden;margin-bottom:14px;')}><div style={sx(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
           <div style={sx('display:flex;justify-content:flex-end;margin-bottom:14px;')}>
             <button onClick={() => setCoursesSorted(!coursesSorted)} style={sx(`border:1px solid ${coursesSorted ? '#4a5d3a' : '#ece2cf'};background:${coursesSorted ? '#4a5d3a' : '#fffdf8'};color:${coursesSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
           </div>

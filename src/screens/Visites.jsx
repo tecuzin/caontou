@@ -33,7 +33,7 @@ export function Visites({
         {filteredVisits.map((v) => {
           const sv = !!saved[v.id]
           return (
-            <div key={v.id} style={sx('display:flex;gap:12px;align-items:center;background:#fffdf8;border:1px solid #efe6d4;border-radius:18px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+            <div key={v.id} style={sx('display:flex;gap:12px;align-items:center;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
               <div style={sx('width:52px;height:52px;flex:0 0 auto;border-radius:14px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:26px;')}>{v.emoji}</div>
               <div style={sx('flex:1;min-width:0;')}>
                 <div style={sx('display:flex;align-items:center;gap:6px;')}>
