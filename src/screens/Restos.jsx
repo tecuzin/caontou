@@ -4,9 +4,9 @@ import { TelLink, MapLink } from '../components/Links.jsx'
 export function Restos({ sx, restos, openAddResto, openEditResto, deleteResto }) {
   return (
     <div data-testid="screen-restos" style={sx('padding:16px 18px 40px;')}>
-      <div style={sx('background:#cf7d3c;border-radius:20px;padding:18px;color:#fff8ef;box-shadow:0 8px 20px rgba(207,125,60,0.22);')}>
+      <div style={sx('background:#cf7d3c;border-radius:20px;padding:18px;color:#fffaf0;box-shadow:0 8px 20px rgba(207,125,60,0.22);')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>🍴 Nos restos</div>
-        <div style={sx('font-size:13px;color:#f6e6d4;margin-top:4px;')}>Bonnes adresses & réservations. Touchez le 📞 pour appeler, le 📍 pour ouvrir Google Maps.</div>
+        <div style={sx('font-size:13px;color:#f1e4d4;margin-top:4px;')}>Bonnes adresses & réservations. Touchez le 📞 pour appeler, le 📍 pour ouvrir Google Maps.</div>
       </div>
 
       {restos.length === 0 && (

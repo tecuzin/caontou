@@ -77,7 +77,7 @@ export const GiteScene = ({ height = 150 }) => (
     <defs>
       <linearGradient id="gs-sky" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stopColor="#7ea8cd" />
-        <stop offset="100%" stopColor="#d8e5ef" />
+        <stop offset="100%" stopColor="#cfe0ec" />
       </linearGradient>
       <linearGradient id="gs-meadow" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stopColor="#7a9e5a" />
