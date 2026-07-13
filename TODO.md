@@ -263,6 +263,25 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
   (commit `d674c09`) + migration store v1→v2 purgeant les anciennes valeurs
   Lyon/Mandailles (`f55db59`). Hébergement, planning, trajet, visites, météo à jour.
 
+## ✅ Complété — sécurité build + qualité tests (13 juillet)
+
+- [x] **Conteneur de build non-root** (Epiq, Trivy DS-0002 HIGH) — bascule sur
+  l'utilisateur `node` (uid 1000) : `GRADLE_USER_HOME=/home/node/.gradle`, chown
+  SDK/workspace/artefacts/home, `USER node` avant le warm-up (cache Gradle
+  préservé), `--chown=node:node` sur les COPY, et tar de `docker cp` taggé
+  uid 1000 dans `build-docker.sh`. Vérifié end-to-end : build 69 signé, artefacts
+  `node:node`, keystore stable `28ce1e58…`. Invariants build tous préservés.
+- [x] **Fix test cassé `jour-j.test.jsx`** — depuis le code-splitting des
+  sous-écrans (44acb05), l'écran Souvenirs est lazy : `getByTestId` synchrone
+  échouait → `findByTestId`. Suite complète repassée **379/379 verts**.
+- [x] Git Flow respecté (branches `feature/`/`fix/`, merges `--no-ff`), APK
+  builds 70-71 auto-déployés sur Telegram, 2 cartes Epiq passées en Done.
+
+> ⏭️ **Restant Todo Epiq** : a11y `<div onClick>` → `<button>` (~48 sites +
+> variantes, Sonar S1082/S6848). **Non fait automatiquement** : nuancé (les
+> backdrops de modales *ne doivent pas* devenir des `<button>`) et gated par une
+> QA visuelle device. À dérouler écran par écran avec validation visuelle.
+
 ## 📅 Backlog suivant
 
 - [x] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
