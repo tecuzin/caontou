@@ -107,7 +107,9 @@ describe('Galerie souvenirs (navigation)', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByText('Souvenirs'))
-    expect(screen.getByTestId('screen-souvenirs')).toBeInTheDocument()
+    // L'écran Souvenirs est chargé en lazy (code-splitting, cf. 44acb05) :
+    // attendre la résolution du chunk avant d'asserter (findBy = async).
+    expect(await screen.findByTestId('screen-souvenirs')).toBeInTheDocument()
     expect(screen.getByTestId('btn-take-photo')).toBeInTheDocument()
     expect(screen.getByTestId('btn-import-photo')).toBeInTheDocument()
   })
