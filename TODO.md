@@ -277,10 +277,16 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 - [x] Git Flow respecté (branches `feature/`/`fix/`, merges `--no-ff`), APK
   builds 70-71 auto-déployés sur Telegram, 2 cartes Epiq passées en Done.
 
-> ⏭️ **Restant Todo Epiq** : a11y `<div onClick>` → `<button>` (~48 sites +
-> variantes, Sonar S1082/S6848). **Non fait automatiquement** : nuancé (les
-> backdrops de modales *ne doivent pas* devenir des `<button>`) et gated par une
-> QA visuelle device. À dérouler écran par écran avec validation visuelle.
+- [x] **A11y modales — `ModalShell` partagé** (lot ~44/48 findings Sonar
+  S1082/S6848) — les 22 feuilles passent par une coquille accessible : backdrop
+  `role="presentation"`, **fermeture Échap** (nouveau), feuille `role="dialog"
+  aria-modal`. Rendu identique, +4 tests, 383 verts, APK build 72. (Carte Epiq
+  gardée In progress pour le reste.)
+
+> ⏭️ **Restant carte a11y** (avec QA visuelle device) : les `<div onClick>`
+> **réellement interactifs** de `App.jsx` (chips/cartes/onglets → `<button>` avec
+> reset de style) + le viewer photo plein écran de Souvenirs (même patron Échap).
+> Ces conversions changent le rendu → à valider écran par écran sur device.
 
 ## 📅 Backlog suivant
 
