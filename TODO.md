@@ -258,8 +258,10 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 - [x] **Prune Docker `[0/5]`** au début du build (évite « no space left on device »).
 - [x] **Alerte Telegram en cas d'échec de build** (trap + `deploy-telegram.sh --message`).
 - [x] Tags de priorité (p1/p2/p3) sur le board Epiq. APK `cantou-v1.0.0-build29/30` déployés.
-- [ ] **Clarifier le lieu réel dans le Cantal** (Telegram #48) — **bloqué** : nécessite
-  l'info côté utilisateur (message reçu dans le canal). Seul item restant du Todo.
+- [x] **Clarifier le lieu réel dans le Cantal** (Telegram #48) — **résolu** : lieu
+  confirmé **Vezels-Roussy (15130), Carladès**. Toute la géographie re-basée
+  (commit `d674c09`) + migration store v1→v2 purgeant les anciennes valeurs
+  Lyon/Mandailles (`f55db59`). Hébergement, planning, trajet, visites, météo à jour.
 
 ## 📅 Backlog suivant
 
