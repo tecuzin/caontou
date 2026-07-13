@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { ModalShell } from './ModalShell.jsx'
 import { pickWinner } from '../vote.js'
 
 /**
@@ -26,12 +27,12 @@ export function VoteModal({ isOpen, onClose, sx, visits, savedVisitIds, familyMe
 
   if (!isOpen) return null
   const sheet = (inner) => (
-    <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-      <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:86vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+    <ModalShell onClose={onClose} z={200} fade={true}>
+      <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:86vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         {inner}
       </div>
-    </div>
+    </ModalShell>
   )
 
   const candidates = candidateIds.map((id) => visits.find((v) => v.id === id)).filter(Boolean)

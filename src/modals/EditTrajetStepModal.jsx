@@ -1,11 +1,12 @@
 import { s } from '../utils.js'
+import { ModalShell } from './ModalShell.jsx'
 
 export function EditTrajetStepModal({ isOpen, onClose, editingTrajetIdx, newTrajetTime, setNewTrajetTime, newTrajetPlace, setNewTrajetPlace, newTrajetNote, setNewTrajetNote, newTrajetColor, setNewTrajetColor, darkMode, onSubmit }) {
   if (!isOpen || editingTrajetIdx === null) return null
   const sx = css => s(css)
   return (
-    <div onClick={onClose} style={sx('position:fixed;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-      <div onClick={e => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+    <ModalShell onClose={onClose} z={200} fade={true}>
+      <div role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer etape</div>
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
@@ -25,6 +26,6 @@ export function EditTrajetStepModal({ isOpen, onClose, editingTrajetIdx, newTraj
           <button onClick={onSubmit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
         </div>
       </div>
-    </div>
+    </ModalShell>
   )
 }

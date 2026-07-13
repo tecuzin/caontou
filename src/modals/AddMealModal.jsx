@@ -1,11 +1,12 @@
 import { s } from '../utils.js'
+import { ModalShell } from './ModalShell.jsx'
 
 export function AddMealModal({ isOpen, onClose, newMealDay, setNewMealDay, newMealType, setNewMealType, newMealLabel, setNewMealLabel, days, darkMode, onSubmit }) {
   if (!isOpen) return null
   const sx = css => s(css)
   return (
-    <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;')}>
-      <div onClick={e => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s;')}>
+    <ModalShell onClose={onClose} z={200} fade={false}>
+      <div role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s;')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:18px;margin-bottom:12px;')}>Ajouter un repas</div>
         <div style={sx('margin-bottom:12px;')}>
@@ -32,6 +33,6 @@ export function AddMealModal({ isOpen, onClose, newMealDay, setNewMealDay, newMe
           <button onClick={onSubmit} style={sx('flex:1;border:none;background:#9c6b4a;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>✓ Ajouter</button>
         </div>
       </div>
-    </div>
+    </ModalShell>
   )
 }

@@ -1,12 +1,13 @@
 import { s } from '../utils.js'
+import { ModalShell } from './ModalShell.jsx'
 
 export function EditTripModal({ isOpen, onClose, newTripStart, setNewTripStart, newTripEnd, setNewTripEnd, newTripOrigin, setNewTripOrigin, newTripEtape, setNewTripEtape, newTripDest, setNewTripDest, darkMode, onSubmit }) {
   if (!isOpen) return null
   const sx = css => s(css)
 
   return (
-    <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-      <div onClick={e => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+    <ModalShell onClose={onClose} z={200} fade={true}>
+      <div role="dialog" aria-modal="true" onClick={e => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Paramètres du voyage</div>
         <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Ces réglages pilotent le compte à rebours, les cartes et les notifications.</div>
@@ -31,6 +32,6 @@ export function EditTripModal({ isOpen, onClose, newTripStart, setNewTripStart, 
           <button data-testid="btn-save-trip" onClick={onSubmit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
         </div>
       </div>
-    </div>
+    </ModalShell>
   )
 }

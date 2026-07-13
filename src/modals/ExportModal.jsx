@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { s } from '../utils.js'
 import { buildExport, downloadExport, shareExport } from '../backup.js'
+import { ModalShell } from './ModalShell.jsx'
 
 export function ExportModal({ isOpen, onClose, currentStoreData, STORE_KEY, darkMode, onExportCopied }) {
   const [exportCopied, setExportCopied] = useState(false)
@@ -31,8 +32,8 @@ export function ExportModal({ isOpen, onClose, currentStoreData, STORE_KEY, dark
   }
 
   return (
-    <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-      <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+    <ModalShell onClose={onClose} z={200} fade={true}>
+      <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Exporter les données</div>
         <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Toutes les données de l'app (planning, dépenses, listes, favoris…) au format JSON. À garder en lieu sûr ou à envoyer sur un autre téléphone.</div>
@@ -44,6 +45,6 @@ export function ExportModal({ isOpen, onClose, currentStoreData, STORE_KEY, dark
         </div>
         <button onClick={onClose} style={sx('width:100%;margin-top:10px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
       </div>
-    </div>
+    </ModalShell>
   )
 }
