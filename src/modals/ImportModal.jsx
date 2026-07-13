@@ -1,4 +1,5 @@
 import { s } from '../utils.js'
+import { ModalShell } from './ModalShell.jsx'
 import { parseImport } from '../backup.js'
 
 export function ImportModal({ isOpen, onClose, importText, setImportText, importError, importPreview, applyImport, doParseImport, darkMode }) {
@@ -19,8 +20,8 @@ export function ImportModal({ isOpen, onClose, importText, setImportText, import
   }
 
   return (
-    <div onClick={closeImport} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-      <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+    <ModalShell onClose={closeImport} z={200} fade={true}>
+      <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Importer des données</div>
         <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
@@ -41,6 +42,6 @@ export function ImportModal({ isOpen, onClose, importText, setImportText, import
         </div>
         <div style={sx('margin-top:10px;font-size:12px;color:#6b6354;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
       </div>
-    </div>
+    </ModalShell>
   )
 }

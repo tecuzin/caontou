@@ -1,4 +1,5 @@
 import { MOODS } from '../journal.js'
+import { ModalShell } from './ModalShell.jsx'
 
 /**
  * Journal de bord d'une journée — humeur (emoji), moment préféré, phrase du
@@ -8,8 +9,8 @@ export function JournalModal({ isOpen, onClose, sx, dayLabel, entry, updateEntry
   if (!isOpen) return null
   const e = entry || {}
   return (
-    <div onClick={onClose} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-      <div onClick={(ev) => ev.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+    <ModalShell onClose={onClose} z={200} fade={true}>
+      <div role="dialog" aria-modal="true" onClick={(ev) => ev.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:2px;')}>📔 Journal de bord</div>
         <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>{dayLabel}</div>
@@ -32,6 +33,6 @@ export function JournalModal({ isOpen, onClose, sx, dayLabel, entry, updateEntry
           <button data-testid="btn-share-journal" onClick={onShare} disabled={!canShare} style={sx(`flex:1;border:none;background:${canShare ? '#cf7d3c' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${canShare ? 'pointer' : 'default'};`)}>📤 Partager le journal</button>
         </div>
       </div>
-    </div>
+    </ModalShell>
   )
 }
