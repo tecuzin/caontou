@@ -4,7 +4,7 @@ import { Ridge } from '../Scenery.jsx'
 export function Meteo({ sx, meteo, trip, fmtDayShort, editMeteo, deleteMeteo, openAddMeteo }) {
   return (
     <div style={sx('padding:16px 18px 40px;')}>
-      <div style={sx('background:#4a5d3a;border-radius:18px;padding:16px;color:#f3ecda;position:relative;overflow:hidden;')}>
+      <div style={sx('background:#4a5d3a;border-radius:16px;padding:16px;color:#f3ecda;position:relative;overflow:hidden;')}>
         <Ridge opacity={0.14} />
         <div style={sx('position:relative;')}>
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>Carladès &amp; Cantal</div>

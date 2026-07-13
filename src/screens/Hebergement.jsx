@@ -17,7 +17,7 @@ const URGENCES = [
 export function Hebergement({ sx, hebergement, openHebEdit }) {
   return (
     <div style={sx('padding:16px 18px 40px;')}>
-      <div style={sx('height:150px;border-radius:18px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.1);')}>
+      <div style={sx('height:150px;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.1);')}>
         <GiteScene />
       </div>
       <div style={sx('display:flex;align-items:center;margin-top:14px;gap:10px;')}>

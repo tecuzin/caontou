@@ -82,12 +82,12 @@ export function Trajet({
       </div>
       <div style={sx('font-size:12px;color:#6b6354;margin-bottom:10px;')}>Chacun son côté de la route : on tape quand on voit des vaches. Celui qui en a le plus à l'arrivée a gagné !</div>
       <div style={sx('display:flex;gap:10px;')}>
-        <button data-testid="btn-cow-left" onClick={() => bumpCow('left')} style={sx('flex:1;border:none;background:#e7ecdf;border-radius:18px;padding:18px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(74,93,58,0.08);')}>
+        <button data-testid="btn-cow-left" onClick={() => bumpCow('left')} style={sx('flex:1;border:none;background:#e7ecdf;border-radius:16px;padding:18px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(74,93,58,0.08);')}>
           <span style={sx('font-size:26px;')}>🐄</span>
           <span data-testid="cow-count-left" style={sx('font-family:Quicksand;font-weight:700;font-size:26px;color:#4a5d3a;')}>{carGames.cowLeft}</span>
           <span style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Côté gauche</span>
         </button>
-        <button data-testid="btn-cow-right" onClick={() => bumpCow('right')} style={sx('flex:1;border:none;background:#f1e4d4;border-radius:18px;padding:18px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(156,107,74,0.08);')}>
+        <button data-testid="btn-cow-right" onClick={() => bumpCow('right')} style={sx('flex:1;border:none;background:#f1e4d4;border-radius:16px;padding:18px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(156,107,74,0.08);')}>
           <span style={sx('font-size:26px;')}>🐄</span>
           <span data-testid="cow-count-right" style={sx('font-family:Quicksand;font-weight:700;font-size:26px;color:#9c6b4a;')}>{carGames.cowRight}</span>
           <span style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Côté droit</span>

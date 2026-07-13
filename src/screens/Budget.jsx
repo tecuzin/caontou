@@ -13,7 +13,7 @@ export function Budget({
       <div style={sx('padding:54px 18px 14px;')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>Budget</div>
       </div>
-      <div style={sx('margin:0 18px 14px;background:#4a5d3a;border-radius:22px;padding:18px;color:#f3ecda;box-shadow:0 10px 24px rgba(74,93,58,0.22);')}>
+      <div style={sx('margin:0 18px 14px;background:#4a5d3a;border-radius:28px;padding:18px;color:#f3ecda;box-shadow:0 10px 24px rgba(74,93,58,0.22);')}>
         <div style={sx('display:flex;justify-content:space-between;align-items:flex-end;')}>
           <div><div style={sx('font-size:12px;color:#c9d2b6;font-weight:700;letter-spacing:0.5px;')}>RESTANT</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:30px;margin-top:2px;')}>{eur(remain)}</div></div>
           <div style={sx('text-align:right;')}>
@@ -36,7 +36,7 @@ export function Budget({
         {budgetCats.map((c) => (
           <div key={c.name}>
             <div style={sx('display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;')}><span style={sx('font-weight:700;')}>{c.name}</span><span style={sx('font-weight:700;color:#6b6354;')}>{eur(c.amt)}</span></div>
-            <div style={sx('height:9px;border-radius:9px;background:#efe6d4;overflow:hidden;')}><div style={sx(`height:100%;background:${c.color};width:${c.pct}%;`)} /></div>
+            <div style={sx('height:9px;border-radius:8px;background:#efe6d4;overflow:hidden;')}><div style={sx(`height:100%;background:${c.color};width:${c.pct}%;`)} /></div>
           </div>
         ))}
       </div>

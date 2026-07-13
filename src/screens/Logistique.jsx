@@ -19,7 +19,7 @@ export function Logistique({
               <span style={sx('font-size:12px;color:#6b6354;font-weight:700;')}>{b.done}/{b.total}</span>
               <button onClick={() => deleteLogiList(L.key)} style={sx('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
             </div>
-            <div style={sx('height:7px;border-radius:7px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={sx(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
+            <div style={sx('height:7px;border-radius:8px;background:#efe6d4;overflow:hidden;margin-bottom:8px;')}><div style={sx(`height:100%;background:#cf7d3c;width:${b.pct}%;`)} /></div>
             <div style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
               {displayItems.map((it) => (
                 <div key={it.label} style={sx('display:flex;align-items:center;width:100%;border-bottom:1px solid #f1e9da;')}>

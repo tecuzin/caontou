@@ -130,7 +130,7 @@ export class ErrorBoundary extends Component {
           <button
             onClick={this.onRetry}
             style={sx(
-              'padding:12px 20px;background:#4a5d3a;color:#fffaf0;font-size:14px;font-weight:500;border:none;border-radius:6px;cursor:pointer;transition:transform 0.08s;'
+              'padding:12px 20px;background:#4a5d3a;color:#fffaf0;font-size:14px;font-weight:500;border:none;border-radius:8px;cursor:pointer;transition:transform 0.08s;'
             )}
             onMouseDown={(e) => (e.target.style.transform = 'scale(0.96)')}
             onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
@@ -141,7 +141,7 @@ export class ErrorBoundary extends Component {
           <button
             onClick={this.onExport}
             style={sx(
-              'padding:12px 20px;background:#9c6b4a;color:#fffaf0;font-size:14px;font-weight:500;border:none;border-radius:6px;cursor:pointer;transition:transform 0.08s;'
+              'padding:12px 20px;background:#9c6b4a;color:#fffaf0;font-size:14px;font-weight:500;border:none;border-radius:8px;cursor:pointer;transition:transform 0.08s;'
             )}
             onMouseDown={(e) => (e.target.style.transform = 'scale(0.96)')}
             onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}
@@ -152,7 +152,7 @@ export class ErrorBoundary extends Component {
           <button
             onClick={this.onResetUI}
             style={sx(
-              'padding:12px 20px;background:#b8503f;color:#fffaf0;font-size:14px;font-weight:500;border:none;border-radius:6px;cursor:pointer;transition:transform 0.08s;'
+              'padding:12px 20px;background:#b8503f;color:#fffaf0;font-size:14px;font-weight:500;border:none;border-radius:8px;cursor:pointer;transition:transform 0.08s;'
             )}
             onMouseDown={(e) => (e.target.style.transform = 'scale(0.96)')}
             onMouseUp={(e) => (e.target.style.transform = 'scale(1)')}

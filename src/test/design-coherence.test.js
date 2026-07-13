@@ -24,7 +24,13 @@ describe('cohérence de design (déterministe)', () => {
     expect(m.paletteScore).toBeGreaterThanOrEqual(60)
   })
 
-  it('score global au-dessus du plancher de départ (> 40)', () => {
-    expect(m.composite).toBeGreaterThan(40)
+  it('échelle de rayons harmonisée (≥ 90)', () => {
+    expect(m.radiusScore).toBeGreaterThanOrEqual(90)
+  })
+
+  // Cliquet anti-régression : le score global ne doit plus redescendre sous le
+  // palier acquis. On le remonte à chaque lot livré (voir docs/design-engine.md).
+  it('score global au-dessus du palier acquis (≥ 58)', () => {
+    expect(m.composite).toBeGreaterThanOrEqual(58)
   })
 })
