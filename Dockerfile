@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     ANDROID_HOME=/android-sdk \
     ANDROID_SDK_ROOT=/android-sdk \
     JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
+    GRADLE_USER_HOME=/home/node/.gradle \
     PATH="/android-sdk/cmdline-tools/latest/bin:/android-sdk/platform-tools:${PATH}"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -24,33 +25,45 @@ RUN yes | sdkmanager --licenses >/dev/null 2>&1 || true && \
         "platforms;android-34" "platforms;android-35" \
         "build-tools;34.0.0" "build-tools;35.0.0" 2>&1 | tail -5
 
+# ── Bascule en utilisateur non-root (Trivy DS-0002 HIGH) ─────────────────────
+# Le build ne requiert aucun privilège root (npm, Gradle, apksigner, keytool
+# sont tous user-space). On donne à l'utilisateur `node` (uid 1000, déjà fourni
+# par node:20-slim) la propriété du SDK, du workspace, du cache Gradle et du
+# dossier d'artefacts, puis on bascule dessus AVANT le warm-up pour que
+# GRADLE_USER_HOME (/home/node/.gradle) soit peuplé par `node` et réutilisé tel
+# quel au runtime. Le source injecté par build-docker.sh (docker cp) est taggé
+# uid 1000 côté tar pour rester cohérent.
+RUN mkdir -p /workspace /artifacts "$GRADLE_USER_HOME" && \
+    chown -R node:node /android-sdk /workspace /artifacts /home/node
+USER node
+
 WORKDIR /workspace
 
 # ── Layer cache npm ───────────────────────────────────────────────────────────
 # Invalidée uniquement quand package*.json change : le `npm install` du
 # runtime (entrypoint) devient alors un no-op de quelques secondes au lieu
 # d'un téléchargement complet de node_modules à chaque build.
-COPY package.json package-lock.json ./
+COPY --chown=node:node package.json package-lock.json ./
 RUN npm install --no-audit --no-fund 2>&1 | tail -3
 
 # ── Layer warm-up Gradle ──────────────────────────────────────────────────────
 # Pré-génère android/ (cap add) et lance un assembleRelease sur un dist
-# factice : peuple /root/.gradle (distribution Gradle + toutes les deps Maven)
+# factice : peuple $GRADLE_USER_HOME (distribution Gradle + toutes les deps Maven)
 # et compile une première fois les plugins Capacitor. Au runtime, cap sync
 # remplace les assets web par les vrais et Gradle ne retélécharge plus rien.
 # Non fatal (|| true) : un échec ici dégrade la vitesse, pas la correction —
 # l'entrypoint refait autorité sur le build final.
-COPY capacitor.config.json ./
+COPY --chown=node:node capacitor.config.json ./
 RUN mkdir -p dist && printf '<!doctype html><html><body>warm-up</body></html>' > dist/index.html && \
     npx cap add android 2>&1 | tail -3 && \
     cd android && chmod +x gradlew && \
     (./gradlew assembleRelease --no-daemon 2>&1 | tail -5 || true)
 
-COPY entrypoint.sh /entrypoint.sh
+COPY --chown=node:node entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Le contexte exclut node_modules/dist/android (.dockerignore) : les layers
 # de cache ci-dessus survivent à cette copie du source.
-COPY . /workspace
+COPY --chown=node:node . /workspace
 
 ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
