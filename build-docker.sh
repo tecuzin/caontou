@@ -107,8 +107,13 @@ docker create \
 # --no-xattrs/--no-mac-metadata : le tar BSD embarque sinon les attributs
 # étendus macOS (com.apple.provenance…) que le daemon Linux ne sait pas poser
 # (lsetxattr: operation not supported → docker cp échoue). Vu au build 39.
+# --uid/--gid 1000 (node) : l'image tourne désormais en utilisateur non-root
+# `node` (Trivy DS-0002). Sans forçage, le tar macOS taggue les fichiers avec
+# l'uid local (501) et `node` ne pourrait plus écrire node_modules/android/dist
+# dans /workspace au runtime. On aligne donc la propriété du source injecté.
 tar -cf - \
   --no-xattrs --no-mac-metadata --no-acls --no-fflags \
+  --uid 1000 --gid 1000 --uname node --gname node \
   --exclude ./node_modules --exclude ./dist --exclude ./android \
   --exclude ./build --exclude ./.git --exclude ./.gradle \
   --exclude "*.apk" --exclude "*.aab" --exclude "*.log" --exclude "*.bak" \
