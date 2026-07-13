@@ -13,6 +13,8 @@
     "test:e2e:coverage": "rm -rf coverage-e2e && playwright test && node scripts/report-e2e-coverage.js",
     "test:appium": "wdio run tests/appium/wdio.conf.js",
     "quality": "bash scripts/quality-audit.sh",
+    "design:audit": "node scripts/design-audit.mjs",
+    "design:consolidate": "node scripts/design-consolidate.mjs",
     "test:bdd": "cucumber-js",
     "package:qa-bundle": "bash scripts/package-appium-bundle.sh"
   },

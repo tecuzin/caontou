@@ -45,7 +45,7 @@ export function Visites({
                 <div style={sx('display:inline-block;margin-top:7px;font-size:11px;font-weight:700;color:#6b6354;background:#f1e9da;border-radius:8px;padding:3px 8px;')}>👶 {v.age}</div>
               </div>
               <button onClick={() => toggleSaved(v.id)} style={sx('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:24px;line-height:1;')}>
-                {sv ? <span style={sx('color:#b8503f;')}>♥</span> : <span style={sx('color:#cabfa6;')}>♡</span>}
+                {sv ? <span style={sx('color:#b8503f;')}>♥</span> : <span style={sx('color:#cbc2ae;')}>♡</span>}
               </button>
               <button onClick={() => editVisit(v.id)} style={sx('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;')}>✏️</button>
               <button onClick={() => deleteVisit(v.id)} style={sx('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;color:#b8503f;')}>🗑️</button>

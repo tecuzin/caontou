@@ -15,7 +15,7 @@ function Tile({ sx, emoji, value, label, bg }) {
 export function Bilan({ sx, recap, onShare }) {
   return (
     <div data-testid="screen-bilan" style={sx('padding:16px 18px 40px;')}>
-      <div style={sx('background:#9c6b4a;border-radius:20px;padding:18px;color:#fdf6e9;box-shadow:0 8px 20px rgba(156,107,74,0.2);')}>
+      <div style={sx('background:#9c6b4a;border-radius:20px;padding:18px;color:#fffaf0;box-shadow:0 8px 20px rgba(156,107,74,0.2);')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>📊 Bilan du séjour</div>
         <div style={sx('font-size:13px;color:#ecd9c4;margin-top:4px;')}>Un petit récap de nos vacances dans le Cantal, à garder ou à envoyer aux proches.</div>
       </div>

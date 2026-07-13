@@ -34,9 +34,9 @@ export function Accueil({
         <button data-testid="btn-dark-mode-toggle" onClick={() => setDarkMode((d) => !d)} style={sx('position:absolute;top:14px;right:56px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>{darkMode ? '☀️' : '🌙'}</button>
         <button data-testid="btn-trip-settings" onClick={openTripEdit} style={sx('position:absolute;top:14px;right:14px;z-index:2;border:none;background:rgba(255,255,255,0.2);color:#fffaf0;border-radius:10px;padding:6px 9px;font-size:15px;cursor:pointer;')}>⚙️</button>
         <div style={sx('position:relative;z-index:1;')}>
-          <div style={sx('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#e8e2cf;')}>{isDepartureDay ? "🎉 C'EST LE GRAND JOUR !" : 'PROCHAINE AVENTURE'}</div>
+          <div style={sx('font-size:12px;letter-spacing:1.5px;font-weight:700;color:#efe6d4;')}>{isDepartureDay ? "🎉 C'EST LE GRAND JOUR !" : 'PROCHAINE AVENTURE'}</div>
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:30px;line-height:1.08;margin-top:8px;text-shadow:0 2px 8px rgba(0,0,0,0.25);')}>Carladès,<br />Cantal</div>
-          <div style={sx('margin-top:9px;font-size:14px;color:#e8e2cf;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
+          <div style={sx('margin-top:9px;font-size:14px;color:#efe6d4;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
           <div style={sx('display:flex;gap:8px;margin-top:16px;')}>
             <div data-testid="countdown-pill" style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;font-family:Quicksand;')}>{isDepartureDay ? 'Jour J 🎉' : `J-${countdown}`}</div>
             <div style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:8px 13px;font-weight:700;')}>☀️ 24° sur place</div>

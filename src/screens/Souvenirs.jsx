@@ -19,7 +19,7 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
   const groups = groupPhotosByDay(photos, days)
   return (
     <div data-testid="screen-souvenirs" style={sx('padding:16px 18px 40px;')}>
-      <div style={sx('background:#9c6b4a;border-radius:20px;padding:18px;color:#fdf6e9;box-shadow:0 8px 20px rgba(156,107,74,0.2);')}>
+      <div style={sx('background:#9c6b4a;border-radius:20px;padding:18px;color:#fffaf0;box-shadow:0 8px 20px rgba(156,107,74,0.2);')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>📸 Souvenirs du séjour</div>
         <div style={sx('font-size:13px;color:#ecd9c4;margin-top:4px;')}>{photos.length ? `${photos.length} photo${photos.length > 1 ? 's' : ''}, rangée${photos.length > 1 ? 's' : ''} par journée` : 'Les photos prises ici se rangent toutes seules par journée.'}</div>
       </div>
