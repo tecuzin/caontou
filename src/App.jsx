@@ -20,6 +20,7 @@ import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
 import { parseImport, formatLastBackup } from './backup.js'
 import { DEPARTURE_INITIAL, isCheckoutWindow } from './departure.js'
+import { challengeOfDay, dayKey } from './challenges.js'
 import { runSelfTests } from './selftest.js'
 import { useVisits } from './hooks/useVisits.js'
 import { useSwipe } from './hooks/useSwipe.js'
@@ -199,6 +200,7 @@ function loadStore() {
       restos: p.restos ?? structuredClone(RESTOS_INITIAL),
       departure: p.departure ?? structuredClone(DEPARTURE_INITIAL),
       ratings: p.ratings ?? {},
+      challengesDone: p.challengesDone ?? {},
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -371,6 +373,16 @@ export default function App() {
   const rateVisit = (id, stars) => { haptic(ImpactStyle.Light); setRatings((r) => ({ ...r, [id]: { ...r[id], stars } })) }
   const setVisitNote = (id, note) => setRatings((r) => ({ ...r, [id]: { ...r[id], note } }))
   const openMaps = (url) => { try { window.open(url, '_blank') } catch { /* WebView sans window.open */ } }
+  const [challengesDone, setChallengesDone] = useState(initial.challengesDone || {})
+  const todayKey = dayKey()
+  const dailyChallenge = useMemo(() => challengeOfDay(todayKey), [todayKey])
+  const challengeDone = !!challengesDone[todayKey]
+  const markChallengeDone = () => {
+    if (challengesDone[todayKey]) return
+    haptic(ImpactStyle.Medium)
+    setChallengesDone((d) => ({ ...d, [todayKey]: true }))
+    setConfettiTrigger(true); setTimeout(() => setConfettiTrigger(false), 2500)
+  }
   const [showResto, setShowResto] = useState(false)
   const [editingRestoId, setEditingRestoId] = useState(null)
   const [restoForm, setRestoForm] = useState({ name: '', place: '', tel: '', resa: '', reserved: false })
@@ -453,8 +465,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -904,7 +916,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -1060,6 +1072,7 @@ export default function App() {
                 setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow}
                 isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }} openMyPosition={openMyPosition} openChangelog={() => setShowChangelog(true)}
                 isCheckoutSoon={isCheckoutSoon} departureDone={departure.filter((i) => i.done).length} departureTotal={departure.length}
+                dailyChallenge={dailyChallenge} challengeDone={challengeDone} markChallengeDone={markChallengeDone}
               />
             )}
 

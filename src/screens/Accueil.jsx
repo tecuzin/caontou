@@ -24,6 +24,7 @@ export function Accueil({
   lastBackupAt, formatLastBackup, setExportCopied, setShowExport, setShowImport, runSelfTestAndShow,
   isDepartureDay, quickPhoto, openMyPosition, openChangelog,
   isCheckoutSoon, departureDone = 0, departureTotal = 0,
+  dailyChallenge, challengeDone, markChallengeDone,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   return (
@@ -87,6 +88,21 @@ export function Accueil({
             <div style={sx('margin-top:12px;background:#f1e4d4;border-radius:12px;padding:10px 13px;font-size:13px;color:#6b5a45;')}>🍽️ Ce soir : <b>{today.meal.dish}</b></div>
           )}
           <button onClick={() => { setTab('planning'); setDay(today.dayIdx) }} style={sx('margin-top:13px;width:100%;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Voir le planning du jour →</button>
+        </div>
+      )}
+
+      {today && dailyChallenge && (
+        <div data-testid="challenge-card" style={sx(`margin:0 18px 14px;background:#fffdf8;border:2px solid #5b7042;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(91,112,66,0.16);${challengeDone ? 'opacity:0.75;' : ''}`)}>
+          <div style={sx('font-size:12px;letter-spacing:1px;font-weight:700;color:#5b7042;')}>🎯 DÉFI DU JOUR</div>
+          <div style={sx('display:flex;align-items:center;gap:12px;margin-top:8px;')}>
+            <span style={sx('font-size:30px;flex:0 0 auto;')}>{dailyChallenge.emoji}</span>
+            <div style={sx(`flex:1;min-width:0;font-family:Quicksand;font-weight:700;font-size:16px;${challengeDone ? 'text-decoration:line-through;color:#9a917f;' : ''}`)}>{dailyChallenge.label}</div>
+          </div>
+          {challengeDone ? (
+            <div data-testid="challenge-done" style={sx('margin-top:12px;text-align:center;font-size:14px;font-weight:700;color:#5b7042;')}>✅ Défi relevé, bravo !</div>
+          ) : (
+            <button data-testid="btn-challenge-done" onClick={markChallengeDone} style={sx('margin-top:12px;width:100%;border:none;background:#5b7042;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>C'est fait ! 🎉</button>
+          )}
         </div>
       )}
 

@@ -44,6 +44,23 @@ describe('Mode « Jour J » (jour du départ)', () => {
     expect(screen.queryByTestId('jour-j-banner')).not.toBeInTheDocument()
     expect(screen.getByTestId('countdown-pill')).toHaveTextContent(/^J-\d+$/)
   })
+})
+
+describe('Défi du jour', () => {
+  it('affiche le défi pendant le séjour et se valide', async () => {
+    const user = userEvent.setup()
+    setToday('2026-08-07')
+    render(<App />)
+    expect(screen.getByTestId('challenge-card')).toBeInTheDocument()
+    await user.click(screen.getByTestId('btn-challenge-done'))
+    expect(screen.getByTestId('challenge-done')).toBeInTheDocument()
+  })
+
+  it('pas de défi hors période de voyage', () => {
+    setToday('2026-07-10')
+    render(<App />)
+    expect(screen.queryByTestId('challenge-card')).not.toBeInTheDocument()
+  })
 
   it('la bannière mène à la checklist du trajet', async () => {
     setToday(TRIP_INITIAL.start)
