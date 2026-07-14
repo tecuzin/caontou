@@ -41,6 +41,32 @@ export function Bilan({ sx, recap, onShare }) {
         </div>
       )}
 
+      {recap.topRated?.length > 0 && (
+        <div data-testid="recap-coups-de-coeur" style={sx('margin-top:16px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:14px;')}>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>⭐ Nos coups de cœur</div>
+          {recap.topRated.map((r) => (
+            <div key={r.name} style={sx('display:flex;align-items:center;gap:8px;font-size:14px;padding:5px 0;')}>
+              <span style={sx('font-size:16px;')}>{r.emoji}</span>
+              <span style={sx('flex:1;min-width:0;color:#6b5a45;')}>{r.name}{r.note ? <span style={sx('color:#9a917f;')}> — « {r.note} »</span> : null}</span>
+              <span style={sx('font-weight:700;color:#cf7d3c;flex:0 0 auto;')}>{'★'.repeat(r.stars)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {recap.toAvoid?.length > 0 && (
+        <div data-testid="recap-a-eviter" style={sx('margin-top:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:14px;')}>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>À revoir la prochaine fois</div>
+          {recap.toAvoid.map((r) => (
+            <div key={r.name} style={sx('display:flex;align-items:center;gap:8px;font-size:14px;padding:5px 0;')}>
+              <span style={sx('font-size:16px;')}>{r.emoji}</span>
+              <span style={sx('flex:1;min-width:0;color:#6b5a45;')}>{r.name}</span>
+              <span style={sx('font-weight:700;color:#9a917f;flex:0 0 auto;')}>{'★'.repeat(r.stars)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {recap.photosCount > 0 && (
         <div style={sx('margin-top:12px;text-align:center;font-size:13px;color:#6b6354;')}>📸 {recap.photosCount} photo{recap.photosCount > 1 ? 's' : ''} souvenir cette fois-ci</div>
       )}

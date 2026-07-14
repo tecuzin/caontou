@@ -197,6 +197,7 @@ function loadStore() {
       lastSeenBuild: p.lastSeenBuild ?? 0,
       restos: p.restos ?? structuredClone(RESTOS_INITIAL),
       departure: p.departure ?? structuredClone(DEPARTURE_INITIAL),
+      ratings: p.ratings ?? {},
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -365,6 +366,9 @@ export default function App() {
   const addDepartureItem = (label) => setDeparture((l) => [...l, { id: Date.now(), emoji: '✅', label, done: false }])
   const removeDepartureItem = (id) => setDeparture((l) => l.filter((i) => i.id !== id))
   const isCheckoutSoon = useMemo(() => isCheckoutWindow(trip.end), [trip.end])
+  const [ratings, setRatings] = useState(initial.ratings || {})
+  const rateVisit = (id, stars) => { haptic(ImpactStyle.Light); setRatings((r) => ({ ...r, [id]: { ...r[id], stars } })) }
+  const setVisitNote = (id, note) => setRatings((r) => ({ ...r, [id]: { ...r[id], note } }))
   const [showResto, setShowResto] = useState(false)
   const [editingRestoId, setEditingRestoId] = useState(null)
   const [restoForm, setRestoForm] = useState({ name: '', place: '', tel: '', resa: '', reserved: false })
@@ -447,8 +451,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -539,7 +543,7 @@ export default function App() {
   const coursesPct = coursesTotal ? Math.round((coursesDone / coursesTotal) * 100) : 0
 
   // Bilan de séjour — synthèse des données existantes pour l'écran Bilan.
-  const recapData = computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, savedCount, packPct, coursesPct, meals, photos })
+  const recapData = computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, savedCount, packPct, coursesPct, meals, photos, ratings, visits })
 
   // visites filtrées + triées
   const filteredVisits = filterAndSortVisits(visits, filter, visitSort)
@@ -898,7 +902,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -1070,6 +1074,7 @@ export default function App() {
                 setNewVisitDur={setNewVisitDur} setNewVisitAge={setNewVisitAge} setNewVisitCat={setNewVisitCat} setShowVisitEdit={setShowVisitEdit}
                 toggleSaved={toggleSaved} editVisit={editVisit} deleteVisit={deleteVisit}
                 openVote={() => setShowVote(true)}
+                ratings={ratings} rateVisit={rateVisit} setVisitNote={setVisitNote}
               />
             )}
 
