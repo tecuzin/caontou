@@ -12,6 +12,7 @@ const MODULES = [
   { emoji: '💶', name: 'Budget', sub: '1 800 € prévus', bg: '#e6ece0', action: 'tab:budget' },
   { emoji: '📸', name: 'Souvenirs', sub: 'Photos par journée', bg: '#f3e2d6', action: 'sub:souvenirs' },
   { emoji: '🍴', name: 'Restos', sub: 'Adresses & résas', bg: '#f1e4d4', action: 'sub:restos' },
+  { emoji: '🔑', name: 'Départ du gîte', sub: 'Avant de rendre les clés', bg: '#f1e4d4', action: 'sub:departure' },
 ]
 
 /** Écran Accueil — carte de la prochaine aventure, aujourd'hui, modules, suggestions et sauvegarde. */
@@ -21,6 +22,7 @@ export function Accueil({
   newSuggestionText, setNewSuggestionText, submitSuggestion, suggestions, deleteSuggestion, sendSuggestions,
   lastBackupAt, formatLastBackup, setExportCopied, setShowExport, setShowImport, runSelfTestAndShow,
   isDepartureDay, quickPhoto, openMyPosition, openChangelog,
+  isCheckoutSoon, departureDone = 0, departureTotal = 0,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   return (
@@ -50,6 +52,14 @@ export function Accueil({
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>🚗 En route pour le Cantal !</div>
           <div style={sx('font-size:13px;color:#6b6354;margin-top:4px;')}>Un dernier coup d'œil à la checklist avant de fermer la porte ?</div>
           <button onClick={() => setSub('trajet')} style={sx('margin-top:12px;width:100%;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Checklist avant de partir →</button>
+        </div>
+      )}
+
+      {isCheckoutSoon && (
+        <div data-testid="checkout-banner" style={sx('margin:0 18px 14px;background:#fffdf8;border:2px solid #9c6b4a;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(156,107,74,0.18);')}>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>🔑 Départ du gîte</div>
+          <div style={sx('font-size:13px;color:#6b6354;margin-top:4px;')}>C'est bientôt la fin du séjour — la checklist pour ne rien oublier avant de rendre les clés{departureTotal ? ` (${departureDone}/${departureTotal})` : ''}.</div>
+          <button data-testid="btn-checkout" onClick={() => setSub('departure')} style={sx('margin-top:12px;width:100%;border:none;background:#9c6b4a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ouvrir la checklist de départ →</button>
         </div>
       )}
 

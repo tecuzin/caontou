@@ -19,6 +19,7 @@ import { Accueil } from './screens/Accueil.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
 import { parseImport, formatLastBackup } from './backup.js'
+import { DEPARTURE_INITIAL, isCheckoutWindow } from './departure.js'
 import { runSelfTests } from './selftest.js'
 import { useVisits } from './hooks/useVisits.js'
 import { useSwipe } from './hooks/useSwipe.js'
@@ -57,6 +58,7 @@ import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
 import { currentPositionMapsHref, openExternal } from './links.js'
 const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
+const Departure = lazy(() => import('./screens/Departure.jsx').then(m => ({ default: m.Departure })))
 import { RestoModal } from './modals/RestoModal.jsx'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
@@ -194,6 +196,7 @@ function loadStore() {
       bingo: p.bingo ?? {},
       lastSeenBuild: p.lastSeenBuild ?? 0,
       restos: p.restos ?? structuredClone(RESTOS_INITIAL),
+      departure: p.departure ?? structuredClone(DEPARTURE_INITIAL),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -357,6 +360,11 @@ export default function App() {
   }
   // Carnet de restaurants (CRUD + réservations)
   const [restos, setRestos] = useState(initial.restos || structuredClone(RESTOS_INITIAL))
+  const [departure, setDeparture] = useState(initial.departure || structuredClone(DEPARTURE_INITIAL))
+  const toggleDeparture = (id) => { haptic(ImpactStyle.Light); setDeparture((l) => l.map((i) => i.id === id ? { ...i, done: !i.done } : i)) }
+  const addDepartureItem = (label) => setDeparture((l) => [...l, { id: Date.now(), emoji: '✅', label, done: false }])
+  const removeDepartureItem = (id) => setDeparture((l) => l.filter((i) => i.id !== id))
+  const isCheckoutSoon = useMemo(() => isCheckoutWindow(trip.end), [trip.end])
   const [showResto, setShowResto] = useState(false)
   const [editingRestoId, setEditingRestoId] = useState(null)
   const [restoForm, setRestoForm] = useState({ name: '', place: '', tel: '', resa: '', reserved: false })
@@ -439,8 +447,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -538,7 +546,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -890,7 +898,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -992,6 +1000,11 @@ export default function App() {
               <Restos sx={sx} restos={restos} openAddResto={openAddResto} openEditResto={openEditResto} deleteResto={deleteResto} />
             )}
 
+            {/* DÉPART DU GÎTE */}
+            {sub === 'departure' && (
+              <Departure sx={sx} departure={departure} toggleDeparture={toggleDeparture} addDepartureItem={addDepartureItem} removeDepartureItem={removeDepartureItem} />
+            )}
+
             {/* LOGISTIQUE */}
             {sub === 'logistique' && (
               <Logistique
@@ -1035,6 +1048,7 @@ export default function App() {
                 lastBackupAt={lastBackupAt} formatLastBackup={formatLastBackup} setExportCopied={setExportCopied}
                 setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow}
                 isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }} openMyPosition={openMyPosition} openChangelog={() => setShowChangelog(true)}
+                isCheckoutSoon={isCheckoutSoon} departureDone={departure.filter((i) => i.done).length} departureTotal={departure.length}
               />
             )}
 
