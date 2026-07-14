@@ -1,3 +1,5 @@
+import { settlement } from '../settle.js'
+
 const SectionLabel = ({ sx, children }) => (
   <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>{children}</div>
 )
@@ -7,7 +9,10 @@ export function Budget({
   sx, eur, catColor, remain, budgetTotal, spentPct, spent,
   setNewBudgetTotal, setShowBudgetTotalEdit, setShowAdd, budgetCats,
   sortExpenses, setSortExpenses, expenses, startEditExpense, deleteExpense,
+  familyMembers = [],
 }) {
+  const { balances, transfers } = settlement(expenses, familyMembers)
+  const shareActive = familyMembers.length >= 2 && expenses.some((e) => e.paidBy)
   return (
     <div data-testid="screen-budget">
       <div style={sx('padding:54px 18px 14px;')}>
@@ -51,13 +56,41 @@ export function Budget({
         ).map((e) => (
           <div key={e._i} style={sx('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
             <span style={sx(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
-            <div style={sx('flex:1;min-width:0;')}><div style={sx('font-weight:700;font-size:14px;')}>{e.label}</div><div style={sx('font-size:12px;color:#6b6354;')}>{e.cat}</div></div>
+            <div style={sx('flex:1;min-width:0;')}><div style={sx('font-weight:700;font-size:14px;')}>{e.label}</div><div style={sx('font-size:12px;color:#6b6354;')}>{e.cat}{e.paidBy ? ` · payé par ${e.paidBy}` : ''}</div></div>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
             <button onClick={() => startEditExpense(e._i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
             <button onClick={() => deleteExpense(e._i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
           </div>
         ))}
       </div>
+
+      {shareActive && (
+        <div data-testid="comptes" style={sx('margin-top:18px;')}>
+          <div style={sx('padding:4px 18px 8px;')}><SectionLabel sx={sx}>Comptes — qui doit combien&nbsp;?</SectionLabel></div>
+          <div style={sx('padding:0 18px;display:flex;flex-direction:column;gap:8px;')}>
+            {balances.map((b) => (
+              <div key={b.member} style={sx('display:flex;align-items:center;justify-content:space-between;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
+                <span style={sx('font-weight:700;font-size:14px;')}>{b.member}</span>
+                <span style={sx(`font-family:Quicksand;font-weight:700;font-size:15px;color:${b.balance > 0.005 ? '#4a5d3a' : b.balance < -0.005 ? '#b8503f' : '#6b6354'};`)}>
+                  {b.balance > 0.005 ? `+${eur(b.balance)}` : b.balance < -0.005 ? eur(b.balance) : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div style={sx('padding:12px 18px 0;')}><SectionLabel sx={sx}>Remboursements</SectionLabel></div>
+          <div style={sx('padding:8px 18px 0;display:flex;flex-direction:column;gap:8px;')}>
+            {transfers.length === 0 ? (
+              <div data-testid="comptes-balanced" style={sx('font-size:14px;color:#4a5d3a;font-weight:600;')}>✅ Tout est équilibré, personne ne doit rien.</div>
+            ) : transfers.map((t, i) => (
+              <div key={i} data-testid="comptes-transfer" style={sx('display:flex;align-items:center;gap:10px;background:#f3ece0;border-radius:14px;padding:12px 14px;font-size:14px;')}>
+                <span style={sx('font-size:18px;')}>↪</span>
+                <div><b>{t.from}</b> doit <b style={sx('color:#9c6b4a;')}>{eur(t.amount)}</b> à <b>{t.to}</b></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div style={sx('height:16px;')} />
     </div>
   )
