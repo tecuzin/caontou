@@ -59,6 +59,7 @@ import { entriesSince } from './changelog.js'
 import { currentPositionMapsHref, openExternal } from './links.js'
 const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
 const Departure = lazy(() => import('./screens/Departure.jsx').then(m => ({ default: m.Departure })))
+const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ default: m.Itinerary })))
 import { RestoModal } from './modals/RestoModal.jsx'
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
@@ -369,6 +370,7 @@ export default function App() {
   const [ratings, setRatings] = useState(initial.ratings || {})
   const rateVisit = (id, stars) => { haptic(ImpactStyle.Light); setRatings((r) => ({ ...r, [id]: { ...r[id], stars } })) }
   const setVisitNote = (id, note) => setRatings((r) => ({ ...r, [id]: { ...r[id], note } }))
+  const openMaps = (url) => { try { window.open(url, '_blank') } catch { /* WebView sans window.open */ } }
   const [showResto, setShowResto] = useState(false)
   const [editingRestoId, setEditingRestoId] = useState(null)
   const [restoForm, setRestoForm] = useState({ name: '', place: '', tel: '', resa: '', reserved: false })
@@ -550,7 +552,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -1007,6 +1009,11 @@ export default function App() {
             {/* DÉPART DU GÎTE */}
             {sub === 'departure' && (
               <Departure sx={sx} departure={departure} toggleDeparture={toggleDeparture} addDepartureItem={addDepartureItem} removeDepartureItem={removeDepartureItem} />
+            )}
+
+            {/* ITINÉRAIRE DU JOUR */}
+            {sub === 'itineraire' && (
+              <Itinerary sx={sx} visits={visits} saved={saved} openMaps={openMaps} />
             )}
 
             {/* LOGISTIQUE */}
