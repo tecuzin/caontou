@@ -57,7 +57,12 @@ export function sortItemsByTime(items) {
  * Parse a distance string (e.g. "25 min") to integer minutes.
  */
 export function parseDist(d) {
-  const m = String(d).match(/\d+/)
+  const s = String(d)
+  // « 1 h 10 » → 70, « 1 h » → 60 (avant le fallback minutes, sinon on ne
+  // lisait que le premier chiffre → une sortie à 1 h passait pour 1 min).
+  const h = s.match(/(\d+)\s*h(?:\s*(\d+))?/)
+  if (h) return parseInt(h[1]) * 60 + (h[2] ? parseInt(h[2]) : 0)
+  const m = s.match(/\d+/)
   return m ? parseInt(m[0]) : 999
 }
 

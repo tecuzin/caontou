@@ -156,6 +156,12 @@ describe('parseDist()', () => {
   it('handles leading text before number', () => {
     expect(parseDist('env. 30 min')).toBe(30)
   })
+
+  it('parses hours and minutes', () => {
+    expect(parseDist('1 h')).toBe(60)
+    expect(parseDist('1 h 10')).toBe(70)
+    expect(parseDist('2 h 05')).toBe(125)
+  })
 })
 
 describe('tripDate() — construit une date locale depuis un ISO', () => {
