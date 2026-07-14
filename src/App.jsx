@@ -243,6 +243,7 @@ export default function App() {
   const [newAmt, setNewAmt] = useState('')
   const [newCat, setNewCat] = useState('Nourriture')
   const [newLabel, setNewLabel] = useState('')
+  const [newPaidBy, setNewPaidBy] = useState('')
   const [newMealDish, setNewMealDish] = useState('')
   const [newActivityTime, setNewActivityTime] = useState('')
   const [newActivityTitle, setNewActivityTitle] = useState('')
@@ -556,13 +557,15 @@ export default function App() {
     if (!a || a <= 0) return
     haptic(ImpactStyle.Medium)
     const data = { label: newLabel || newCat, cat: newCat, amt: a }
+    // Partage des dépenses : attribue un payeur si la famille est renseignée.
+    if (familyMembers.length) data.paidBy = newPaidBy || familyMembers[0]
     if (editingExpenseIdx !== null) {
       updateExpense(editingExpenseIdx, data)
       setEditingExpenseIdx(null)
     } else {
       addExpense(data)
     }
-    setShowAdd(false); setNewAmt(''); setNewLabel('')
+    setShowAdd(false); setNewAmt(''); setNewLabel(''); setNewPaidBy('')
   }
   const deleteExpense = (idx) => {
     haptic(ImpactStyle.Medium)
@@ -574,10 +577,11 @@ export default function App() {
     setNewAmt(String(e.amt))
     setNewLabel(e.label)
     setNewCat(e.cat)
+    setNewPaidBy(e.paidBy || '')
     setEditingExpenseIdx(idx)
     setShowAdd(true)
   }
-  const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel(''); setEditingExpenseIdx(null) }
+  const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel(''); setNewPaidBy(''); setEditingExpenseIdx(null) }
 
   const editMeal = (id) => {
     const m = meals.find(x => x.id === id)
@@ -1073,6 +1077,7 @@ export default function App() {
                 sx={sx} eur={eur} catColor={catColor} remain={remain} budgetTotal={budgetTotal} spentPct={spentPct} spent={spent}
                 setNewBudgetTotal={setNewBudgetTotal} setShowBudgetTotalEdit={setShowBudgetTotalEdit} setShowAdd={setShowAdd} budgetCats={budgetCats}
                 sortExpenses={sortExpenses} setSortExpenses={setSortExpenses} expenses={expenses} startEditExpense={startEditExpense} deleteExpense={deleteExpense}
+                familyMembers={familyMembers}
               />
             )}
 
@@ -1106,6 +1111,17 @@ export default function App() {
                 <button key={c.name} onClick={() => setNewCat(c.name)} style={sx(`border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
               ))}
             </div>
+            {familyMembers.length > 0 && (
+              <>
+                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Payé par</div>
+                <div data-testid="paidby-chips" style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:7px;margin-bottom:20px;')}>
+                  {familyMembers.map((m) => {
+                    const sel = (newPaidBy || familyMembers[0]) === m
+                    return <button key={m} onClick={() => setNewPaidBy(m)} style={sx(`border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;background:${sel ? '#4a5d3a' : '#f3ece0'};color:${sel ? '#fffaf0' : '#6b6354'};`)}>{m}</button>
+                  })}
+                </div>
+              </>
+            )}
             <div style={sx('display:flex;gap:10px;')}>
               <button onClick={closeAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
               <button data-testid="btn-submit-depense" onClick={submitExpense} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
