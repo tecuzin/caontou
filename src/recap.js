@@ -12,7 +12,11 @@ import { eur } from './utils.js'
  * Agrège les tranches du store en objet « recap » consommé par l'écran Bilan
  * et par buildRecapText. Fonction pure (extraite d'App.jsx) — testable isolément.
  */
-export function computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, savedCount, packPct, coursesPct, meals, photos }) {
+export function computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, savedCount, packPct, coursesPct, meals, photos, ratings = {}, visits = [] }) {
+  const rated = visits
+    .map((v) => ({ name: v.name, emoji: v.emoji, stars: ratings[v.id]?.stars || 0, note: (ratings[v.id]?.note || '').trim() }))
+    .filter((r) => r.stars > 0)
+    .sort((a, b) => b.stars - a.stars)
   return {
     daysCount: days.length,
     spent, budgetTotal, spentPct,
@@ -21,6 +25,9 @@ export function computeRecap({ days, spent, budgetTotal, spentPct, budgetCats, s
     packPct, coursesPct,
     mealsPlanned: meals.length,
     photosCount: photos.length,
+    ratedCount: rated.length,
+    topRated: rated.filter((r) => r.stars >= 4).slice(0, 5),
+    toAvoid: rated.filter((r) => r.stars <= 2),
   }
 }
 
@@ -42,6 +49,9 @@ export function buildRecapText(d) {
     `🍽️ ${d.mealsPlanned} repas planifiés`,
   )
   if (d.photosCount) lines.push(`📸 ${d.photosCount} photo${d.photosCount > 1 ? 's' : ''} souvenir`)
+  if (d.topRated?.length) {
+    lines.push(`⭐ Coups de cœur : ${d.topRated.map((r) => `${r.name} (${r.stars}★)`).join(', ')}`)
+  }
   lines.push('', 'Vivement la prochaine aventure ! 🏔️')
   return lines.join('\n')
 }
