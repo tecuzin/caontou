@@ -513,6 +513,8 @@ export default function App() {
   const [showJournal, setShowJournal] = useState(false)
   const [journalDayIdx, setJournalDayIdx] = useState(0)
   const openJournal = (dayIdx) => { setJournalDayIdx(dayIdx); setShowJournal(true) }
+  // Depuis Souvenirs : renvoie au jour du calendrier et ouvre son journal.
+  const openDayJournal = (dayIdx) => { setSub(null); setTab('planning'); setDay(dayIdx); openJournal(dayIdx) }
   const journalDayKey = days[journalDayIdx] ? `${days[journalDayIdx].dow} ${days[journalDayIdx].num}` : ''
   const updateJournalEntry = (field, value) => setJournal((j) => ({ ...j, [journalDayKey]: { ...(j[journalDayKey] || {}), [field]: value } }))
   const doShareJournal = () => { haptic(ImpactStyle.Medium); shareJournal(days, journal) }
@@ -1000,7 +1002,7 @@ export default function App() {
 
             {/* SOUVENIRS */}
             {sub === 'souvenirs' && (
-              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} />
+              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} journal={journal} openDayJournal={openDayJournal} />
             )}
 
             {/* BINGO */}

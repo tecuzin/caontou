@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { groupPhotosByDay } from '../photos.js'
+import { hasJournalEntry, journalSnippet } from '../journal.js'
 
 /** Vignette : charge son URL affichable à l'affichage (async Filesystem). */
 function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
@@ -14,9 +15,12 @@ function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
 }
 
 /** Sous-écran Souvenirs — galerie photo du séjour regroupée par journée. */
-export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay }) {
+export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay, journal = {}, openDayJournal }) {
   const [viewer, setViewer] = useState(null) // meta de la photo ouverte en plein écran
   const groups = groupPhotosByDay(photos, days)
+  const journalDays = days
+    .map((d, i) => ({ d, i, entry: journal[`${d.dow} ${d.num}`] }))
+    .filter((x) => hasJournalEntry(x.entry))
   return (
     <div data-testid="screen-souvenirs" style={sx('padding:16px 18px 40px;')}>
       <div style={sx('background:#9c6b4a;border-radius:20px;padding:18px;color:#fffaf0;box-shadow:0 8px 20px rgba(156,107,74,0.2);')}>
@@ -28,6 +32,27 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
         <button data-testid="btn-take-photo" onClick={() => capturePhoto('camera')} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>📷 Prendre une photo</button>
         <button data-testid="btn-import-photo" onClick={() => capturePhoto('photos')} style={sx('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>🖼️ Importer</button>
       </div>
+
+      {openDayJournal && journalDays.length > 0 && (
+        <div data-testid="souvenirs-journal" style={sx('margin-top:20px;')}>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>📔 Journal de bord</div>
+          <div style={sx('display:flex;flex-direction:column;gap:8px;')}>
+            {journalDays.map(({ d, i, entry }) => (
+              <button
+                key={i} data-testid={`journal-link-${i}`} onClick={() => openDayJournal(i)}
+                style={sx('display:flex;align-items:center;gap:12px;text-align:left;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;cursor:pointer;')}
+              >
+                <span style={sx('font-size:22px;flex:0 0 auto;')}>{entry.mood || '📔'}</span>
+                <span style={sx('flex:1;min-width:0;')}>
+                  <span style={sx('display:block;font-family:Quicksand;font-weight:700;font-size:14px;')}>{d.dow} {d.num} — {d.title}</span>
+                  {journalSnippet(entry) && <span style={sx('display:block;font-size:12px;color:#6b6354;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;')}>{journalSnippet(entry)}</span>}
+                </span>
+                <span style={sx('flex:0 0 auto;color:#9c6b4a;font-size:16px;')}>›</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {groups.length === 0 && (
         <div style={sx('margin-top:22px;text-align:center;color:#9a917f;font-size:14px;line-height:1.6;')}>
