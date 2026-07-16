@@ -31,6 +31,8 @@ import { shareSuggestions } from './suggestions.js'
 import { useExpenses } from './hooks/useExpenses.js'
 import { useMeals } from './hooks/useMeals.js'
 import { useRestos } from './hooks/useRestos.js'
+import { useDeparture } from './hooks/useDeparture.js'
+import { useRatings } from './hooks/useRatings.js'
 import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
@@ -381,14 +383,11 @@ export default function App() {
   const forgetCar = () => { haptic(ImpactStyle.Light); setCarSpot(null) }
   // Carnet de restaurants (CRUD + réservations)
   const { restos, setRestos, addResto, updateResto, removeResto } = useRestos(initial.restos)
-  const [departure, setDeparture] = useState(initial.departure || structuredClone(DEPARTURE_INITIAL))
-  const toggleDeparture = (id) => { haptic(ImpactStyle.Light); setDeparture((l) => l.map((i) => i.id === id ? { ...i, done: !i.done } : i)) }
-  const addDepartureItem = (label) => setDeparture((l) => [...l, { id: Date.now(), emoji: '✅', label, done: false }])
-  const removeDepartureItem = (id) => setDeparture((l) => l.filter((i) => i.id !== id))
+  const { departure, setDeparture, toggleDeparture: toggleDepartureItem, addDepartureItem, removeDepartureItem } = useDeparture(initial.departure)
+  const toggleDeparture = (id) => { haptic(ImpactStyle.Light); toggleDepartureItem(id) }
   const isCheckoutSoon = useMemo(() => isCheckoutWindow(trip.end), [trip.end])
-  const [ratings, setRatings] = useState(initial.ratings || {})
-  const rateVisit = (id, stars) => { haptic(ImpactStyle.Light); setRatings((r) => ({ ...r, [id]: { ...r[id], stars } })) }
-  const setVisitNote = (id, note) => setRatings((r) => ({ ...r, [id]: { ...r[id], note } }))
+  const { ratings, setRatings, rateVisit: rateVisitEntry, setVisitNote } = useRatings(initial.ratings)
+  const rateVisit = (id, stars) => { haptic(ImpactStyle.Light); rateVisitEntry(id, stars) }
   const openMaps = (url) => { try { window.open(url, '_blank') } catch { /* WebView sans window.open */ } }
   const [challengesDone, setChallengesDone] = useState(initial.challengesDone || {})
   const todayKey = dayKey()
