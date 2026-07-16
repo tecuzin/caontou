@@ -288,6 +288,21 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 > reset de style) + le viewer photo plein écran de Souvenirs (même patron Échap).
 > Ces conversions changent le rendu → à valider écran par écran sur device.
 
+## ✅ Complété — carte hors-ligne du séjour (16 juillet)
+
+- [x] **🗺️ Carte simplifiée hors-ligne** (module Accueil → « Carte ») : carte
+  schématique SVG sans réseau — gîte au centre, 17 visites placées à leurs
+  coordonnées relatives réelles (Carladès/Cantal), **position voiture**
+  (`carSpot`) si mémorisée, traits gîte→visites, tap = détail, « M'y guider ».
+  Coords ajoutées au gîte (`GITE_COORDS`) + `VISITS_INITIAL` ; migration store
+  **v2→v3** backfille par id (visites perso intactes). Module `src/geo.js`
+  (projection équirectangulaire pure). Couleurs 100 % palette (audit design
+  redundant=0 / composite=78). +27 tests, suite **507 verte**. Vérifié en réel
+  (Playwright). ⏭️ Carte détaillée **OpenTopoMap** en ligne = ticket séparé.
+- [ ] **🎛️ Fonctions désactivables + 📦 tout dans le JSON** — tickets Epiq créés
+  (feature-flags/store + Réglages ; sortir KIDS_GAMES/BINGO_CANTAL/urgences des
+  constantes vers le store). À faire.
+
 ## ✅ Complété — refactor hooks de domaine (16 juillet)
 
 - [x] **Extraction de 3 hooks de données purs d'`App.jsx`** (clean code, aligné
