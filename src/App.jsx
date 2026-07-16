@@ -35,33 +35,33 @@ import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
 import { useTripConfig } from './hooks/useTripConfig.js'
 import { Confetti } from './Confetti.jsx'
-import { ExportModal } from './modals/ExportModal.jsx'
-import { ImportModal } from './modals/ImportModal.jsx'
-import { EditVisitModal } from './modals/EditVisitModal.jsx'
-import { AddLogiItemModal } from './modals/AddLogiItemModal.jsx'
-import { AddCourseItemModal } from './modals/AddCourseItemModal.jsx'
-import { AddTrajetCheckModal } from './modals/AddTrajetCheckModal.jsx'
-import { EditMeteoFullModal } from './modals/EditMeteoFullModal.jsx'
-import { EditTripModal } from './modals/EditTripModal.jsx'
-import { EditTrajetStepModal } from './modals/EditTrajetStepModal.jsx'
-import { EditBudgetModal } from './modals/EditBudgetModal.jsx'
-import { EditHebergementModal } from './modals/EditHebergementModal.jsx'
-import { JournalModal } from './modals/JournalModal.jsx'
-import { VoteModal } from './modals/VoteModal.jsx'
+const ExportModal = lazy(() => import('./modals/ExportModal.jsx').then(mod => ({ default: mod.ExportModal })))
+const ImportModal = lazy(() => import('./modals/ImportModal.jsx').then(mod => ({ default: mod.ImportModal })))
+const EditVisitModal = lazy(() => import('./modals/EditVisitModal.jsx').then(mod => ({ default: mod.EditVisitModal })))
+const AddLogiItemModal = lazy(() => import('./modals/AddLogiItemModal.jsx').then(mod => ({ default: mod.AddLogiItemModal })))
+const AddCourseItemModal = lazy(() => import('./modals/AddCourseItemModal.jsx').then(mod => ({ default: mod.AddCourseItemModal })))
+const AddTrajetCheckModal = lazy(() => import('./modals/AddTrajetCheckModal.jsx').then(mod => ({ default: mod.AddTrajetCheckModal })))
+const EditMeteoFullModal = lazy(() => import('./modals/EditMeteoFullModal.jsx').then(mod => ({ default: mod.EditMeteoFullModal })))
+const EditTripModal = lazy(() => import('./modals/EditTripModal.jsx').then(mod => ({ default: mod.EditTripModal })))
+const EditTrajetStepModal = lazy(() => import('./modals/EditTrajetStepModal.jsx').then(mod => ({ default: mod.EditTrajetStepModal })))
+const EditBudgetModal = lazy(() => import('./modals/EditBudgetModal.jsx').then(mod => ({ default: mod.EditBudgetModal })))
+const EditHebergementModal = lazy(() => import('./modals/EditHebergementModal.jsx').then(mod => ({ default: mod.EditHebergementModal })))
+const JournalModal = lazy(() => import('./modals/JournalModal.jsx').then(mod => ({ default: mod.JournalModal })))
+const VoteModal = lazy(() => import('./modals/VoteModal.jsx').then(mod => ({ default: mod.VoteModal })))
 const Souvenirs = lazy(() => import('./screens/Souvenirs.jsx').then(m => ({ default: m.Souvenirs })))
 const Bingo = lazy(() => import('./screens/Bingo.jsx').then(m => ({ default: m.Bingo })))
 import { countCompletedLines } from './bingo.js'
 const Bilan = lazy(() => import('./screens/Bilan.jsx').then(m => ({ default: m.Bilan })))
 import { shareRecap, computeRecap } from './recap.js'
-import { WhatsNewModal } from './modals/WhatsNewModal.jsx'
-import { ChangelogModal } from './modals/ChangelogModal.jsx'
+const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
+const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
 import { currentPositionMapsHref, openExternal } from './links.js'
 const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
 const Departure = lazy(() => import('./screens/Departure.jsx').then(m => ({ default: m.Departure })))
 const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ default: m.Itinerary })))
-import { RestoModal } from './modals/RestoModal.jsx'
+const RestoModal = lazy(() => import('./modals/RestoModal.jsx').then(mod => ({ default: mod.RestoModal })))
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
 import { buildIcs, shareIcs } from './ics.js'
@@ -981,7 +981,7 @@ export default function App() {
       {sub && (
         <div data-testid="sub-screen-wrapper" onTouchStart={subScreenSwipe.onTouchStart} onTouchEnd={subScreenSwipe.onTouchEnd} style={sx('height:100%;display:flex;flex-direction:column;')}>
           <div style={sx('display:flex;align-items:center;gap:8px;padding:54px 14px 12px;background:#fffdf8;border-bottom:1px solid #ece2cf;flex:0 0 auto;')}>
-            <button onClick={() => setSub(null)} style={sx('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:3px;')}>‹</button>
+            <button onClick={() => setSub(null)} style={sx('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:4px;')}>‹</button>
             <span style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
           </div>
           {/* key={sub} remonte le conteneur à chaque navigation → rejoue screenIn */}
@@ -1127,7 +1127,7 @@ export default function App() {
           {/* BARRE D'ONGLETS */}
           <div data-testid="tab-bar" onTouchStart={tabBarSwipe.onTouchStart} onTouchEnd={tabBarSwipe.onTouchEnd} style={sx('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
             {TABS.map(([key, emoji, label]) => (
-              <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={sx('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;')}>
+              <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={sx('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0;')}>
                 <span style={sx('font-size:20px;')}>{emoji}</span>
                 <span style={sx(`font-size:11px;color:${tab === key ? '#4a5d3a' : '#6b6354'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
               </button>
@@ -1147,25 +1147,25 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Libellé</div>
             <input data-testid="input-label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Catégorie</div>
-            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:7px;margin-bottom:20px;')}>
+            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;margin-bottom:20px;')}>
               {CATS.map((c) => (
-                <button key={c.name} onClick={() => setNewCat(c.name)} style={sx(`border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
+                <button key={c.name} onClick={() => setNewCat(c.name)} style={sx(`border:none;border-radius:999px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
               ))}
             </div>
             {familyMembers.length > 0 && (
               <>
                 <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Payé par</div>
-                <div data-testid="paidby-chips" style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:7px;margin-bottom:20px;')}>
+                <div data-testid="paidby-chips" style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;margin-bottom:20px;')}>
                   {familyMembers.map((m) => {
                     const sel = (newPaidBy || familyMembers[0]) === m
-                    return <button key={m} onClick={() => setNewPaidBy(m)} style={sx(`border:none;border-radius:999px;padding:8px 15px;font-weight:700;font-size:13px;cursor:pointer;background:${sel ? '#4a5d3a' : '#f3ece0'};color:${sel ? '#fffaf0' : '#6b6354'};`)}>{m}</button>
+                    return <button key={m} onClick={() => setNewPaidBy(m)} style={sx(`border:none;border-radius:999px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;background:${sel ? '#4a5d3a' : '#f3ece0'};color:${sel ? '#fffaf0' : '#6b6354'};`)}>{m}</button>
                   })}
                 </div>
               </>
             )}
             <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-submit-depense" onClick={submitExpense} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
+              <button onClick={closeAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-submit-depense" onClick={submitExpense} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
             </div>
           </div>
         </div>
@@ -1182,8 +1182,8 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Plat</div>
             <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeMealEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveMeal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+              <button onClick={closeMealEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveMeal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1200,8 +1200,8 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
             <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeActivityEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+              <button onClick={closeActivityEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -1218,9 +1218,9 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
             <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Laschamps -> Vezels-Roussy" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeDayEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
-              {days.length > 1 && <button onClick={() => { deleteDay(editingDayIdx); closeDayEdit() }} style={sx('flex:0 0 auto;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Supprimer</button>}
+              <button onClick={closeDayEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              <button onClick={saveDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
+              {days.length > 1 && <button onClick={() => { deleteDay(editingDayIdx); closeDayEdit() }} style={sx('flex:0 0 auto;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Supprimer</button>}
             </div>
           </div>
         </div>
@@ -1243,60 +1243,60 @@ export default function App() {
               ))}
             </div>
             <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeActivityAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+              <button onClick={closeActivityAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
       )}
 
-      <AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} />
+      {showAddLogiItem && <Suspense fallback={null}><AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} /></Suspense>}
 
-      <AddCourseItemModal isOpen={showAddCourseItem} onClose={closeAddCourseItem} selectedCourseKey={editingCourseKey} newCourseItem={newCourseItem} setNewCourseItem={setNewCourseItem} courseGroups={courses} darkMode={darkMode} onSubmit={addCourseItem} />
+      {showAddCourseItem && <Suspense fallback={null}><AddCourseItemModal isOpen={showAddCourseItem} onClose={closeAddCourseItem} selectedCourseKey={editingCourseKey} newCourseItem={newCourseItem} setNewCourseItem={setNewCourseItem} courseGroups={courses} darkMode={darkMode} onSubmit={addCourseItem} /></Suspense>}
 
-      <EditMeteoFullModal isOpen={showMeteoEdit} onClose={closeMeteoEdit} editingMeteoIdx={editingMeteoIdx} newMeteoDay={newMeteoDay} setNewMeteoDay={setNewMeteoDay} newMeteoNum={newMeteoNum} setNewMeteoNum={setNewMeteoNum} newMeteoIcon={newMeteoIcon} setNewMeteoIcon={setNewMeteoIcon} newMeteoHi={newMeteoHi} setNewMeteoHi={setNewMeteoHi} newMeteoLo={newMeteoLo} setNewMeteoLo={setNewMeteoLo} newMeteoRain={newMeteoRain} setNewMeteoRain={setNewMeteoRain} darkMode={darkMode} onSubmit={saveMeteo} />
+      {showMeteoEdit && <Suspense fallback={null}><EditMeteoFullModal isOpen={showMeteoEdit} onClose={closeMeteoEdit} editingMeteoIdx={editingMeteoIdx} newMeteoDay={newMeteoDay} setNewMeteoDay={setNewMeteoDay} newMeteoNum={newMeteoNum} setNewMeteoNum={setNewMeteoNum} newMeteoIcon={newMeteoIcon} setNewMeteoIcon={setNewMeteoIcon} newMeteoHi={newMeteoHi} setNewMeteoHi={setNewMeteoHi} newMeteoLo={newMeteoLo} setNewMeteoLo={setNewMeteoLo} newMeteoRain={newMeteoRain} setNewMeteoRain={setNewMeteoRain} darkMode={darkMode} onSubmit={saveMeteo} /></Suspense>}
 
-      <EditTrajetStepModal isOpen={showTrajetEdit} onClose={closeTrajetEdit} editingTrajetIdx={editingTrajetIdx} newTrajetTime={newTrajetTime} setNewTrajetTime={setNewTrajetTime} newTrajetPlace={newTrajetPlace} setNewTrajetPlace={setNewTrajetPlace} newTrajetNote={newTrajetNote} setNewTrajetNote={setNewTrajetNote} newTrajetColor={newTrajetColor} setNewTrajetColor={setNewTrajetColor} darkMode={darkMode} onSubmit={saveTrajetStep} />
+      {showTrajetEdit && <Suspense fallback={null}><EditTrajetStepModal isOpen={showTrajetEdit} onClose={closeTrajetEdit} editingTrajetIdx={editingTrajetIdx} newTrajetTime={newTrajetTime} setNewTrajetTime={setNewTrajetTime} newTrajetPlace={newTrajetPlace} setNewTrajetPlace={setNewTrajetPlace} newTrajetNote={newTrajetNote} setNewTrajetNote={setNewTrajetNote} newTrajetColor={newTrajetColor} setNewTrajetColor={setNewTrajetColor} darkMode={darkMode} onSubmit={saveTrajetStep} /></Suspense>}
 
-      <EditVisitModal isOpen={showVisitEdit} onClose={closeVisitEdit} editIdx={editingVisitId} editVisitName={newVisitName} setEditVisitName={setNewVisitName} editVisitDist={newVisitDist} setEditVisitDist={setNewVisitDist} editVisitCat={newVisitCat} setEditVisitCat={setNewVisitCat} editVisitNote={newVisitAge} setEditVisitNote={setNewVisitAge} darkMode={darkMode} onSubmit={saveVisit} onDelete={() => {}} />
+      {showVisitEdit && <Suspense fallback={null}><EditVisitModal isOpen={showVisitEdit} onClose={closeVisitEdit} editIdx={editingVisitId} editVisitName={newVisitName} setEditVisitName={setNewVisitName} editVisitDist={newVisitDist} setEditVisitDist={setNewVisitDist} editVisitCat={newVisitCat} setEditVisitCat={setNewVisitCat} editVisitNote={newVisitAge} setEditVisitNote={setNewVisitAge} darkMode={darkMode} onSubmit={saveVisit} onDelete={() => {}} /></Suspense>}
 
-      <EditBudgetModal isOpen={showBudgetTotalEdit} onClose={() => setShowBudgetTotalEdit(false)} newBudgetTotal={newBudgetTotal} setNewBudgetTotal={setNewBudgetTotal} budgetTotal={budgetTotal} darkMode={darkMode} onSubmit={saveBudgetTotal} />
+      {showBudgetTotalEdit && <Suspense fallback={null}><EditBudgetModal isOpen={showBudgetTotalEdit} onClose={() => setShowBudgetTotalEdit(false)} newBudgetTotal={newBudgetTotal} setNewBudgetTotal={setNewBudgetTotal} budgetTotal={budgetTotal} darkMode={darkMode} onSubmit={saveBudgetTotal} /></Suspense>}
 
       {/* MODAL: Hébergement edit */}
-      <EditHebergementModal isOpen={showHebEdit} onClose={() => setShowHebEdit(false)} hebFields={{ nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact }} setHebFields={(update) => { Object.entries(update).forEach(([k, v]) => { if (k === 'nom') setNewHebNom(v); else if (k === 'adresse') setNewHebAdresse(v); else if (k === 'arrivee') setNewHebArrivee(v); else if (k === 'depart') setNewHebDepart(v); else if (k === 'capacite') setNewHebCapacite(v); else if (k === 'wifiNom') setNewHebWifiNom(v); else if (k === 'wifiPass') setNewHebWifiPass(v); else if (k === 'contact') setNewHebContact(v); }); }} darkMode={darkMode} onSubmit={saveHebergement} />
+      {showHebEdit && <Suspense fallback={null}><EditHebergementModal isOpen={showHebEdit} onClose={() => setShowHebEdit(false)} hebFields={{ nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact }} setHebFields={(update) => { Object.entries(update).forEach(([k, v]) => { if (k === 'nom') setNewHebNom(v); else if (k === 'adresse') setNewHebAdresse(v); else if (k === 'arrivee') setNewHebArrivee(v); else if (k === 'depart') setNewHebDepart(v); else if (k === 'capacite') setNewHebCapacite(v); else if (k === 'wifiNom') setNewHebWifiNom(v); else if (k === 'wifiPass') setNewHebWifiPass(v); else if (k === 'contact') setNewHebContact(v); }); }} darkMode={darkMode} onSubmit={saveHebergement} /></Suspense>}
 
-      <AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} />
+      {showAddTrajetCheck && <Suspense fallback={null}><AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} /></Suspense>}
 
       {/* MODAL: Journal de bord */}
-      <JournalModal
+      {showJournal && <Suspense fallback={null}><JournalModal
         isOpen={showJournal} onClose={() => setShowJournal(false)} sx={sx}
         dayLabel={days[journalDayIdx] ? `${days[journalDayIdx].dow} ${days[journalDayIdx].num} — ${days[journalDayIdx].title}` : ''}
         entry={journal[journalDayKey]} updateEntry={updateJournalEntry}
         onShare={doShareJournal} canShare={!!buildJournalText(days, journal)}
-      />
+      /></Suspense>}
 
       {/* MODAL: Vote familial « on fait quoi demain ? » */}
-      <VoteModal
+      {showVote && <Suspense fallback={null}><VoteModal
         isOpen={showVote} onClose={() => setShowVote(false)} sx={sx}
         visits={visits} savedVisitIds={Object.keys(saved).filter((k) => saved[k]).map(Number)}
         familyMembers={familyMembers} setFamilyMembers={setFamilyMembers}
         days={days} addActivity={addActivity}
         onWinner={() => { haptic(ImpactStyle.Medium); setConfettiTrigger(true); setTimeout(() => setConfettiTrigger(false), 2500) }}
-      />
+      /></Suspense>}
 
       {/* MODAL: Ajout/édition resto */}
-      <RestoModal isOpen={showResto} onClose={() => setShowResto(false)} sx={sx} editing={editingRestoId !== null} fields={restoForm} setField={setRestoField} onSubmit={saveResto} onDelete={() => deleteResto(editingRestoId)} />
+      {showResto && <Suspense fallback={null}><RestoModal isOpen={showResto} onClose={() => setShowResto(false)} sx={sx} editing={editingRestoId !== null} fields={restoForm} setField={setRestoField} onSubmit={saveResto} onDelete={() => deleteResto(editingRestoId)} /></Suspense>}
 
       {/* MODAL: Quoi de neuf (premier lancement d'un build) */}
-      <WhatsNewModal isOpen={showWhatsNew} onClose={closeWhatsNew} sx={sx} entries={whatsNewEntries} />
+      {showWhatsNew && <Suspense fallback={null}><WhatsNewModal isOpen={showWhatsNew} onClose={closeWhatsNew} sx={sx} entries={whatsNewEntries} /></Suspense>}
 
       {/* MODAL: Historique des versions (bouton) */}
-      <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} sx={sx} currentBuild={BUILD_NUMBER} />
+      {showChangelog && <Suspense fallback={null}><ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} sx={sx} currentBuild={BUILD_NUMBER} /></Suspense>}
 
       {/* MODAL: Export des données */}
-      <ExportModal isOpen={showExport} onClose={() => setShowExport(false)} currentStoreData={currentStoreData} STORE_KEY={STORE_KEY} darkMode={darkMode} onExportCopied={markBackedUp} />
+      {showExport && <Suspense fallback={null}><ExportModal isOpen={showExport} onClose={() => setShowExport(false)} currentStoreData={currentStoreData} STORE_KEY={STORE_KEY} darkMode={darkMode} onExportCopied={markBackedUp} /></Suspense>}
 
-      <ImportModal isOpen={showImport} onClose={closeImport} importText={importText} setImportText={setImportText} importError={importError} importPreview={importPreview} applyImport={applyImport} doParseImport={doParseImport} darkMode={darkMode} />
+      {showImport && <Suspense fallback={null}><ImportModal isOpen={showImport} onClose={closeImport} importText={importText} setImportText={setImportText} importError={importError} importPreview={importPreview} applyImport={applyImport} doParseImport={doParseImport} darkMode={darkMode} /></Suspense>}
 
       {/* MODAL: Auto-diagnostic */}
       {showSelftest && (
@@ -1319,13 +1319,13 @@ export default function App() {
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowSelftest(false)} style={sx('width:100%;margin-top:14px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
+            <button onClick={() => setShowSelftest(false)} style={sx('width:100%;margin-top:14px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Fermer</button>
           </div>
         </div>
       )}
 
       {/* MODAL: Paramètres du voyage */}
-      <EditTripModal isOpen={showTripEdit} onClose={() => setShowTripEdit(false)} newTripStart={newTripStart} setNewTripStart={setNewTripStart} newTripEnd={newTripEnd} setNewTripEnd={setNewTripEnd} newTripOrigin={newTripOrigin} setNewTripOrigin={setNewTripOrigin} newTripEtape={newTripEtape} setNewTripEtape={setNewTripEtape} newTripDest={newTripDest} setNewTripDest={setNewTripDest} darkMode={darkMode} onSubmit={saveTrip} />
+      {showTripEdit && <Suspense fallback={null}><EditTripModal isOpen={showTripEdit} onClose={() => setShowTripEdit(false)} newTripStart={newTripStart} setNewTripStart={setNewTripStart} newTripEnd={newTripEnd} setNewTripEnd={setNewTripEnd} newTripOrigin={newTripOrigin} setNewTripOrigin={setNewTripOrigin} newTripEtape={newTripEtape} setNewTripEtape={setNewTripEtape} newTripDest={newTripDest} setNewTripDest={setNewTripDest} darkMode={darkMode} onSubmit={saveTrip} /></Suspense>}
 
       {/* MODAL: Nouvelle liste de logistique */}
       {showAddLogiList && (
@@ -1338,8 +1338,8 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
             <input data-testid="input-logi-list-name" value={newLogiListName} onChange={(e) => setNewLogiListName(e.target.value)} placeholder="Ex : Sac de plage" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addLogiList()} />
             <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddLogiList(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-logi-list" onClick={addLogiList} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+              <button onClick={() => setShowAddLogiList(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-logi-list" onClick={addLogiList} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1354,8 +1354,8 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
             <input data-testid="input-course-cat-name" value={newCourseCatName} onChange={(e) => setNewCourseCatName(e.target.value)} placeholder="Ex : Apéro" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addCourseCategory()} />
             <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddCourseCat(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-course-cat" onClick={addCourseCategory} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+              <button onClick={() => setShowAddCourseCat(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-course-cat" onClick={addCourseCategory} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>
@@ -1382,8 +1382,8 @@ export default function App() {
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
             <input value={newDaySub2} onChange={(e) => setNewDaySub2(e.target.value)} placeholder="Ex : Au gré de l'envie" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowDayAdd(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-day-add" onClick={addDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter</button>
+              <button onClick={() => setShowDayAdd(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              <button data-testid="btn-save-day-add" onClick={addDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
         </div>

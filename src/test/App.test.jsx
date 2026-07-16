@@ -209,7 +209,7 @@ describe('Visites — filtres et tri', () => {
     render(<App />)
     await user.click(screen.getByTestId('tab-visites'))
     await user.click(screen.getByText('+ Ajouter visite'))
-    expect(screen.getByText('Ajouter une visite')).toBeInTheDocument()
+    expect(await screen.findByText('Ajouter une visite')).toBeInTheDocument()
   })
 
   it('le filtre Sport isole les activités Sport (Carladès)', async () => {
@@ -230,7 +230,7 @@ describe('Visites — filtres et tri', () => {
     render(<App />)
     await user.click(screen.getByTestId('tab-visites'))
     await user.click(screen.getByText('+ Ajouter visite'))
-    await user.type(screen.getByPlaceholderText('Ex : Pas de Cère'), 'Grotte du Loup')
+    await user.type(await screen.findByPlaceholderText('Ex : Pas de Cère'), 'Grotte du Loup')
     await user.click(screen.getByText('Enregistrer'))
     expect(screen.getByText('Grotte du Loup')).toBeInTheDocument()
   })
@@ -272,7 +272,7 @@ describe('Export / import des données', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('btn-export'))
-    const json = screen.getByTestId('export-json').value
+    const json = (await screen.findByTestId('export-json')).value
     const parsed = JSON.parse(json)
     expect(parsed.app).toBe('cantou')
     expect(parsed.schema).toBe('cantou.v1')
@@ -285,6 +285,7 @@ describe('Export / import des données', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('btn-import'))
+    await screen.findByTestId('import-textarea')
     const payload = JSON.stringify({ app: 'cantou', data: { expenses: [{ label: 'X', cat: 'Extra', amt: 5 }], meals: [], budgetTotal: 1000 } })
     fireEvent.change(screen.getByTestId('import-textarea'), { target: { value: payload } })
     expect(screen.getByTestId('import-preview')).toBeInTheDocument()
@@ -340,7 +341,7 @@ describe('Paramètres du voyage', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('btn-trip-settings'))
-    await user.clear(screen.getByTestId('input-trip-origin'))
+    await user.clear(await screen.findByTestId('input-trip-origin'))
     await user.type(screen.getByTestId('input-trip-origin'), 'Paris')
     await user.clear(screen.getByTestId('input-trip-dest'))
     await user.type(screen.getByTestId('input-trip-dest'), 'Marseille')

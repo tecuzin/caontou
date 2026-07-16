@@ -35,7 +35,7 @@ describe('« Quoi de neuf ? » au lancement', () => {
     const user = userEvent.setup()
     localStorageMock._seed({ lastSeenBuild: 1 }) // très ancien → nouveautés à montrer
     render(<App />)
-    expect(screen.getByTestId('btn-whatsnew-ok')).toBeInTheDocument()
+    expect(await screen.findByTestId('btn-whatsnew-ok')).toBeInTheDocument()
     expect(screen.getByText('🆕 Quoi de neuf ?')).toBeInTheDocument()
     await user.click(screen.getByTestId('btn-whatsnew-ok'))
     expect(screen.queryByTestId('btn-whatsnew-ok')).not.toBeInTheDocument()
@@ -48,7 +48,8 @@ describe('« Quoi de neuf ? » au lancement', () => {
     const user = userEvent.setup()
     render(<App />)
     await user.click(screen.getByTestId('btn-open-historique'))
-    // modale (pas un sous-écran) listant chaque build du changelog
+    // modale lazy (pas un sous-écran) listant chaque build du changelog
+    await screen.findByTestId(`changelog-${CHANGELOG[0].build}`)
     for (const e of CHANGELOG) {
       expect(screen.getByTestId(`changelog-${e.build}`)).toBeInTheDocument()
     }
