@@ -1,18 +1,30 @@
+import { useState, useEffect } from 'react'
 import { settlement } from '../settle.js'
 
 const SectionLabel = ({ sx, children }) => (
   <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>{children}</div>
 )
 
+/** Vignette de reçu attaché à une dépense (charge son URL à l'affichage). */
+function ReceiptThumb({ sx, id, srcMap, loadSrc, onOpen }) {
+  useEffect(() => { if (!srcMap[id]) loadSrc({ id, file: `cantou-photos/${id}.jpeg` }) }, [id, srcMap, loadSrc])
+  return (
+    <button data-testid={`receipt-thumb-${id}`} onClick={() => onOpen(id)} style={sx('flex:0 0 auto;width:32px;height:32px;border:none;border-radius:8px;overflow:hidden;background:#ece2cf;cursor:pointer;padding:0;')}>
+      {srcMap[id] ? <img src={srcMap[id]} alt="reçu" style={sx('width:100%;height:100%;object-fit:cover;display:block;')} /> : <span style={sx('font-size:15px;')}>🧾</span>}
+    </button>
+  )
+}
+
 /** Écran Budget — total, catégories, liste des dépenses. */
 export function Budget({
   sx, eur, catColor, remain, budgetTotal, spentPct, spent,
   setNewBudgetTotal, setShowBudgetTotalEdit, setShowAdd, budgetCats,
   sortExpenses, setSortExpenses, expenses, startEditExpense, deleteExpense,
-  familyMembers = [],
+  familyMembers = [], srcMap = {}, loadSrc = () => {},
 }) {
   const { balances, transfers } = settlement(expenses, familyMembers)
   const shareActive = familyMembers.length >= 2 && expenses.some((e) => e.paidBy)
+  const [receipt, setReceipt] = useState(null) // id du reçu ouvert en plein écran
   return (
     <div data-testid="screen-budget">
       <div style={sx('padding:54px 18px 14px;')}>
@@ -57,6 +69,7 @@ export function Budget({
           <div key={e._i} style={sx('display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;')}>
             <span style={sx(`width:10px;height:10px;border-radius:50%;background:${catColor(e.cat)};flex:0 0 auto;`)} />
             <div style={sx('flex:1;min-width:0;')}><div style={sx('font-weight:700;font-size:14px;')}>{e.label}</div><div style={sx('font-size:12px;color:#6b6354;')}>{e.cat}{e.paidBy ? ` · payé par ${e.paidBy}` : ''}</div></div>
+            {e.receiptId && <ReceiptThumb sx={sx} id={e.receiptId} srcMap={srcMap} loadSrc={loadSrc} onOpen={setReceipt} />}
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{eur(e.amt)}</div>
             <button onClick={() => startEditExpense(e._i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
             <button onClick={() => deleteExpense(e._i)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
@@ -88,6 +101,13 @@ export function Budget({
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {receipt && (
+        <div data-testid="receipt-viewer" onClick={() => setReceipt(null)} style={sx('position:fixed;inset:0;z-index:300;background:rgba(20,16,10,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;')}>
+          {srcMap[receipt] && <img src={srcMap[receipt]} alt="reçu" style={sx('max-width:100%;max-height:80%;border-radius:12px;object-fit:contain;')} />}
+          <button style={sx('margin-top:18px;border:1px solid rgba(255,255,255,0.4);background:transparent;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px 28px;cursor:pointer;')}>Fermer</button>
         </div>
       )}
 

@@ -31,6 +31,8 @@ export function dayKeyForDate(trip, days, date = new Date()) {
  * @returns {Array<{ key, label, photos }>} — seulement les groupes non vides.
  */
 export function groupPhotosByDay(photos, days) {
+  // Les reçus (attachés à une dépense) ne font pas partie de la galerie souvenirs.
+  photos = photos.filter((p) => p.kind !== 'receipt')
   const groups = []
   days.forEach((d) => {
     const key = `${d.dow} ${d.num}`

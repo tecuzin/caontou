@@ -253,6 +253,7 @@ export default function App() {
   const [newCat, setNewCat] = useState('Nourriture')
   const [newLabel, setNewLabel] = useState('')
   const [newPaidBy, setNewPaidBy] = useState('')
+  const [newReceiptId, setNewReceiptId] = useState('')
   const [newMealDish, setNewMealDish] = useState('')
   const [newActivityTime, setNewActivityTime] = useState('')
   const [newActivityTitle, setNewActivityTitle] = useState('')
@@ -602,13 +603,18 @@ export default function App() {
     const data = { label: newLabel || newCat, cat: newCat, amt: a }
     // Partage des dépenses : attribue un payeur si la famille est renseignée.
     if (familyMembers.length) data.paidBy = newPaidBy || familyMembers[0]
+    data.receiptId = newReceiptId || undefined // reçu photo attaché
     if (editingExpenseIdx !== null) {
       updateExpense(editingExpenseIdx, data)
       setEditingExpenseIdx(null)
     } else {
       addExpense(data)
     }
-    setShowAdd(false); setNewAmt(''); setNewLabel(''); setNewPaidBy('')
+    setShowAdd(false); setNewAmt(''); setNewLabel(''); setNewPaidBy(''); setNewReceiptId('')
+  }
+  const captureReceipt = async (source = 'camera') => {
+    const meta = await capturePhoto(source, { kind: 'receipt' })
+    if (meta) setNewReceiptId(meta.id)
   }
   const deleteExpense = (idx) => {
     haptic(ImpactStyle.Medium)
@@ -621,10 +627,11 @@ export default function App() {
     setNewLabel(e.label)
     setNewCat(e.cat)
     setNewPaidBy(e.paidBy || '')
+    setNewReceiptId(e.receiptId || '')
     setEditingExpenseIdx(idx)
     setShowAdd(true)
   }
-  const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel(''); setNewPaidBy(''); setEditingExpenseIdx(null) }
+  const closeAdd = () => { setShowAdd(false); setNewAmt(''); setNewLabel(''); setNewPaidBy(''); setNewReceiptId(''); setEditingExpenseIdx(null) }
 
   const editMeal = (id) => {
     const m = meals.find(x => x.id === id)
@@ -1134,7 +1141,7 @@ export default function App() {
                 sx={sx} eur={eur} catColor={catColor} remain={remain} budgetTotal={budgetTotal} spentPct={spentPct} spent={spent}
                 setNewBudgetTotal={setNewBudgetTotal} setShowBudgetTotalEdit={setShowBudgetTotalEdit} setShowAdd={setShowAdd} budgetCats={budgetCats}
                 sortExpenses={sortExpenses} setSortExpenses={setSortExpenses} expenses={expenses} startEditExpense={startEditExpense} deleteExpense={deleteExpense}
-                familyMembers={familyMembers}
+                familyMembers={familyMembers} srcMap={srcMap} loadSrc={loadSrc}
               />
             )}
 
@@ -1179,6 +1186,20 @@ export default function App() {
                 </div>
               </>
             )}
+            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Reçu (photo du ticket)</div>
+            <div style={sx('display:flex;align-items:center;gap:10px;margin-top:6px;margin-bottom:20px;')}>
+              {newReceiptId ? (
+                <>
+                  <span style={sx('display:inline-flex;align-items:center;gap:6px;background:#e7ecdf;color:#4a5d3a;border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;')}>🧾 Reçu attaché</span>
+                  <button data-testid="btn-remove-receipt" onClick={() => setNewReceiptId('')} style={sx('border:none;background:transparent;color:#b8503f;cursor:pointer;font-size:13px;font-weight:700;')}>Retirer</button>
+                </>
+              ) : (
+                <>
+                  <button data-testid="btn-receipt-camera" onClick={() => captureReceipt('camera')} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📷 Photographier</button>
+                  <button data-testid="btn-receipt-gallery" onClick={() => captureReceipt('photos')} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>🖼️ Importer</button>
+                </>
+              )}
+            </div>
             <div style={sx('display:flex;gap:10px;')}>
               <button onClick={closeAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
               <button data-testid="btn-submit-depense" onClick={submitExpense} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
