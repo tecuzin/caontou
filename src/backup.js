@@ -4,7 +4,7 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 
 // Les 15 clés du store cantou.v1 — utilisées pour construire l'export et
 // reconnaître un JSON importé comme un export Cantou valide.
-export const STORE_KEYS = ['saved', 'checks', 'expenses', 'meals', 'shoppingItems', 'days', 'visits', 'meteo', 'trajets', 'trajetSteps', 'trip', 'logi', 'courses', 'budgetTotal', 'hebergement', 'trajetCheckItems', 'suggestions', 'lastBackupAt', 'journal', 'carGames', 'photos', 'familyMembers', 'bingo', 'lastSeenBuild', 'restos', 'departure', 'ratings', 'challengesDone']
+export const STORE_KEYS = ['saved', 'checks', 'expenses', 'meals', 'shoppingItems', 'days', 'visits', 'meteo', 'trajets', 'trajetSteps', 'trip', 'logi', 'courses', 'budgetTotal', 'hebergement', 'trajetCheckItems', 'suggestions', 'lastBackupAt', 'journal', 'carGames', 'photos', 'familyMembers', 'bingo', 'lastSeenBuild', 'restos', 'departure', 'ratings', 'challengesDone', 'carSpot']
 
 /** Construit le JSON d'export (enveloppe app/schema/exportedAt + données). */
 export function buildExport(data, schema) {

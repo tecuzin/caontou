@@ -57,7 +57,8 @@ const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod =
 const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
-import { currentPositionMapsHref, openExternal } from './links.js'
+import { currentPositionMapsHref, openExternal, getCurrentCoords, mapsCoordsHref } from './links.js'
+import { CarSpot } from './components/CarSpot.jsx'
 const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
 const Departure = lazy(() => import('./screens/Departure.jsx').then(m => ({ default: m.Departure })))
 const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ default: m.Itinerary })))
@@ -200,6 +201,7 @@ function loadStore() {
       restos: p.restos ?? structuredClone(RESTOS_INITIAL),
       departure: p.departure ?? structuredClone(DEPARTURE_INITIAL),
       ratings: p.ratings ?? {},
+      carSpot: p.carSpot ?? null,
       challengesDone: p.challengesDone ?? {},
     }
   } catch {
@@ -362,6 +364,19 @@ export default function App() {
       try { window.alert('Position indisponible — vérifie que la localisation est activée et autorisée pour Cantou.') } catch { }
     }
   }
+  // Mémo voiture : mémorise le point GPS où on s'est garé, y retourne via Maps.
+  const [carSpot, setCarSpot] = useState(initial.carSpot || null)
+  const parkCar = async () => {
+    haptic(ImpactStyle.Medium)
+    try {
+      const { lat, lng } = await getCurrentCoords()
+      setCarSpot({ lat, lng, at: Date.now() })
+    } catch {
+      try { window.alert('Position indisponible — vérifie que la localisation est activée et autorisée pour Cantou.') } catch { }
+    }
+  }
+  const findCar = () => { if (carSpot) { haptic(ImpactStyle.Light); openExternal(mapsCoordsHref(carSpot.lat, carSpot.lng)) } }
+  const forgetCar = () => { haptic(ImpactStyle.Light); setCarSpot(null) }
   // Carnet de restaurants (CRUD + réservations)
   const [restos, setRestos] = useState(initial.restos || structuredClone(RESTOS_INITIAL))
   const [departure, setDeparture] = useState(initial.departure || structuredClone(DEPARTURE_INITIAL))
@@ -465,8 +480,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -918,7 +933,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -1075,6 +1090,7 @@ export default function App() {
                 isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }} openMyPosition={openMyPosition} openChangelog={() => setShowChangelog(true)}
                 isCheckoutSoon={isCheckoutSoon} departureDone={departure.filter((i) => i.done).length} departureTotal={departure.length}
                 dailyChallenge={dailyChallenge} challengeDone={challengeDone} markChallengeDone={markChallengeDone}
+                carSpot={carSpot} parkCar={parkCar} findCar={findCar} forgetCar={forgetCar}
               />
             )}
 

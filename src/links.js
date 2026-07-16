@@ -38,14 +38,14 @@ export function mapsCoordsHref(lat, lng) {
  * GPS gérés nativement — `navigator.geolocation` n'est pas fiable dans la
  * WebView). Sur web : `navigator.geolocation` en secours. Rejette si refusé.
  */
-export async function currentPositionMapsHref() {
+export async function getCurrentCoords() {
   if (Capacitor.isNativePlatform()) {
     const perm = await Geolocation.requestPermissions()
     if (perm.location !== 'granted' && perm.coarseLocation !== 'granted') {
       throw new Error('Autorisation de localisation refusée')
     }
     const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 10000 })
-    return mapsCoordsHref(pos.coords.latitude, pos.coords.longitude)
+    return { lat: pos.coords.latitude, lng: pos.coords.longitude }
   }
   return new Promise((resolve, reject) => {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
@@ -53,9 +53,14 @@ export async function currentPositionMapsHref() {
       return
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve(mapsCoordsHref(pos.coords.latitude, pos.coords.longitude)),
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       (err) => reject(err),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
     )
   })
+}
+
+export async function currentPositionMapsHref() {
+  const { lat, lng } = await getCurrentCoords()
+  return mapsCoordsHref(lat, lng)
 }
