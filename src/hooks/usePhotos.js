@@ -23,8 +23,12 @@ export function usePhotos(initial, trip, days) {
     dirReady.current = true
   }
 
-  /** Prend une photo (source='camera') ou importe depuis la galerie ('photos'). */
-  const capturePhoto = async (source = 'camera') => {
+  /**
+   * Prend une photo (source='camera') ou importe depuis la galerie ('photos').
+   * `extra` enrichit la métadonnée (ex. { kind: 'receipt' } pour un reçu, exclu
+   * de la galerie souvenirs).
+   */
+  const capturePhoto = async (source = 'camera', extra = {}) => {
     try {
       const shot = await Camera.getPhoto({
         resultType: CameraResultType.Base64,
@@ -37,7 +41,7 @@ export function usePhotos(initial, trip, days) {
       const id = photoId()
       const file = `${PHOTO_DIR}/${id}.jpeg`
       await Filesystem.writeFile({ path: file, data: shot.base64String, directory: Directory.Data })
-      const meta = { id, file, day: dayKeyForDate(trip, days), takenAt: new Date().toISOString() }
+      const meta = { id, file, day: dayKeyForDate(trip, days), takenAt: new Date().toISOString(), ...extra }
       setPhotos((p) => [...p, meta])
       setSrcMap((m) => ({ ...m, [id]: `data:image/jpeg;base64,${shot.base64String}` }))
       return meta
