@@ -288,6 +288,17 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 > reset de style) + le viewer photo plein écran de Souvenirs (même patron Échap).
 > Ces conversions changent le rendu → à valider écran par écran sur device.
 
+## ✅ Complété — journal vocal (16 juillet)
+
+- [x] **🎙️ Journal de bord vocal (dictée)** — le récit du jour peut être dicté à
+  la voix. Module `src/speech.js` (wrapper Web Speech API, `webkitSpeechRecognition`
+  dans la WebView Android) : `isSpeechSupported`, `startDictation` (fr-FR, continu,
+  bribes finalisées) et `appendSegment`. Bouton 🎙️ dans `JournalModal` : bascule
+  enregistre/stop, concatène au texte existant, gère le refus micro et masque le
+  bouton si la plateforme ne sait pas dicter. 10 tests (`speech.test.js`,
+  `journal-mic.test.jsx`), suite complète **472 verte**. Carte Epiq (reçu photo
+  déjà livré → Done ; journal vocal → In progress puis Done).
+
 ## 📅 Backlog suivant
 
 - [x] **Tests Appium sur device réel** — suite écrite (`tests/appium/`,
