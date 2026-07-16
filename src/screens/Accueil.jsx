@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Panorama } from '../Scenery.jsx'
 import { KIDS_GAMES, EMERGENCY_NUMBERS } from '../data.js'
+import { CarSpot } from '../components/CarSpot.jsx'
 import { TelLink } from '../components/Links.jsx'
 
 const MODULES = [
@@ -25,6 +26,7 @@ export function Accueil({
   isDepartureDay, quickPhoto, openMyPosition, openChangelog,
   isCheckoutSoon, departureDone = 0, departureTotal = 0,
   dailyChallenge, challengeDone, markChallengeDone,
+  carSpot, parkCar, findCar, forgetCar,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   return (
@@ -105,6 +107,8 @@ export function Accueil({
           )}
         </div>
       )}
+
+      {today && parkCar && <CarSpot sx={sx} carSpot={carSpot} parkCar={parkCar} findCar={findCar} forgetCar={forgetCar} />}
 
       <div style={sx('margin:0 18px 12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
         <div style={sx('display:flex;align-items:center;gap:12px;')}>
