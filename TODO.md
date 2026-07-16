@@ -288,6 +288,16 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 > reset de style) + le viewer photo plein écran de Souvenirs (même patron Échap).
 > Ces conversions changent le rendu → à valider écran par écran sur device.
 
+## ✅ Complété — refactor hooks de domaine (16 juillet)
+
+- [x] **Extraction de 3 hooks de données purs d'`App.jsx`** (clean code, aligné
+  sur useLogi/useMeals) : `useRestos` (CRUD bonnes adresses, id stable max+1),
+  `useDeparture` (checklist « Départ du gîte »), `useRatings` (notes/avis des
+  visites). App conserve les wrappers haptics et l'orchestration modale.
+  carSpot/bingo/challenges laissés dans App (side-effects natifs/confetti, pas
+  des hooks de données — pas d'abstraction gratuite). +22 tests renderHook,
+  suite **489 verte**. Git Flow : `refactor/extract-restos-hook` → develop.
+
 ## ✅ Complété — journal vocal (16 juillet)
 
 - [x] **🎙️ Journal de bord vocal (dictée)** — le récit du jour peut être dicté à
