@@ -18,7 +18,7 @@ export function JournalModal({ isOpen, onClose, sx, dayLabel, entry, updateEntry
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Humeur du jour</div>
         <div style={sx('display:flex;gap:8px;margin-top:6px;margin-bottom:14px;')}>
           {MOODS.map((m) => (
-            <button key={m} data-testid={`mood-${m}`} onClick={() => updateEntry('mood', e.mood === m ? '' : m)} style={sx(`flex:1;font-size:24px;padding:8px 0;border-radius:12px;cursor:pointer;background:${e.mood === m ? '#e7ecdf' : '#fffdf8'};border:${e.mood === m ? '2px solid #4a5d3a' : '1px solid #d8cbb0'};`)}>{m}</button>
+            <button key={m} data-testid={`mood-${m}`} onClick={() => updateEntry('mood', e.mood === m ? '' : m)} style={sx(`flex:1;font-size:26px;padding:8px 0;border-radius:12px;cursor:pointer;background:${e.mood === m ? '#e7ecdf' : '#fffdf8'};border:${e.mood === m ? '2px solid #4a5d3a' : '1px solid #d8cbb0'};`)}>{m}</button>
           ))}
         </div>
 

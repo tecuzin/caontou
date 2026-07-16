@@ -42,13 +42,13 @@ export function Visites({
                 <div style={sx('flex:1;min-width:0;')}>
                   <div style={sx('display:flex;align-items:center;gap:6px;')}>
                     <span style={sx(`width:8px;height:8px;border-radius:50%;background:${VCAT[v.cat]};flex:0 0 auto;`)} />
-                    <span style={sx(`font-size:11px;font-weight:700;color:${VCAT[v.cat]};text-transform:uppercase;letter-spacing:0.5px;`)}>{v.cat}</span>
+                    <span style={sx(`font-size:12px;font-weight:700;color:${VCAT[v.cat]};text-transform:uppercase;letter-spacing:0.5px;`)}>{v.cat}</span>
                   </div>
                   <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{v.name}</div>
                   <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>{v.dist}  ·  {v.dur}</div>
-                  <div style={sx('display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:#6b6354;background:#f1e9da;border-radius:8px;padding:4px 8px;')}>👶 {v.age}</div>
+                  <div style={sx('display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:#6b6354;background:#f1e9da;border-radius:8px;padding:4px 8px;')}>👶 {v.age}</div>
                 </div>
-                <button onClick={() => toggleSaved(v.id)} style={sx('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:24px;line-height:1;')}>
+                <button onClick={() => toggleSaved(v.id)} style={sx('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:26px;line-height:1;')}>
                   {sv ? <span style={sx('color:#b8503f;')}>♥</span> : <span style={sx('color:#cbc2ae;')}>♡</span>}
                 </button>
                 <button onClick={() => editVisit(v.id)} style={sx('flex:0 0 auto;border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px;')}>✏️</button>

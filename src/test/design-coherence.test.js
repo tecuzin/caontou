@@ -32,9 +32,13 @@ describe('cohérence de design (déterministe)', () => {
     expect(m.spacingScore).toBeGreaterThanOrEqual(95)
   })
 
+  it('gamme typographique consolidée (≥ 60)', () => {
+    expect(m.fontScore).toBeGreaterThanOrEqual(60)
+  })
+
   // Cliquet anti-régression : le score global ne doit plus redescendre sous le
   // palier acquis. On le remonte à chaque lot livré (voir docs/design-engine.md).
-  it('score global au-dessus du palier acquis (≥ 68)', () => {
-    expect(m.composite).toBeGreaterThanOrEqual(68)
+  it('score global au-dessus du palier acquis (≥ 78)', () => {
+    expect(m.composite).toBeGreaterThanOrEqual(78)
   })
 })

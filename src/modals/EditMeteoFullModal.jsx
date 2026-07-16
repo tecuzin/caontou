@@ -20,7 +20,7 @@ export function EditMeteoFullModal({ isOpen, onClose, editingMeteoIdx, newMeteoD
           </div>
         </div>
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Icone</div>
-        <input value={newMeteoIcon} onChange={e => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
+        <input value={newMeteoIcon} onChange={e => setNewMeteoIcon(e.target.value)} placeholder="☀️" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:26px;text-align:center;')} />
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Temp max</div>
         <input value={newMeteoHi} onChange={e => setNewMeteoHi(e.target.value)} placeholder="24" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Temp min</div>

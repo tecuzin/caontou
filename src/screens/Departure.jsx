@@ -26,7 +26,7 @@ export function Departure({ sx, departure, toggleDeparture, addDepartureItem, re
         {departure.map((it) => (
           <div key={it.id} data-testid="departure-item" style={sx(`display:flex;align-items:center;gap:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;${it.done ? 'opacity:0.6;' : ''}`)}>
             <button aria-label={`Cocher ${it.label}`} onClick={() => toggleDeparture(it.id)} style={sx(`width:24px;height:24px;flex:0 0 auto;border-radius:8px;border:2px solid ${it.done ? '#4a5d3a' : '#d8cbb0'};background:${it.done ? '#4a5d3a' : '#fffdf8'};color:#fffaf0;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;`)}>{it.done ? '✓' : ''}</button>
-            <span style={sx('font-size:18px;flex:0 0 auto;')}>{it.emoji}</span>
+            <span style={sx('font-size:19px;flex:0 0 auto;')}>{it.emoji}</span>
             <span style={sx(`flex:1;min-width:0;font-size:14px;font-weight:600;${it.done ? 'text-decoration:line-through;color:#9a917f;' : ''}`)}>{it.label}</span>
             <button aria-label={`Supprimer ${it.label}`} onClick={() => removeDepartureItem(it.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
           </div>

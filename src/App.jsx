@@ -982,7 +982,7 @@ export default function App() {
         <div data-testid="sub-screen-wrapper" onTouchStart={subScreenSwipe.onTouchStart} onTouchEnd={subScreenSwipe.onTouchEnd} style={sx('height:100%;display:flex;flex-direction:column;')}>
           <div style={sx('display:flex;align-items:center;gap:8px;padding:54px 14px 12px;background:#fffdf8;border-bottom:1px solid #ece2cf;flex:0 0 auto;')}>
             <button onClick={() => setSub(null)} style={sx('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:4px;')}>‹</button>
-            <span style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>{subTitle}</span>
+            <span style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>{subTitle}</span>
           </div>
           {/* key={sub} remonte le conteneur à chaque navigation → rejoue screenIn */}
           <div key={sub} className="screen-in" style={sx('flex:1;overflow-y:auto;')}>
@@ -1129,7 +1129,7 @@ export default function App() {
             {TABS.map(([key, emoji, label]) => (
               <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={sx('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0;')}>
                 <span style={sx('font-size:20px;')}>{emoji}</span>
-                <span style={sx(`font-size:11px;color:${tab === key ? '#4a5d3a' : '#6b6354'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
+                <span style={sx(`font-size:12px;color:${tab === key ? '#4a5d3a' : '#6b6354'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
               </button>
             ))}
           </div>
@@ -1143,7 +1143,7 @@ export default function App() {
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Montant</div>
-            <input data-testid="input-montant" value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:18px;font-family:Quicksand;font-weight:700;')} />
+            <input data-testid="input-montant" value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:19px;font-family:Quicksand;font-weight:700;')} />
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Libellé</div>
             <input data-testid="input-label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Catégorie</div>
@@ -1334,7 +1334,7 @@ export default function App() {
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle liste</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Emoji</div>
-            <input value={newLogiListEmoji} onChange={(e) => setNewLogiListEmoji(e.target.value)} placeholder="📦" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:24px;text-align:center;')} />
+            <input value={newLogiListEmoji} onChange={(e) => setNewLogiListEmoji(e.target.value)} placeholder="📦" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:26px;text-align:center;')} />
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
             <input data-testid="input-logi-list-name" value={newLogiListName} onChange={(e) => setNewLogiListName(e.target.value)} placeholder="Ex : Sac de plage" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addLogiList()} />
             <div style={sx('display:flex;gap:10px;')}>

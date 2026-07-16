@@ -22,7 +22,7 @@ export function Hebergement({ sx, hebergement, openHebEdit }) {
       </div>
       <div style={sx('display:flex;align-items:center;margin-top:14px;gap:10px;')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:20px;flex:1;')}>{hebergement.nom}</div>
-        <button onClick={openHebEdit} style={sx('border:none;background:transparent;cursor:pointer;font-size:18px;padding:4px;')}>✏️</button>
+        <button onClick={openHebEdit} style={sx('border:none;background:transparent;cursor:pointer;font-size:19px;padding:4px;')}>✏️</button>
       </div>
       <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>📍 {hebergement.adresse}</div>
       <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
