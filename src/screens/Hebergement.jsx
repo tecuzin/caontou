@@ -26,24 +26,24 @@ export function Hebergement({ sx, hebergement, openHebEdit }) {
       </div>
       <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>📍 {hebergement.adresse}</div>
       <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
-        <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Arrivée</div><div style={sx('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.arrivee}</div></div>
-        <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Départ</div><div style={sx('font-weight:700;font-size:14px;margin-top:3px;')}>{hebergement.depart}</div></div>
+        <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Arrivée</div><div style={sx('font-weight:700;font-size:14px;margin-top:4px;')}>{hebergement.arrivee}</div></div>
+        <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Départ</div><div style={sx('font-weight:700;font-size:14px;margin-top:4px;')}>{hebergement.depart}</div></div>
       </div>
       <div style={sx('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>🛏️ {hebergement.capacite}</div>
       <div style={sx('margin:18px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Équipements</div>
       <div style={sx('display:flex;flex-wrap:wrap;gap:8px;')}>
-        {HEB_EQUIP.map((eq) => <span key={eq} style={sx('background:#fffdf8;border:1px solid #e3d8c2;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:#6b6354;')}>{eq}</span>)}
+        {HEB_EQUIP.map((eq) => <span key={eq} style={sx('background:#fffdf8;border:1px solid #e3d8c2;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:#6b6354;')}>{eq}</span>)}
       </div>
       <div style={sx('margin-top:16px;background:#e7ecdf;border-radius:14px;padding:14px;')}>
         <div style={sx('font-weight:700;font-family:Quicksand;')}>📶 Wi-Fi</div>
-        <div style={sx('font-size:13px;color:#4a5d3a;margin-top:5px;')}>Réseau : <b>{hebergement.wifiNom}</b></div>
+        <div style={sx('font-size:13px;color:#4a5d3a;margin-top:6px;')}>Réseau : <b>{hebergement.wifiNom}</b></div>
         <div style={sx('font-size:13px;color:#4a5d3a;margin-top:2px;')}>Code : <b>{hebergement.wifiPass}</b></div>
       </div>
       <div style={sx('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 {hebergement.contact}</div>
       <div style={sx('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>{hebergement.note}</div>
       <div data-testid="heb-urgences" style={sx('margin-top:16px;background:#fbe9e6;border:1px solid #e6bcb2;border-radius:14px;padding:14px;')}>
         <div style={sx('font-weight:700;font-family:Quicksand;color:#b8503f;')}>🚨 Urgences</div>
-        <div style={sx('display:flex;flex-direction:column;gap:6px;margin-top:9px;')}>
+        <div style={sx('display:flex;flex-direction:column;gap:6px;margin-top:10px;')}>
           {URGENCES.map((u) => (
             <a key={u.n} href={`tel:${u.n}`} style={sx('display:flex;align-items:center;gap:10px;text-decoration:none;color:#6b5a45;')}>
               <span style={sx('flex:0 0 auto;min-width:42px;text-align:center;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;border-radius:8px;padding:4px 8px;font-size:14px;')}>{u.n}</span>
@@ -51,7 +51,7 @@ export function Hebergement({ sx, hebergement, openHebEdit }) {
             </a>
           ))}
         </div>
-        <div style={sx('font-size:12px;color:#8a6f5c;margin-top:9px;line-height:1.4;')}>💊 Pharmacie / médecin le plus proche : à noter dans « ✏️ » ci-dessus (champ notes).</div>
+        <div style={sx('font-size:12px;color:#8a6f5c;margin-top:10px;line-height:1.4;')}>💊 Pharmacie / médecin le plus proche : à noter dans « ✏️ » ci-dessus (champ notes).</div>
       </div>
     </div>
   )

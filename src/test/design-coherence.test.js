@@ -28,9 +28,13 @@ describe('cohérence de design (déterministe)', () => {
     expect(m.radiusScore).toBeGreaterThanOrEqual(90)
   })
 
+  it('grille d\'espacement 2px respectée (≥ 95)', () => {
+    expect(m.spacingScore).toBeGreaterThanOrEqual(95)
+  })
+
   // Cliquet anti-régression : le score global ne doit plus redescendre sous le
   // palier acquis. On le remonte à chaque lot livré (voir docs/design-engine.md).
-  it('score global au-dessus du palier acquis (≥ 58)', () => {
-    expect(m.composite).toBeGreaterThanOrEqual(58)
+  it('score global au-dessus du palier acquis (≥ 68)', () => {
+    expect(m.composite).toBeGreaterThanOrEqual(68)
   })
 })

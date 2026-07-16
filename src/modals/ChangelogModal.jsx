@@ -20,11 +20,11 @@ export function ChangelogModal({ isOpen, onClose, sx, currentBuild }) {
               <span style={sx('font-size:12px;color:#9a917f;')}>{e.date}</span>
             </div>
             {e.items.map((it, i) => (
-              <div key={i} style={sx('font-size:14px;padding:3px 0;color:#3a352b;')}>{it}</div>
+              <div key={i} style={sx('font-size:14px;padding:4px 0;color:#3a352b;')}>{it}</div>
             ))}
           </div>
         ))}
-        <button data-testid="btn-changelog-close" onClick={onClose} style={sx('width:100%;margin-top:4px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
+        <button data-testid="btn-changelog-close" onClick={onClose} style={sx('width:100%;margin-top:4px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Fermer</button>
       </div>
     </ModalShell>
   )

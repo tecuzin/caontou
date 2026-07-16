@@ -12,15 +12,15 @@ export function Repas({
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:26px;')}>Repas &amp; courses</div>
       </div>
       <div style={sx('margin:0 18px 16px;display:flex;background:#ece2cf;border-radius:14px;padding:4px;')}>
-        <button onClick={() => setMealTab('repas')} style={sx(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'repas' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'repas' ? '#fffaf0' : '#6b6354'};`)}>Menus</button>
-        <button onClick={() => setMealTab('courses')} style={sx(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'courses' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'courses' ? '#fffaf0' : '#6b6354'};`)}>Courses</button>
+        <button onClick={() => setMealTab('repas')} style={sx(`flex:1;border:none;border-radius:10px;padding:10px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'repas' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'repas' ? '#fffaf0' : '#6b6354'};`)}>Menus</button>
+        <button onClick={() => setMealTab('courses')} style={sx(`flex:1;border:none;border-radius:10px;padding:10px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${mealTab === 'courses' ? '#4a5d3a' : 'transparent'};color:${mealTab === 'courses' ? '#fffaf0' : '#6b6354'};`)}>Courses</button>
       </div>
 
       {mealTab === 'repas' && (
         <>
           <div style={sx('padding:0 18px;display:flex;flex-direction:column;gap:10px;')}>
             {meals.map((ml) => (
-              <div key={ml.id} style={sx('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:13px 14px;')}>
+              <div key={ml.id} style={sx('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:12px 14px;')}>
                 <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;color:#cf7d3c;width:54px;flex:0 0 auto;')}>{ml.day}</div>
                 <div style={sx('font-weight:600;font-size:14px;flex:1;')}>{ml.dish}</div>
                 <button onClick={() => editMeal(ml.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
@@ -43,11 +43,11 @@ export function Repas({
           <div style={sx('display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6b6354;margin-bottom:6px;')}><span>Liste de courses</span><span>{coursesDone}/{coursesTotal}</span></div>
           <div style={sx('height:9px;border-radius:8px;background:#efe6d4;overflow:hidden;margin-bottom:14px;')}><div style={sx(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
           <div style={sx('display:flex;justify-content:flex-end;margin-bottom:14px;')}>
-            <button onClick={() => setCoursesSorted(!coursesSorted)} style={sx(`border:1px solid ${coursesSorted ? '#4a5d3a' : '#ece2cf'};background:${coursesSorted ? '#4a5d3a' : '#fffdf8'};color:${coursesSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 13px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
+            <button onClick={() => setCoursesSorted(!coursesSorted)} style={sx(`border:1px solid ${coursesSorted ? '#4a5d3a' : '#ece2cf'};background:${coursesSorted ? '#4a5d3a' : '#fffdf8'};color:${coursesSorted ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;`)}>↑ Non cochés en premier</button>
           </div>
           {coursesGroups.map((g) => (
             <div key={g.key} style={sx('margin-bottom:16px;')}>
-              <div style={sx('display:flex;align-items:baseline;gap:8px;margin-bottom:7px;')}>
+              <div style={sx('display:flex;align-items:baseline;gap:8px;margin-bottom:6px;')}>
                 <span style={sx('font-family:Quicksand;font-weight:700;font-size:15px;flex:1;')}>{g.name}</span>
                 <span style={sx('font-size:12px;color:#6b6354;')}>{g.doneStr}</span>
                 <button onClick={() => deleteCourseCategory(g.key)} style={sx('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
@@ -75,7 +75,7 @@ export function Repas({
               <button onClick={() => { setEditingCourseKey(g.key); setShowAddCourseItem(true) }} style={sx('width:100%;margin-top:8px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter article</button>
             </div>
           ))}
-          <button data-testid="btn-add-course-cat" onClick={() => setShowAddCourseCat(true)} style={sx('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:13px;cursor:pointer;')}>+ Nouvelle catégorie</button>
+          <button data-testid="btn-add-course-cat" onClick={() => setShowAddCourseCat(true)} style={sx('width:100%;margin-top:4px;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Nouvelle catégorie</button>
           <div style={sx('margin-top:20px;padding-top:16px;border-top:1px solid #efe6d4;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>Gerer les articles</div>
             <div style={sx('display:flex;flex-direction:column;gap:8px;')}>

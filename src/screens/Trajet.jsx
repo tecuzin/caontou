@@ -25,17 +25,17 @@ export function Trajet({
         </div>
       </div>
       <div style={sx('margin-top:14px;display:flex;background:#ece2cf;border-radius:14px;padding:4px;')}>
-        <button data-testid="btn-trajet-aller" onClick={() => setTrajetDir('aller')} style={sx(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'aller' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'aller' ? '#fffaf0' : '#6b6354'};`)}>Aller</button>
-        <button data-testid="btn-trajet-retour" onClick={() => setTrajetDir('retour')} style={sx(`flex:1;border:none;border-radius:10px;padding:9px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'retour' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'retour' ? '#fffaf0' : '#6b6354'};`)}>Retour</button>
+        <button data-testid="btn-trajet-aller" onClick={() => setTrajetDir('aller')} style={sx(`flex:1;border:none;border-radius:10px;padding:10px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'aller' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'aller' ? '#fffaf0' : '#6b6354'};`)}>Aller</button>
+        <button data-testid="btn-trajet-retour" onClick={() => setTrajetDir('retour')} style={sx(`flex:1;border:none;border-radius:10px;padding:10px;font-weight:700;font-family:Quicksand;font-size:15px;cursor:pointer;background:${trajetDir === 'retour' ? '#4a5d3a' : 'transparent'};color:${trajetDir === 'retour' ? '#fffaf0' : '#6b6354'};`)}>Retour</button>
       </div>
       <div style={sx('margin-top:14px;background:#f1e4d4;border-radius:16px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>👶 Avec les enfants : une pause toutes les 1 h 30, et la playlist d’histoires audio prête pour la route.</div>
       <div style={sx('margin:20px 0 12px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Les etapes · {trajetDir}</div>
       {trajets[trajetDir].map((st, i) => (
         <div key={i} style={sx('display:flex;gap:12px;')}>
-          <div style={sx('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{st.time}</div>
+          <div style={sx('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:2px;')}>{st.time}</div>
           <div style={sx('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
-            <div style={sx(`width:13px;height:13px;border-radius:50%;background:${st.color};margin-top:3px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${st.color};`)} />
-            <div style={sx('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
+            <div style={sx(`width:13px;height:13px;border-radius:50%;background:${st.color};margin-top:4px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${st.color};`)} />
+            <div style={sx('flex:1;width:2px;background:#e3d8c2;margin:4px 0;')} />
           </div>
           <div style={sx('flex:1;padding-bottom:18px;')}>
             <div style={sx('display:flex;align-items:center;gap:8px;')}>

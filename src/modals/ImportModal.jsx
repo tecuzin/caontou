@@ -30,15 +30,15 @@ export function ImportModal({ isOpen, onClose, importText, setImportText, import
           📂 Choisir un fichier…
           <input type="file" accept=".json,application/json" onChange={handleImportFile} style={sx('display:none;')} />
         </label>
-        {importError && <div style={sx('margin-top:10px;background:#f7e2dc;border-radius:12px;padding:11px 13px;font-size:13px;color:#b8503f;font-weight:600;')}>⚠️ {importError}</div>}
+        {importError && <div style={sx('margin-top:10px;background:#f7e2dc;border-radius:12px;padding:12px 12px;font-size:13px;color:#b8503f;font-weight:600;')}>⚠️ {importError}</div>}
         {importPreview && (
-          <div data-testid="import-preview" style={sx('margin-top:10px;background:#e7ecdf;border-radius:12px;padding:11px 13px;font-size:13px;color:#4a5d3a;')}>
+          <div data-testid="import-preview" style={sx('margin-top:10px;background:#e7ecdf;border-radius:12px;padding:12px 12px;font-size:13px;color:#4a5d3a;')}>
             ✓ Export Cantou valide — {Array.isArray(importPreview.expenses) ? importPreview.expenses.length : 0} dépenses, {Array.isArray(importPreview.meals) ? importPreview.meals.length : 0} repas, {Array.isArray(importPreview.visits) ? importPreview.visits.length : 0} visites, {Array.isArray(importPreview.days) ? importPreview.days.length : 0} jours de planning.
           </div>
         )}
         <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
-          <button onClick={closeImport} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-          <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={sx(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
+          <button onClick={closeImport} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+          <button data-testid="btn-apply-import" onClick={applyImport} disabled={!importPreview} style={sx(`flex:1;border:none;background:${importPreview ? '#b8503f' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:${importPreview ? 'pointer' : 'not-allowed'};`)}>Remplacer mes données</button>
         </div>
         <div style={sx('margin-top:10px;font-size:12px;color:#6b6354;text-align:center;')}>⚠️ Remplace toutes les données actuelles de l'app.</div>
       </div>

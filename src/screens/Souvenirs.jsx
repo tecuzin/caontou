@@ -29,8 +29,8 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
       </div>
 
       <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
-        <button data-testid="btn-take-photo" onClick={() => capturePhoto('camera')} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>📷 Prendre une photo</button>
-        <button data-testid="btn-import-photo" onClick={() => capturePhoto('photos')} style={sx('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>🖼️ Importer</button>
+        <button data-testid="btn-take-photo" onClick={() => capturePhoto('camera')} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>📷 Prendre une photo</button>
+        <button data-testid="btn-import-photo" onClick={() => capturePhoto('photos')} style={sx('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>🖼️ Importer</button>
       </div>
 
       {openDayJournal && journalDays.length > 0 && (
@@ -82,8 +82,8 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
             {srcMap[viewer.id] && <img src={srcMap[viewer.id]} alt="" style={sx('max-width:100%;max-height:100%;border-radius:12px;object-fit:contain;')} />}
           </div>
           <div onClick={(e) => e.stopPropagation()} style={sx('flex:0 0 auto;display:flex;gap:10px;padding:14px 18px 34px;')}>
-            <button onClick={() => setViewer(null)} style={sx('flex:1;border:1px solid rgba(255,255,255,0.4);background:transparent;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
-            <button data-testid="btn-delete-photo" onClick={() => { deletePhoto(viewer.id); setViewer(null) }} style={sx('flex:1;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>🗑️ Supprimer</button>
+            <button onClick={() => setViewer(null)} style={sx('flex:1;border:1px solid rgba(255,255,255,0.4);background:transparent;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Fermer</button>
+            <button data-testid="btn-delete-photo" onClick={() => { deletePhoto(viewer.id); setViewer(null) }} style={sx('flex:1;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>🗑️ Supprimer</button>
           </div>
         </div>
       )}

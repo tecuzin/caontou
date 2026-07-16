@@ -76,8 +76,8 @@ export function VoteModal({ isOpen, onClose, sx, visits, savedVisitIds, familyMe
       </div>
 
       <div style={sx('display:flex;gap:10px;')}>
-        <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-        <button data-testid="vote-start" disabled={!canStart} onClick={() => { setPhase('voting'); setVoterIdx(0); setVotes([]) }} style={sx(`flex:1;border:none;background:${canStart ? '#4a5d3a' : '#cbc2ae'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${canStart ? 'pointer' : 'default'};`)}>Commencer le vote →</button>
+        <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+        <button data-testid="vote-start" disabled={!canStart} onClick={() => { setPhase('voting'); setVoterIdx(0); setVotes([]) }} style={sx(`flex:1;border:none;background:${canStart ? '#4a5d3a' : '#cbc2ae'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:${canStart ? 'pointer' : 'default'};`)}>Commencer le vote →</button>
       </div>
     </>)
   }
@@ -122,8 +122,8 @@ export function VoteModal({ isOpen, onClose, sx, visits, savedVisitIds, familyMe
       {days.map((d, i) => <option key={i} value={i}>{d.dow} {d.num} — {d.title}</option>)}
     </select>
     <div style={sx('display:flex;gap:10px;')}>
-      <button data-testid="vote-replay" onClick={() => { setPhase('setup'); setVotes([]); setVoterIdx(0); setWinnerId(null) }} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>↺ Rejouer</button>
-      <button data-testid="vote-add-planning" onClick={addWinnerToPlanning} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Ajouter au planning</button>
+      <button data-testid="vote-replay" onClick={() => { setPhase('setup'); setVotes([]); setVoterIdx(0); setWinnerId(null) }} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>↺ Rejouer</button>
+      <button data-testid="vote-add-planning" onClick={addWinnerToPlanning} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter au planning</button>
     </div>
   </>)
 }

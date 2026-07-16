@@ -27,7 +27,7 @@ export function Itinerary({ sx, visits = [], saved = {}, openMaps }) {
           <div style={sx('font-size:12px;color:#dbe2c9;margin-top:2px;')}>Estimation aller-retour depuis Vezels-Roussy (indicative).</div>
           <ol style={sx('margin:12px 0 0;padding-left:20px;')}>
             {ordered.map((v) => (
-              <li key={v.id} data-testid="route-stop" style={sx('font-size:14px;padding:3px 0;')}>
+              <li key={v.id} data-testid="route-stop" style={sx('font-size:14px;padding:4px 0;')}>
                 <b>{v.name}</b> <span style={sx('color:#dbe2c9;')}>· {v.dist}</span>
               </li>
             ))}

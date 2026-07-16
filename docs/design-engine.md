@@ -77,8 +77,12 @@ vertical se brouille. Score dégressif au-delà de 6 tailles.
 
 ### 2.4 Grille d'espacement
 
-Part des `padding/margin/gap/top/left/right/bottom` alignés sur une **grille de
-4 px**. Les valeurs impaires (`3,5,7,9,11,13px`) cassent le rythme.
+Part des `padding/margin/gap/top/left/right/bottom` alignés sur la **grille
+réelle du design : 2 px**. (Première version : 4 px — mais `6/10/14/18` sont des
+tokens signature à des centaines d'occurrences ; les pénaliser aurait poussé à
+casser l'identité visuelle. Même leçon que pour les rayons, cf. §4.) La vraie
+dérive = les valeurs **impaires** (`3,5,7,9,11,13px`), snappées vers le voisin
+pair le plus fréquent (±1 px, sous le seuil de perception).
 
 ### 2.5 Score composite
 
@@ -141,7 +145,9 @@ Le moteur encode cette nuance plutôt que de « corriger » à l'aveugle.
 | B73 | Score palette          |   0   | **64**| reste = paires 2≤ΔE<5 (perceptibles)  |
 | B74 | Rayons distincts        |  16   | **9** | orphelins 6/7/9/13/18/22/26 snappés   |
 | B74 | Score rayons           |  54   | **98**| échelle honnête {4,8,12,14,16,20,28}  |
-| —   | **Score composite**    | **23**| **60**| B73 : 23→49 · B74 : 49→60             |
+| B82 | Espacements impairs    | 124   | **0** | snap ±1 px vers le pair fréquent      |
+| B82 | Score espacement       |  49   |**100**| grille honnête 2 px                   |
+| —   | **Score composite**    | **23**| **70**| B73 : 49 · B74 : 60 · B82 : 70        |
 
 Étape rayons (B74) : les rayons orphelins ont été ramenés sur les tokens réels
 (la carte = 14px, le sheet = 28px). Le seul résidu est `10px` (×8). À chaque
@@ -158,8 +164,9 @@ Le score reste tiré vers le bas par des leviers qui **changent les pixels** —
 donc à dérouler **pas à pas, avec QA visuelle sur device** :
 
 - ✅ **Rayons** (B74) : orphelins snappés sur l'échelle {4,8,12,14,16,20,28}.
-- **Espacement** : réaligner les valeurs impaires sur la grille 4 px.
-- **Typo** : ramener les ~19 tailles à une gamme modulaire (~7 pas).
+- ✅ **Espacement** (B82) : 124 valeurs impaires snappées sur la grille 2 px.
+- **Typo** : ramener les ~19 tailles à une gamme modulaire (~7 pas) — dernier
+  levier (score typo 0, poids 0,15 → composite max atteignable ≈ 85).
 - **Élévation** : unifier les ombres ad hoc en une échelle d'élévation à 3 niveaux.
 
 ---
@@ -170,7 +177,8 @@ donc à dérouler **pas à pas, avec QA visuelle sur device** :
 
 1. `npm test` — la suite complète doit rester **verte** (dont
    `design-coherence.test.js`, **cliquet anti-régression** : 0 dérive, palette
-   ≥ 60, rayons ≥ 90, composite ≥ 58 — seuils remontés à chaque lot livré) ;
+   ≥ 60, rayons ≥ 90, espacement ≥ 95, composite ≥ 68 — seuils remontés à
+   chaque lot livré) ;
 2. `npm run quality -- --only lighthouse` — **Perf / A11y / BP / SEO** ne doivent
    pas régresser (référence : 94 / 100 / 100 / 100).
 
