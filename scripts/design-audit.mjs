@@ -14,7 +14,9 @@
 //      l'ad hoc.
 //   3. Échelle typographique  — les tailles de police suivent-elles une gamme
 //      modulaire cohérente ?
-//   4. Grille d'espacement    — paddings/margins/gaps sur une grille de 4 px.
+//   4. Grille d'espacement    — paddings/margins/gaps sur la grille réelle du
+//      design : pas de 2 px (6/10/14/18 sont des tokens signature à forte
+//      fréquence ; une grille de 4 px les aurait pénalisés à tort).
 //
 // Sortie : un score de cohérence 0-100 + les points chauds à corriger.
 // Aucune dépendance externe, pur JS — reproductible et hors-ligne.
@@ -139,7 +141,7 @@ for (let i = 0; i < colorList.length; i++) {
 const RADIUS_SCALE = [0, 4, 8, 12, 14, 16, 20, 28, 999]
 const offScale = (val, scale, tol = 1) => !scale.some(s => Math.abs(s - val) <= tol)
 const radiusIssues = [...radii.entries()].filter(([v]) => offScale(v, RADIUS_SCALE, 0.5))
-const spacingOffGrid = [...spacing.entries()].filter(([v]) => v % 4 !== 0 && v > 2)
+const spacingOffGrid = [...spacing.entries()].filter(([v]) => v % 2 !== 0 && v > 1)
 const fontSizes = [...fonts.keys()].sort((a, b) => a - b)
 
 // ── Score composite ───────────────────────────────────────────────────────────
@@ -179,7 +181,7 @@ console.log(`  ${close.length} paires quasi-doublons (2≤ΔE<5).\n`)
 console.log(`● Rayons hors échelle {${RADIUS_SCALE.filter(v => v && v < 999).join(',')}} : ${radiusIssues.length} valeurs`)
 console.log('     ' + radiusIssues.sort((a, b) => b[1] - a[1]).map(([v, n]) => `${v}px×${n}`).join('  ') + '\n')
 
-console.log(`● Espacements hors grille 4px : ${spacingOffGrid.length} valeurs`)
+console.log(`● Espacements hors grille 2px : ${spacingOffGrid.length} valeurs`)
 console.log('     ' + spacingOffGrid.sort((a, b) => b[1] - a[1]).slice(0, 12).map(([v, n]) => `${v}px×${n}`).join('  ') + '\n')
 
 console.log(`● Tailles de police (${fontSizes.length}) : ${fontSizes.map(v => v + 'px').join(' ')}\n`)

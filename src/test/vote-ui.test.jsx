@@ -24,6 +24,7 @@ beforeEach(() => { localStorageMock.clear() })
 const openVote = async (user) => {
   await user.click(screen.getByTestId('tab-visites'))
   await user.click(screen.getByTestId('btn-open-vote'))
+  await screen.findByTestId('vote-new-voter') // modale lazy : attendre le chunk
 }
 
 describe('Vote familial (UI, pass-and-play)', () => {

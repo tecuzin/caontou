@@ -16,7 +16,7 @@ export function WhatsNewModal({ isOpen, onClose, sx, entries }) {
           <div key={e.build} style={sx('margin-bottom:14px;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;color:#9c6b4a;margin-bottom:6px;')}>Version {e.version} · build {e.build}</div>
             {e.items.map((it, i) => (
-              <div key={i} style={sx('display:flex;gap:8px;font-size:14px;padding:3px 0;')}><span>{it}</span></div>
+              <div key={i} style={sx('display:flex;gap:8px;font-size:14px;padding:4px 0;')}><span>{it}</span></div>
             ))}
           </div>
         ))}

@@ -32,10 +32,10 @@ export function Planning({
         </div>
         {cur.items.map((it, i) => (
           <div key={i} style={sx('display:flex;gap:12px;')}>
-            <div style={sx('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:1px;')}>{it.time}</div>
+            <div style={sx('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:2px;')}>{it.time}</div>
             <div style={sx('display:flex;flex-direction:column;align-items:center;flex:0 0 auto;')}>
-              <div style={sx(`width:13px;height:13px;border-radius:50%;background:${it.color};margin-top:3px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${it.color};`)} />
-              <div style={sx('flex:1;width:2px;background:#e3d8c2;margin:3px 0;')} />
+              <div style={sx(`width:13px;height:13px;border-radius:50%;background:${it.color};margin-top:4px;border:2px solid #f4ecdc;box-shadow:0 0 0 1px ${it.color};`)} />
+              <div style={sx('flex:1;width:2px;background:#e3d8c2;margin:4px 0;')} />
             </div>
             <div style={sx('flex:1;padding-bottom:18px;')}>
               <div style={sx('display:flex;align-items:center;gap:8px;')}>

@@ -23,7 +23,7 @@ export function Budget({
           <div><div style={sx('font-size:12px;color:#c9d2b6;font-weight:700;letter-spacing:0.5px;')}>RESTANT</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:30px;margin-top:2px;')}>{eur(remain)}</div></div>
           <div style={sx('text-align:right;')}>
             <div style={sx('font-size:12px;color:#dbe2c9;')}>sur {eur(budgetTotal)}</div>
-            <button onClick={() => { setNewBudgetTotal(String(budgetTotal)); setShowBudgetTotalEdit(true) }} style={sx('margin-top:4px;border:none;background:rgba(255,255,255,0.15);color:#dbe2c9;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer;')}>✏️ Modifier</button>
+            <button onClick={() => { setNewBudgetTotal(String(budgetTotal)); setShowBudgetTotalEdit(true) }} style={sx('margin-top:4px;border:none;background:rgba(255,255,255,0.15);color:#dbe2c9;border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;')}>✏️ Modifier</button>
           </div>
         </div>
         <div style={sx('margin-top:14px;height:10px;border-radius:10px;background:rgba(255,255,255,0.18);overflow:hidden;')}><div style={sx(`height:100%;background:#e8c07a;width:${spentPct}%;`)} /></div>
@@ -37,7 +37,7 @@ export function Budget({
       )}
       <button data-testid="btn-add-depense" onClick={() => setShowAdd(true)} style={sx('margin:0 18px 18px;width:calc(100% - 36px);border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Ajouter une dépense</button>
       <div style={sx('padding:0 18px 8px;')}><SectionLabel sx={sx}>Par catégorie</SectionLabel></div>
-      <div style={sx('padding:0 18px 14px;display:flex;flex-direction:column;gap:13px;')}>
+      <div style={sx('padding:0 18px 14px;display:flex;flex-direction:column;gap:12px;')}>
         {budgetCats.map((c) => (
           <div key={c.name}>
             <div style={sx('display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;')}><span style={sx('font-weight:700;')}>{c.name}</span><span style={sx('font-weight:700;color:#6b6354;')}>{eur(c.amt)}</span></div>
@@ -47,7 +47,7 @@ export function Budget({
       </div>
       <div style={sx('padding:4px 18px 8px;display:flex;align-items:center;justify-content:space-between;')}>
         <SectionLabel sx={sx}>Dépenses</SectionLabel>
-        <button onClick={() => setSortExpenses(s2 => s2 === 'amt' ? 'date' : 'amt')} style={sx(`border:1px solid ${sortExpenses === 'amt' ? '#4a5d3a' : '#ece2cf'};background:${sortExpenses === 'amt' ? '#4a5d3a' : '#fffdf8'};color:${sortExpenses === 'amt' ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:5px 12px;font-weight:700;font-size:11px;cursor:pointer;`)}>↓ Par montant</button>
+        <button onClick={() => setSortExpenses(s2 => s2 === 'amt' ? 'date' : 'amt')} style={sx(`border:1px solid ${sortExpenses === 'amt' ? '#4a5d3a' : '#ece2cf'};background:${sortExpenses === 'amt' ? '#4a5d3a' : '#fffdf8'};color:${sortExpenses === 'amt' ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer;`)}>↓ Par montant</button>
       </div>
       <div style={sx('padding:0 18px;display:flex;flex-direction:column;gap:8px;')}>
         {(sortExpenses === 'amt'

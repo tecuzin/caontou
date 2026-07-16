@@ -102,7 +102,7 @@ describe('Journal de bord (UI)', () => {
     render(<App />)
     await user.click(screen.getByTestId('tab-planning'))
     await user.click(screen.getByTestId('btn-journal'))
-    await user.type(screen.getByTestId('journal-best'), 'la cascade')
+    await user.type(await screen.findByTestId('journal-best'), 'la cascade')
     await user.click(screen.getByTestId('mood-😊'))
     const stored = JSON.parse(window.localStorage.getItem('cantou.v1'))
     const entries = Object.values(stored.journal)

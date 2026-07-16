@@ -32,8 +32,8 @@ export function JournalModal({ isOpen, onClose, sx, dayLabel, entry, updateEntry
         <input data-testid="journal-quote" value={e.quote || ''} onChange={(ev) => updateEntry('quote', ev.target.value)} placeholder="Ex : « encore la cascade ! »" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
 
         <div style={sx('display:flex;gap:10px;')}>
-          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Fermer</button>
-          <button data-testid="btn-share-journal" onClick={onShare} disabled={!canShare} style={sx(`flex:1;border:none;background:${canShare ? '#cf7d3c' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:${canShare ? 'pointer' : 'default'};`)}>📤 Partager le journal</button>
+          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Fermer</button>
+          <button data-testid="btn-share-journal" onClick={onShare} disabled={!canShare} style={sx(`flex:1;border:none;background:${canShare ? '#cf7d3c' : '#d8cbb0'};color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:${canShare ? 'pointer' : 'default'};`)}>📤 Partager le journal</button>
         </div>
       </div>
     </ModalShell>

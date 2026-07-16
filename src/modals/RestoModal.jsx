@@ -23,9 +23,9 @@ export function RestoModal({ isOpen, onClose, sx, editing, fields, setField, onS
         <button data-testid="resto-reserved" onClick={() => setField('reserved', !fields.reserved)} style={sx(`width:100%;margin-bottom:18px;border:${fields.reserved ? '2px solid #4a5d3a' : '1px solid #d8cbb0'};background:${fields.reserved ? '#e7ecdf' : '#fffdf8'};color:#3a352b;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:12px;padding:12px;cursor:pointer;`)}>{fields.reserved ? '✓ Réservé' : 'Marquer comme réservé'}</button>
 
         <div style={sx('display:flex;gap:10px;')}>
-          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Annuler</button>
-          {editing && <button data-testid="resto-delete" onClick={onDelete} style={sx('flex:0 0 auto;border:1px solid #b8503f;background:#f7e2dc;color:#b8503f;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px 16px;cursor:pointer;')}>🗑️</button>}
-          <button data-testid="resto-save" onClick={onSubmit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:13px;cursor:pointer;')}>Enregistrer</button>
+          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+          {editing && <button data-testid="resto-delete" onClick={onDelete} style={sx('flex:0 0 auto;border:1px solid #b8503f;background:#f7e2dc;color:#b8503f;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px 16px;cursor:pointer;')}>🗑️</button>}
+          <button data-testid="resto-save" onClick={onSubmit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
         </div>
       </div>
     </ModalShell>

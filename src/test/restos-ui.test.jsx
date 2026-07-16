@@ -35,7 +35,7 @@ describe('Carnet de restaurants (UI)', () => {
     render(<App />)
     await openRestos(user)
     await user.click(screen.getByTestId('btn-add-resto'))
-    await user.type(screen.getByTestId('resto-name'), 'Auberge test')
+    await user.type(await screen.findByTestId('resto-name'), 'Auberge test')
     await user.type(screen.getByTestId('resto-place'), 'Mur-de-Barrez')
     await user.type(screen.getByTestId('resto-tel'), '04 71 47 50 00')
     await user.click(screen.getByTestId('resto-reserved'))
