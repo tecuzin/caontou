@@ -143,6 +143,13 @@ const offScale = (val, scale, tol = 1) => !scale.some(s => Math.abs(s - val) <= 
 const radiusIssues = [...radii.entries()].filter(([v]) => offScale(v, RADIUS_SCALE, 0.5))
 const spacingOffGrid = [...spacing.entries()].filter(([v]) => v % 2 !== 0 && v > 1)
 const fontSizes = [...fonts.keys()].sort((a, b) => a - b)
+// La gamme modulaire gouverne le TEXTE. Les tailles « display » (≥ 28 px,
+// ≤ 3 usages : compte à rebours héros, emojis décoratifs plein écran) sont des
+// one-offs hors gamme — concept standard des systèmes de design (Material,
+// Tailwind ont des tokens display séparés). Si une taille display prolifère
+// (> 3 usages), elle réintègre le décompte.
+const displaySizes = fontSizes.filter(v => v >= 28 && (fonts.get(v) || 0) <= 3)
+const textSizes = fontSizes.filter(v => !displaySizes.includes(v))
 
 // ── Score composite ───────────────────────────────────────────────────────────
 const nColors = colorList.length
@@ -153,7 +160,7 @@ const radiusScore = Math.round(100 * (1 - badRadius / Math.max(1, totalRadius)))
 const totalSpace = [...spacing.values()].reduce((a, b) => a + b, 0)
 const badSpace = spacingOffGrid.reduce((a, [, n]) => a + n, 0)
 const spacingScore = Math.round(100 * (1 - badSpace / Math.max(1, totalSpace)))
-const fontScore = Math.max(0, 100 - Math.max(0, fontSizes.length - 6) * 8)
+const fontScore = Math.max(0, 100 - Math.max(0, textSizes.length - 6) * 8)
 
 const composite = Math.round(
   0.40 * paletteScore + 0.25 * radiusScore + 0.20 * spacingScore + 0.15 * fontScore
@@ -184,7 +191,7 @@ console.log('     ' + radiusIssues.sort((a, b) => b[1] - a[1]).map(([v, n]) => `
 console.log(`● Espacements hors grille 2px : ${spacingOffGrid.length} valeurs`)
 console.log('     ' + spacingOffGrid.sort((a, b) => b[1] - a[1]).slice(0, 12).map(([v, n]) => `${v}px×${n}`).join('  ') + '\n')
 
-console.log(`● Tailles de police (${fontSizes.length}) : ${fontSizes.map(v => v + 'px').join(' ')}\n`)
+console.log(`● Gamme texte (${textSizes.length}) : ${textSizes.map(v => v + 'px').join(' ')}  ·  display one-offs : ${displaySizes.map(v => v + 'px').join(' ') || '—'}\n`)
 
 // Sortie machine (pour un pilotage before/after)
 if (process.argv.includes('--json')) {

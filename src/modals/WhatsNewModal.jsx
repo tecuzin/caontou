@@ -10,7 +10,7 @@ export function WhatsNewModal({ isOpen, onClose, sx, entries }) {
     <ModalShell onClose={onClose} z={210} fade={true}>
       <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:82vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-        <div style={sx('font-family:Quicksand;font-weight:700;font-size:21px;margin-bottom:2px;')}>🆕 Quoi de neuf ?</div>
+        <div style={sx('font-family:Quicksand;font-weight:700;font-size:22px;margin-bottom:2px;')}>🆕 Quoi de neuf ?</div>
         <div style={sx('font-size:13px;color:#6b6354;margin-bottom:16px;')}>Les nouveautés de l'app des vacances depuis ta dernière ouverture.</div>
         {entries.map((e) => (
           <div key={e.build} style={sx('margin-bottom:14px;')}>

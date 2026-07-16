@@ -129,7 +129,7 @@ export function Accueil({
       <div style={sx('padding:0 18px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;')}>
         {MODULES.map((m) => (
           <button key={m.name} onClick={() => openModule(m.action)} style={sx('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-            <div style={sx(`width:42px;height:42px;border-radius:14px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:21px;`)}>{m.emoji}</div>
+            <div style={sx(`width:42px;height:42px;border-radius:14px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:22px;`)}>{m.emoji}</div>
             <div>
               <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{m.name}</div>
               <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>{m.sub}</div>
@@ -141,7 +141,7 @@ export function Accueil({
       <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🎲 Jeux avec les enfants</div>
       <div style={sx('padding:0 18px 12px;')}>
         <button data-testid="btn-open-bingo" onClick={() => setSub('bingo')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🔍</div>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🔍</div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Bingo du Cantal</div>
             <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>16 trésors à repérer · une ligne complète = 🎉</div>
@@ -149,7 +149,7 @@ export function Accueil({
           <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>›</div>
         </button>
         <button data-testid="btn-toggle-games" onClick={() => setGamesOpen((o) => !o)} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:21px;')}>🎲</div>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🎲</div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Idées de jeux</div>
             <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>{KIDS_GAMES.length} activités nature, au gîte et le soir</div>
@@ -162,7 +162,7 @@ export function Accueil({
               <div key={i} style={sx('display:flex;gap:12px;align-items:flex-start;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
                 <div style={sx('width:44px;height:44px;flex:0 0 auto;border-radius:14px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:22px;')}>{g.emoji}</div>
                 <div style={sx('flex:1;min-width:0;')}>
-                  <div style={sx(`font-size:11px;font-weight:700;color:${g.color};text-transform:uppercase;letter-spacing:0.5px;`)}>{g.place}</div>
+                  <div style={sx(`font-size:12px;font-weight:700;color:${g.color};text-transform:uppercase;letter-spacing:0.5px;`)}>{g.place}</div>
                   <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{g.name}</div>
                   <div style={sx('font-size:12px;color:#6b6354;margin-top:4px;line-height:1.4;')}>{g.desc}</div>
                 </div>
@@ -197,7 +197,7 @@ export function Accueil({
         <div data-testid="emergency-block" style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:6px 14px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
           {EMERGENCY_NUMBERS.map((e, i) => (
             <div key={e.num} style={sx(`display:flex;align-items:center;gap:10px;padding:10px 0;${i < EMERGENCY_NUMBERS.length - 1 ? 'border-bottom:1px solid #f1e9da;' : ''}`)}>
-              <span style={sx('font-size:18px;flex:0 0 auto;')}>{e.emoji}</span>
+              <span style={sx('font-size:19px;flex:0 0 auto;')}>{e.emoji}</span>
               <span style={sx('flex:1;font-size:14px;color:#3a352b;')}>{e.label}</span>
               <TelLink sx={sx} num={e.num} style={'color:#b8503f;font-weight:700;text-decoration:none;font-family:Quicksand;font-size:16px;'}>📞 {e.num}</TelLink>
             </div>
@@ -208,7 +208,7 @@ export function Accueil({
 
       <div style={sx('padding:6px 18px 12px;')}>
         <button data-testid="btn-open-bilan" onClick={() => setSub('bilan')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#f3e2d6;display:flex;align-items:center;justify-content:center;font-size:21px;')}>📊</div>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#f3e2d6;display:flex;align-items:center;justify-content:center;font-size:22px;')}>📊</div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Bilan du séjour</div>
             <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>Stats & récap à partager</div>

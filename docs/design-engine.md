@@ -71,9 +71,15 @@ trahissent l'ad hoc. Score = part des usages sur l'échelle.
 
 ### 2.3 Échelle typographique
 
-Nombre de tailles de police distinctes. Une gamme modulaire lisible en compte
-~6–7 (légende, corps, sous-titre, titre, gros titre, hero). Au-delà, le rythme
-vertical se brouille. Score dégressif au-delà de 6 tailles.
+Nombre de tailles de police distinctes **dans la gamme texte**. Une gamme
+modulaire lisible en compte ~6–7 (légende, corps, sous-titre, titre, gros
+titre). Au-delà, le rythme vertical se brouille. Score dégressif au-delà de
+6 tailles. Les tailles **display** (≥ 28 px, ≤ 3 usages — compte à rebours
+héros, emojis décoratifs plein écran) sont des one-offs hors gamme, listées à
+part : concept standard (Material/Tailwind ont des tokens display séparés).
+Une taille display qui prolifère (> 3 usages) réintègre le décompte. Nuance
+découverte pendant le lot : la moitié des « tailles orphelines » étaient des
+**emojis**, pas du texte.
 
 ### 2.4 Grille d'espacement
 
@@ -147,7 +153,9 @@ Le moteur encode cette nuance plutôt que de « corriger » à l'aveugle.
 | B74 | Score rayons           |  54   | **98**| échelle honnête {4,8,12,14,16,20,28}  |
 | B82 | Espacements impairs    | 124   | **0** | snap ±1 px vers le pair fréquent      |
 | B82 | Score espacement       |  49   |**100**| grille honnête 2 px                   |
-| —   | **Score composite**    | **23**| **70**| B73 : 49 · B74 : 60 · B82 : 70        |
+| B83 | Tailles de police      |  19   | **13**| 43 snaps ±1-2 px vers le voisin fréquent |
+| B83 | Score typo             |   0   | **68**| gamme texte = 10 pas · 3 display à part |
+| —   | **Score composite**    | **23**| **80**| B73 : 49 · B74 : 60 · B82 : 70 · B83 : 80 |
 
 Étape rayons (B74) : les rayons orphelins ont été ramenés sur les tokens réels
 (la carte = 14px, le sheet = 28px). Le seul résidu est `10px` (×8). À chaque
@@ -165,8 +173,11 @@ donc à dérouler **pas à pas, avec QA visuelle sur device** :
 
 - ✅ **Rayons** (B74) : orphelins snappés sur l'échelle {4,8,12,14,16,20,28}.
 - ✅ **Espacement** (B82) : 124 valeurs impaires snappées sur la grille 2 px.
-- **Typo** : ramener les ~19 tailles à une gamme modulaire (~7 pas) — dernier
-  levier (score typo 0, poids 0,15 → composite max atteignable ≈ 85).
+- ✅ **Typo** (B83) : 19 → 13 tailles (gamme texte 10 pas + 3 display).
+  Le cœur dense 12/13/14/15 (438 usages) est l'identité du design — conservé.
+- **Élévation** : unifier les ombres ad hoc en une échelle à 3 niveaux (dernier
+  levier restant ; le composite est plafonné par la palette : les paires
+  2≤ΔE<5 restantes sont des choix perceptibles, pas de la dérive).
 - **Élévation** : unifier les ombres ad hoc en une échelle d'élévation à 3 niveaux.
 
 ---
@@ -177,8 +188,8 @@ donc à dérouler **pas à pas, avec QA visuelle sur device** :
 
 1. `npm test` — la suite complète doit rester **verte** (dont
    `design-coherence.test.js`, **cliquet anti-régression** : 0 dérive, palette
-   ≥ 60, rayons ≥ 90, espacement ≥ 95, composite ≥ 68 — seuils remontés à
-   chaque lot livré) ;
+   ≥ 60, rayons ≥ 90, espacement ≥ 95, typo ≥ 60, composite ≥ 78 — seuils
+   remontés à chaque lot livré) ;
 2. `npm run quality -- --only lighthouse` — **Perf / A11y / BP / SEO** ne doivent
    pas régresser (référence : 94 / 100 / 100 / 100).
 

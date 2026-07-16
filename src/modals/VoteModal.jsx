@@ -97,7 +97,7 @@ export function VoteModal({ isOpen, onClose, sx, visits, savedVisitIds, familyMe
       <div style={sx('display:flex;flex-direction:column;gap:10px;')}>
         {candidates.map((v) => (
           <button key={v.id} data-testid={`vote-pick-${v.id}`} onClick={() => castVote(v.id)} style={sx('display:flex;align-items:center;gap:12px;text-align:left;border:1px solid #e3d8c2;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.06);')}>
-            <span style={sx('font-size:24px;flex:0 0 auto;')}>{v.emoji}</span>
+            <span style={sx('font-size:26px;flex:0 0 auto;')}>{v.emoji}</span>
             <span style={sx('flex:1;font-size:15px;font-weight:700;font-family:Quicksand;')}>{v.name}</span>
           </button>
         ))}
@@ -115,7 +115,7 @@ export function VoteModal({ isOpen, onClose, sx, visits, savedVisitIds, familyMe
     <div style={sx('text-align:center;')}>
       <div style={sx('font-size:44px;')}>{winner?.emoji || '🎉'}</div>
       <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#9c6b4a;margin-top:4px;')}>La famille a choisi</div>
-      <div data-testid="vote-winner" style={sx('font-family:Quicksand;font-weight:700;font-size:21px;margin:4px 0 16px;')}>{winner?.name || '—'}</div>
+      <div data-testid="vote-winner" style={sx('font-family:Quicksand;font-weight:700;font-size:22px;margin:4px 0 16px;')}>{winner?.name || '—'}</div>
     </div>
     <div style={sx('font-size:12px;font-weight:700;color:#6b6354;margin-bottom:8px;')}>Ajouter au planning du jour</div>
     <select data-testid="vote-target-day" value={targetDay} onChange={(e) => setTargetDay(Number(e.target.value))} style={sx('width:100%;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;margin-bottom:18px;')}>

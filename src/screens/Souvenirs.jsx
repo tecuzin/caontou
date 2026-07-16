@@ -56,7 +56,7 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
 
       {groups.length === 0 && (
         <div style={sx('margin-top:22px;text-align:center;color:#9a917f;font-size:14px;line-height:1.6;')}>
-          <div style={sx('font-size:40px;')}>🏔️</div>
+          <div style={sx('font-size:44px;')}>🏔️</div>
           Aucune photo pour l'instant.<br />Le premier souvenir n'attend que vous !
         </div>
       )}

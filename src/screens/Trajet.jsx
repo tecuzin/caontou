@@ -52,7 +52,7 @@ export function Trajet({
       <button onClick={() => { setEditingTrajetIdx(null); setNewTrajetTime(''); setNewTrajetPlace(''); setNewTrajetNote(''); setNewTrajetColor('#5b7042'); setShowTrajetEdit(true) }} style={sx('width:100%;margin:4px 0 16px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;')}>+ Ajouter une étape</button>
       <div style={sx('display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Avant de partir · {tr.done}/{tr.total}</div>
-        <button onClick={() => setShowAddTrajetCheck(true)} style={sx('border:none;background:transparent;cursor:pointer;font-size:18px;padding:2px 4px;color:#9c6b4a;')}>＋</button>
+        <button onClick={() => setShowAddTrajetCheck(true)} style={sx('border:none;background:transparent;cursor:pointer;font-size:19px;padding:2px 4px;color:#9c6b4a;')}>＋</button>
       </div>
       <div style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
         {tr.items.map((it) => (

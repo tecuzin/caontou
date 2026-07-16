@@ -20,8 +20,8 @@ export function Bingo({ sx, items, checked, toggleBingo }) {
           const on = !!checked[i]
           return (
             <button key={i} data-testid={`bingo-cell-${i}`} onClick={() => toggleBingo(i)} style={sx(`aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;border:${on ? '2px solid #4a5d3a' : '1px solid #e3d8c2'};background:${on ? '#e7ecdf' : '#fffdf8'};border-radius:14px;padding:4px;cursor:pointer;box-shadow:0 2px 6px rgba(74,93,58,0.06);`)}>
-              <span style={sx(`font-size:24px;${on ? '' : 'filter:grayscale(0.4);opacity:0.85;'}`)}>{on ? '✅' : it.emoji}</span>
-              <span style={sx('font-size:9px;line-height:1.15;font-weight:700;color:#6b6354;')}>{it.label}</span>
+              <span style={sx(`font-size:26px;${on ? '' : 'filter:grayscale(0.4);opacity:0.85;'}`)}>{on ? '✅' : it.emoji}</span>
+              <span style={sx('font-size:10px;line-height:1.15;font-weight:700;color:#6b6354;')}>{it.label}</span>
             </button>
           )
         })}

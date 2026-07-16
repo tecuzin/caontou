@@ -14,7 +14,7 @@ export function Planning({
         {days.map((d, i) => (
           <button key={i} onClick={() => setDay(i)} style={sx(`flex:0 0 auto;width:54px;border:1px solid ${i === day ? '#4a5d3a' : '#ece2cf'};background:${i === day ? '#4a5d3a' : '#fffdf8'};color:${i === day ? '#fffaf0' : '#6b6354'};border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;`)}>
             <span style={sx('font-size:12px;font-weight:600;')}>{d.dow}</span>
-            <span style={sx('font-family:Quicksand;font-weight:700;font-size:18px;')}>{d.num}</span>
+            <span style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>{d.num}</span>
           </button>
         ))}
         <button data-testid="btn-add-day" onClick={() => setShowDayAdd(true)} style={sx('flex:0 0 auto;width:54px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:20px;font-weight:700;')}>＋</button>

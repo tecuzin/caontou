@@ -25,7 +25,7 @@ export function ImportModal({ isOpen, onClose, importText, setImportText, import
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Importer des données</div>
         <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Coller un export Cantou ci-dessous, ou choisir le fichier JSON.</div>
-        <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); doParseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={sx('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:11px;font-family:ui-monospace,monospace;resize:none;')} />
+        <textarea data-testid="import-textarea" value={importText} onChange={(e) => { setImportText(e.target.value); doParseImport(e.target.value) }} placeholder='{"app":"cantou", …}' style={sx('width:100%;height:140px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:12px;font-family:ui-monospace,monospace;resize:none;')} />
         <label style={sx('display:block;margin-top:10px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;text-align:center;')}>
           📂 Choisir un fichier…
           <input type="file" accept=".json,application/json" onChange={handleImportFile} style={sx('display:none;')} />
