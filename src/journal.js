@@ -10,7 +10,13 @@ export const MOODS = ['😍', '😊', '🙂', '😴', '🌧️']
 
 /** True si l'entrée contient au moins un champ rempli. */
 export function hasJournalEntry(entry) {
-  return !!(entry && (entry.best?.trim() || entry.quote?.trim() || entry.mood))
+  return !!(entry && (entry.text?.trim() || entry.best?.trim() || entry.quote?.trim() || entry.mood))
+}
+
+/** Court extrait d'une entrée pour l'aperçu (Souvenirs). */
+export function journalSnippet(entry, max = 90) {
+  const raw = (entry?.text || entry?.best || entry?.quote || '').trim().replace(/\s+/g, ' ')
+  return raw.length > max ? `${raw.slice(0, max - 1)}…` : raw
 }
 
 /** Compile le journal complet en texte partageable. */
@@ -22,6 +28,7 @@ export function buildJournalText(days, journal) {
     if (!hasJournalEntry(e)) return
     const lines = [`${d.dow} ${d.num} — ${d.title}`]
     if (e.mood) lines.push(`Humeur : ${e.mood}`)
+    if (e.text?.trim()) lines.push(e.text.trim())
     if (e.best?.trim()) lines.push(`⭐ Moment préféré : ${e.best.trim()}`)
     if (e.quote?.trim()) lines.push(`💬 Phrase du jour : ${e.quote.trim()}`)
     parts.push(lines.join('\n'))
