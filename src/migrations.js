@@ -1,11 +1,11 @@
-import { TRIP_INITIAL, TRAJETS_INITIAL } from './data.js'
+import { TRIP_INITIAL, TRAJETS_INITIAL, VISITS_INITIAL } from './data.js'
 
 /**
  * Migration system pour cantou.v1 store.
  * Applique les transformations ordonnées au chargement (ensureStoreIsUpToDate).
  */
 
-export const LATEST_SCHEMA = 2
+export const LATEST_SCHEMA = 3
 
 const MIGRATIONS = [
   // v1 → v2 : re-basage Carladès. Les stores créés par les premiers builds
@@ -38,6 +38,26 @@ const MIGRATIONS = [
       // dupliquées depuis HEB_INITIAL — App.jsx — pour éviter un import circulaire).
       if (s.hebergement && staleRe.test(`${s.hebergement.nom || ''} ${s.hebergement.adresse || ''}`)) {
         s.hebergement = { ...s.hebergement, nom: 'Notre gîte en Carladès', adresse: 'Vezels-Roussy (15130)' }
+      }
+      return s
+    },
+  },
+  // v2 → v3 : la carte du séjour a besoin de coordonnées. On backfill lat/lng
+  // sur les visites déjà persistées (par id, depuis VISITS_INITIAL) sans
+  // écraser d'éventuelles coords déjà présentes ni toucher aux visites
+  // personnalisées de l'utilisateur (id inconnu → laissées telles quelles).
+  {
+    from: 2,
+    to: 3,
+    apply(store) {
+      const s = { ...store }
+      if (Array.isArray(s.visits)) {
+        const coords = new Map(VISITS_INITIAL.map((v) => [v.id, { lat: v.lat, lng: v.lng }]))
+        s.visits = s.visits.map((v) => {
+          if (typeof v.lat === 'number' && typeof v.lng === 'number') return v
+          const c = coords.get(v.id)
+          return c ? { ...v, lat: c.lat, lng: c.lng } : v
+        })
       }
       return s
     },

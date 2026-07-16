@@ -15,6 +15,7 @@ const MODULES = [
   { emoji: '🍴', name: 'Restos', sub: 'Adresses & résas', bg: '#f1e4d4', action: 'sub:restos' },
   { emoji: '🔑', name: 'Départ du gîte', sub: 'Avant de rendre les clés', bg: '#f1e4d4', action: 'sub:departure' },
   { emoji: '🧭', name: 'Itinéraire', sub: 'Sorties par proximité', bg: '#e7ecdf', action: 'sub:itineraire' },
+  { emoji: '🗺️', name: 'Carte', sub: 'Séjour & voiture', bg: '#dfeae6', action: 'sub:carte' },
 ]
 
 /** Écran Accueil — carte de la prochaine aventure, aujourd'hui, modules, suggestions et sauvegarde. */

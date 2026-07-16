@@ -69,10 +69,40 @@ describe('Store migrations', () => {
       expect(result.trajets.aller[0].place).toBe('Depart de Lille')
     })
 
-    it('est un no-op pour un store déjà en v2', () => {
+    it('est un no-op sur trip pour un store déjà en v2', () => {
       const store = { schemaVersion: 2, trip: { origin: 'Lyon' } } // « Lyon » choisi volontairement en v2
       const result = applyMigrations(store, 2)
       expect(result.trip.origin).toBe('Lyon')
+    })
+  })
+
+  describe('v2 → v3 : backfill des coordonnées de visites', () => {
+    it('ajoute lat/lng par id sur les visites connues sans coords', () => {
+      const store = { schemaVersion: 2, visits: [{ id: 1, name: 'Pas de Cère' }] }
+      const result = applyMigrations(store, 2)
+      expect(typeof result.visits[0].lat).toBe('number')
+      expect(typeof result.visits[0].lng).toBe('number')
+      expect(result.schemaVersion).toBe(3)
+    })
+
+    it('ne réécrit pas des coords déjà présentes', () => {
+      const store = { schemaVersion: 2, visits: [{ id: 1, name: 'X', lat: 12.3, lng: 4.5 }] }
+      const result = applyMigrations(store, 2)
+      expect(result.visits[0].lat).toBe(12.3)
+      expect(result.visits[0].lng).toBe(4.5)
+    })
+
+    it('laisse intactes les visites personnalisées (id inconnu)', () => {
+      const store = { schemaVersion: 2, visits: [{ id: 9999, name: 'Ma visite perso' }] }
+      const result = applyMigrations(store, 2)
+      expect(result.visits[0]).toEqual({ id: 9999, name: 'Ma visite perso' })
+    })
+
+    it('backfill aussi via la chaîne v1 → v3', () => {
+      const store = { visits: [{ id: 2, name: 'Le Lioran' }] }
+      const result = applyMigrations(store, 1)
+      expect(typeof result.visits[0].lat).toBe('number')
+      expect(result.schemaVersion).toBe(3)
     })
   })
 })

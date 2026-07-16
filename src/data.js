@@ -11,6 +11,10 @@ export const TRIP_INITIAL = {
   destination: 'Vezels-Roussy (Cantal)',
 }
 
+// Coordonnées du gîte (Vezels-Roussy, 15130, Carladès) — centre par défaut de
+// la carte du séjour. Approximatives (~bourg de Vezels-Roussy).
+export const GITE_COORDS = { lat: 44.827, lng: 2.566 }
+
 export const MEALS_INITIAL = [
   { id: 1, day: 'Mer 5', dish: 'Etape a Laschamps — resto simple' },
   { id: 2, day: 'Jeu 6', dish: 'Pates au pesto (soir arrivee)' },
@@ -171,24 +175,27 @@ export const TRAJETS_INITIAL = {
 // d'Aurillac). Distances de route indicatives depuis Vezels-Roussy. Les sites
 // emblématiques du nord (Puy Mary, Salers) sont conservés mais étiquetés
 // « grande sortie » (~1 h de route), plus à « 25 min » comme avant.
+// `lat`/`lng` : coordonnées réelles approximatives (site/bourg) servant à
+// placer les visites sur la carte du séjour. Précision « à la commune » —
+// suffisante pour une carte schématique relative au gîte, pas pour naviguer.
 export const VISITS_INITIAL = [
-  { id: 1, emoji: '🌉', name: 'Pas de Cère — sentier des passerelles', cat: 'Nature', dist: '30 min', dur: '1 h 30', age: 'Des 4 ans' },
-  { id: 2, emoji: '🚠', name: 'Le Lioran — télécabine du Plomb du Cantal', cat: 'Nature', dist: '45 min', dur: '½ journee', age: 'Tous ages' },
-  { id: 3, emoji: '🌲', name: 'Accrobranche « jungle verte » du Lioran', cat: 'Sport', dist: '45 min', dur: '½ journee', age: 'Des 3 ans' },
-  { id: 4, emoji: '💧', name: 'Cascade de la Conche (Vic-sur-Cère)', cat: 'Nature', dist: '30 min', dur: '45 min', age: 'Tous ages' },
-  { id: 5, emoji: '💦', name: 'Cascade du Faillitoux (Thiézac)', cat: 'Nature', dist: '35 min', dur: '1 h', age: 'Poussette non' },
-  { id: 6, emoji: '🏰', name: 'Château de Messilhac (Renaissance)', cat: 'Patrimoine', dist: '15 min', dur: '1 h', age: 'Des 5 ans' },
-  { id: 7, emoji: '🏘️', name: 'Village de Raulhac (Carladès)', cat: 'Patrimoine', dist: '15 min', dur: '1 h', age: 'Tous ages' },
-  { id: 8, emoji: '⛰️', name: 'Rocher de Ronesque (panorama 360°)', cat: 'Nature', dist: '12 min', dur: '1 h 30', age: 'Des 6 ans' },
-  { id: 9, emoji: '🪨', name: 'Site de Carlat (rocher historique)', cat: 'Patrimoine', dist: '20 min', dur: '1 h', age: 'Des 5 ans' },
-  { id: 10, emoji: '🎡', name: 'Parc de loisirs de Vic-sur-Cère', cat: 'Famille', dist: '30 min', dur: '½ journee', age: 'Tous ages' },
-  { id: 11, emoji: '🌋', name: 'Maison des Volcans, Aurillac', cat: 'Patrimoine', dist: '25 min', dur: '1 h 30', age: 'Des 3 ans' },
-  { id: 12, emoji: '🧺', name: 'Marché de Vic-sur-Cère', cat: 'Marché', dist: '30 min', dur: 'Matinée', age: 'Tous ages' },
-  { id: 13, emoji: '🏊', name: 'Lac de Saint-Etienne-Cantalès', cat: 'Baignade', dist: '50 min', dur: '½ journee', age: 'Tous ages' },
-  { id: 14, emoji: '🧀', name: 'Buronnerie & degustation Cantal', cat: 'Gourmand', dist: '30 min', dur: '1 h', age: 'Tous ages' },
-  { id: 15, emoji: '⛰️', name: 'Puy Mary — Pas de Peyrol (grande sortie)', cat: 'Nature', dist: '1 h 15', dur: 'Journée', age: 'Des 4 ans (porte-bebe)' },
-  { id: 16, emoji: '🏘️', name: 'Village de Salers (grande sortie)', cat: 'Patrimoine', dist: '1 h 20', dur: '½ journee', age: 'Poussette ok' },
-  { id: 17, emoji: '🚂', name: 'Gentiane Express (grande sortie)', cat: 'Famille', dist: '1 h 10', dur: '½ journee', age: 'Tous ages' },
+  { id: 1, emoji: '🌉', name: 'Pas de Cère — sentier des passerelles', cat: 'Nature', dist: '30 min', dur: '1 h 30', age: 'Des 4 ans', lat: 45.017, lng: 2.657 },
+  { id: 2, emoji: '🚠', name: 'Le Lioran — télécabine du Plomb du Cantal', cat: 'Nature', dist: '45 min', dur: '½ journee', age: 'Tous ages', lat: 45.083, lng: 2.744 },
+  { id: 3, emoji: '🌲', name: 'Accrobranche « jungle verte » du Lioran', cat: 'Sport', dist: '45 min', dur: '½ journee', age: 'Des 3 ans', lat: 45.098, lng: 2.751 },
+  { id: 4, emoji: '💧', name: 'Cascade de la Conche (Vic-sur-Cère)', cat: 'Nature', dist: '30 min', dur: '45 min', age: 'Tous ages', lat: 44.985, lng: 2.635 },
+  { id: 5, emoji: '💦', name: 'Cascade du Faillitoux (Thiézac)', cat: 'Nature', dist: '35 min', dur: '1 h', age: 'Poussette non', lat: 45.028, lng: 2.672 },
+  { id: 6, emoji: '🏰', name: 'Château de Messilhac (Renaissance)', cat: 'Patrimoine', dist: '15 min', dur: '1 h', age: 'Des 5 ans', lat: 44.858, lng: 2.663 },
+  { id: 7, emoji: '🏘️', name: 'Village de Raulhac (Carladès)', cat: 'Patrimoine', dist: '15 min', dur: '1 h', age: 'Tous ages', lat: 44.791, lng: 2.660 },
+  { id: 8, emoji: '⛰️', name: 'Rocher de Ronesque (panorama 360°)', cat: 'Nature', dist: '12 min', dur: '1 h 30', age: 'Des 6 ans', lat: 44.823, lng: 2.628 },
+  { id: 9, emoji: '🪨', name: 'Site de Carlat (rocher historique)', cat: 'Patrimoine', dist: '20 min', dur: '1 h', age: 'Des 5 ans', lat: 44.851, lng: 2.581 },
+  { id: 10, emoji: '🎡', name: 'Parc de loisirs de Vic-sur-Cère', cat: 'Famille', dist: '30 min', dur: '½ journee', age: 'Tous ages', lat: 44.982, lng: 2.625 },
+  { id: 11, emoji: '🌋', name: 'Maison des Volcans, Aurillac', cat: 'Patrimoine', dist: '25 min', dur: '1 h 30', age: 'Des 3 ans', lat: 44.918, lng: 2.457 },
+  { id: 12, emoji: '🧺', name: 'Marché de Vic-sur-Cère', cat: 'Marché', dist: '30 min', dur: 'Matinée', age: 'Tous ages', lat: 44.980, lng: 2.626 },
+  { id: 13, emoji: '🏊', name: 'Lac de Saint-Etienne-Cantalès', cat: 'Baignade', dist: '50 min', dur: '½ journee', age: 'Tous ages', lat: 44.903, lng: 2.222 },
+  { id: 14, emoji: '🧀', name: 'Buronnerie & degustation Cantal', cat: 'Gourmand', dist: '30 min', dur: '1 h', age: 'Tous ages', lat: 45.046, lng: 2.732 },
+  { id: 15, emoji: '⛰️', name: 'Puy Mary — Pas de Peyrol (grande sortie)', cat: 'Nature', dist: '1 h 15', dur: 'Journée', age: 'Des 4 ans (porte-bebe)', lat: 45.108, lng: 2.680 },
+  { id: 16, emoji: '🏘️', name: 'Village de Salers (grande sortie)', cat: 'Patrimoine', dist: '1 h 20', dur: '½ journee', age: 'Poussette ok', lat: 45.139, lng: 2.494 },
+  { id: 17, emoji: '🚂', name: 'Gentiane Express (grande sortie)', cat: 'Famille', dist: '1 h 10', dur: '½ journee', age: 'Tous ages', lat: 45.279, lng: 2.660 },
 ]
 
 export const METEO_INITIAL = [

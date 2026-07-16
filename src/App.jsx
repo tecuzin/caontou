@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { StatusBar, Style } from '@capacitor/status-bar'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL, GITE_COORDS } from './data.js'
 import { s, eur, buildList, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { filterAndSortVisits } from './visits.js'
 import { computeToday } from './today.js'
@@ -65,6 +65,7 @@ import { CarSpot } from './components/CarSpot.jsx'
 const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
 const Departure = lazy(() => import('./screens/Departure.jsx').then(m => ({ default: m.Departure })))
 const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ default: m.Itinerary })))
+const Carte = lazy(() => import('./screens/Carte.jsx').then(m => ({ default: m.Carte })))
 const RestoModal = lazy(() => import('./modals/RestoModal.jsx').then(mod => ({ default: mod.RestoModal })))
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
@@ -579,7 +580,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -1047,6 +1048,11 @@ export default function App() {
             {/* ITINÉRAIRE DU JOUR */}
             {sub === 'itineraire' && (
               <Itinerary sx={sx} visits={visits} saved={saved} openMaps={openMaps} />
+            )}
+
+            {/* CARTE DU SÉJOUR (hors-ligne) */}
+            {sub === 'carte' && (
+              <Carte sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} />
             )}
 
             {/* LOGISTIQUE */}
