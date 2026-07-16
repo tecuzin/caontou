@@ -30,6 +30,7 @@ import { useTrajets } from './hooks/useTrajets.js'
 import { shareSuggestions } from './suggestions.js'
 import { useExpenses } from './hooks/useExpenses.js'
 import { useMeals } from './hooks/useMeals.js'
+import { useRestos } from './hooks/useRestos.js'
 import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
@@ -379,7 +380,7 @@ export default function App() {
   const findCar = () => { if (carSpot) { haptic(ImpactStyle.Light); openExternal(mapsCoordsHref(carSpot.lat, carSpot.lng)) } }
   const forgetCar = () => { haptic(ImpactStyle.Light); setCarSpot(null) }
   // Carnet de restaurants (CRUD + réservations)
-  const [restos, setRestos] = useState(initial.restos || structuredClone(RESTOS_INITIAL))
+  const { restos, setRestos, addResto, updateResto, removeResto } = useRestos(initial.restos)
   const [departure, setDeparture] = useState(initial.departure || structuredClone(DEPARTURE_INITIAL))
   const toggleDeparture = (id) => { haptic(ImpactStyle.Light); setDeparture((l) => l.map((i) => i.id === id ? { ...i, done: !i.done } : i)) }
   const addDepartureItem = (label) => setDeparture((l) => [...l, { id: Date.now(), emoji: '✅', label, done: false }])
@@ -408,15 +409,12 @@ export default function App() {
   const saveResto = () => {
     if (!restoForm.name.trim()) return
     haptic(ImpactStyle.Medium)
-    if (editingRestoId === null) {
-      const id = (restos.reduce((m, r) => Math.max(m, r.id), 0) || 0) + 1
-      setRestos((list) => [...list, { id, ...restoForm, name: restoForm.name.trim() }])
-    } else {
-      setRestos((list) => list.map((r) => r.id === editingRestoId ? { ...r, ...restoForm, name: restoForm.name.trim() } : r))
-    }
+    const data = { ...restoForm, name: restoForm.name.trim() }
+    if (editingRestoId === null) addResto(data)
+    else updateResto(editingRestoId, data)
     setShowResto(false)
   }
-  const deleteResto = (id) => { haptic(ImpactStyle.Medium); setRestos((list) => list.filter((r) => r.id !== id)); setShowResto(false) }
+  const deleteResto = (id) => { haptic(ImpactStyle.Medium); removeResto(id); setShowResto(false) }
   const [bingo, setBingo] = useState(initial.bingo || {})
   const toggleBingo = (idx) => {
     haptic(ImpactStyle.Light)
