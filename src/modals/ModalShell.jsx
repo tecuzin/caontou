@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import { s } from '../utils.js'
+import { useEscapeKey } from '../hooks/useEscapeKey.js'
 
 /**
  * Coquille de modale accessible, partagée par toutes les feuilles (bottom
@@ -16,11 +16,7 @@ import { s } from '../utils.js'
  * z-index et animation de backdrop (paramétrés par `z` et `fade`).
  */
 export function ModalShell({ onClose, z = 200, fade = true, children }) {
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  useEscapeKey(onClose)
 
   const backdrop = `position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:${z};`
     + `display:flex;flex-direction:column;justify-content:flex-end;`

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { settlement } from '../settle.js'
+import { useEscapeKey } from '../hooks/useEscapeKey.js'
 
 const SectionLabel = ({ sx, children }) => (
   <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>{children}</div>
@@ -25,6 +26,7 @@ export function Budget({
   const { balances, transfers } = settlement(expenses, familyMembers)
   const shareActive = familyMembers.length >= 2 && expenses.some((e) => e.paidBy)
   const [receipt, setReceipt] = useState(null) // id du reçu ouvert en plein écran
+  useEscapeKey(() => setReceipt(null), !!receipt) // fermeture clavier du reçu
   return (
     <div data-testid="screen-budget">
       <div style={sx('padding:54px 18px 14px;')}>
@@ -105,9 +107,9 @@ export function Budget({
       )}
 
       {receipt && (
-        <div data-testid="receipt-viewer" onClick={() => setReceipt(null)} style={sx('position:fixed;inset:0;z-index:300;background:rgba(20,16,10,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;')}>
+        <div data-testid="receipt-viewer" role="presentation" onClick={() => setReceipt(null)} style={sx('position:fixed;inset:0;z-index:300;background:rgba(20,16,10,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease;')}>
           {srcMap[receipt] && <img src={srcMap[receipt]} alt="reçu" style={sx('max-width:100%;max-height:80%;border-radius:12px;object-fit:contain;')} />}
-          <button style={sx('margin-top:18px;border:1px solid rgba(255,255,255,0.4);background:transparent;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px 28px;cursor:pointer;')}>Fermer</button>
+          <button onClick={() => setReceipt(null)} style={sx('margin-top:18px;border:1px solid rgba(255,255,255,0.4);background:transparent;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px 28px;cursor:pointer;')}>Fermer</button>
         </div>
       )}
 

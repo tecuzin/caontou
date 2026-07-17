@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { groupPhotosByDay } from '../photos.js'
 import { hasJournalEntry, journalSnippet } from '../journal.js'
+import { useEscapeKey } from '../hooks/useEscapeKey.js'
 
 /** Vignette : charge son URL affichable à l'affichage (async Filesystem). */
 function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
@@ -17,6 +18,7 @@ function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
 /** Sous-écran Souvenirs — galerie photo du séjour regroupée par journée. */
 export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay, journal = {}, openDayJournal }) {
   const [viewer, setViewer] = useState(null) // meta de la photo ouverte en plein écran
+  useEscapeKey(() => setViewer(null), !!viewer) // fermeture clavier de la visionneuse
   const groups = groupPhotosByDay(photos, days)
   const journalDays = days
     .map((d, i) => ({ d, i, entry: journal[`${d.dow} ${d.num}`] }))
@@ -77,7 +79,7 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
 
       {/* Visionneuse plein écran */}
       {viewer && (
-        <div data-testid="photo-viewer" onClick={() => setViewer(null)} style={sx('position:fixed;inset:0;z-index:300;background:rgba(20,16,10,0.92);display:flex;flex-direction:column;animation:fadeIn 0.2s ease;')}>
+        <div data-testid="photo-viewer" role="presentation" onClick={() => setViewer(null)} style={sx('position:fixed;inset:0;z-index:300;background:rgba(20,16,10,0.92);display:flex;flex-direction:column;animation:fadeIn 0.2s ease;')}>
           <div style={sx('flex:1;display:flex;align-items:center;justify-content:center;padding:20px;min-height:0;')}>
             {srcMap[viewer.id] && <img src={srcMap[viewer.id]} alt="" style={sx('max-width:100%;max-height:100%;border-radius:12px;object-fit:contain;')} />}
           </div>

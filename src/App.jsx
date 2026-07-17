@@ -34,6 +34,7 @@ import { useRestos } from './hooks/useRestos.js'
 import { useDeparture } from './hooks/useDeparture.js'
 import { useRatings } from './hooks/useRatings.js'
 import { useFeatures } from './hooks/useFeatures.js'
+import { ModalShell } from './modals/ModalShell.jsx'
 import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
@@ -1198,8 +1199,8 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER UNE DÉPENSE ============ */}
       {showAdd && (
-        <div onClick={closeAdd} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={closeAdd} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Montant</div>
@@ -1242,13 +1243,13 @@ export default function App() {
               <button data-testid="btn-submit-depense" onClick={submitExpense} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* ============ FEUILLE : EDITER REPAS ============ */}
       {showMealEdit && (
-        <div onClick={closeMealEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={closeMealEdit} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealId === null ? 'Ajouter un repas' : `Repas du ${newMealDay}`}</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
@@ -1260,13 +1261,13 @@ export default function App() {
               <button onClick={saveMeal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* ============ FEUILLE : EDITER ACTIVITE PLANNING ============ */}
       {showActivityEdit && editingActivityIdx && (
-        <div onClick={closeActivityEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={closeActivityEdit} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer activite</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
@@ -1278,13 +1279,13 @@ export default function App() {
               <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* ============ FEUILLE : AJOUTER/EDITER JOUR ============ */}
       {showDayEdit && editingDayIdx !== null && (
-        <div onClick={closeDayEdit} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={closeDayEdit} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer jour</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
@@ -1297,13 +1298,13 @@ export default function App() {
               {days.length > 1 && <button onClick={() => { deleteDay(editingDayIdx); closeDayEdit() }} style={sx('flex:0 0 auto;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Supprimer</button>}
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* ============ FEUILLE : AJOUTER ACTIVITE ============ */}
       {showActivityAdd && (
-        <div onClick={closeActivityAdd} style={sx('position:absolute;inset:0;z-index:200;background:rgba(40,30,18,0.42);display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={closeActivityAdd} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter activite</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
@@ -1321,7 +1322,7 @@ export default function App() {
               <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {showAddLogiItem && <Suspense fallback={null}><AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} /></Suspense>}
@@ -1374,8 +1375,8 @@ export default function App() {
 
       {/* MODAL: Auto-diagnostic */}
       {showSelftest && (
-        <div onClick={() => setShowSelftest(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={() => setShowSelftest(false)} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Auto-diagnostic</div>
             <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Vérifications rapides exécutées directement sur ce téléphone (pas la suite de tests complète du build — voir le skill « release »).</div>
@@ -1395,7 +1396,7 @@ export default function App() {
             </div>
             <button onClick={() => setShowSelftest(false)} style={sx('width:100%;margin-top:14px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Fermer</button>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* MODAL: Paramètres du voyage */}
@@ -1403,8 +1404,8 @@ export default function App() {
 
       {/* MODAL: Nouvelle liste de logistique */}
       {showAddLogiList && (
-        <div onClick={() => setShowAddLogiList(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={() => setShowAddLogiList(false)} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle liste</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Emoji</div>
@@ -1416,13 +1417,13 @@ export default function App() {
               <button data-testid="btn-save-logi-list" onClick={addLogiList} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* MODAL: Nouvelle catégorie de courses */}
       {showAddCourseCat && (
-        <div onClick={() => setShowAddCourseCat(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={() => setShowAddCourseCat(false)} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle catégorie</div>
             <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
@@ -1432,13 +1433,13 @@ export default function App() {
               <button data-testid="btn-save-course-cat" onClick={addCourseCategory} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* MODAL: Ajouter un jour au planning */}
       {showDayAdd && (
-        <div onClick={() => setShowDayAdd(false)} style={sx('position:fixed;inset:0;background:rgba(40,30,18,0.42);z-index:200;display:flex;flex-direction:column;justify-content:flex-end;animation:fadeIn 0.2s ease;')}>
-          <div onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
+        <ModalShell onClose={() => setShowDayAdd(false)} z={200}>
+          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
             <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un jour</div>
             <div style={sx('display:flex;gap:10px;')}>
@@ -1460,7 +1461,7 @@ export default function App() {
               <button data-testid="btn-save-day-add" onClick={addDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
             </div>
           </div>
-        </div>
+        </ModalShell>
       )}
 
       {/* BANDEAU UNDO SUPPRESSION */}
