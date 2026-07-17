@@ -288,6 +288,16 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 > reset de style) + le viewer photo plein écran de Souvenirs (même patron Échap).
 > Ces conversions changent le rendu → à valider écran par écran sur device.
 
+## ✅ Complété — carte détaillée OpenTopoMap (17 juillet)
+
+- [x] **🗺️ Carte détaillée OpenTopoMap** (Ticket Epiq) : bouton « Carte détaillée »
+  depuis la carte du séjour (en ligne) → écran topographique OpenTopoMap avec
+  marqueurs (gîte, visites, voiture), zoom +/− et attribution OSM. **Repli auto**
+  sur la carte simplifiée hors-ligne. **Sans dépendance ni clé API** : `src/osm.js`
+  (projection Web Mercator, choix de zoom, grille de tuiles) ; tuiles chargées à
+  la demande. +13 tests, suite **542 verte**, vérifié en réel (Playwright).
+- ✅ **Duo carte complet** : simplifiée hors-ligne + détaillée OpenTopoMap.
+
 ## ✅ Complété — toutes les données dans le JSON (17 juillet)
 
 - [x] **📦 Toutes les données de référence dans le JSON** (Ticket Epiq) : plus
