@@ -288,6 +288,19 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 > reset de style) + le viewer photo plein écran de Souvenirs (même patron Échap).
 > Ces conversions changent le rendu → à valider écran par écran sur device.
 
+## ✅ Complété — fonctions désactivables (17 juillet)
+
+- [x] **🎛️ Toutes les fonctions désactivables** (Ticket Epiq) : écran **Réglages**
+  (tuile ⚙️ Accueil, jamais coupable) avec interrupteurs groupés Onglets /
+  Modules / Extras. Catalogue `src/features.js` (clés `tab_`/`mod_`/`extra_`,
+  défaut = activé → aucune migration), hook `useFeatures`. Objet `features`
+  persisté dans le store et **exporté dans le JSON** (`STORE_KEYS`). Gating :
+  barre du bas filtrée (accueil toujours présent + garde-fou), tuiles Accueil,
+  extras (défi, mémo voiture, vote). Données jamais supprimées. +15 tests,
+  suite **522 verte**, vérifié en réel (Playwright).
+- [ ] **📦 Toutes les données de référence dans le JSON** (jeux, bingo, urgences)
+  — ticket Epiq créé, à faire (dernier volet du refacto « tout personnalisable »).
+
 ## ✅ Complété — carte hors-ligne du séjour (16 juillet)
 
 - [x] **🗺️ Carte simplifiée hors-ligne** (module Accueil → « Carte ») : carte
