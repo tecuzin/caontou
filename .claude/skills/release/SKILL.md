@@ -141,7 +141,11 @@ curl -s -F "chat_id=${TELEGRAM_CHAT_ID}" \
 - [ ] `main` et `develop` sont synchronisés (`git log main..develop` ne montre
       que d'éventuels commits `chore: build.number` postérieurs)
 - [ ] APK reçu sur Telegram, digest keystore vérifié
-- [ ] `TODO.md` mis à jour (section Complété) — voir skill `project-manage`
+- [ ] **Board Epiq à jour** — Epiq est la **source de vérité unique du backlog** :
+      chaque carte livrée passée en UAT/EUA avec tags `buildNN`/`vX.Y.Z` +
+      commentaire (voir skill `project-manage`). C'est ici que se lit l'état réel
+      de la release, pas dans un fichier.
+- [ ] `TODO.md` mis à jour (journal des livraisons — pas un backlog)
 - [ ] README à jour si des fonctionnalités livrées changent l'usage documenté
 
 ## Rollback

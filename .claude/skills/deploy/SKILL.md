@@ -72,6 +72,10 @@ part. Garder le changelog **synchrone avec les cartes Epiq** passées en UAT/EUA
 
 ## Après chaque déploiement réussi : board Epiq (obligatoire)
 
+> **Epiq est la source de vérité unique du backlog** (board
+> `01KWSTHN79VWRQB7MGPQWR153M`). Un déploiement n'est « fini » que quand le board
+> reflète la livraison — c'est là qu'on lit l'état réel, pas dans un fichier.
+
 Pour **chaque carte Epiq embarquée** dans l'APK envoyé :
 1. La déplacer en **UAT/EUA** (id `01KX43H1Z2K4EWCCG0TV8CC8P5`) — c'est David
    qui teste puis la passera en Done (ne jamais le faire à sa place).

@@ -5,10 +5,18 @@ description: Gestion du projet Cantou — TODO, ADR, reprise de session
 
 # Project Management — Cantou
 
-Ce skill gère la traçabilité du projet : board Epiq (source de vérité des tâches),
-TODO.md et décisions d'architecture.
+Ce skill gère la traçabilité du projet : board Epiq, décisions d'architecture, et
+notes de session.
 
-## Board Epiq — workflow (source de vérité, consignes David 09/07/2026)
+> ## ⚠️ Epiq est la SOURCE DE VÉRITÉ UNIQUE du backlog
+> Le board Epiq (`01KWSTHN79VWRQB7MGPQWR153M`) est **le seul** endroit qui fait
+> foi pour les tâches, priorités et états. On lit Epiq pour savoir quoi faire,
+> on y écrit l'avancement (colonnes + tags + commentaires). **Aucun backlog
+> parallèle** : `TODO.md` n'est qu'un journal lisible des livraisons et notes de
+> reprise — jamais une liste de tâches faisant autorité. En cas de divergence,
+> **Epiq gagne** ; corriger `TODO.md`, pas l'inverse.
+
+## Board Epiq — workflow (source de vérité unique, consignes David 09/07/2026)
 
 Colonnes, dans l'ordre :
 
@@ -46,7 +54,7 @@ IDs utiles : board `01KWSTHN79VWRQB7MGPQWR153M` · Proposal `01KX43H1YZHXADB0SA2
 #    cartes revenues de UAT/EUA en Todo = rapports de test à corriger en priorité.
 #    → Taguer toute carte des colonnes actives (Proposal/Todo/In progress/UAT)
 #      restée SANS tag (voir « Tags de classification »).
-# 2. Lire le backlog complémentaire
+# 2. Lire les notes de session (PAS un backlog : Epiq fait foi pour les tâches)
 cat TODO.md
 
 # 3. Lire les ADR si on touche à l'architecture

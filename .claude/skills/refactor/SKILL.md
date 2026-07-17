@@ -12,8 +12,15 @@ raté — le test avait raison.
 
 ## Point de départ (toujours faire en premier)
 
+> **Epiq est la source de vérité unique du backlog** (board
+> `01KWSTHN79VWRQB7MGPQWR153M`). Un refactor important doit correspondre à une
+> carte Epiq en **Todo/In progress** (la déplacer en In progress au démarrage,
+> voir skill `project-manage`). `TODO.md` n'est qu'un journal, pas une liste de
+> tâches faisant autorité.
+
 ```bash
-cat TODO.md                                    # contexte, éviter de dupliquer du travail en cours
+mcp epiq_issue_list                            # QUOI faire : Epiq fait foi (cartes Todo/In progress)
+cat TODO.md                                    # notes de session (pas un backlog)
 wc -l src/*.jsx src/*.js                       # repérer les fichiers monolithiques
 npm run test:coverage                          # baseline chiffrée avant de toucher au code
 cgc update                                     # rafraîchir le graphe de code avant analyse
