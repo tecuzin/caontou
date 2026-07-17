@@ -40,6 +40,7 @@ export const FEATURE_GROUPS = [
       { key: 'extra_challenge', label: 'Défi du jour' },
       { key: 'extra_carspot', label: 'Mémo voiture' },
       { key: 'extra_vote', label: 'Vote familial' },
+      { key: 'extra_weather_suggestions', label: 'Suggestions météo' },
     ],
   },
 ]

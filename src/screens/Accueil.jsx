@@ -32,6 +32,7 @@ export function Accueil({
   dailyChallenge, challengeDone, markChallengeDone,
   carSpot, parkCar, findCar, forgetCar,
   isOn = () => true, kidsGames = KIDS_GAMES, emergencyNumbers = EMERGENCY_NUMBERS,
+  weatherSuggest = null, onOpenVisites,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   const shownModules = MODULES.filter((m) => {
@@ -113,6 +114,20 @@ export function Accueil({
             <div data-testid="challenge-done" style={sx('margin-top:12px;text-align:center;font-size:14px;font-weight:700;color:#5b7042;')}>✅ Défi relevé, bravo !</div>
           ) : (
             <button data-testid="btn-challenge-done" onClick={markChallengeDone} style={sx('margin-top:12px;width:100%;border:none;background:#5b7042;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>C'est fait ! 🎉</button>
+          )}
+        </div>
+      )}
+
+      {today && weatherSuggest && (
+        <div data-testid="weather-suggestion" style={sx(`margin:0 18px 14px;background:#fffdf8;border:1px solid ${weatherSuggest.rainy ? '#4f8a86' : '#efe6d4'};border-radius:20px;padding:16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);`)}>
+          <div style={sx('font-size:12px;letter-spacing:1px;font-weight:700;color:#4f8a86;')}>{weatherSuggest.rainy ? '🌧️ MÉTÉO DU JOUR' : '☀️ MÉTÉO DU JOUR'}</div>
+          <div style={sx('font-size:14px;color:#6b6354;margin-top:8px;line-height:1.4;')}>{weatherSuggest.message}</div>
+          {weatherSuggest.rainy && weatherSuggest.indoor.length > 0 && (
+            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;')}>
+              {weatherSuggest.indoor.slice(0, 4).map((v) => (
+                <button key={v.id} data-testid={`weather-indoor-${v.id}`} onClick={onOpenVisites} style={sx('border:none;background:#e7ecdf;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:12px;border-radius:999px;padding:7px 12px;cursor:pointer;')}>{v.emoji} {v.name}</button>
+              ))}
+            </div>
           )}
         </div>
       )}

@@ -5,6 +5,7 @@ import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, V
 import { s, eur, buildList, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { filterAndSortVisits } from './visits.js'
 import { computeToday } from './today.js'
+import { weatherSuggestion } from './weather.js'
 // Sous-écrans chargés à la demande (code-splitting) — allègent le bundle initial,
 // ils ne sont montés qu'à l'ouverture depuis l'accueil (sub === …).
 const Meteo = lazy(() => import('./screens/Meteo.jsx').then(m => ({ default: m.Meteo })))
@@ -1136,6 +1137,7 @@ export default function App() {
                 dailyChallenge={isOn('extra_challenge') ? dailyChallenge : null} challengeDone={challengeDone} markChallengeDone={markChallengeDone}
                 carSpot={carSpot} parkCar={isOn('extra_carspot') ? parkCar : null} findCar={findCar} forgetCar={forgetCar}
                 isOn={isOn} kidsGames={kidsGames} emergencyNumbers={emergencyNumbers}
+                weatherSuggest={today && isOn('extra_weather_suggestions') ? weatherSuggestion(today.w, visits) : null} onOpenVisites={() => { setTab('visites'); setSub(null) }}
               />
             )}
 
