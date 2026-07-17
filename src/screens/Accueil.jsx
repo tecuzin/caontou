@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Panorama } from '../Scenery.jsx'
 import { KIDS_GAMES, EMERGENCY_NUMBERS } from '../data.js'
+import { featureKeyForAction } from '../features.js'
 import { CarSpot } from '../components/CarSpot.jsx'
 import { TelLink } from '../components/Links.jsx'
 
@@ -16,6 +17,8 @@ const MODULES = [
   { emoji: '🔑', name: 'Départ du gîte', sub: 'Avant de rendre les clés', bg: '#f1e4d4', action: 'sub:departure' },
   { emoji: '🧭', name: 'Itinéraire', sub: 'Sorties par proximité', bg: '#e7ecdf', action: 'sub:itineraire' },
   { emoji: '🗺️', name: 'Carte', sub: 'Séjour & voiture', bg: '#dfeae6', action: 'sub:carte' },
+  // Réglages n'a pas de clé feature (mod_reglages inconnue) → toujours visible.
+  { emoji: '🎛️', name: 'Réglages', sub: 'Activer / masquer', bg: '#eee7d4', action: 'sub:reglages' },
 ]
 
 /** Écran Accueil — carte de la prochaine aventure, aujourd'hui, modules, suggestions et sauvegarde. */
@@ -28,8 +31,13 @@ export function Accueil({
   isCheckoutSoon, departureDone = 0, departureTotal = 0,
   dailyChallenge, challengeDone, markChallengeDone,
   carSpot, parkCar, findCar, forgetCar,
+  isOn = () => true,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
+  const shownModules = MODULES.filter((m) => {
+    const key = featureKeyForAction(m.action)
+    return !key || isOn(key)
+  })
   return (
     <div data-testid="screen-accueil">
       <div style={sx('margin:54px 18px 14px 18px;border-radius:28px;padding:20px;color:#fffaf0;box-shadow:0 10px 26px rgba(74,93,58,0.24);position:relative;overflow:hidden;min-height:190px;')}>
@@ -132,8 +140,8 @@ export function Accueil({
 
       <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Tout le séjour</div>
       <div style={sx('padding:0 18px 12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;')}>
-        {MODULES.map((m) => (
-          <button key={m.name} onClick={() => openModule(m.action)} style={sx('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+        {shownModules.map((m) => (
+          <button key={m.name} data-testid={`module-${m.action}`} onClick={() => openModule(m.action)} style={sx('text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
             <div style={sx(`width:42px;height:42px;border-radius:14px;background:${m.bg};display:flex;align-items:center;justify-content:center;font-size:22px;`)}>{m.emoji}</div>
             <div>
               <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{m.name}</div>
