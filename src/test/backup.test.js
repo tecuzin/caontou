@@ -96,6 +96,18 @@ describe('parseImport()', () => {
     expect(STORE_KEYS).toContain('trip')
     expect(STORE_KEYS).toContain('trajets')
   })
+
+  it('STORE_KEYS inclut les données de référence et les fonctions (tout dans le JSON)', () => {
+    for (const k of ['features', 'kidsGames', 'bingoItems', 'emergencyNumbers']) {
+      expect(STORE_KEYS).toContain(k)
+    }
+  })
+
+  it('reconnaît un export ne contenant que des données de référence', () => {
+    const { data, error } = parseImport(JSON.stringify({ app: 'cantou', data: { bingoItems: [{ emoji: '🐄', label: 'x' }] } }))
+    expect(error).toBe('')
+    expect(data.bingoItems).toHaveLength(1)
+  })
 })
 
 describe('downloadExport()', () => {

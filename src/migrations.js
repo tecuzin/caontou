@@ -1,11 +1,11 @@
-import { TRIP_INITIAL, TRAJETS_INITIAL, VISITS_INITIAL } from './data.js'
+import { TRIP_INITIAL, TRAJETS_INITIAL, VISITS_INITIAL, KIDS_GAMES, BINGO_CANTAL, EMERGENCY_NUMBERS } from './data.js'
 
 /**
  * Migration system pour cantou.v1 store.
  * Applique les transformations ordonnées au chargement (ensureStoreIsUpToDate).
  */
 
-export const LATEST_SCHEMA = 3
+export const LATEST_SCHEMA = 4
 
 const MIGRATIONS = [
   // v1 → v2 : re-basage Carladès. Les stores créés par les premiers builds
@@ -59,6 +59,20 @@ const MIGRATIONS = [
           return c ? { ...v, lat: c.lat, lng: c.lng } : v
         })
       }
+      return s
+    },
+  },
+  // v3 → v4 : plus aucune donnée de référence en constante. On seed dans le
+  // store (donc dans l'export JSON, personnalisable) les listes restées
+  // statiques — uniquement si absentes, pour préserver toute personnalisation.
+  {
+    from: 3,
+    to: 4,
+    apply(store) {
+      const s = { ...store }
+      if (!Array.isArray(s.kidsGames)) s.kidsGames = structuredClone(KIDS_GAMES)
+      if (!Array.isArray(s.bingoItems)) s.bingoItems = structuredClone(BINGO_CANTAL)
+      if (!Array.isArray(s.emergencyNumbers)) s.emergencyNumbers = structuredClone(EMERGENCY_NUMBERS)
       return s
     },
   },
