@@ -67,6 +67,7 @@ const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m
 const Departure = lazy(() => import('./screens/Departure.jsx').then(m => ({ default: m.Departure })))
 const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ default: m.Itinerary })))
 const Carte = lazy(() => import('./screens/Carte.jsx').then(m => ({ default: m.Carte })))
+const CarteDetaillee = lazy(() => import('./screens/CarteDetaillee.jsx').then(m => ({ default: m.CarteDetaillee })))
 const Reglages = lazy(() => import('./screens/Reglages.jsx').then(m => ({ default: m.Reglages })))
 const RestoModal = lazy(() => import('./modals/RestoModal.jsx').then(mod => ({ default: mod.RestoModal })))
 import { usePhotos } from './hooks/usePhotos.js'
@@ -596,7 +597,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', reglages: 'Réglages' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -1074,7 +1075,12 @@ export default function App() {
 
             {/* CARTE DU SÉJOUR (hors-ligne) */}
             {sub === 'carte' && (
-              <Carte sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} />
+              <Carte sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} openDetailed={() => setSub('carte-detaillee')} />
+            )}
+
+            {/* CARTE DÉTAILLÉE (OpenTopoMap, en ligne, repli hors-ligne) */}
+            {sub === 'carte-detaillee' && (
+              <CarteDetaillee sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} />
             )}
 
             {/* RÉGLAGES (fonctions désactivables) */}
