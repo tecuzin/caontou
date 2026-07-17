@@ -44,6 +44,8 @@ IDs utiles : board `01KWSTHN79VWRQB7MGPQWR153M` · Proposal `01KX43H1YZHXADB0SA2
 ```bash
 # 1. Lire le board Epiq (mcp epiq_issue_list) : cartes en Todo = travail autorisé,
 #    cartes revenues de UAT/EUA en Todo = rapports de test à corriger en priorité.
+#    → Taguer toute carte des colonnes actives (Proposal/Todo/In progress/UAT)
+#      restée SANS tag (voir « Tags de classification »).
 # 2. Lire le backlog complémentaire
 cat TODO.md
 
@@ -67,6 +69,34 @@ Créée par Claude lors d'un audit ou une proposition. Description auto-suffisan
 contexte et raison. David la lit, la trie mentalement.
 
 **Exemple** : "Error Boundary React + export de secours (p1, audit robustesse 09/07)"
+
+**⚠️ Tagger dès la création (obligatoire).** Toute carte créée par Claude reçoit
+immédiatement ses **tags de classification** : au moins **un tag de domaine** +
+**un tag de priorité** (`p1`/`p2`/`p3`). Voir la section « Tags de classification »
+ci-dessous. Une carte sans tag est un oubli à corriger — ne pas laisser de carte
+non taguée dans Proposal / Todo / In progress / UAT.
+
+```bash
+mcp epiq_issue_create <title> --parentId <lane>
+mcp epiq_issue_description_edit <issueId> --description "..."
+mcp epiq_issue_tag_add <issueId> --tagName produit      # domaine
+mcp epiq_issue_tag_add <issueId> --tagName p2           # priorité
+```
+
+### Tags de classification (obligatoires à la création)
+Distincts des tags de livraison `buildNN`/`vX.Y.Z` (ajoutés en Phase 5). Réutiliser
+**le vocabulaire existant** (ne pas inventer de synonymes) :
+
+- **Domaine** : `produit`, `technique`, `refactor`, `qualite`, `tests`, `ux`,
+  `securite`, `outillage`, `doc`, `notifications`, `idee-creative`, ou un domaine
+  fonctionnel (`visites`, `repas`, `trajet`, `hebergement`, `contenu-cantal`…).
+- **Priorité** : `p1` (haute) · `p2` (moyenne) · `p3` (basse).
+- Combiner librement (ex. une feature carte = `produit` + `visites` + `p2` ;
+  un refacto = `technique` + `refactor` + `p2`).
+
+**Audit au démarrage de session** : lister les issues et **taguer toute carte des
+colonnes actives (Proposal/Todo/In progress/UAT) restée sans tag** avant de coder.
+Les cartes Done anciennes non taguées ne sont pas prioritaires (historique).
 
 ### Phase 2 : Todo (GO David)
 David déplace la carte de Proposal vers Todo quand il veut que Claude l'implémente.
