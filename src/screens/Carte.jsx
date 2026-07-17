@@ -11,7 +11,7 @@ const VB_H = 430
  * leurs positions relatives réelles. Un tap sur un marqueur affiche son détail.
  * La carte topographique détaillée (OpenTopoMap, en ligne) est un écran séparé.
  */
-export function Carte({ sx, visits = [], gite, carSpot, savedIds = [], findCar }) {
+export function Carte({ sx, visits = [], gite, carSpot, savedIds = [], findCar, openDetailed }) {
   const [selected, setSelected] = useState(null) // { kind, id, name, meta }
 
   const placedVisits = visits.filter(hasCoords)
@@ -31,6 +31,10 @@ export function Carte({ sx, visits = [], gite, carSpot, savedIds = [], findCar }
       <div style={sx('font-size:13px;color:#6b6354;margin:2px 0 12px;')}>
         Le séjour d'un coup d'œil — {placedVisits.length} lieux placés autour du gîte, sans réseau.
       </div>
+
+      {openDetailed && (typeof navigator === 'undefined' || navigator.onLine) && (
+        <button data-testid="btn-carte-detaillee" onClick={openDetailed} style={sx('width:100%;margin-bottom:12px;border:1px solid #4f8a86;background:#fffdf8;color:#4f8a86;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:11px;cursor:pointer;')}>🌍 Carte détaillée (OpenTopoMap)</button>
+      )}
 
       <div style={sx('background:#e7ecdf;border:1px solid #dbe2c9;border-radius:20px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.06);')}>
         <svg data-testid="map-svg" viewBox={`0 0 ${VB_W} ${VB_H}`} width="100%" role="img" aria-label="Carte schématique du séjour" style={{ display: 'block' }}>
