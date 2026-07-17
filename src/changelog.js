@@ -5,6 +5,37 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 91, version: '1.2.0', date: '2026-07-17', items: [
+    '🎉 Version 1.2.0 — deux cartes du séjour et une app entièrement personnalisable',
+    '🗺️ Carte détaillée OpenTopoMap (reliefs, sentiers, cols) quand tu as du réseau',
+  ] },
+  { build: 90, version: '1.2.0', date: '2026-07-17', items: [
+    '📦 Tout est personnalisable : jeux, bingo et numéros d\'urgence dans la sauvegarde',
+  ] },
+  { build: 89, version: '1.2.0', date: '2026-07-17', items: [
+    '🎛️ Réglages : active ou masque chaque onglet, module ou carte selon tes envies',
+  ] },
+  { build: 88, version: '1.2.0', date: '2026-07-16', items: [
+    '🗺️ Carte du séjour hors-ligne : le gîte, les visites et la voiture d\'un coup d\'œil',
+  ] },
+  { build: 86, version: '1.1.0', date: '2026-07-16', items: [
+    '🎙️ Journal de bord : dicte le récit du jour à la voix',
+  ] },
+  { build: 85, version: '1.1.0', date: '2026-07-16', items: [
+    '🧾 Budget : attache la photo d\'un reçu à une dépense',
+  ] },
+  { build: 84, version: '1.1.0', date: '2026-07-14', items: [
+    '🚗 Mémo voiture : mémorise où on s\'est garé et laisse-toi guider au retour',
+  ] },
+  { build: 82, version: '1.1.0', date: '2026-07-13', items: [
+    '💸 Budget : partage des dépenses « qui doit combien ? »',
+    '⭐ Visites : note tes sorties et garde un souvenir (étoiles + commentaire)',
+  ] },
+  { build: 80, version: '1.1.0', date: '2026-07-13', items: [
+    '📔 Journal de bord quotidien, relié aux Souvenirs',
+    '🧭 Itinéraire du jour rangé par proximité · 🔑 checklist de départ du gîte',
+    '🎯 Défi du jour pour les enfants',
+  ] },
   { build: 68, version: '1.1.0', date: '2026-07-12', items: [
     '🛠️ Fiabilité : logique interne extraite et testée (aucun changement visible)',
   ] },

@@ -2,6 +2,36 @@
 
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
+## [1.2.0] - 2026-07-17
+Grosse mineure fonctionnelle (builds 68→91). Deux cartes du séjour, personnalisation
+totale de l'app, et de nombreux ajouts famille. Suite de tests 542 unitaires + 29 E2E
+au vert.
+### Ajouté
+- **Carte du séjour hors-ligne** : carte schématique SVG (gîte au centre, visites
+  placées à leurs coordonnées réelles, **position de la voiture**), tap = détail.
+- **Carte détaillée OpenTopoMap** (en ligne, sans dépendance ni clé API) : tuiles
+  topographiques, zoom, mêmes marqueurs, **repli automatique** hors-ligne.
+- **Fonctions désactivables** : écran **Réglages** (interrupteurs Onglets / Modules /
+  Extras) piloté par des *feature-flags* persistés dans le store.
+- **Tout personnalisable** : plus aucune donnée en constante statique — jeux enfants,
+  grille du bingo et numéros d'urgence passent dans le store, donc dans l'export JSON.
+- **Journal de bord** quotidien (récit libre) + **dictée vocale** du récit.
+- **Mémo voiture** : mémorise le point GPS de stationnement + retour guidé via Maps.
+- **Budget** : reçu photo attaché à une dépense ; partage « qui doit combien ? ».
+- **Visites** : notes & avis post-visite (0–5 ★ + commentaire) ; itinéraire du jour
+  ordonné par proximité.
+- **Départ du gîte** : checklist sensible à la date de retour.
+- **Défi du jour** pour les enfants (mini-quête déterministe).
+### Technique
+- Extraction de hooks de domaine d'`App.jsx` (`useRestos`, `useDeparture`,
+  `useRatings`, `useFeatures`…) ; modules purs testables `geo.js` / `osm.js`.
+- Migrations de store v2→v3 (coordonnées) et v3→v4 (données de référence).
+- Moteur déterministe de cohérence de design (CIEDE2000) + consolidation
+  palette / typographie / rayons / espacements. Modales chargées en lazy (−40 kB).
+### Corrigé
+- `parseDist` interprète les durées en heures (« 1 h 10 » → 70 min).
+- Test `jour-j` : écran Souvenirs lazy attendu de façon asynchrone.
+
 ## [1.1.0] - 2026-07-12
 Release de qualité (builds 60→67). Aucune régression fonctionnelle ; focus tests,
 performance, accessibilité, sécurité et outillage. Voir `docs/retex/` pour le détail chiffré.
