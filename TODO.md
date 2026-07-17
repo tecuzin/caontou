@@ -6,6 +6,16 @@
 
 ---
 
+## 🔄 En cours — drainage backlog Proposal (17 juillet, post-v1.2.0)
+
+Les 5 propositions passées en Todo par David sont en implémentation.
+- [x] **🌦️ Suggestions météo** (repli indoor si pluie) — livré **build 94**, en
+  UAT/EUA. Module pur `src/weather.js`, flag `extra_weather_suggestions`.
+- [ ] 🧳 Multi-séjours · 📕 Album souvenir · 🧑‍🏫 Onboarding · 🔗 Partage QR —
+  en cours (implémentation parallèle par agents, worktrees isolés).
+- [ ] 🎨 Cohérence visuelle (In progress) — différée après merge des agents
+  (touche theme.js + écrans, conflits ; QA device requise).
+
 ## ✅ Complété — a11y overlays (17 juillet, après v1.2.0)
 
 - [x] **♿ Overlays accessibles** (carte Epiq In progress) : les 2 visionneuses
