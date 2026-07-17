@@ -31,7 +31,7 @@ export function Accueil({
   isCheckoutSoon, departureDone = 0, departureTotal = 0,
   dailyChallenge, challengeDone, markChallengeDone,
   carSpot, parkCar, findCar, forgetCar,
-  isOn = () => true,
+  isOn = () => true, kidsGames = KIDS_GAMES, emergencyNumbers = EMERGENCY_NUMBERS,
 }) {
   const [gamesOpen, setGamesOpen] = useState(false)
   const shownModules = MODULES.filter((m) => {
@@ -165,13 +165,13 @@ export function Accueil({
           <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🎲</div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Idées de jeux</div>
-            <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>{KIDS_GAMES.length} activités nature, au gîte et le soir</div>
+            <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>{kidsGames.length} activités nature, au gîte et le soir</div>
           </div>
           <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>{gamesOpen ? '▲' : '▼'}</div>
         </button>
         {gamesOpen && (
           <div data-testid="games-list" style={sx('margin-top:10px;display:flex;flex-direction:column;gap:10px;')}>
-            {KIDS_GAMES.map((g, i) => (
+            {kidsGames.map((g, i) => (
               <div key={i} style={sx('display:flex;gap:12px;align-items:flex-start;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
                 <div style={sx('width:44px;height:44px;flex:0 0 auto;border-radius:14px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:22px;')}>{g.emoji}</div>
                 <div style={sx('flex:1;min-width:0;')}>
@@ -208,8 +208,8 @@ export function Accueil({
       <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🆘 Urgences & repères</div>
       <div style={sx('padding:0 18px 12px;')}>
         <div data-testid="emergency-block" style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:6px 14px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          {EMERGENCY_NUMBERS.map((e, i) => (
-            <div key={e.num} style={sx(`display:flex;align-items:center;gap:10px;padding:10px 0;${i < EMERGENCY_NUMBERS.length - 1 ? 'border-bottom:1px solid #f1e9da;' : ''}`)}>
+          {emergencyNumbers.map((e, i) => (
+            <div key={e.num} style={sx(`display:flex;align-items:center;gap:10px;padding:10px 0;${i < emergencyNumbers.length - 1 ? 'border-bottom:1px solid #f1e9da;' : ''}`)}>
               <span style={sx('font-size:19px;flex:0 0 auto;')}>{e.emoji}</span>
               <span style={sx('flex:1;font-size:14px;color:#3a352b;')}>{e.label}</span>
               <TelLink sx={sx} num={e.num} style={'color:#b8503f;font-weight:700;text-decoration:none;font-family:Quicksand;font-size:16px;'}>📞 {e.num}</TelLink>

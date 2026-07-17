@@ -82,7 +82,7 @@ describe('Store migrations', () => {
       const result = applyMigrations(store, 2)
       expect(typeof result.visits[0].lat).toBe('number')
       expect(typeof result.visits[0].lng).toBe('number')
-      expect(result.schemaVersion).toBe(3)
+      expect(result.schemaVersion).toBe(LATEST_SCHEMA)
     })
 
     it('ne réécrit pas des coords déjà présentes', () => {
@@ -98,11 +98,37 @@ describe('Store migrations', () => {
       expect(result.visits[0]).toEqual({ id: 9999, name: 'Ma visite perso' })
     })
 
-    it('backfill aussi via la chaîne v1 → v3', () => {
+    it('backfill aussi via la chaîne complète depuis v1', () => {
       const store = { visits: [{ id: 2, name: 'Le Lioran' }] }
       const result = applyMigrations(store, 1)
       expect(typeof result.visits[0].lat).toBe('number')
-      expect(result.schemaVersion).toBe(3)
+      expect(result.schemaVersion).toBe(LATEST_SCHEMA)
+    })
+  })
+
+  describe('v3 → v4 : données de référence dans le store', () => {
+    it('seed jeux/bingo/urgences depuis les constantes si absents', () => {
+      const store = { schemaVersion: 3 }
+      const result = applyMigrations(store, 3)
+      expect(Array.isArray(result.kidsGames)).toBe(true)
+      expect(result.kidsGames.length).toBeGreaterThan(0)
+      expect(Array.isArray(result.bingoItems)).toBe(true)
+      expect(Array.isArray(result.emergencyNumbers)).toBe(true)
+      expect(result.schemaVersion).toBe(4)
+    })
+
+    it('ne réécrit pas des listes déjà personnalisées', () => {
+      const custom = [{ emoji: '🎯', label: 'Perso' }]
+      const store = { schemaVersion: 3, bingoItems: custom }
+      const result = applyMigrations(store, 3)
+      expect(result.bingoItems).toEqual(custom)
+    })
+
+    it('seed via la chaîne complète depuis v1', () => {
+      const result = applyMigrations({}, 1)
+      expect(Array.isArray(result.kidsGames)).toBe(true)
+      expect(Array.isArray(result.emergencyNumbers)).toBe(true)
+      expect(result.schemaVersion).toBe(LATEST_SCHEMA)
     })
   })
 })

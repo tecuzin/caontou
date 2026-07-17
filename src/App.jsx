@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { StatusBar, Style } from '@capacitor/status-bar'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL, GITE_COORDS } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL, GITE_COORDS, KIDS_GAMES, EMERGENCY_NUMBERS } from './data.js'
 import { s, eur, buildList, tripDate, fmtDayShort, fmtMonthYear } from './utils.js'
 import { filterAndSortVisits } from './visits.js'
 import { computeToday } from './today.js'
@@ -171,6 +171,9 @@ const DEFAULTS = {
     { label: 'Péage A75', cat: 'Transport', amt: 24.6 },
   ],
   features: {},
+  kidsGames: structuredClone(KIDS_GAMES),
+  bingoItems: structuredClone(BINGO_CANTAL),
+  emergencyNumbers: structuredClone(EMERGENCY_NUMBERS),
 }
 
 function loadStore() {
@@ -211,6 +214,9 @@ function loadStore() {
       carSpot: p.carSpot ?? null,
       challengesDone: p.challengesDone ?? {},
       features: p.features ?? {},
+      kidsGames: p.kidsGames ?? structuredClone(KIDS_GAMES),
+      bingoItems: p.bingoItems ?? structuredClone(BINGO_CANTAL),
+      emergencyNumbers: p.emergencyNumbers ?? structuredClone(EMERGENCY_NUMBERS),
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -392,6 +398,11 @@ export default function App() {
   const toggleDeparture = (id) => { haptic(ImpactStyle.Light); toggleDepartureItem(id) }
   const isCheckoutSoon = useMemo(() => isCheckoutWindow(trip.end), [trip.end])
   const { features, setFeatures, toggleFeature, isOn } = useFeatures(initial.features)
+  // Données de référence désormais dans le store (donc dans l'export JSON,
+  // personnalisables). Valeurs par défaut seedées depuis les constantes.
+  const [kidsGames] = useState(initial.kidsGames || structuredClone(KIDS_GAMES))
+  const [bingoItems] = useState(initial.bingoItems || structuredClone(BINGO_CANTAL))
+  const [emergencyNumbers] = useState(initial.emergencyNumbers || structuredClone(EMERGENCY_NUMBERS))
   const { ratings, setRatings, rateVisit: rateVisitEntry, setVisitNote } = useRatings(initial.ratings)
   const rateVisit = (id, stars) => { haptic(ImpactStyle.Light); rateVisitEntry(id, stars) }
   const openMaps = (url) => { try { window.open(url, '_blank') } catch { /* WebView sans window.open */ } }
@@ -484,8 +495,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -943,7 +954,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -1038,7 +1049,7 @@ export default function App() {
 
             {/* BINGO */}
             {sub === 'bingo' && (
-              <Bingo sx={sx} items={BINGO_CANTAL} checked={bingo} toggleBingo={toggleBingo} />
+              <Bingo sx={sx} items={bingoItems} checked={bingo} toggleBingo={toggleBingo} />
             )}
 
             {/* BILAN */}
@@ -1117,7 +1128,7 @@ export default function App() {
                 isCheckoutSoon={isCheckoutSoon} departureDone={departure.filter((i) => i.done).length} departureTotal={departure.length}
                 dailyChallenge={isOn('extra_challenge') ? dailyChallenge : null} challengeDone={challengeDone} markChallengeDone={markChallengeDone}
                 carSpot={carSpot} parkCar={isOn('extra_carspot') ? parkCar : null} findCar={findCar} forgetCar={forgetCar}
-                isOn={isOn}
+                isOn={isOn} kidsGames={kidsGames} emergencyNumbers={emergencyNumbers}
               />
             )}
 
