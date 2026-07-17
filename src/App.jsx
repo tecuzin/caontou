@@ -34,7 +34,6 @@ import { useRestos } from './hooks/useRestos.js'
 import { useDeparture } from './hooks/useDeparture.js'
 import { useRatings } from './hooks/useRatings.js'
 import { useFeatures } from './hooks/useFeatures.js'
-import { FEATURE_GROUPS, featureKeyForAction } from './features.js'
 import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
@@ -68,6 +67,7 @@ const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m
 const Departure = lazy(() => import('./screens/Departure.jsx').then(m => ({ default: m.Departure })))
 const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ default: m.Itinerary })))
 const Carte = lazy(() => import('./screens/Carte.jsx').then(m => ({ default: m.Carte })))
+const Reglages = lazy(() => import('./screens/Reglages.jsx').then(m => ({ default: m.Reglages })))
 const RestoModal = lazy(() => import('./modals/RestoModal.jsx').then(mod => ({ default: mod.RestoModal })))
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
@@ -585,7 +585,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', reglages: 'Réglages' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -979,16 +979,22 @@ export default function App() {
   const sendSuggestions = () => shareSuggestions(suggestions)
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
+  // Onglets réellement affichés (l'accueil ne se coupe jamais).
+  const visibleTabs = TABS.filter(([key]) => key === 'accueil' || isOn(`tab_${key}`))
+  // Garde-fou : si l'onglet courant vient d'être désactivé, revenir à l'accueil.
+  useEffect(() => {
+    if (tab !== 'accueil' && !isOn(`tab_${tab}`)) { setTab('accueil'); setSub(null) }
+  }, [tab, features]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Navigation par glissement : gauche/droite sur la barre d'onglets pour
   // changer d'écran, glissement gauche→droite sur le contenu d'un
   // sous-écran pour revenir en arrière (équivalent du bouton ‹).
-  const currentTabIdx = TABS.findIndex(([key]) => key === tab)
+  const currentTabIdx = visibleTabs.findIndex(([key]) => key === tab)
   const goToAdjacentTab = (dir) => {
     const nextIdx = currentTabIdx + dir
-    if (nextIdx < 0 || nextIdx >= TABS.length) return
+    if (nextIdx < 0 || nextIdx >= visibleTabs.length) return
     haptic(ImpactStyle.Light)
-    setTab(TABS[nextIdx][0])
+    setTab(visibleTabs[nextIdx][0])
     setSub(null)
   }
   const tabBarSwipe = useSwipe(() => goToAdjacentTab(1), () => goToAdjacentTab(-1))
@@ -1006,7 +1012,7 @@ export default function App() {
       {sub && (
         <div data-testid="sub-screen-wrapper" onTouchStart={subScreenSwipe.onTouchStart} onTouchEnd={subScreenSwipe.onTouchEnd} style={sx('height:100%;display:flex;flex-direction:column;')}>
           <div style={sx('display:flex;align-items:center;gap:8px;padding:54px 14px 12px;background:#fffdf8;border-bottom:1px solid #ece2cf;flex:0 0 auto;')}>
-            <button onClick={() => setSub(null)} style={sx('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:4px;')}>‹</button>
+            <button data-testid="sub-back" onClick={() => setSub(null)} style={sx('width:36px;height:36px;border:none;background:#f1e9da;border-radius:50%;font-size:22px;line-height:1;cursor:pointer;color:#4a5d3a;display:flex;align-items:center;justify-content:center;padding-bottom:4px;')}>‹</button>
             <span style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>{subTitle}</span>
           </div>
           {/* key={sub} remonte le conteneur à chaque navigation → rejoue screenIn */}
@@ -1060,6 +1066,11 @@ export default function App() {
               <Carte sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} />
             )}
 
+            {/* RÉGLAGES (fonctions désactivables) */}
+            {sub === 'reglages' && (
+              <Reglages sx={sx} isOn={isOn} toggleFeature={toggleFeature} />
+            )}
+
             {/* LOGISTIQUE */}
             {sub === 'logistique' && (
               <Logistique
@@ -1104,8 +1115,9 @@ export default function App() {
                 setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow}
                 isDepartureDay={isDepartureDay} quickPhoto={() => { setSub('souvenirs'); capturePhoto('camera') }} openMyPosition={openMyPosition} openChangelog={() => setShowChangelog(true)}
                 isCheckoutSoon={isCheckoutSoon} departureDone={departure.filter((i) => i.done).length} departureTotal={departure.length}
-                dailyChallenge={dailyChallenge} challengeDone={challengeDone} markChallengeDone={markChallengeDone}
-                carSpot={carSpot} parkCar={parkCar} findCar={findCar} forgetCar={forgetCar}
+                dailyChallenge={isOn('extra_challenge') ? dailyChallenge : null} challengeDone={challengeDone} markChallengeDone={markChallengeDone}
+                carSpot={carSpot} parkCar={isOn('extra_carspot') ? parkCar : null} findCar={findCar} forgetCar={forgetCar}
+                isOn={isOn}
               />
             )}
 
@@ -1126,7 +1138,7 @@ export default function App() {
                 setEditingVisitId={setEditingVisitId} setNewVisitName={setNewVisitName} setNewVisitDist={setNewVisitDist}
                 setNewVisitDur={setNewVisitDur} setNewVisitAge={setNewVisitAge} setNewVisitCat={setNewVisitCat} setShowVisitEdit={setShowVisitEdit}
                 toggleSaved={toggleSaved} editVisit={editVisit} deleteVisit={deleteVisit}
-                openVote={() => setShowVote(true)}
+                openVote={isOn('extra_vote') ? () => setShowVote(true) : null}
                 ratings={ratings} rateVisit={rateVisit} setVisitNote={setVisitNote}
               />
             )}
@@ -1157,7 +1169,7 @@ export default function App() {
 
           {/* BARRE D'ONGLETS */}
           <div data-testid="tab-bar" onTouchStart={tabBarSwipe.onTouchStart} onTouchEnd={tabBarSwipe.onTouchEnd} style={sx('flex:0 0 auto;display:flex;background:rgba(255,253,248,0.97);border-top:1px solid #ece2cf;padding:8px 6px 24px;')}>
-            {TABS.map(([key, emoji, label]) => (
+            {visibleTabs.map(([key, emoji, label]) => (
               <button key={key} data-testid={`tab-${key}`} onClick={() => { setTab(key); setSub(null) }} style={sx('flex:1;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px 0;')}>
                 <span style={sx('font-size:20px;')}>{emoji}</span>
                 <span style={sx(`font-size:12px;color:${tab === key ? '#4a5d3a' : '#6b6354'};font-weight:${tab === key ? '700' : '600'};`)}>{label}</span>
