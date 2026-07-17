@@ -71,6 +71,7 @@ const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ defa
 const Carte = lazy(() => import('./screens/Carte.jsx').then(m => ({ default: m.Carte })))
 const CarteDetaillee = lazy(() => import('./screens/CarteDetaillee.jsx').then(m => ({ default: m.CarteDetaillee })))
 const Reglages = lazy(() => import('./screens/Reglages.jsx').then(m => ({ default: m.Reglages })))
+const Sejours = lazy(() => import('./screens/Sejours.jsx').then(m => ({ default: m.Sejours })))
 const RestoModal = lazy(() => import('./modals/RestoModal.jsx').then(mod => ({ default: mod.RestoModal })))
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
@@ -599,7 +600,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -978,6 +979,15 @@ export default function App() {
   }
   const closeImport = () => { setShowImport(false); setImportText(''); setImportError(''); setImportPreview(null) }
 
+  // Multi-séjours : remet le store à ses valeurs par défaut (« séjour vierge »).
+  // On efface la clé cantou.v1 puis on recharge — loadStore() reconstruit les
+  // DEFAULTS. Les profils (cantou.profiles) ne sont PAS touchés.
+  const resetToDefaults = () => {
+    haptic(ImpactStyle.Medium)
+    try { localStorage.removeItem(STORE_KEY) } catch { }
+    try { window.location.reload() } catch { }
+  }
+
   // Suggestions : notes libres pour de futures fonctionnalités, envoyées en
   // texte brut vers Telegram/WhatsApp (pas besoin de parser du JSON).
   const submitSuggestion = () => {
@@ -1088,6 +1098,11 @@ export default function App() {
             {/* RÉGLAGES (fonctions désactivables) */}
             {sub === 'reglages' && (
               <Reglages sx={sx} isOn={isOn} toggleFeature={toggleFeature} />
+            )}
+
+            {/* MES SÉJOURS (multi-séjours / modèles réutilisables) */}
+            {sub === 'sejours' && (
+              <Sejours sx={sx} trip={trip} fmtDayShort={fmtDayShort} fmtMonthYear={fmtMonthYear} currentStoreData={currentStoreData} resetToDefaults={resetToDefaults} />
             )}
 
             {/* LOGISTIQUE */}
