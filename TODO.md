@@ -6,6 +6,16 @@
 
 ---
 
+## ✅ Complété — a11y overlays (17 juillet, après v1.2.0)
+
+- [x] **♿ Overlays accessibles** (carte Epiq In progress) : les 2 visionneuses
+  plein écran (photo Souvenirs, reçu Budget) reçoivent `role="presentation"` +
+  fermeture **Échap** (hook `useEscapeKey` factorisé) ; les 9 dernières modales
+  inline d'`App.jsx` migrent vers **ModalShell** (backdrop presentation, Échap,
+  feuille `role="dialog"`). Sonar S1082/S6848 résolus, plus aucun backdrop
+  `<div onClick>` dupliqué. Rendu identique (vérifié en réel). +4 tests, suite
+  **546 verte**. → **UAT/EUA** pour QA device (conversions d'overlays).
+
 ## 🚀 Release v1.2.0 — 17 juillet (build 92)
 
 Tag `v1.2.0` posé sur `main`, APK `cantou-v1.2.0-build92` signé (keystore stable
