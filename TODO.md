@@ -288,6 +288,18 @@ committé). Pas de `dangerouslySetInnerHTML`/`eval`, rendu JSX safe partout.
 > reset de style) + le viewer photo plein écran de Souvenirs (même patron Échap).
 > Ces conversions changent le rendu → à valider écran par écran sur device.
 
+## ✅ Complété — toutes les données dans le JSON (17 juillet)
+
+- [x] **📦 Toutes les données de référence dans le JSON** (Ticket Epiq) : plus
+  aucune constante statique — jeux enfants (`kidsGames`), grille du bingo
+  (`bingoItems`) et numéros d'urgence (`emergencyNumbers`) passent dans le store
+  `cantou.v1`, donc **exportés/personnalisables** via import JSON. DEFAULTS,
+  loadStore, currentStoreData, persistance, `STORE_KEYS` + migration **v3→v4**
+  (seed depuis constantes si absent). Accueil/Bingo lisent depuis le store.
+  +12 tests, suite **529 verte**. ⏭️ Édition in-app dédiée (CRUD) = suivi
+  optionnel ; la personnalisation passe par l'export/import JSON.
+- ✅ **Refacto « tout personnalisable » complet** : feature-flags + données JSON.
+
 ## ✅ Complété — fonctions désactivables (17 juillet)
 
 - [x] **🎛️ Toutes les fonctions désactivables** (Ticket Epiq) : écran **Réglages**
