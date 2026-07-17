@@ -1047,7 +1047,7 @@ export default function App() {
 
             {/* SOUVENIRS */}
             {sub === 'souvenirs' && (
-              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} journal={journal} openDayJournal={openDayJournal} />
+              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} journal={journal} openDayJournal={openDayJournal} trip={trip} />
             )}
 
             {/* BINGO */}
