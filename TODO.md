@@ -6,6 +6,18 @@
 
 ---
 
+## 🚀 Release v1.2.0 — 17 juillet (build 92)
+
+Tag `v1.2.0` posé sur `main`, APK `cantou-v1.2.0-build92` signé (keystore stable
+`28ce1e58…`) et déployé sur Telegram + bundle QA Appium. Régression 542 unit +
+29 E2E verte. Faits marquants (builds 68→91) : **cartes du séjour** (simplifiée
+hors-ligne + détaillée OpenTopoMap), **fonctions désactivables** (Réglages),
+**tout dans le JSON** (personnalisable), journal vocal, mémo voiture, reçu photo,
+partage des dépenses, notes de visites, défi du jour. CHANGELOG + « Nouveautés »
+in-app à jour.
+
+---
+
 ## ✅ Complété
 
 - [x] Design hi-fi porté dans `src/App.jsx` (fidèle au prototype)
