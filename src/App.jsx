@@ -224,7 +224,9 @@ function loadStore() {
       kidsGames: p.kidsGames ?? structuredClone(KIDS_GAMES),
       bingoItems: p.bingoItems ?? structuredClone(BINGO_CANTAL),
       emergencyNumbers: p.emergencyNumbers ?? structuredClone(EMERGENCY_NUMBERS),
-      onboarded: p.onboarded ?? false,
+      // Store existant (raw présent) = utilisateur déjà installé → pas d'assistant.
+      // Le 1er lancement (pas de raw) part de DEFAULTS (onboarded:false) → assistant.
+      onboarded: p.onboarded ?? true,
     }
   } catch {
     return structuredClone(DEFAULTS)
