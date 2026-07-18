@@ -41,6 +41,9 @@ import { NewLogiListModal } from './modals/NewLogiListModal.jsx'
 import { NewCourseCatModal } from './modals/NewCourseCatModal.jsx'
 import { AddDayModal } from './modals/AddDayModal.jsx'
 import { SelftestModal } from './modals/SelftestModal.jsx'
+import { MealSheet } from './modals/MealSheet.jsx'
+import { ActivityEditSheet } from './modals/ActivityEditSheet.jsx'
+import { DayEditSheet } from './modals/DayEditSheet.jsx'
 import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
@@ -1303,57 +1306,17 @@ export default function App() {
 
       {/* ============ FEUILLE : EDITER REPAS ============ */}
       {showMealEdit && (
-        <ModalShell onClose={closeMealEdit} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealId === null ? 'Ajouter un repas' : `Repas du ${newMealDay}`}</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
-            <input value={newMealDay} onChange={(e) => setNewMealDay(e.target.value)} placeholder="Ex : Sam 11" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Plat</div>
-            <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeMealEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveMeal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </ModalShell>
+        <MealSheet sx={sx} onClose={closeMealEdit} isEdit={editingMealId !== null} day={newMealDay} setDay={setNewMealDay} dish={newMealDish} setDish={setNewMealDish} onSubmit={saveMeal} />
       )}
 
       {/* ============ FEUILLE : EDITER ACTIVITE PLANNING ============ */}
       {showActivityEdit && editingActivityIdx && (
-        <ModalShell onClose={closeActivityEdit} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer activite</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeActivityEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </ModalShell>
+        <ActivityEditSheet sx={sx} onClose={closeActivityEdit} time={newActivityTime} setTime={setNewActivityTime} title={newActivityTitle} setTitle={setNewActivityTitle} onSubmit={submitActivity} />
       )}
 
       {/* ============ FEUILLE : AJOUTER/EDITER JOUR ============ */}
       {showDayEdit && editingDayIdx !== null && (
-        <ModalShell onClose={closeDayEdit} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer jour</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newDayTitle} onChange={(e) => setNewDayTitle(e.target.value)} placeholder="Ex : Le grand depart" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
-            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Laschamps -> Vezels-Roussy" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeDayEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
-              {days.length > 1 && <button onClick={() => { deleteDay(editingDayIdx); closeDayEdit() }} style={sx('flex:0 0 auto;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Supprimer</button>}
-            </div>
-          </div>
-        </ModalShell>
+        <DayEditSheet sx={sx} onClose={closeDayEdit} title={newDayTitle} setTitle={setNewDayTitle} sub={newDaySub} setSub={setNewDaySub} onSubmit={saveDay} onDelete={() => { deleteDay(editingDayIdx); closeDayEdit() }} canDelete={days.length > 1} />
       )}
 
       {/* ============ FEUILLE : AJOUTER ACTIVITE ============ */}
