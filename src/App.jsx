@@ -932,6 +932,13 @@ export default function App() {
     hookAddLogiItem(editingLogiKey, newLogiItem)
     closeAddLogiItem()
   }
+  // Enregistre l'article et garde la modale ouverte (saisie en rafale).
+  const addLogiItemKeep = () => {
+    if (!newLogiItem.trim() || !editingLogiKey) return
+    haptic(ImpactStyle.Light)
+    hookAddLogiItem(editingLogiKey, newLogiItem)
+    setNewLogiItem('')
+  }
   const closeAddLogiItem = () => { setShowAddLogiItem(false); setEditingLogiKey(null); setNewLogiItem('') }
   const deleteLogiItem = (key, item) => {
     haptic(ImpactStyle.Medium)
@@ -945,6 +952,13 @@ export default function App() {
     haptic(ImpactStyle.Medium)
     hookAddCourseItem(editingCourseKey, newCourseItem)
     closeAddCourseItem()
+  }
+  // Enregistre l'article et garde la modale ouverte (saisie en rafale).
+  const addCourseItemKeep = () => {
+    if (!newCourseItem.trim() || !editingCourseKey) return
+    haptic(ImpactStyle.Light)
+    hookAddCourseItem(editingCourseKey, newCourseItem)
+    setNewCourseItem('')
   }
   const closeAddCourseItem = () => { setShowAddCourseItem(false); setEditingCourseKey(null); setNewCourseItem('') }
   const deleteCourseItem = (key, item) => {
@@ -980,6 +994,13 @@ export default function App() {
     haptic(ImpactStyle.Medium)
     setTrajetCheckItems((list) => [...list, newTrajetCheckItem])
     setNewTrajetCheckItem(''); setShowAddTrajetCheck(false)
+  }
+  // Enregistre l'item et garde la modale ouverte (saisie en rafale).
+  const addTrajetCheckItemKeep = () => {
+    if (!newTrajetCheckItem.trim()) return
+    haptic(ImpactStyle.Light)
+    setTrajetCheckItems((list) => [...list, newTrajetCheckItem])
+    setNewTrajetCheckItem('')
   }
   const deleteTrajetCheckItem = (label) => {
     haptic(ImpactStyle.Medium)
@@ -1293,9 +1314,9 @@ export default function App() {
         <ActivityAddSheet sx={sx} onClose={closeActivityAdd} time={newActivityTime} setTime={setNewActivityTime} title={newActivityTitle} setTitle={setNewActivityTitle} color={newActivityColor} setColor={setNewActivityColor} onSubmit={submitActivity} />
       )}
 
-      {showAddLogiItem && <Suspense fallback={null}><AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} /></Suspense>}
+      {showAddLogiItem && <Suspense fallback={null}><AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} onSubmitAndNew={addLogiItemKeep} /></Suspense>}
 
-      {showAddCourseItem && <Suspense fallback={null}><AddCourseItemModal isOpen={showAddCourseItem} onClose={closeAddCourseItem} selectedCourseKey={editingCourseKey} newCourseItem={newCourseItem} setNewCourseItem={setNewCourseItem} courseGroups={courses} darkMode={darkMode} onSubmit={addCourseItem} /></Suspense>}
+      {showAddCourseItem && <Suspense fallback={null}><AddCourseItemModal isOpen={showAddCourseItem} onClose={closeAddCourseItem} selectedCourseKey={editingCourseKey} newCourseItem={newCourseItem} setNewCourseItem={setNewCourseItem} courseGroups={courses} darkMode={darkMode} onSubmit={addCourseItem} onSubmitAndNew={addCourseItemKeep} /></Suspense>}
 
       {showMeteoEdit && <Suspense fallback={null}><EditMeteoFullModal isOpen={showMeteoEdit} onClose={closeMeteoEdit} editingMeteoIdx={editingMeteoIdx} newMeteoDay={newMeteoDay} setNewMeteoDay={setNewMeteoDay} newMeteoNum={newMeteoNum} setNewMeteoNum={setNewMeteoNum} newMeteoIcon={newMeteoIcon} setNewMeteoIcon={setNewMeteoIcon} newMeteoHi={newMeteoHi} setNewMeteoHi={setNewMeteoHi} newMeteoLo={newMeteoLo} setNewMeteoLo={setNewMeteoLo} newMeteoRain={newMeteoRain} setNewMeteoRain={setNewMeteoRain} darkMode={darkMode} onSubmit={saveMeteo} /></Suspense>}
 
@@ -1308,7 +1329,7 @@ export default function App() {
       {/* MODAL: Hébergement edit */}
       {showHebEdit && <Suspense fallback={null}><EditHebergementModal isOpen={showHebEdit} onClose={() => setShowHebEdit(false)} hebFields={{ nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact }} setHebFields={(update) => { Object.entries(update).forEach(([k, v]) => { if (k === 'nom') setNewHebNom(v); else if (k === 'adresse') setNewHebAdresse(v); else if (k === 'arrivee') setNewHebArrivee(v); else if (k === 'depart') setNewHebDepart(v); else if (k === 'capacite') setNewHebCapacite(v); else if (k === 'wifiNom') setNewHebWifiNom(v); else if (k === 'wifiPass') setNewHebWifiPass(v); else if (k === 'contact') setNewHebContact(v); }); }} darkMode={darkMode} onSubmit={saveHebergement} /></Suspense>}
 
-      {showAddTrajetCheck && <Suspense fallback={null}><AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} /></Suspense>}
+      {showAddTrajetCheck && <Suspense fallback={null}><AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} onSubmitAndNew={addTrajetCheckItemKeep} /></Suspense>}
 
       {/* MODAL: Journal de bord */}
       {showJournal && <Suspense fallback={null}><JournalModal
