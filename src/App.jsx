@@ -21,6 +21,7 @@ import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
 import { parseImport, formatLastBackup } from './backup.js'
 import { encodeSharePayload, shareConfig as shareConfigText } from './share-config.js'
+import { track, loadTrack, clearTrack, buildTrackingExport, shareTracking } from './tracking.js'
 import { DEPARTURE_INITIAL, isCheckoutWindow } from './departure.js'
 import { challengeOfDay, dayKey } from './challenges.js'
 import { runSelfTests } from './selftest.js'
@@ -1040,6 +1041,11 @@ export default function App() {
     if (tab !== 'accueil' && !isOn(`tab_${tab}`)) { setTab('accueil'); setSub(null) }
   }, [tab, features]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Tracking de parcours (local, anonyme) — journalise l'onglet et le
+  // sous-écran affichés quand la fonction est activée (flag extra_tracking).
+  useEffect(() => { if (isOn('extra_tracking')) track('tab', tab) }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (sub && isOn('extra_tracking')) track('screen', sub) }, [sub]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Navigation par glissement : gauche/droite sur la barre d'onglets pour
   // changer d'écran, glissement gauche→droite sur le contenu d'un
   // sous-écran pour revenir en arrière (équivalent du bouton ‹).
@@ -1134,7 +1140,10 @@ export default function App() {
 
             {/* RÉGLAGES (fonctions désactivables) */}
             {sub === 'reglages' && (
-              <Reglages sx={sx} isOn={isOn} toggleFeature={toggleFeature} relaunchOnboarding={() => { setOnboarded(false); setSub(null) }} />
+              <Reglages sx={sx} isOn={isOn} toggleFeature={toggleFeature} relaunchOnboarding={() => { setOnboarded(false); setSub(null) }}
+                trackingCount={loadTrack().length}
+                onShareTracking={() => { haptic(ImpactStyle.Light); shareTracking(JSON.stringify(buildTrackingExport(loadTrack(), { build: BUILD_NUMBER }), null, 2)) }}
+                onResetTracking={() => { haptic(ImpactStyle.Medium); clearTrack() }} />
             )}
 
             {/* MES SÉJOURS (multi-séjours / modèles réutilisables) */}
