@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { groupPhotosByDay } from '../photos.js'
 import { hasJournalEntry, journalSnippet } from '../journal.js'
+import { buildAlbumHtml, buildNativeSrcMap, shareAlbum, albumHasContent } from '../album.js'
 import { useEscapeKey } from '../hooks/useEscapeKey.js'
 
 /** Vignette : charge son URL affichable à l'affichage (async Filesystem). */
@@ -16,13 +17,29 @@ function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
 }
 
 /** Sous-écran Souvenirs — galerie photo du séjour regroupée par journée. */
-export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay, journal = {}, openDayJournal }) {
+export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay, journal = {}, openDayJournal, trip = {} }) {
   const [viewer, setViewer] = useState(null) // meta de la photo ouverte en plein écran
+  const [busy, setBusy] = useState(false) // génération de l'album en cours
   useEscapeKey(() => setViewer(null), !!viewer) // fermeture clavier de la visionneuse
   const groups = groupPhotosByDay(photos, days)
   const journalDays = days
     .map((d, i) => ({ d, i, entry: journal[`${d.dow} ${d.num}`] }))
     .filter((x) => hasJournalEntry(x.entry))
+  const canAlbum = albumHasContent(days, journal, groups)
+
+  // Génère le carnet de voyage HTML autonome puis ouvre le partage/téléchargement.
+  const makeAlbum = async () => {
+    if (busy) return
+    setBusy(true)
+    try {
+      const photosByDay = groupPhotosByDay(photos, days)
+      const fullMap = await buildNativeSrcMap(photosByDay, srcMap)
+      const html = buildAlbumHtml({ trip, days, journal, photosByDay, srcMap: fullMap })
+      await shareAlbum(html)
+    } finally {
+      setBusy(false)
+    }
+  }
   return (
     <div data-testid="screen-souvenirs" style={sx('padding:16px 18px 40px;')}>
       <div style={sx('background:#9c6b4a;border-radius:20px;padding:18px;color:#fffaf0;box-shadow:0 8px 20px rgba(156,107,74,0.2);')}>
@@ -34,6 +51,13 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
         <button data-testid="btn-take-photo" onClick={() => capturePhoto('camera')} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>📷 Prendre une photo</button>
         <button data-testid="btn-import-photo" onClick={() => capturePhoto('photos')} style={sx('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>🖼️ Importer</button>
       </div>
+
+      {canAlbum && (
+        <button
+          data-testid="btn-album" onClick={makeAlbum} disabled={busy}
+          style={sx('width:100%;margin-top:10px;border:1px solid #9c6b4a;background:#fffdf8;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}
+        >{busy ? '📕 Préparation…' : '📕 Album souvenir'}</button>
+      )}
 
       {openDayJournal && journalDays.length > 0 && (
         <div data-testid="souvenirs-journal" style={sx('margin-top:20px;')}>

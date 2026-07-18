@@ -36,3 +36,15 @@ describe('Souvenirs — lien vers le journal du calendrier', () => {
     expect(openDayJournal).toHaveBeenCalledWith(1)
   })
 })
+
+describe('Souvenirs — album souvenir', () => {
+  it('cache le bouton album sans aucun contenu', () => {
+    render(<Souvenirs {...baseProps} journal={{}} openDayJournal={vi.fn()} />)
+    expect(screen.queryByTestId('btn-album')).toBeNull()
+  })
+
+  it('affiche le bouton album dès qu\'il y a du journal', () => {
+    render(<Souvenirs {...baseProps} journal={{ 'Mer 5': { best: 'la cascade' } }} openDayJournal={vi.fn()} trip={{ start: '2026-08-05', end: '2026-08-15', destination: 'Vezels-Roussy' }} />)
+    expect(screen.getByTestId('btn-album')).toBeInTheDocument()
+  })
+})
