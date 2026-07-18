@@ -61,6 +61,8 @@ const Bilan = lazy(() => import('./screens/Bilan.jsx').then(m => ({ default: m.B
 import { shareRecap, computeRecap } from './recap.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
 const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
+const Onboarding = lazy(() => import('./screens/Onboarding.jsx').then(m => ({ default: m.Onboarding })))
+import { shouldOnboard } from './onboarding.js'
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
 import { currentPositionMapsHref, openExternal, getCurrentCoords, mapsCoordsHref } from './links.js'
@@ -71,6 +73,7 @@ const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ defa
 const Carte = lazy(() => import('./screens/Carte.jsx').then(m => ({ default: m.Carte })))
 const CarteDetaillee = lazy(() => import('./screens/CarteDetaillee.jsx').then(m => ({ default: m.CarteDetaillee })))
 const Reglages = lazy(() => import('./screens/Reglages.jsx').then(m => ({ default: m.Reglages })))
+const Sejours = lazy(() => import('./screens/Sejours.jsx').then(m => ({ default: m.Sejours })))
 const RestoModal = lazy(() => import('./modals/RestoModal.jsx').then(mod => ({ default: mod.RestoModal })))
 import { usePhotos } from './hooks/usePhotos.js'
 import { buildJournalText, shareJournal } from './journal.js'
@@ -177,6 +180,7 @@ const DEFAULTS = {
   kidsGames: structuredClone(KIDS_GAMES),
   bingoItems: structuredClone(BINGO_CANTAL),
   emergencyNumbers: structuredClone(EMERGENCY_NUMBERS),
+  onboarded: false,
 }
 
 function loadStore() {
@@ -220,6 +224,9 @@ function loadStore() {
       kidsGames: p.kidsGames ?? structuredClone(KIDS_GAMES),
       bingoItems: p.bingoItems ?? structuredClone(BINGO_CANTAL),
       emergencyNumbers: p.emergencyNumbers ?? structuredClone(EMERGENCY_NUMBERS),
+      // Store existant (raw présent) = utilisateur déjà installé → pas d'assistant.
+      // Le 1er lancement (pas de raw) part de DEFAULTS (onboarded:false) → assistant.
+      onboarded: p.onboarded ?? true,
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -361,6 +368,7 @@ export default function App() {
   const [familyMembers, setFamilyMembers] = useState(initial.familyMembers || [])
   const [showVote, setShowVote] = useState(false)
   const [lastSeenBuild, setLastSeenBuild] = useState(initial.lastSeenBuild || 0)
+  const [onboarded, setOnboarded] = useState(initial.onboarded ?? false)
   const [showWhatsNew, setShowWhatsNew] = useState(false)
   const whatsNewEntries = useMemo(() => entriesSince(lastSeenBuild), [lastSeenBuild])
   useEffect(() => {
@@ -498,8 +506,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -599,7 +607,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -819,6 +827,19 @@ export default function App() {
     setShowTripEdit(false)
   }
 
+  // Assistant de premier lancement (onboarding) — collecte dates/trajet/budget
+  // puis mémorise `onboarded` pour ne plus jamais s'afficher.
+  const finishOnboarding = ({ start, end, origin, etape, destination, budget }) => {
+    haptic(ImpactStyle.Medium)
+    if (start && end && start <= end && origin?.trim() && destination?.trim()) {
+      updateTrip({ start, end, origin: origin.trim(), etape: (etape || '').trim(), destination: destination.trim() })
+    }
+    const b = parseFloat(String(budget).replace(',', '.'))
+    if (b > 0) setBudgetTotal(b)
+    setOnboarded(true)
+  }
+  const skipOnboarding = () => setOnboarded(true)
+
   // Listes logistique personnalisables (en plus des items)
   const addLogiList = () => {
     if (!newLogiListName.trim()) return
@@ -957,7 +978,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -977,6 +998,15 @@ export default function App() {
     try { window.location.reload() } catch { }
   }
   const closeImport = () => { setShowImport(false); setImportText(''); setImportError(''); setImportPreview(null) }
+
+  // Multi-séjours : remet le store à ses valeurs par défaut (« séjour vierge »).
+  // On efface la clé cantou.v1 puis on recharge — loadStore() reconstruit les
+  // DEFAULTS. Les profils (cantou.profiles) ne sont PAS touchés.
+  const resetToDefaults = () => {
+    haptic(ImpactStyle.Medium)
+    try { localStorage.removeItem(STORE_KEY) } catch { }
+    try { window.location.reload() } catch { }
+  }
 
   // Suggestions : notes libres pour de futures fonctionnalités, envoyées en
   // texte brut vers Telegram/WhatsApp (pas besoin de parser du JSON).
@@ -1022,6 +1052,13 @@ export default function App() {
     }}>
       <Confetti trigger={confettiTrigger} />
 
+      {/* ============ ONBOARDING (1er lancement) ============ */}
+      {shouldOnboard({ onboarded }) && (
+        <Suspense fallback={null}>
+          <Onboarding sx={sx} trip={trip} isOn={isOn} toggleFeature={toggleFeature} onFinish={finishOnboarding} onSkip={skipOnboarding} />
+        </Suspense>
+      )}
+
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (
         <div data-testid="sub-screen-wrapper" onTouchStart={subScreenSwipe.onTouchStart} onTouchEnd={subScreenSwipe.onTouchEnd} style={sx('height:100%;display:flex;flex-direction:column;')}>
@@ -1047,7 +1084,7 @@ export default function App() {
 
             {/* SOUVENIRS */}
             {sub === 'souvenirs' && (
-              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} journal={journal} openDayJournal={openDayJournal} />
+              <Souvenirs sx={sx} photos={photos} days={days} srcMap={srcMap} capturePhoto={capturePhoto} deletePhoto={deletePhoto} loadSrc={loadSrc} shareDay={shareDay} journal={journal} openDayJournal={openDayJournal} trip={trip} />
             )}
 
             {/* BINGO */}
@@ -1088,6 +1125,11 @@ export default function App() {
             {/* RÉGLAGES (fonctions désactivables) */}
             {sub === 'reglages' && (
               <Reglages sx={sx} isOn={isOn} toggleFeature={toggleFeature} />
+            )}
+
+            {/* MES SÉJOURS (multi-séjours / modèles réutilisables) */}
+            {sub === 'sejours' && (
+              <Sejours sx={sx} trip={trip} fmtDayShort={fmtDayShort} fmtMonthYear={fmtMonthYear} currentStoreData={currentStoreData} resetToDefaults={resetToDefaults} />
             )}
 
             {/* LOGISTIQUE */}
