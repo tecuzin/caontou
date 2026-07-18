@@ -4,6 +4,23 @@
 > Voyage paramétrable dans l'app (⚙️ sur l'accueil) — par défaut **5 → 15 août 2026**
 > (Beauvais → Laschamps → Cantal). Deadline app : **15 juillet 2026**.
 
+## ✅ « Enregistrer & nouveau » dans les listes (18 juillet, build 101)
+
+- [x] Les modales d'ajout d'items de liste (préparatifs, courses, checklist
+  trajet) ont un bouton **« ＋ Enregistrer & nouveau »** : sauvegarde sans fermer,
+  vide + refocus le champ (saisie en rafale) ; Entrée = enregistrer & nouveau ;
+  « ✓ Ajouter » sauvegarde et ferme. +4 tests, suite 619 verte, vérifié en réel.
+  > ⚠️ **Ticket Epiq à créer/déplacer une fois le MCP epiq ré-approuvé** (voir
+  > note ci-dessous) — non faisable cette session.
+
+## ⚠️ MCP epiq/codegraphcontext en attente d'approbation
+
+Le setup a été rendu reproductible via `.mcp.json` (projet) et les définitions
+*locales* redondantes retirées → les serveurs MCP passent en **« Pending approval »**.
+**Action requise une fois** : lancer `claude` en interactif et approuver les 2
+serveurs MCP du projet. La CLI `cgc` et les hooks git fonctionnent déjà ; seule
+l'écriture sur le board Epiq via MCP est en pause d'ici là.
+
 ## 🔧 Refacto + outillage UX (18 juillet, post-v1.2.0)
 
 - [x] **Alléger App.jsx** : les 9 feuilles inline extraites en composants
