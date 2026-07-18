@@ -61,6 +61,8 @@ const Bilan = lazy(() => import('./screens/Bilan.jsx').then(m => ({ default: m.B
 import { shareRecap, computeRecap } from './recap.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
 const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
+const Onboarding = lazy(() => import('./screens/Onboarding.jsx').then(m => ({ default: m.Onboarding })))
+import { shouldOnboard } from './onboarding.js'
 import { BUILD_NUMBER } from './build-info.js'
 import { entriesSince } from './changelog.js'
 import { currentPositionMapsHref, openExternal, getCurrentCoords, mapsCoordsHref } from './links.js'
@@ -177,6 +179,7 @@ const DEFAULTS = {
   kidsGames: structuredClone(KIDS_GAMES),
   bingoItems: structuredClone(BINGO_CANTAL),
   emergencyNumbers: structuredClone(EMERGENCY_NUMBERS),
+  onboarded: false,
 }
 
 function loadStore() {
@@ -220,6 +223,7 @@ function loadStore() {
       kidsGames: p.kidsGames ?? structuredClone(KIDS_GAMES),
       bingoItems: p.bingoItems ?? structuredClone(BINGO_CANTAL),
       emergencyNumbers: p.emergencyNumbers ?? structuredClone(EMERGENCY_NUMBERS),
+      onboarded: p.onboarded ?? false,
     }
   } catch {
     return structuredClone(DEFAULTS)
@@ -361,6 +365,7 @@ export default function App() {
   const [familyMembers, setFamilyMembers] = useState(initial.familyMembers || [])
   const [showVote, setShowVote] = useState(false)
   const [lastSeenBuild, setLastSeenBuild] = useState(initial.lastSeenBuild || 0)
+  const [onboarded, setOnboarded] = useState(initial.onboarded ?? false)
   const [showWhatsNew, setShowWhatsNew] = useState(false)
   const whatsNewEntries = useMemo(() => entriesSince(lastSeenBuild), [lastSeenBuild])
   useEffect(() => {
@@ -498,8 +503,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -819,6 +824,19 @@ export default function App() {
     setShowTripEdit(false)
   }
 
+  // Assistant de premier lancement (onboarding) — collecte dates/trajet/budget
+  // puis mémorise `onboarded` pour ne plus jamais s'afficher.
+  const finishOnboarding = ({ start, end, origin, etape, destination, budget }) => {
+    haptic(ImpactStyle.Medium)
+    if (start && end && start <= end && origin?.trim() && destination?.trim()) {
+      updateTrip({ start, end, origin: origin.trim(), etape: (etape || '').trim(), destination: destination.trim() })
+    }
+    const b = parseFloat(String(budget).replace(',', '.'))
+    if (b > 0) setBudgetTotal(b)
+    setOnboarded(true)
+  }
+  const skipOnboarding = () => setOnboarded(true)
+
   // Listes logistique personnalisables (en plus des items)
   const addLogiList = () => {
     if (!newLogiListName.trim()) return
@@ -957,7 +975,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -1021,6 +1039,13 @@ export default function App() {
       ...(darkMode ? { backgroundImage: STARRY_BACKGROUND_IMAGE, backgroundRepeat: 'no-repeat' } : {}),
     }}>
       <Confetti trigger={confettiTrigger} />
+
+      {/* ============ ONBOARDING (1er lancement) ============ */}
+      {shouldOnboard({ onboarded }) && (
+        <Suspense fallback={null}>
+          <Onboarding sx={sx} trip={trip} isOn={isOn} toggleFeature={toggleFeature} onFinish={finishOnboarding} onSkip={skipOnboarding} />
+        </Suspense>
+      )}
 
       {/* ============ SOUS-ÉCRANS ============ */}
       {sub && (
