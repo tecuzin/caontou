@@ -4,8 +4,8 @@ import { eur } from '../utils.js'
 function Tile({ sx, emoji, value, label, bg }) {
   return (
     <div style={sx(`background:${bg};border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:2px;`)}>
-      <div style={sx('font-size:20px;')}>{emoji}</div>
-      <div style={sx('font-family:Quicksand;font-weight:700;font-size:20px;')}>{value}</div>
+      <div style={sx('font-size:19px;')}>{emoji}</div>
+      <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>{value}</div>
       <div style={sx('font-size:12px;color:#6b6354;font-weight:600;')}>{label}</div>
     </div>
   )
@@ -46,7 +46,7 @@ export function Bilan({ sx, recap, onShare }) {
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>⭐ Nos coups de cœur</div>
           {recap.topRated.map((r) => (
             <div key={r.name} style={sx('display:flex;align-items:center;gap:8px;font-size:14px;padding:6px 0;')}>
-              <span style={sx('font-size:16px;')}>{r.emoji}</span>
+              <span style={sx('font-size:15px;')}>{r.emoji}</span>
               <span style={sx('flex:1;min-width:0;color:#6b5a45;')}>{r.name}{r.note ? <span style={sx('color:#9a917f;')}> — « {r.note} »</span> : null}</span>
               <span style={sx('font-weight:700;color:#cf7d3c;flex:0 0 auto;')}>{'★'.repeat(r.stars)}</span>
             </div>
@@ -59,7 +59,7 @@ export function Bilan({ sx, recap, onShare }) {
           <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;margin-bottom:10px;')}>À revoir la prochaine fois</div>
           {recap.toAvoid.map((r) => (
             <div key={r.name} style={sx('display:flex;align-items:center;gap:8px;font-size:14px;padding:6px 0;')}>
-              <span style={sx('font-size:16px;')}>{r.emoji}</span>
+              <span style={sx('font-size:15px;')}>{r.emoji}</span>
               <span style={sx('flex:1;min-width:0;color:#6b5a45;')}>{r.name}</span>
               <span style={sx('font-weight:700;color:#9a917f;flex:0 0 auto;')}>{'★'.repeat(r.stars)}</span>
             </div>

@@ -15,7 +15,7 @@ export function Logistique({
           <div key={L.key} style={sx('margin-bottom:18px;')}>
             <div style={sx('display:flex;align-items:center;gap:10px;margin-bottom:8px;')}>
               <span style={sx('font-size:19px;')}>{L.emoji}</span>
-              <span style={sx('font-family:Quicksand;font-weight:700;font-size:16px;flex:1;')}>{L.name}</span>
+              <span style={sx('font-family:Quicksand;font-weight:700;font-size:15px;flex:1;')}>{L.name}</span>
               <span style={sx('font-size:12px;color:#6b6354;font-weight:700;')}>{b.done}/{b.total}</span>
               <button onClick={() => deleteLogiList(L.key)} style={sx('border:none;background:transparent;cursor:pointer;font-size:13px;padding:2px 4px;color:#b8503f;')}>🗑️</button>
             </div>

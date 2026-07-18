@@ -19,8 +19,8 @@ export function Trajet({
             <span>{trajetDir === 'aller' ? trip.destination : trip.origin}</span>
           </div>
           <div style={sx('display:flex;gap:20px;margin-top:14px;flex-wrap:wrap;')}>
-            <div><div style={sx('font-size:12px;color:#c9d2b6;')}>{trajetDir === 'aller' ? 'Départ' : 'Retour'}</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{fmtDayShort(trajetDir === 'aller' ? trip.start : trip.end)}</div></div>
-            {trip.etape && <div><div style={sx('font-size:12px;color:#c9d2b6;')}>Étape (nuit)</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{trip.etape}</div></div>}
+            <div><div style={sx('font-size:12px;color:#c9d2b6;')}>{trajetDir === 'aller' ? 'Départ' : 'Retour'}</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{fmtDayShort(trajetDir === 'aller' ? trip.start : trip.end)}</div></div>
+            {trip.etape && <div><div style={sx('font-size:12px;color:#c9d2b6;')}>Étape (nuit)</div><div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{trip.etape}</div></div>}
           </div>
         </div>
       </div>

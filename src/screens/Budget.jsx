@@ -45,7 +45,7 @@ export function Budget({
       </div>
       {spentPct >= 80 && (
         <div style={sx('margin:0 18px 14px;background:#b8503f;border-radius:14px;padding:12px 16px;color:#fff;display:flex;align-items:center;gap:10px;')}>
-          <span style={sx('font-size:20px;')}>⚠️</span>
+          <span style={sx('font-size:19px;')}>⚠️</span>
           <div><div style={sx('font-weight:700;font-family:Quicksand;font-size:14px;')}>Budget à {spentPct} %</div><div style={sx('font-size:12px;opacity:0.9;margin-top:2px;')}>Plus que {eur(remain)} restants</div></div>
         </div>
       )}

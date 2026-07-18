@@ -17,17 +17,17 @@ export function Planning({
             <span style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>{d.num}</span>
           </button>
         ))}
-        <button data-testid="btn-add-day" onClick={() => setShowDayAdd(true)} style={sx('flex:0 0 auto;width:54px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:20px;font-weight:700;')}>＋</button>
+        <button data-testid="btn-add-day" onClick={() => setShowDayAdd(true)} style={sx('flex:0 0 auto;width:54px;border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;border-radius:16px;padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:19px;font-weight:700;')}>＋</button>
       </div>
       <div style={sx('padding:0 18px 8px;')}>
         <div style={sx('display:flex;align-items:center;justify-content:space-between;')}>
           <div>
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:20px;')}>{cur.title}</div>
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>{cur.title}</div>
             <div style={sx('font-size:13px;color:#6b6354;margin-bottom:16px;')}>{cur.sub}</div>
           </div>
           <div style={sx('display:flex;gap:4px;flex:0 0 auto;')}>
-            <button data-testid="btn-journal" onClick={() => openJournal(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;')}>📔</button>
-            <button onClick={() => editDay(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:16px;padding:4px;')}>✏️</button>
+            <button data-testid="btn-journal" onClick={() => openJournal(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:15px;padding:4px;')}>📔</button>
+            <button onClick={() => editDay(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:15px;padding:4px;')}>✏️</button>
           </div>
         </div>
         {cur.items.map((it, i) => (

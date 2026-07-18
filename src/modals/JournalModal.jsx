@@ -64,9 +64,9 @@ export function JournalModal({ isOpen, onClose, sx, dayLabel, entry, updateEntry
         </div>
         <textarea data-testid="journal-text" value={e.text || ''} onChange={(ev) => updateEntry('text', ev.target.value)} rows={4} placeholder="Ce qu'on a fait, vu, ri, mangé… quelques mots pour s'en souvenir." style={sx('width:100%;margin-top:6px;margin-bottom:4px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;resize:vertical;line-height:1.4;')} />
         {micError
-          ? <div data-testid="journal-mic-error" style={sx('font-size:11px;color:#cf4a3c;margin-bottom:10px;')}>{micError}</div>
+          ? <div data-testid="journal-mic-error" style={sx('font-size:12px;color:#cf4a3c;margin-bottom:10px;')}>{micError}</div>
           : recording
-            ? <div style={sx('font-size:11px;color:#6b6354;margin-bottom:10px;')}>Parle, ça s'écrit tout seul. Touche à nouveau pour arrêter.</div>
+            ? <div style={sx('font-size:12px;color:#6b6354;margin-bottom:10px;')}>Parle, ça s'écrit tout seul. Touche à nouveau pour arrêter.</div>
             : <div style={sx('margin-bottom:10px;')} />}
 
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>⭐ Moment préféré</div>

@@ -110,7 +110,7 @@ export function Accueil({
           <div style={sx('font-size:12px;letter-spacing:1px;font-weight:700;color:#5b7042;')}>🎯 DÉFI DU JOUR</div>
           <div style={sx('display:flex;align-items:center;gap:12px;margin-top:8px;')}>
             <span style={sx('font-size:30px;flex:0 0 auto;')}>{dailyChallenge.emoji}</span>
-            <div style={sx(`flex:1;min-width:0;font-family:Quicksand;font-weight:700;font-size:16px;${challengeDone ? 'text-decoration:line-through;color:#9a917f;' : ''}`)}>{dailyChallenge.label}</div>
+            <div style={sx(`flex:1;min-width:0;font-family:Quicksand;font-weight:700;font-size:15px;${challengeDone ? 'text-decoration:line-through;color:#9a917f;' : ''}`)}>{dailyChallenge.label}</div>
           </div>
           {challengeDone ? (
             <div data-testid="challenge-done" style={sx('margin-top:12px;text-align:center;font-size:14px;font-weight:700;color:#5b7042;')}>✅ Défi relevé, bravo !</div>
@@ -140,7 +140,7 @@ export function Accueil({
         <div style={sx('display:flex;align-items:center;gap:12px;')}>
           <div style={sx('width:44px;height:44px;border-radius:14px;background:#dfeae6;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🚗</div>
           <div style={sx('flex:1;')}>
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>Le grand départ</div>
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Le grand départ</div>
             <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>{fmtDayShort(trip.start)} · depuis {trip.origin}{trip.etape ? ` · via ${trip.etape}` : ''}</div>
           </div>
         </div>
@@ -149,7 +149,7 @@ export function Accueil({
 
       <button onClick={() => setSub('logistique')} style={sx('margin:0 18px 14px;width:calc(100% - 36px);text-align:left;background:#fffdf8;border:1px solid #efe6d4;border-radius:20px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
         <div style={sx('display:flex;justify-content:space-between;align-items:center;')}>
-          <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>🧳 Valises &amp; préparatifs</div>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>🧳 Valises &amp; préparatifs</div>
           <div style={sx('font-size:13px;color:#6b6354;font-weight:700;')}>{packDone}/{packTotal}</div>
         </div>
         <div style={sx('margin-top:12px;height:9px;border-radius:8px;background:#efe6d4;overflow:hidden;')}><div style={sx(`height:100%;border-radius:8px;background:#cf7d3c;width:${packPct}%;`)} /></div>
@@ -229,7 +229,7 @@ export function Accueil({
             <div key={e.num} style={sx(`display:flex;align-items:center;gap:10px;padding:10px 0;${i < emergencyNumbers.length - 1 ? 'border-bottom:1px solid #f1e9da;' : ''}`)}>
               <span style={sx('font-size:19px;flex:0 0 auto;')}>{e.emoji}</span>
               <span style={sx('flex:1;font-size:14px;color:#3a352b;')}>{e.label}</span>
-              <TelLink sx={sx} num={e.num} style={'color:#b8503f;font-weight:700;text-decoration:none;font-family:Quicksand;font-size:16px;'}>📞 {e.num}</TelLink>
+              <TelLink sx={sx} num={e.num} style={'color:#b8503f;font-weight:700;text-decoration:none;font-family:Quicksand;font-size:15px;'}>📞 {e.num}</TelLink>
             </div>
           ))}
         </div>

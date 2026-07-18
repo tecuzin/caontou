@@ -89,7 +89,7 @@ export function Sejours({ sx, trip, fmtDayShort, fmtMonthYear, currentStoreData,
         <div style={sx('display:flex;align-items:center;gap:12px;')}>
           <div style={sx('width:44px;height:44px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🧳</div>
           <div style={sx('flex:1;min-width:0;')}>
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{trip?.destination || 'Séjour en cours'}</div>
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{trip?.destination || 'Séjour en cours'}</div>
             <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>{fmtDayShort(trip.start)} → {fmtDayShort(trip.end)} {fmtMonthYear(trip.end)}</div>
           </div>
         </div>
@@ -107,7 +107,7 @@ export function Sejours({ sx, trip, fmtDayShort, fmtMonthYear, currentStoreData,
         <div style={sx('display:flex;flex-direction:column;gap:12px;')}>
           {profiles.map((p) => (
             <div key={p.id} data-testid={`profile-${p.id}`} style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-              <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{p.name}</div>
+              <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{p.name}</div>
               <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>Sauvegardé le {fmtSavedAt(p.savedAt)}</div>
               <div style={sx('display:flex;gap:8px;margin-top:12px;')}>
                 <button data-testid={`btn-load-${p.id}`} onClick={() => openLoad(p)} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📂 Charger</button>

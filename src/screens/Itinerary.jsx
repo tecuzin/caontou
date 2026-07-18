@@ -23,7 +23,7 @@ export function Itinerary({ sx, visits = [], saved = {}, openMaps }) {
 
       {stops > 0 && (
         <div data-testid="route-summary" style={sx('margin:8px 18px 14px;background:#4a5d3a;border-radius:20px;padding:16px;color:#f3ecda;')}>
-          <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{stops} arrêt{stops > 1 ? 's' : ''} · ~{fmtMinutes(roundTripMin)} de route</div>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{stops} arrêt{stops > 1 ? 's' : ''} · ~{fmtMinutes(roundTripMin)} de route</div>
           <div style={sx('font-size:12px;color:#dbe2c9;margin-top:2px;')}>Estimation aller-retour depuis Vezels-Roussy (indicative).</div>
           <ol style={sx('margin:12px 0 0;padding-left:20px;')}>
             {ordered.map((v) => (
@@ -48,7 +48,7 @@ export function Itinerary({ sx, visits = [], saved = {}, openMaps }) {
               style={sx(`display:flex;align-items:center;gap:12px;text-align:left;background:#fffdf8;border:1px solid ${on ? '#4a5d3a' : '#efe6d4'};border-radius:14px;padding:12px 14px;cursor:pointer;`)}
             >
               <span style={sx(`width:22px;height:22px;flex:0 0 auto;border-radius:8px;border:2px solid ${on ? '#4a5d3a' : '#d8cbb0'};background:${on ? '#4a5d3a' : '#fffdf8'};color:#fffaf0;font-size:13px;display:flex;align-items:center;justify-content:center;`)}>{on ? '✓' : ''}</span>
-              <span style={sx('font-size:20px;flex:0 0 auto;')}>{v.emoji}</span>
+              <span style={sx('font-size:19px;flex:0 0 auto;')}>{v.emoji}</span>
               <span style={sx('flex:1;min-width:0;font-weight:600;font-size:14px;')}>{v.name}</span>
               <span style={sx('font-size:12px;color:#6b6354;flex:0 0 auto;')}>{v.dist}</span>
             </button>
