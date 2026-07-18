@@ -4,6 +4,18 @@
 > Voyage paramétrable dans l'app (⚙️ sur l'accueil) — par défaut **5 → 15 août 2026**
 > (Beauvais → Laschamps → Cantal). Deadline app : **15 juillet 2026**.
 
+## 🔧 Refacto + outillage UX (18 juillet, post-v1.2.0)
+
+- [x] **Alléger App.jsx** : les 9 feuilles inline extraites en composants
+  `src/modals/` (App.jsx **1528 → 1368 lignes**). Rendu/testids inchangés.
+- [x] **📊 Tracking de parcours UX** : `src/tracking.js` (journal local anonyme
+  en anneau, clé séparée `cantou.track`), effets de nav dans App.jsx (flag
+  `extra_tracking`), section « Parcours (UX) » dans Réglages (partage JSON via
+  Telegram + reset). **Agent dédié** `.claude/agents/ux-analyst.md` pour analyser
+  le JSON récupéré et proposer des tickets Epiq UX (Proposal, lecture seule).
+- Reste en Proposal : extraire le routeur d'App.jsx, découper Accueil.jsx (tickets
+  de refacto créés depuis l'audit des écrans).
+
 ---
 
 ## 🔄 Drainage backlog Proposal (17-18 juillet, post-v1.2.0)
