@@ -18,6 +18,7 @@ const MODULES = [
   { emoji: '🧭', name: 'Itinéraire', sub: 'Sorties par proximité', bg: '#e7ecdf', action: 'sub:itineraire' },
   { emoji: '🗺️', name: 'Carte', sub: 'Séjour & voiture', bg: '#dfeae6', action: 'sub:carte' },
   { emoji: '🧳', name: 'Mes séjours', sub: 'Sauver & réutiliser', bg: '#e7ecdf', action: 'sub:sejours' },
+  { emoji: '🔗', name: 'Partager', sub: 'Config vers un autre tél.', bg: '#dfeae6', action: 'sub:partage-config' },
   // Réglages n'a pas de clé feature (mod_reglages inconnue) → toujours visible.
   { emoji: '🎛️', name: 'Réglages', sub: 'Activer / masquer', bg: '#eee7d4', action: 'sub:reglages' },
 ]
