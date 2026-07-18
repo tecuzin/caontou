@@ -6,15 +6,26 @@
 
 ---
 
-## 🔄 En cours — drainage backlog Proposal (17 juillet, post-v1.2.0)
+## 🔄 Drainage backlog Proposal (17-18 juillet, post-v1.2.0)
 
-Les 5 propositions passées en Todo par David sont en implémentation.
-- [x] **🌦️ Suggestions météo** (repli indoor si pluie) — livré **build 94**, en
-  UAT/EUA. Module pur `src/weather.js`, flag `extra_weather_suggestions`.
-- [ ] 🧳 Multi-séjours · 📕 Album souvenir · 🧑‍🏫 Onboarding · 🔗 Partage QR —
-  en cours (implémentation parallèle par agents, worktrees isolés).
-- [ ] 🎨 Cohérence visuelle (In progress) — différée après merge des agents
-  (touche theme.js + écrans, conflits ; QA device requise).
+Les 5 propositions passées en Todo par David.
+- [x] **🌦️ Suggestions météo** (repli indoor) — build **94**, UAT/EUA. `weather.js`.
+- [x] **🧳 Multi-séjours** (profils réutilisables) — build **95**, UAT/EUA.
+  `profiles.js`, écran Sejours, clé `cantou.profiles`.
+- [x] **📕 Album souvenir** (carnet HTML partageable) — build **95**, UAT/EUA.
+  `album.js`, bouton sur Souvenirs, sans dépendance.
+- [x] **🧑‍🏫 Onboarding** (assistant 1er lancement) — build **95**, UAT/EUA.
+  `onboarding.js`, flag `onboarded` (affiché seulement en install neuve).
+- [ ] **🔗 Partage QR** — reste **In progress** : agent stoppé sur limite de
+  session avant l'encodeur QR (contrainte zéro-dépendance = gros morceau).
+- [ ] 🎨 Cohérence visuelle (In progress) — différée, QA device requise.
+
+> Note technique : les 4 features ci-dessus (météo + 3 du build 95) ont été
+> implémentées en parallèle par agents dans des worktrees isolés, puis
+> intégrées via une branche `integration/proposal-batch` (merge unique vers
+> develop). Un agent avait commité un symlink `node_modules` par erreur →
+> détracké ; deps réinstallées (`npm ci` en neutralisant `npm_config_allow_scripts`).
+> Suite **585 verte**, audit design vert.
 
 ## ✅ Complété — a11y overlays (17 juillet, après v1.2.0)
 
