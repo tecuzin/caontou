@@ -17,7 +17,7 @@ export function Restos({ sx, restos, openAddResto, openEditResto, deleteResto })
         <div key={r.id} data-testid={`resto-${r.id}`} style={sx('margin-top:12px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:14px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
           <div style={sx('display:flex;align-items:flex-start;gap:8px;')}>
             <div style={sx('flex:1;')}>
-              <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{r.name}</div>
+              <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{r.name}</div>
               {r.place && <div style={sx('margin-top:4px;')}><MapLink sx={sx} place={r.place} style={'color:#4f8a86;font-weight:600;text-decoration:none;font-size:13px;'}>📍 {r.place}</MapLink></div>}
               {r.tel && <div style={sx('margin-top:4px;')}><TelLink sx={sx} num={r.tel} style={'color:#9c6b4a;font-weight:700;text-decoration:none;font-size:14px;'}>📞 {r.tel}</TelLink></div>}
             </div>

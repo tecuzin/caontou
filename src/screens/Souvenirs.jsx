@@ -73,7 +73,7 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
                   <span style={sx('display:block;font-family:Quicksand;font-weight:700;font-size:14px;')}>{d.dow} {d.num} — {d.title}</span>
                   {journalSnippet(entry) && <span style={sx('display:block;font-size:12px;color:#6b6354;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;')}>{journalSnippet(entry)}</span>}
                 </span>
-                <span style={sx('flex:0 0 auto;color:#9c6b4a;font-size:16px;')}>›</span>
+                <span style={sx('flex:0 0 auto;color:#9c6b4a;font-size:15px;')}>›</span>
               </button>
             ))}
           </div>

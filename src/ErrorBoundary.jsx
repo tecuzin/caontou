@@ -85,7 +85,7 @@ export class ErrorBoundary extends Component {
         {/* Titre */}
         <h1
           style={sx(
-            'color:#2f2a22;font-size:20px;font-weight:600;margin:0 0 12px;text-align:center;'
+            'color:#2f2a22;font-size:19px;font-weight:600;margin:0 0 12px;text-align:center;'
           )}
         >
           Oups, une erreur s'est produite
@@ -112,7 +112,7 @@ export class ErrorBoundary extends Component {
             </summary>
             <pre
               style={sx(
-                'margin:8px 0 0;font-size:10px;color:#2f2a22;overflow-x:auto;white-space:pre-wrap;word-break:break-word;'
+                'margin:8px 0 0;font-size:12px;color:#2f2a22;overflow-x:auto;white-space:pre-wrap;word-break:break-word;'
               )}
             >
               {this.state.error.toString()}

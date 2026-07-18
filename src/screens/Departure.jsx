@@ -16,7 +16,7 @@ export function Departure({ sx, departure, toggleDeparture, addDepartureItem, re
 
       <div style={sx('margin:8px 18px 14px;background:#4a5d3a;border-radius:20px;padding:16px;color:#f3ecda;')}>
         <div style={sx('display:flex;justify-content:space-between;align-items:baseline;')}>
-          <span style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{done}/{departure.length} fait{done > 1 ? 's' : ''}</span>
+          <span style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{done}/{departure.length} fait{done > 1 ? 's' : ''}</span>
           <span data-testid="departure-pct" style={sx('font-size:13px;color:#dbe2c9;')}>{pct} %</span>
         </div>
         <div style={sx('margin-top:12px;height:8px;border-radius:8px;background:rgba(255,255,255,0.18);overflow:hidden;')}><div style={sx(`height:100%;background:#e8c07a;width:${pct}%;`)} /></div>

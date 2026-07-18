@@ -11,7 +11,7 @@ export function CarSpot({ sx, carSpot, parkCar, findCar, forgetCar }) {
       <div style={sx('display:flex;align-items:center;gap:10px;')}>
         <span style={sx('font-size:22px;flex:0 0 auto;')}>🅿️</span>
         <div style={sx('flex:1;min-width:0;')}>
-          <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>Mémo voiture</div>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Mémo voiture</div>
           <div style={sx('font-size:12px;color:#6b6354;margin-top:1px;')}>{parked ? formatParkedAt(carSpot.at) : 'Sur un grand parking ? Mémorise où tu t\'es garé.'}</div>
         </div>
       </div>

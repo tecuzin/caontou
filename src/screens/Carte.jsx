@@ -93,7 +93,7 @@ export function Carte({ sx, visits = [], gite, carSpot, savedIds = [], findCar, 
       {/* Détail du marqueur sélectionné */}
       {selected && (
         <div data-testid="map-selected" style={sx('margin-top:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:14px 16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{selected.name}</div>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{selected.name}</div>
           <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>{selected.meta}</div>
           {selected.kind === 'car' && findCar && (
             <button data-testid="map-find-car" onClick={findCar} style={sx('margin-top:10px;border:none;background:#4f8a86;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:12px;padding:9px 14px;cursor:pointer;')}>🧭 M'y guider</button>

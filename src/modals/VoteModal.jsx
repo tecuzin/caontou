@@ -53,7 +53,7 @@ export function VoteModal({ isOpen, onClose, sx, visits, savedVisitIds, familyMe
           const on = candidateIds.includes(v.id)
           return (
             <button key={v.id} data-testid={`vote-cand-${v.id}`} onClick={() => toggleCandidate(v.id)} style={sx(`display:flex;align-items:center;gap:10px;text-align:left;border:${on ? '2px solid #4a5d3a' : '1px solid #e3d8c2'};background:${on ? '#e7ecdf' : '#fffdf8'};border-radius:14px;padding:10px 12px;cursor:pointer;`)}>
-              <span style={sx('font-size:20px;flex:0 0 auto;')}>{v.emoji}</span>
+              <span style={sx('font-size:19px;flex:0 0 auto;')}>{v.emoji}</span>
               <span style={sx('flex:1;font-size:14px;font-weight:600;')}>{v.name}</span>
               {on && <span style={sx('font-size:14px;color:#4a5d3a;')}>✓</span>}
             </button>

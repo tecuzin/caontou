@@ -112,7 +112,7 @@ body { background: #f4ecdc; color: #2f2a22; font-family: -apple-system, "Segoe U
 .cover { background: #4a5d3a; color: #fffaf0; border-radius: 20px; padding: 40px 24px; text-align: center; box-shadow: 0 8px 20px rgba(74,93,58,0.2); margin-bottom: 24px; }
 .cover .emoji { font-size: 44px; }
 .cover h1 { font-size: 26px; margin-top: 12px; }
-.cover .dates { font-size: 16px; color: #efe6d4; margin-top: 8px; }
+.cover .dates { font-size: 15px; color: #efe6d4; margin-top: 8px; }
 .day { background: #fffdf8; border: 1px solid #efe6d4; border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(74,93,58,0.1); }
 .day h2 { font-size: 19px; color: #4a5d3a; margin-bottom: 12px; }
 .mood { font-size: 22px; margin-bottom: 8px; }

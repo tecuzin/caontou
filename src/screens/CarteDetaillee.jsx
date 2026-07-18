@@ -108,8 +108,8 @@ export function CarteDetaillee(props) {
 
           {/* Zoom */}
           <div style={{ position: 'absolute', right: '10px', top: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button data-testid="detmap-zoom-in" aria-label="Zoomer" onClick={() => setZoom(Math.min((z) + 1, 15))} style={sx('width:34px;height:34px;border:none;border-radius:10px;background:rgba(255,253,248,0.95);font-size:20px;font-weight:700;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15);color:#4a5d3a;')}>+</button>
-            <button data-testid="detmap-zoom-out" aria-label="Dézoomer" onClick={() => setZoom(Math.max((z) - 1, 3))} style={sx('width:34px;height:34px;border:none;border-radius:10px;background:rgba(255,253,248,0.95);font-size:20px;font-weight:700;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15);color:#4a5d3a;')}>−</button>
+            <button data-testid="detmap-zoom-in" aria-label="Zoomer" onClick={() => setZoom(Math.min((z) + 1, 15))} style={sx('width:34px;height:34px;border:none;border-radius:10px;background:rgba(255,253,248,0.95);font-size:19px;font-weight:700;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15);color:#4a5d3a;')}>+</button>
+            <button data-testid="detmap-zoom-out" aria-label="Dézoomer" onClick={() => setZoom(Math.max((z) - 1, 3))} style={sx('width:34px;height:34px;border:none;border-radius:10px;background:rgba(255,253,248,0.95);font-size:19px;font-weight:700;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15);color:#4a5d3a;')}>−</button>
           </div>
 
           {/* Attribution obligatoire */}
@@ -119,7 +119,7 @@ export function CarteDetaillee(props) {
 
       {selected && (
         <div data-testid="detmap-selected" style={sx('margin-top:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:14px 16px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('font-family:Quicksand;font-weight:700;font-size:16px;')}>{selected.name}</div>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{selected.name}</div>
           <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>{selected.meta}</div>
         </div>
       )}
