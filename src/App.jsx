@@ -1124,7 +1124,7 @@ export default function App() {
 
             {/* RÉGLAGES (fonctions désactivables) */}
             {sub === 'reglages' && (
-              <Reglages sx={sx} isOn={isOn} toggleFeature={toggleFeature} />
+              <Reglages sx={sx} isOn={isOn} toggleFeature={toggleFeature} relaunchOnboarding={() => { setOnboarded(false); setSub(null) }} />
             )}
 
             {/* MES SÉJOURS (multi-séjours / modèles réutilisables) */}

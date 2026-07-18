@@ -21,7 +21,7 @@ function Toggle({ sx, on, onClick, label }) {
  * les données restent intactes (rien n'est supprimé). Tout est exporté dans
  * le JSON de sauvegarde.
  */
-export function Reglages({ sx, isOn, toggleFeature }) {
+export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding }) {
   return (
     <div data-testid="screen-reglages" style={sx('padding:0 18px 24px;')}>
       <div style={sx('font-size:13px;color:#6b6354;margin:2px 0 16px;')}>
@@ -41,6 +41,14 @@ export function Reglages({ sx, isOn, toggleFeature }) {
           </div>
         </div>
       ))}
+
+      {relaunchOnboarding && (
+        <div style={sx('margin-top:6px;')}>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;margin-bottom:8px;')}>Assistant</div>
+          <button data-testid="btn-relaunch-onboarding" onClick={relaunchOnboarding} style={sx('width:100%;border:1px solid #cf7d3c;background:#fffdf8;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:12px;cursor:pointer;')}>🔁 Relancer l'assistant de configuration</button>
+          <div style={sx('font-size:12px;color:#6b6354;margin-top:6px;')}>Rejoue les étapes de dates, trajet et budget (utile pour reconfigurer un séjour).</div>
+        </div>
+      )}
     </div>
   )
 }
