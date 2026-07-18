@@ -20,6 +20,7 @@ import { Accueil } from './screens/Accueil.jsx'
 import { scheduleAllNotifications } from './notifications.js'
 import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
 import { parseImport, formatLastBackup } from './backup.js'
+import { encodeSharePayload, shareConfig as shareConfigText } from './share-config.js'
 import { DEPARTURE_INITIAL, isCheckoutWindow } from './departure.js'
 import { challengeOfDay, dayKey } from './challenges.js'
 import { runSelfTests } from './selftest.js'
@@ -73,6 +74,7 @@ const Itinerary = lazy(() => import('./screens/Itinerary.jsx').then(m => ({ defa
 const Carte = lazy(() => import('./screens/Carte.jsx').then(m => ({ default: m.Carte })))
 const CarteDetaillee = lazy(() => import('./screens/CarteDetaillee.jsx').then(m => ({ default: m.CarteDetaillee })))
 const Reglages = lazy(() => import('./screens/Reglages.jsx').then(m => ({ default: m.Reglages })))
+const PartageConfig = lazy(() => import('./screens/PartageConfig.jsx').then(m => ({ default: m.PartageConfig })))
 const Sejours = lazy(() => import('./screens/Sejours.jsx').then(m => ({ default: m.Sejours })))
 const RestoModal = lazy(() => import('./modals/RestoModal.jsx').then(mod => ({ default: mod.RestoModal })))
 import { usePhotos } from './hooks/usePhotos.js'
@@ -607,7 +609,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -1130,6 +1132,11 @@ export default function App() {
             {/* MES SÉJOURS (multi-séjours / modèles réutilisables) */}
             {sub === 'sejours' && (
               <Sejours sx={sx} trip={trip} fmtDayShort={fmtDayShort} fmtMonthYear={fmtMonthYear} currentStoreData={currentStoreData} resetToDefaults={resetToDefaults} />
+            )}
+
+            {/* PARTAGE DE CONFIG (QR + copier/coller, hors-ligne) */}
+            {sub === 'partage-config' && (
+              <PartageConfig sx={sx} payloadText={encodeSharePayload(currentStoreData())} onShare={shareConfigText} setters={{ setTrip, setSaved, setBudgetTotal, setFeatures }} />
             )}
 
             {/* LOGISTIQUE */}
