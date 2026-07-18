@@ -879,3 +879,5 @@
 {"v":1,"id":["01KXT9VPRCV7YQSVCYXZNX4VKP","01KXT9VPR97HQQNTYTRNMHV2ZF"],"add.issue.tag":{"id":"01KXEDWFVP8Y6WRTCYMRMP9Q1Y","tag":"01KXT9VPR7M1J1CV8TMZ6N79SQ"}}
 {"v":1,"id":["01KXT9VYQD4NWH31ANJXTNMQ9V","01KXT9VPRCV7YQSVCYXZNX4VKP"],"add.issue.tag":{"id":"01KXEDWFVP8Y6WRTCYMRMP9Q1Y","tag":"01KXRM2QAW959WR90JXP1FDC0E"}}
 {"v":1,"id":["01KXTA8D53YZQ4YTS73FZ1QFDZ","01KXT9VYQD4NWH31ANJXTNMQ9V"],"add.issue":{"id":"01KXTA8D4ZRPJ0J93MB0FHW7TY","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🧹 Alléger App.jsx : extraire les 9 modales inline restantes en composants","rank":"7fffffffffffffffffffffff"}}
+{"v":1,"id":["01KXTA8K5HQPNT5BS9TVCVZXY0","01KXTA8D53YZQ4YTS73FZ1QFDZ"],"add.issue":{"id":"01KXTA8K5DTGVJH4N5XK632VJM","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🧹 Alléger App.jsx : extraire le routeur de navigation (onglets + sous-écrans)","rank":"bfffffffffffffffffffffff"}}
+{"v":1,"id":["01KXTA8VK3WCGC3JT8EKQ9ASAQ","01KXTA8K5HQPNT5BS9TVCVZXY0"],"add.issue":{"id":"01KXTA8VK0ETVC1AVCFZSVC452","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🧹 Découper Accueil.jsx en sous-composants de section","rank":"dfffffffffffffffffffffff"}}
