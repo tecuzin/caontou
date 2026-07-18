@@ -36,7 +36,15 @@ import { useRestos } from './hooks/useRestos.js'
 import { useDeparture } from './hooks/useDeparture.js'
 import { useRatings } from './hooks/useRatings.js'
 import { useFeatures } from './hooks/useFeatures.js'
-import { ModalShell } from './modals/ModalShell.jsx'
+import { NewLogiListModal } from './modals/NewLogiListModal.jsx'
+import { NewCourseCatModal } from './modals/NewCourseCatModal.jsx'
+import { AddDayModal } from './modals/AddDayModal.jsx'
+import { SelftestModal } from './modals/SelftestModal.jsx'
+import { MealSheet } from './modals/MealSheet.jsx'
+import { ActivityEditSheet } from './modals/ActivityEditSheet.jsx'
+import { DayEditSheet } from './modals/DayEditSheet.jsx'
+import { ExpenseSheet } from './modals/ExpenseSheet.jsx'
+import { ActivityAddSheet } from './modals/ActivityAddSheet.jsx'
 import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
@@ -1250,130 +1258,30 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER UNE DÉPENSE ============ */}
       {showAdd && (
-        <ModalShell onClose={closeAdd} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Montant</div>
-            <input data-testid="input-montant" value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:19px;font-family:Quicksand;font-weight:700;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Libellé</div>
-            <input data-testid="input-label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Catégorie</div>
-            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;margin-bottom:20px;')}>
-              {CATS.map((c) => (
-                <button key={c.name} onClick={() => setNewCat(c.name)} style={sx(`border:none;border-radius:999px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
-              ))}
-            </div>
-            {familyMembers.length > 0 && (
-              <>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Payé par</div>
-                <div data-testid="paidby-chips" style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;margin-bottom:20px;')}>
-                  {familyMembers.map((m) => {
-                    const sel = (newPaidBy || familyMembers[0]) === m
-                    return <button key={m} onClick={() => setNewPaidBy(m)} style={sx(`border:none;border-radius:999px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;background:${sel ? '#4a5d3a' : '#f3ece0'};color:${sel ? '#fffaf0' : '#6b6354'};`)}>{m}</button>
-                  })}
-                </div>
-              </>
-            )}
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Reçu (photo du ticket)</div>
-            <div style={sx('display:flex;align-items:center;gap:10px;margin-top:6px;margin-bottom:20px;')}>
-              {newReceiptId ? (
-                <>
-                  <span style={sx('display:inline-flex;align-items:center;gap:6px;background:#e7ecdf;color:#4a5d3a;border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;')}>🧾 Reçu attaché</span>
-                  <button data-testid="btn-remove-receipt" onClick={() => setNewReceiptId('')} style={sx('border:none;background:transparent;color:#b8503f;cursor:pointer;font-size:13px;font-weight:700;')}>Retirer</button>
-                </>
-              ) : (
-                <>
-                  <button data-testid="btn-receipt-camera" onClick={() => captureReceipt('camera')} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📷 Photographier</button>
-                  <button data-testid="btn-receipt-gallery" onClick={() => captureReceipt('photos')} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>🖼️ Importer</button>
-                </>
-              )}
-            </div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-submit-depense" onClick={submitExpense} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
-            </div>
-          </div>
-        </ModalShell>
+        <ExpenseSheet sx={sx} onClose={closeAdd} isEdit={editingExpenseIdx !== null} cats={CATS}
+          amount={newAmt} setAmount={setNewAmt} label={newLabel} setLabel={setNewLabel} cat={newCat} setCat={setNewCat}
+          familyMembers={familyMembers} paidBy={newPaidBy} setPaidBy={setNewPaidBy}
+          receiptId={newReceiptId} setReceiptId={setNewReceiptId} onCaptureReceipt={captureReceipt} onSubmit={submitExpense} />
       )}
 
       {/* ============ FEUILLE : EDITER REPAS ============ */}
       {showMealEdit && (
-        <ModalShell onClose={closeMealEdit} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingMealId === null ? 'Ajouter un repas' : `Repas du ${newMealDay}`}</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour</div>
-            <input value={newMealDay} onChange={(e) => setNewMealDay(e.target.value)} placeholder="Ex : Sam 11" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Plat</div>
-            <input value={newMealDish} onChange={(e) => setNewMealDish(e.target.value)} placeholder="Ex : Truffade maison" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeMealEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveMeal} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </ModalShell>
+        <MealSheet sx={sx} onClose={closeMealEdit} isEdit={editingMealId !== null} day={newMealDay} setDay={setNewMealDay} dish={newMealDish} setDish={setNewMealDish} onSubmit={saveMeal} />
       )}
 
       {/* ============ FEUILLE : EDITER ACTIVITE PLANNING ============ */}
       {showActivityEdit && editingActivityIdx && (
-        <ModalShell onClose={closeActivityEdit} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer activite</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeActivityEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
-            </div>
-          </div>
-        </ModalShell>
+        <ActivityEditSheet sx={sx} onClose={closeActivityEdit} time={newActivityTime} setTime={setNewActivityTime} title={newActivityTitle} setTitle={setNewActivityTitle} onSubmit={submitActivity} />
       )}
 
       {/* ============ FEUILLE : AJOUTER/EDITER JOUR ============ */}
       {showDayEdit && editingDayIdx !== null && (
-        <ModalShell onClose={closeDayEdit} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer jour</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newDayTitle} onChange={(e) => setNewDayTitle(e.target.value)} placeholder="Ex : Le grand depart" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
-            <input value={newDaySub} onChange={(e) => setNewDaySub(e.target.value)} placeholder="Ex : Laschamps -> Vezels-Roussy" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeDayEdit} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button onClick={saveDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Enregistrer</button>
-              {days.length > 1 && <button onClick={() => { deleteDay(editingDayIdx); closeDayEdit() }} style={sx('flex:0 0 auto;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Supprimer</button>}
-            </div>
-          </div>
-        </ModalShell>
+        <DayEditSheet sx={sx} onClose={closeDayEdit} title={newDayTitle} setTitle={setNewDayTitle} sub={newDaySub} setSub={setNewDaySub} onSubmit={saveDay} onDelete={() => { deleteDay(editingDayIdx); closeDayEdit() }} canDelete={days.length > 1} />
       )}
 
       {/* ============ FEUILLE : AJOUTER ACTIVITE ============ */}
       {showActivityAdd && (
-        <ModalShell onClose={closeActivityAdd} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter activite</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
-            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
-              {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
-                <button key={c} onClick={() => setNewActivityColor(c)} style={sx(`width:32px;height:32px;border-radius:50%;background:${c};border:${newActivityColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
-              ))}
-            </div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeActivityAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </ModalShell>
+        <ActivityAddSheet sx={sx} onClose={closeActivityAdd} time={newActivityTime} setTime={setNewActivityTime} title={newActivityTitle} setTitle={setNewActivityTitle} color={newActivityColor} setColor={setNewActivityColor} onSubmit={submitActivity} />
       )}
 
       {showAddLogiItem && <Suspense fallback={null}><AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} /></Suspense>}
@@ -1426,28 +1334,7 @@ export default function App() {
 
       {/* MODAL: Auto-diagnostic */}
       {showSelftest && (
-        <ModalShell onClose={() => setShowSelftest(false)} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;max-height:80vh;overflow-y:auto;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Auto-diagnostic</div>
-            <div style={sx('font-size:13px;color:#6b6354;margin-bottom:14px;')}>Vérifications rapides exécutées directement sur ce téléphone (pas la suite de tests complète du build — voir le skill « release »).</div>
-            <div data-testid="selftest-summary" style={sx(`font-family:Quicksand;font-weight:700;font-size:15px;margin-bottom:10px;color:${selftestResults.every((r) => r.pass) ? '#4a5d3a' : '#b8503f'};`)}>
-              {selftestResults.filter((r) => r.pass).length} / {selftestResults.length} vérifications OK
-            </div>
-            <div data-testid="selftest-results">
-              {selftestResults.map((r, i) => (
-                <div key={i} style={sx(`display:flex;gap:8px;padding:8px 0;border-bottom:1px solid #ece2cf;font-size:13px;color:${r.pass ? '#4a5d3a' : '#b8503f'};`)}>
-                  <span>{r.pass ? '✅' : '❌'}</span>
-                  <div>
-                    <div style={sx('font-weight:600;')}>{r.name}</div>
-                    {!r.pass && <div style={sx('font-size:12px;color:#6b6354;')}>{r.detail}</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button onClick={() => setShowSelftest(false)} style={sx('width:100%;margin-top:14px;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Fermer</button>
-          </div>
-        </ModalShell>
+        <SelftestModal sx={sx} onClose={() => setShowSelftest(false)} results={selftestResults} />
       )}
 
       {/* MODAL: Paramètres du voyage */}
@@ -1455,64 +1342,17 @@ export default function App() {
 
       {/* MODAL: Nouvelle liste de logistique */}
       {showAddLogiList && (
-        <ModalShell onClose={() => setShowAddLogiList(false)} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle liste</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Emoji</div>
-            <input value={newLogiListEmoji} onChange={(e) => setNewLogiListEmoji(e.target.value)} placeholder="📦" maxLength="2" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:26px;text-align:center;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
-            <input data-testid="input-logi-list-name" value={newLogiListName} onChange={(e) => setNewLogiListName(e.target.value)} placeholder="Ex : Sac de plage" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addLogiList()} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddLogiList(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-logi-list" onClick={addLogiList} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </ModalShell>
+        <NewLogiListModal sx={sx} onClose={() => setShowAddLogiList(false)} emoji={newLogiListEmoji} setEmoji={setNewLogiListEmoji} name={newLogiListName} setName={setNewLogiListName} onSubmit={addLogiList} />
       )}
 
       {/* MODAL: Nouvelle catégorie de courses */}
       {showAddCourseCat && (
-        <ModalShell onClose={() => setShowAddCourseCat(false)} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Nouvelle catégorie</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Nom</div>
-            <input data-testid="input-course-cat-name" value={newCourseCatName} onChange={(e) => setNewCourseCatName(e.target.value)} placeholder="Ex : Apéro" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} onKeyDown={(e) => e.key === 'Enter' && addCourseCategory()} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowAddCourseCat(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-course-cat" onClick={addCourseCategory} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </ModalShell>
+        <NewCourseCatModal sx={sx} onClose={() => setShowAddCourseCat(false)} name={newCourseCatName} setName={setNewCourseCatName} onSubmit={addCourseCategory} />
       )}
 
       {/* MODAL: Ajouter un jour au planning */}
       {showDayAdd && (
-        <ModalShell onClose={() => setShowDayAdd(false)} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('width:100%;background:#f6efe2;border-radius:28px 28px 0 0;padding:20px 20px 36px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter un jour</div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Jour (abrégé)</div>
-                <input data-testid="input-day-dow" value={newDayDow} onChange={(e) => setNewDayDow(e.target.value)} placeholder="Ex : Dim" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-              <div style={sx('flex:1;')}>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Numéro</div>
-                <input data-testid="input-day-num" value={newDayNum} onChange={(e) => setNewDayNum(e.target.value)} placeholder="Ex : 16" inputMode="numeric" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-              </div>
-            </div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input data-testid="input-day-title" value={newDayTitle2} onChange={(e) => setNewDayTitle2(e.target.value)} placeholder="Ex : Journée détente" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Sous-titre</div>
-            <input value={newDaySub2} onChange={(e) => setNewDaySub2(e.target.value)} placeholder="Ex : Au gré de l'envie" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={() => setShowDayAdd(false)} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-save-day-add" onClick={addDay} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </ModalShell>
+        <AddDayModal sx={sx} onClose={() => setShowDayAdd(false)} dow={newDayDow} setDow={setNewDayDow} num={newDayNum} setNum={setNewDayNum} title={newDayTitle2} setTitle={setNewDayTitle2} sub={newDaySub2} setSub={setNewDaySub2} onSubmit={addDay} />
       )}
 
       {/* BANDEAU UNDO SUPPRESSION */}
