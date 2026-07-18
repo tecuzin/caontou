@@ -10,16 +10,13 @@
   trajet) ont un bouton **« ＋ Enregistrer & nouveau »** : sauvegarde sans fermer,
   vide + refocus le champ (saisie en rafale) ; Entrée = enregistrer & nouveau ;
   « ✓ Ajouter » sauvegarde et ferme. +4 tests, suite 619 verte, vérifié en réel.
-  > ⚠️ **Ticket Epiq à créer/déplacer une fois le MCP epiq ré-approuvé** (voir
-  > note ci-dessous) — non faisable cette session.
+  Ticket Epiq en UAT/EUA (tags build101 / v1.2.0).
 
-## ⚠️ MCP epiq/codegraphcontext en attente d'approbation
+## ✅ MCP epiq/codegraphcontext — reproductibles et approuvés
 
-Le setup a été rendu reproductible via `.mcp.json` (projet) et les définitions
-*locales* redondantes retirées → les serveurs MCP passent en **« Pending approval »**.
-**Action requise une fois** : lancer `claude` en interactif et approuver les 2
-serveurs MCP du projet. La CLI `cgc` et les hooks git fonctionnent déjà ; seule
-l'écriture sur le board Epiq via MCP est en pause d'ici là.
+Setup rendu reproductible via `.mcp.json` (projet), définitions *locales*
+redondantes retirées, serveurs MCP **approuvés et ✔ Connected**. Source unique,
+partageable. (CLI `cgc` + hooks d'indexation + cron 6 h opérationnels.)
 
 ## 🔧 Refacto + outillage UX (18 juillet, post-v1.2.0)
 
