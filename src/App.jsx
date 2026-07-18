@@ -36,7 +36,6 @@ import { useRestos } from './hooks/useRestos.js'
 import { useDeparture } from './hooks/useDeparture.js'
 import { useRatings } from './hooks/useRatings.js'
 import { useFeatures } from './hooks/useFeatures.js'
-import { ModalShell } from './modals/ModalShell.jsx'
 import { NewLogiListModal } from './modals/NewLogiListModal.jsx'
 import { NewCourseCatModal } from './modals/NewCourseCatModal.jsx'
 import { AddDayModal } from './modals/AddDayModal.jsx'
@@ -44,6 +43,8 @@ import { SelftestModal } from './modals/SelftestModal.jsx'
 import { MealSheet } from './modals/MealSheet.jsx'
 import { ActivityEditSheet } from './modals/ActivityEditSheet.jsx'
 import { DayEditSheet } from './modals/DayEditSheet.jsx'
+import { ExpenseSheet } from './modals/ExpenseSheet.jsx'
+import { ActivityAddSheet } from './modals/ActivityAddSheet.jsx'
 import { useLogi } from './hooks/useLogi.js'
 import { useCourses } from './hooks/useCourses.js'
 import { usePlanning } from './hooks/usePlanning.js'
@@ -1257,51 +1258,10 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER UNE DÉPENSE ============ */}
       {showAdd && (
-        <ModalShell onClose={closeAdd} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>{editingExpenseIdx !== null ? 'Editer dépense' : 'Nouvelle dépense'}</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Montant</div>
-            <input data-testid="input-montant" value={newAmt} onChange={(e) => setNewAmt(e.target.value)} inputMode="decimal" placeholder="0,00 €" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:19px;font-family:Quicksand;font-weight:700;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Libellé</div>
-            <input data-testid="input-label" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} placeholder="Ex : Glaces à Dienne" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Catégorie</div>
-            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;margin-bottom:20px;')}>
-              {CATS.map((c) => (
-                <button key={c.name} onClick={() => setNewCat(c.name)} style={sx(`border:none;border-radius:999px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;background:${newCat === c.name ? c.color : '#f3ece0'};color:${newCat === c.name ? '#fffaf0' : '#6b6354'};`)}>{c.name}</button>
-              ))}
-            </div>
-            {familyMembers.length > 0 && (
-              <>
-                <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Payé par</div>
-                <div data-testid="paidby-chips" style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;margin-bottom:20px;')}>
-                  {familyMembers.map((m) => {
-                    const sel = (newPaidBy || familyMembers[0]) === m
-                    return <button key={m} onClick={() => setNewPaidBy(m)} style={sx(`border:none;border-radius:999px;padding:8px 16px;font-weight:700;font-size:13px;cursor:pointer;background:${sel ? '#4a5d3a' : '#f3ece0'};color:${sel ? '#fffaf0' : '#6b6354'};`)}>{m}</button>
-                  })}
-                </div>
-              </>
-            )}
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Reçu (photo du ticket)</div>
-            <div style={sx('display:flex;align-items:center;gap:10px;margin-top:6px;margin-bottom:20px;')}>
-              {newReceiptId ? (
-                <>
-                  <span style={sx('display:inline-flex;align-items:center;gap:6px;background:#e7ecdf;color:#4a5d3a;border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700;')}>🧾 Reçu attaché</span>
-                  <button data-testid="btn-remove-receipt" onClick={() => setNewReceiptId('')} style={sx('border:none;background:transparent;color:#b8503f;cursor:pointer;font-size:13px;font-weight:700;')}>Retirer</button>
-                </>
-              ) : (
-                <>
-                  <button data-testid="btn-receipt-camera" onClick={() => captureReceipt('camera')} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📷 Photographier</button>
-                  <button data-testid="btn-receipt-gallery" onClick={() => captureReceipt('photos')} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>🖼️ Importer</button>
-                </>
-              )}
-            </div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button data-testid="btn-submit-depense" onClick={submitExpense} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>{editingExpenseIdx !== null ? 'Enregistrer' : 'Ajouter'}</button>
-            </div>
-          </div>
-        </ModalShell>
+        <ExpenseSheet sx={sx} onClose={closeAdd} isEdit={editingExpenseIdx !== null} cats={CATS}
+          amount={newAmt} setAmount={setNewAmt} label={newLabel} setLabel={setNewLabel} cat={newCat} setCat={setNewCat}
+          familyMembers={familyMembers} paidBy={newPaidBy} setPaidBy={setNewPaidBy}
+          receiptId={newReceiptId} setReceiptId={setNewReceiptId} onCaptureReceipt={captureReceipt} onSubmit={submitExpense} />
       )}
 
       {/* ============ FEUILLE : EDITER REPAS ============ */}
@@ -1321,26 +1281,7 @@ export default function App() {
 
       {/* ============ FEUILLE : AJOUTER ACTIVITE ============ */}
       {showActivityAdd && (
-        <ModalShell onClose={closeActivityAdd} z={200}>
-          <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} style={sx('background:#f6efe2;border-radius:28px 28px 0 0;padding:18px 18px 30px;animation:sheetUp 0.3s cubic-bezier(0.2,0.8,0.2,1);')}>
-            <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Ajouter activite</div>
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-            <input value={newActivityTime} onChange={(e) => setNewActivityTime(e.target.value)} placeholder="Ex : 10:00" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
-            <input value={newActivityTitle} onChange={(e) => setNewActivityTitle(e.target.value)} placeholder="Ex : Visite musee" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
-            <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Couleur</div>
-            <div style={sx('display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-bottom:20px;')}>
-              {['#5b7042', '#cf7d3c', '#4f8a86', '#9c6b4a', '#8a8b3d', '#b8503f'].map((c) => (
-                <button key={c} onClick={() => setNewActivityColor(c)} style={sx(`width:32px;height:32px;border-radius:50%;background:${c};border:${newActivityColor === c ? '3px solid #2f2a22' : '2px solid #d8cbb0'};cursor:pointer;`)} />
-              ))}
-            </div>
-            <div style={sx('display:flex;gap:10px;')}>
-              <button onClick={closeActivityAdd} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
-              <button onClick={submitActivity} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ajouter</button>
-            </div>
-          </div>
-        </ModalShell>
+        <ActivityAddSheet sx={sx} onClose={closeActivityAdd} time={newActivityTime} setTime={setNewActivityTime} title={newActivityTitle} setTitle={setNewActivityTitle} color={newActivityColor} setColor={setNewActivityColor} onSubmit={submitActivity} />
       )}
 
       {showAddLogiItem && <Suspense fallback={null}><AddLogiItemModal isOpen={showAddLogiItem} onClose={closeAddLogiItem} selectedLogiKey={editingLogiKey} newLogiItem={newLogiItem} setNewLogiItem={setNewLogiItem} logiLists={logi} darkMode={darkMode} onSubmit={addLogiItem} /></Suspense>}
