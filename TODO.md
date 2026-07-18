@@ -22,11 +22,13 @@ Les 5 propositions passées en Todo par David.
   (collage). Scan device à valider.
 - [x] **🔁 Bouton « Relancer l'assistant »** (nouveau ticket) — livré **build 96**,
   UAT/EUA. Rejoue l'onboarding depuis Réglages.
-- [ ] 🎨 Cohérence visuelle (In progress) — **seule carte restante**. QA device
-  requise (typo/rayons/espacement/élévation, changements visibles pas à pas).
+- [x] **🎨 Cohérence visuelle** — passe déterministe livrée **build 98**, UAT/EUA.
+  Gamme typo 11→7 tailles (fontScore 60→92, composite 78→83). Reste la QA
+  device pas à pas (élévation/détails visuels) avant Done.
 
-**Bilan drainage** : 5/5 propositions livrées (builds 94-97) + bouton relancer.
-Suite **607 verte**. Toutes en UAT/EUA pour validation device.
+**Bilan drainage** : 5/5 propositions livrées (builds 94-97) + bouton relancer
+(96) + consolidation typo (98). Suite **607 verte**. Board : Todo/Proposal/In
+progress **vides** ; tout en UAT/EUA pour validation device.
 
 > Note technique : les 4 features ci-dessus (météo + 3 du build 95) ont été
 > implémentées en parallèle par agents dans des worktrees isolés, puis
