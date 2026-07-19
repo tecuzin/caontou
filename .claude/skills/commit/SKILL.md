@@ -64,6 +64,16 @@ git switch develop && git merge --no-ff hotfix/<x.y.z> -m "merge: hotfix/<x.y.z>
 git branch -d hotfix/<x.y.z>
 ```
 
+## À chaque livraison (systématique)
+Toute livraison dans un build met à jour **ensemble et systématiquement** :
+- **l'historique des versions** : `src/changelog.js` (entrée `build: NN`, in-app)
+  **et** `CHANGELOG.md` (dépôt) ;
+- **le board Epiq** (source de vérité unique) : cartes livrées → UAT/EUA + tags
+  `buildNN`/`vX.Y.Z` + commentaire (voir skills `deploy` et `project-manage`).
+
+Jamais l'un sans l'autre : un build sans entrée d'historique ou sans mise à jour
+Epiq est une livraison incomplète.
+
 ## Notes
 - Commits atomiques : un sujet = un commit. Grouper les fichiers liés.
 - Vérifier `git status`/`git diff` avant de committer ; ne jamais committer

@@ -57,15 +57,19 @@ Appium cassé est bloquant seulement s'il révèle un vrai bug (à trancher au
 cas par cas — l'environnement Appium est parfois indisponible, voir
 `skill test-appium`).
 
-## 3. CHANGELOG et version
+## 3. Historique des versions et version (systématique)
 
 1. Ajouter l'entrée `## [x.y.z] - YYYY-MM-DD` en tête de `CHANGELOG.md`
    (Ajouté / Corrigé / Technique), en listant les commits depuis le dernier
    tag : `git log --oneline v<précédent>..develop`.
-2. Bump `version` dans `package.json` (le `build-docker.sh` le lit pour nommer
+2. **Mettre à jour `src/changelog.js`** (historique in-app / « Quoi de neuf ? ») :
+   l'entrée `build: NN` de la release doit exister et refléter la version. Ne
+   jamais taguer une release dont l'historique in-app est en retard — les deux
+   historiques (dépôt + in-app) sont tenus à jour **systématiquement**.
+3. Bump `version` dans `package.json` (le `build-docker.sh` le lit pour nommer
    l'APK — `APP_VERSION`).
 
-Ces deux changements + les tout derniers ajustements sont committés **sur la
+Ces changements + les tout derniers ajustements sont committés **sur la
 branche `release/<x.y.z>`**, pas directement sur `develop`.
 
 ## 4. Git Flow — release

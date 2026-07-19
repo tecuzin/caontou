@@ -124,14 +124,19 @@ mcp epiq_issue_move <issueId> --parentId 01KWSTHN7AKWFJT9N28CGWDPXK
 ```
 
 ### Phase 4 : Code + build
-Claude implémente, teste localement, committe. Ensuite : `./build-docker.sh --deploy`
-qui fabrique un APK numéroté avec tags.
+Claude implémente, teste localement, committe. **Avant de builder, mettre à jour
+l'historique des versions systématiquement** (`src/changelog.js` + `CHANGELOG.md`,
+voir skill `deploy`) — c'est un réflexe non négociable, au même titre que le board
+Epiq. Ensuite : `./build-docker.sh --deploy` qui fabrique un APK numéroté avec tags.
 
 ### Phase 5 : UAT/EUA (tests David)
 À la livraison, Claude déplace la carte en UAT/EUA avec :
 - Tag `buildNN` (numéro du build qui embarque la feature)
 - Tag `vX.Y.Z` (version sémantique)
 - Commentaire Epiq résumant la livraison (« Livré en build 41 : StatusBar thémée crème/bleu nuit, splash Cantou, generate-icon.py écrit 11 splash.png »)
+- **Vérifier que la même livraison figure dans l'historique** (`src/changelog.js`
+  entrée `build: NN` + `CHANGELOG.md`). Historique et Epiq sont tenus à jour
+  **ensemble, systématiquement** — jamais une carte en UAT sans entrée d'historique.
 
 **Commandes Claude** :
 ```bash

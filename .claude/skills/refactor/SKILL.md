@@ -121,12 +121,16 @@ npm run test                               # suite complète verte avant merge
 git checkout develop
 git merge --no-ff refactor/<nom>
 git branch -d refactor/<nom>
+# Avant de builder : MAJ systématique de l'historique (src/changelog.js + CHANGELOG.md)
 ./build-docker.sh --deploy                 # build APK + envoi Telegram (skill build-apk / deploy)
 ```
 
 Committer `build.number` séparément une fois le build confirmé (`BUILD
 SUCCESSFUL`, digest du keystore stable vérifié, "APK envoyé avec succès sur
-Telegram" dans les logs) — voir skill **deploy**.
+Telegram" dans les logs) — voir skill **deploy**. **À chaque livraison, tenir à
+jour systématiquement l'historique des versions (`src/changelog.js` +
+`CHANGELOG.md`) ET le board Epiq (cartes → UAT/EUA + tags `buildNN`/`vX.Y.Z`)** :
+les deux vont ensemble, jamais l'un sans l'autre.
 
 ## Objectif de couverture
 

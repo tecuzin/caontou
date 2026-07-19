@@ -61,14 +61,21 @@ cantou-v{semver}-build{N}-{YYYYMMDD-HHMM}.apk
 ex : cantou-v0.2.0-build43-20260701-1900.apk
 ```
 
-## Avant de builder : mettre à jour le changelog (si nouveautés visibles)
+## Avant de builder : mettre à jour l'historique des versions (systématique)
 
-Si le build embarque des **nouveautés visibles par la famille**, ajouter une
-entrée en tête de `src/changelog.js` (`{ build: NN, version, date, items: [...] }`,
-plus récent d'abord). C'est la source de « Quoi de neuf ? » (1ᵉʳ lancement) et de
-la page Historique. Le numéro de build vient de `build.number` (incrémenté au
-début de `build-docker.sh`) → l'entrée `build: NN` doit correspondre au build qui
-part. Garder le changelog **synchrone avec les cartes Epiq** passées en UAT/EUA.
+> **Règle systématique — jamais optionnelle.** Chaque build déployé **doit**
+> ajouter une entrée en tête de `src/changelog.js`
+> (`{ build: NN, version, date, items: [...] }`, plus récent d'abord) **et**
+> mettre à jour `CHANGELOG.md`. On ne déploie pas un build sans avoir consigné
+> ce qu'il embarque. Un build absent de l'historique est une livraison ratée.
+
+`src/changelog.js` est la source de « Quoi de neuf ? » (1ᵉʳ lancement) et de la
+page Historique in-app ; `CHANGELOG.md` est le journal versionné côté dépôt. Le
+numéro de build vient de `build.number` (incrémenté au début de
+`build-docker.sh`) → l'entrée `build: NN` doit correspondre au build qui part.
+Garder l'historique **synchrone avec les cartes Epiq** passées en UAT/EUA : les
+deux (historique + Epiq) sont tenus à jour **systématiquement** à chaque
+déploiement, jamais l'un sans l'autre.
 
 ## Après chaque déploiement réussi : board Epiq (obligatoire)
 
