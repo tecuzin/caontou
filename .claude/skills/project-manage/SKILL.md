@@ -42,6 +42,13 @@ Proposal → Todo → In progress → UAT/EUA → Done
 4. Si David **remet une carte de UAT/EUA en Todo**, elle contient son **rapport de
    test utilisateur** (description ou commentaire) : le lire, corriger, re-livrer
    (retour en In progress → UAT/EUA avec le nouveau tag de build).
+5. **Tout commentaire de David sur une carte APPELLE une réponse.** Un commentaire
+   est une consigne, pas une note passive : le **lire**, **agir** (corriger la
+   carte / le code / les tags…) **puis répondre par un commentaire** sur la même
+   carte (`epiq_issue_comment_add`) résumant ce qui a été fait — ou, si ça ne
+   peut pas être fait, pourquoi. On ne laisse **jamais** un commentaire de David
+   sans réponse. Réflexe de reprise de session : **scanner les commentaires des
+   cartes actives** (Proposal/Todo/In progress/UAT) et traiter ceux sans réponse.
 
 IDs utiles : board `01KWSTHN79VWRQB7MGPQWR153M` · Proposal `01KX43H1YZHXADB0SA2NRVC6F2`
 · Todo `01KWSTHN7AKWFJT9N28CGWDPXJ` · In progress `01KWSTHN7AKWFJT9N28CGWDPXK`
@@ -54,6 +61,10 @@ IDs utiles : board `01KWSTHN79VWRQB7MGPQWR153M` · Proposal `01KX43H1YZHXADB0SA2
 #    cartes revenues de UAT/EUA en Todo = rapports de test à corriger en priorité.
 #    → Taguer toute carte des colonnes actives (Proposal/Todo/In progress/UAT)
 #      restée SANS tag (voir « Tags de classification »).
+#    → SCANNER les commentaires des cartes actives : tout commentaire de David
+#      sans réponse doit être traité PUIS répondu par un commentaire (règle 5).
+#      Les commentaires sont dans l'event log (mcp epiq_state_get → eventLog,
+#      action add.issue.comment) : filtrer par issue = id des cartes actives.
 # 2. Lire les notes de session (PAS un backlog : Epiq fait foi pour les tâches)
 cat TODO.md
 
