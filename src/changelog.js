@@ -5,6 +5,9 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 106, version: '1.3.0', date: '2026-07-19', items: [
+    '🗺️ Carte détaillée : pré-charge les tuiles autour du gîte pour la consulter hors-ligne',
+  ] },
   { build: 105, version: '1.3.0', date: '2026-07-19', items: [
     '🗺️ Carte : visites « faites » marquées + compteur de progression et filtre',
     '🌙 Ciel du jour : lever/coucher du soleil et phase de lune (hors-ligne)',
