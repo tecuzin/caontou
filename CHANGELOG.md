@@ -3,9 +3,12 @@
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
 ## [Non publié]
-Lot « Carladès » (build 105, sur `develop`) — 8 fonctionnalités familiales, toutes
-hors-ligne et désactivables, s'appuyant sur des modules purs testés. Suite 675 tests.
+Lot « Carladès » (builds 105-106, sur `develop`) — fonctionnalités familiales, toutes
+hors-ligne et désactivables, s'appuyant sur des modules purs testés. Suite 680 tests.
 ### Ajouté
+- **Carte détaillée hors-ligne** (build 106, `tile-cache.js`) : pré-chargement des
+  tuiles OpenTopoMap autour du gîte (IndexedDB) → consultation sans réseau ;
+  complète le contrôle « prêt hors-ligne ».
 - **Carte** : visites « faites » différenciées (✓ + teinte) + compteur de
   progression et filtre Tout/À faire/Faites (aussi sur la carte détaillée).
 - **Ciel du jour** : lever/coucher du soleil et phase de lune calculés 100 %
