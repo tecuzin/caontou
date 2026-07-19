@@ -258,6 +258,26 @@ export const EMERGENCY_NUMBERS = [
   { emoji: '💬', label: 'Urgences par SMS', num: '114' },
 ]
 
+// Fiches recettes des spécialités du Cantal (éditables, donc dans le store/JSON).
+// ingredients & steps sont des listes de lignes libres.
+export const RECIPES_INITIAL = [
+  { id: 1, emoji: '🧀', name: 'Aligot', desc: 'Purée filante à la tome fraîche du Cantal',
+    ingredients: ['1 kg de pommes de terre', '400 g de tome fraîche du Cantal', '2 gousses d\'ail', '20 cl de crème', '50 g de beurre', 'Sel, poivre'],
+    steps: ['Cuire les pommes de terre à l\'eau salée, les écraser en purée fine.', 'Ajouter beurre, crème et ail écrasé sur feu doux.', 'Incorporer la tome coupée en lamelles.', 'Travailler à la spatule en soulevant jusqu\'à ce que ça file (5-10 min).', 'Servir aussitôt, bien filant.'] },
+  { id: 2, emoji: '🥔', name: 'Truffade', desc: 'Pommes de terre sautées à la tome',
+    ingredients: ['1 kg de pommes de terre', '300 g de tome fraîche', '150 g de lard', '2 gousses d\'ail', 'Sel, poivre'],
+    steps: ['Faire revenir le lard puis les pommes de terre en dés dans la graisse.', 'Cuire à couvert 20 min en remuant.', 'Ajouter l\'ail et la tome en lamelles.', 'Mélanger jusqu\'à ce que la tome fonde et file.', 'Dorer légèrement et servir.'] },
+  { id: 3, emoji: '🥬', name: 'Pounti', desc: 'Terrine aux herbes, pruneaux et lard',
+    ingredients: ['200 g de lard/poitrine', '2 poignées de blettes ou d\'épinards', '6 œufs', '100 g de farine', '25 cl de lait', 'Une poignée de pruneaux', 'Persil, sel, poivre'],
+    steps: ['Hacher lard, herbes et persil.', 'Battre œufs, farine et lait en pâte lisse.', 'Mélanger le tout, ajouter les pruneaux.', 'Verser dans un moule beurré.', 'Cuire 45 min à 180 °C. Se mange tiède ou froid.'] },
+  { id: 4, emoji: '🍲', name: 'Chou farci', desc: 'Feuilles de chou garnies, mijotées',
+    ingredients: ['1 chou vert', '400 g de chair à saucisse', '1 oignon', '1 œuf', 'Mie de pain', 'Bouillon', 'Sel, poivre'],
+    steps: ['Blanchir les feuilles de chou 5 min.', 'Mélanger chair, oignon, œuf et mie.', 'Garnir chaque feuille et rouler.', 'Ranger dans une cocotte, mouiller de bouillon.', 'Mijoter 1 h à couvert.'] },
+  { id: 5, emoji: '🌰', name: 'Crème de châtaigne', desc: 'Dessert doux aux marrons du pays',
+    ingredients: ['500 g de châtaignes (ou purée)', '50 cl de lait', '80 g de sucre', '1 gousse de vanille', 'Une pincée de sel'],
+    steps: ['Cuire les châtaignes épluchées dans le lait vanillé 30 min.', 'Mixer en crème lisse avec le sucre.', 'Ajuster la texture avec un peu de lait.', 'Servir tiède ou frais, éventuellement avec de la crème.'] },
+]
+
 // Carnet de restaurants du séjour (éditable). resa = note de réservation,
 // reserved = statut (réservé / à réserver).
 export const RESTOS_INITIAL = [

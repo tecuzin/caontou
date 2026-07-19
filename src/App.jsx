@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { StatusBar, Style } from '@capacitor/status-bar'
-import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL, KIDS_GAMES, EMERGENCY_NUMBERS } from './data.js'
+import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL, RECIPES_INITIAL, KIDS_GAMES, EMERGENCY_NUMBERS } from './data.js'
 import { s, buildList, tripDate } from './utils.js'
 import { filterAndSortVisits } from './visits.js'
 import { computeToday } from './today.js'
@@ -170,6 +170,7 @@ const DEFAULTS = {
   kidsGames: structuredClone(KIDS_GAMES),
   bingoItems: structuredClone(BINGO_CANTAL),
   emergencyNumbers: structuredClone(EMERGENCY_NUMBERS),
+  recipes: structuredClone(RECIPES_INITIAL),
   onboarded: false,
 }
 
@@ -214,6 +215,7 @@ function loadStore() {
       kidsGames: p.kidsGames ?? structuredClone(KIDS_GAMES),
       bingoItems: p.bingoItems ?? structuredClone(BINGO_CANTAL),
       emergencyNumbers: p.emergencyNumbers ?? structuredClone(EMERGENCY_NUMBERS),
+      recipes: p.recipes ?? structuredClone(RECIPES_INITIAL),
       // Store existant (raw présent) = utilisateur déjà installé → pas d'assistant.
       // Le 1er lancement (pas de raw) part de DEFAULTS (onboarded:false) → assistant.
       onboarded: p.onboarded ?? true,
@@ -404,6 +406,7 @@ export default function App() {
   const [kidsGames] = useState(initial.kidsGames || structuredClone(KIDS_GAMES))
   const [bingoItems] = useState(initial.bingoItems || structuredClone(BINGO_CANTAL))
   const [emergencyNumbers] = useState(initial.emergencyNumbers || structuredClone(EMERGENCY_NUMBERS))
+  const [recipes, setRecipes] = useState(initial.recipes || structuredClone(RECIPES_INITIAL))
   const { ratings, setRatings, rateVisit: rateVisitEntry, setVisitNote } = useRatings(initial.ratings)
   const rateVisit = (id, stars) => { haptic(ImpactStyle.Light); rateVisitEntry(id, stars) }
   const openMaps = (url) => { try { window.open(url, '_blank') } catch { /* WebView sans window.open */ } }
@@ -496,8 +499,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, onboarded })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, onboarded])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -599,7 +602,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?', badges: 'Mes badges' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?', badges: 'Mes badges', recettes: 'Recettes du Cantal' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -991,7 +994,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, onboarded })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, onboarded })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -1093,7 +1096,7 @@ export default function App() {
         mealTab={mealTab} meals={meals} meteo={meteo} newShoppingItem={newShoppingItem} newSuggestionText={newSuggestionText} openAddMeal={openAddMeal}
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}
         openMaps={openMaps} openModule={openModule} openMyPosition={openMyPosition} openTripEdit={openTripEdit} packDone={packDone} packPct={packPct}
-        packTotal={packTotal} parkCar={parkCar} photos={photos} rateVisit={rateVisit} ratings={ratings} recapData={recapData}
+        packTotal={packTotal} parkCar={parkCar} photos={photos} rateVisit={rateVisit} ratings={ratings} recapData={recapData} recipes={recipes} setRecipes={setRecipes}
         remain={remain} removeDepartureItem={removeDepartureItem} resetCows={resetCows} resetPlates={resetPlates} togglePlate={togglePlate} resetToDefaults={resetToDefaults} restos={restos} runSelfTestAndShow={runSelfTestAndShow}
         saved={saved} savedCount={savedCount} sendSuggestions={sendSuggestions} setBudgetTotal={setBudgetTotal} setCoursesSorted={setCoursesSorted} setDarkMode={setDarkMode}
         setDay={setDay} setEditingCourseKey={setEditingCourseKey} setEditingLogiKey={setEditingLogiKey} setEditingTrajetIdx={setEditingTrajetIdx} setEditingVisitId={setEditingVisitId} setExportCopied={setExportCopied}

@@ -34,6 +34,7 @@ export const FEATURE_GROUPS = [
       { key: 'mod_carte', label: 'Carte du séjour' },
       { key: 'mod_offline-check', label: 'Prêt hors-ligne ?' },
       { key: 'mod_badges', label: 'Badges enfants' },
+      { key: 'mod_recettes', label: 'Recettes du Cantal' },
     ],
   },
   {

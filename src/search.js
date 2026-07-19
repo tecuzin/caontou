@@ -31,6 +31,7 @@ function collect(store) {
   ;(s.courses || []).forEach((c) => (c.items || []).forEach((it) => push('Courses', { tab: 'repas' }, itemText(it), c.name)))
   ;(s.shoppingItems || []).forEach((it) => push('Courses', { tab: 'repas' }, itemText(it)))
   ;(s.restos || []).forEach((r) => push('Restos', { sub: 'restos' }, r.name, r.place))
+  ;(s.recipes || []).forEach((r) => push('Recettes', { sub: 'recettes' }, r.name, r.desc, (r.ingredients || []).join(' ')))
   const tr = s.trajets || {}
   ;['aller', 'retour'].forEach((dir) => (tr[dir] || []).forEach((st) => push('Trajet', { sub: 'trajet' }, st.place, st.time, st.note)))
   const j = s.journal || {}
