@@ -569,6 +569,8 @@ export default function App() {
     setCarGames((g) => (side === 'left' ? { ...g, cowLeft: (g.cowLeft || 0) + 1 } : { ...g, cowRight: (g.cowRight || 0) + 1 }))
   }
   const resetCows = () => { haptic(ImpactStyle.Medium); setCarGames((g) => ({ ...g, cowLeft: 0, cowRight: 0 })) }
+  const togglePlate = (code) => { haptic(ImpactStyle.Light); setCarGames((g) => ({ ...g, plates: { ...(g.plates || {}), [code]: !(g.plates && g.plates[code]) } })) }
+  const resetPlates = () => { haptic(ImpactStyle.Medium); setCarGames((g) => ({ ...g, plates: {} })) }
 
   // dérivés préparatifs
   let packDone = 0, packTotal = 0
@@ -1092,7 +1094,7 @@ export default function App() {
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}
         openMaps={openMaps} openModule={openModule} openMyPosition={openMyPosition} openTripEdit={openTripEdit} packDone={packDone} packPct={packPct}
         packTotal={packTotal} parkCar={parkCar} photos={photos} rateVisit={rateVisit} ratings={ratings} recapData={recapData}
-        remain={remain} removeDepartureItem={removeDepartureItem} resetCows={resetCows} resetToDefaults={resetToDefaults} restos={restos} runSelfTestAndShow={runSelfTestAndShow}
+        remain={remain} removeDepartureItem={removeDepartureItem} resetCows={resetCows} resetPlates={resetPlates} togglePlate={togglePlate} resetToDefaults={resetToDefaults} restos={restos} runSelfTestAndShow={runSelfTestAndShow}
         saved={saved} savedCount={savedCount} sendSuggestions={sendSuggestions} setBudgetTotal={setBudgetTotal} setCoursesSorted={setCoursesSorted} setDarkMode={setDarkMode}
         setDay={setDay} setEditingCourseKey={setEditingCourseKey} setEditingLogiKey={setEditingLogiKey} setEditingTrajetIdx={setEditingTrajetIdx} setEditingVisitId={setEditingVisitId} setExportCopied={setExportCopied}
         setFeatures={setFeatures} setFilter={setFilter} setLogiSorted={setLogiSorted} setMealTab={setMealTab} setNewBudgetTotal={setNewBudgetTotal} setNewShoppingItem={setNewShoppingItem}
