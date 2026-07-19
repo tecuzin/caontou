@@ -1,12 +1,34 @@
 import { useEffect, useState } from 'react'
 import { hasCoords } from '../geo.js'
 import { buildTileMap, chooseZoom, tileUrl } from '../osm.js'
+import { cachedTileObjectURL } from '../tile-cache.js'
 import { formatParkedAt } from '../carspot.js'
 import { visitedIdSet } from '../visits-progress.js'
 import { Carte } from './Carte.jsx'
 
 const VB_W = 340
 const VB_H = 430
+
+/**
+ * Une tuile OpenTopoMap. En ligne : chargée depuis le réseau. Hors-ligne : tente
+ * la version pré-chargée en cache (IndexedDB) via un objectURL. Le style/position
+ * est identique au rendu précédent (comportement en ligne inchangé).
+ */
+function TileImg({ t }) {
+  const url = tileUrl(t.x, t.y, t.z)
+  const [src, setSrc] = useState(typeof navigator === 'undefined' || navigator.onLine ? url : null)
+  useEffect(() => {
+    let alive = true, obj = null
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      cachedTileObjectURL(url).then((o) => { if (alive) { if (o) { obj = o; setSrc(o) } else setSrc(url) } })
+    } else {
+      setSrc(url)
+    }
+    return () => { alive = false; if (obj && URL.revokeObjectURL) URL.revokeObjectURL(obj) }
+  }, [url])
+  const style = { position: 'absolute', left: `${t.left}px`, top: `${t.top}px`, width: '256px', height: '256px', userSelect: 'none' }
+  return src ? <img src={src} alt="" loading="lazy" draggable={false} style={style} /> : <div style={style} />
+}
 
 /** True si le réseau est disponible (repli hors-ligne sinon). */
 function useOnline() {
@@ -74,16 +96,9 @@ export function CarteDetaillee(props) {
 
       <div style={sx('position:relative;border:1px solid #dbe2c9;border-radius:20px;overflow:hidden;box-shadow:0 2px 8px rgba(74,93,58,0.06);background:#e7ecdf;')}>
         <div style={{ position: 'relative', width: `${VB_W}px`, height: `${VB_H}px`, maxWidth: '100%' }}>
-          {/* Tuiles OpenTopoMap */}
+          {/* Tuiles OpenTopoMap (servies depuis le cache hors-ligne si dispo) */}
           {map && map.tiles.map((t) => (
-            <img
-              key={`${t.z}-${t.x}-${t.y}`}
-              src={tileUrl(t.x, t.y, t.z)}
-              alt=""
-              loading="lazy"
-              draggable={false}
-              style={{ position: 'absolute', left: `${t.left}px`, top: `${t.top}px`, width: `${256}px`, height: `${256}px`, userSelect: 'none' }}
-            />
+            <TileImg key={`${t.z}-${t.x}-${t.y}`} t={t} />
           ))}
 
           {/* Marqueurs (superposés) */}

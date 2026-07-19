@@ -18,4 +18,11 @@ describe('OfflineCheck — écran prêt hors-ligne', () => {
     render(<OfflineCheck sx={s} storeData={() => ({ visits: [], days: [], meals: [], courses: [], logi: [] })} />)
     expect(screen.getByTestId('offline-ready-banner')).toHaveTextContent('Presque prêt')
   })
+
+  it('propose le pré-chargement des tuiles de la carte détaillée', () => {
+    render(<OfflineCheck sx={s} storeData={full} />)
+    expect(screen.getByTestId('tile-preload')).toBeInTheDocument()
+    expect(screen.getByTestId('btn-preload-tiles')).toHaveTextContent(/Pré-charger la carte/)
+    expect(screen.getByTestId('tile-cached-count')).toHaveTextContent(/tuile\(s\) en cache/)
+  })
 })
