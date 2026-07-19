@@ -2,6 +2,26 @@
 
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
+## [Non publié]
+Lot « Carladès » (build 105, sur `develop`) — 8 fonctionnalités familiales, toutes
+hors-ligne et désactivables, s'appuyant sur des modules purs testés. Suite 675 tests.
+### Ajouté
+- **Carte** : visites « faites » différenciées (✓ + teinte) + compteur de
+  progression et filtre Tout/À faire/Faites (aussi sur la carte détaillée).
+- **Ciel du jour** : lever/coucher du soleil et phase de lune calculés 100 %
+  hors-ligne (`astro.js`) depuis les coordonnées du gîte, carte sur l'Accueil.
+- **Recherche globale** (`search.js`) depuis l'Accueil : visites, repas, planning,
+  préparatifs, courses, restos, trajet, journal, recettes — aiguillage au tap.
+- **Badges enfants** (`badges.js`) : 8 badges débloqués par jalons + Confetti.
+- **Jeux de route** (`car-games.js`) : « je vois quelque chose de… » et « repère
+  la plaque » (départements de l'itinéraire), en plus du compteur de vaches.
+- **Contrôle « prêt hors-ligne ? »** (`offline-check.js`) : diagnostics de
+  disponibilité locale + liste des seules fonctions qui exigent le réseau.
+- **Fiches recettes du Cantal** éditables (nouvelle collection `recipes` au store,
+  donc exportée en JSON) : aligot, truffade, pounti, chou farci, crème de châtaigne.
+- **Carte postale « Carladès »** (`postcard.js`) : composition sur `<canvas>` d'une
+  photo Souvenirs + légende, partagée via la feuille système (hors-ligne).
+
 ## [1.3.0] - 2026-07-19
 Mineure fonctionnelle (builds 92→104). Assistant de premier lancement, multi-séjours,
 album souvenir, suggestions météo et partage de config par QR, accessibilité renforcée,
