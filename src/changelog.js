@@ -5,17 +5,23 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 105, version: '1.3.0', date: '2026-07-19', items: [
+    '🗺️ Carte : visites « faites » marquées + compteur de progression et filtre',
+    '🌙 Ciel du jour : lever/coucher du soleil et phase de lune (hors-ligne)',
+    '🔎 Recherche globale dans tout le contenu du séjour depuis l\'accueil',
+    '🏅 Badges de progression pour les enfants (visites, défis, bingo, photos…)',
+    '🃏 Plus de jeux de route : « je vois… » et « repère la plaque »',
+    '📴 Contrôle « prêt hors-ligne ? » avant de perdre le réseau',
+    '🧀 Fiches recettes du Cantal éditables (aligot, truffade, pounti…)',
+    '🖼️ Carte postale « Carladès » à composer depuis une photo et partager',
+  ] },
   { build: 104, version: '1.3.0', date: '2026-07-19', items: [
     '🎉 Version 1.3.0 — assistant de démarrage, multi-séjours et bien plus',
     '🧭 Assistant de configuration au premier lancement (relançable dans Réglages)',
     '🧳 Mes séjours : garde plusieurs séjours et rebascule quand tu veux',
-  ] },
-  { build: 104, version: '1.3.0', date: '2026-07-19', items: [
     '📸 Album souvenir de fin de séjour, à partager',
     '🌦️ Suggestions d\'activités selon la météo (repli à l\'abri s\'il pleut)',
     '🔳 Partage de la config par QR code entre téléphones, sans réseau',
-  ] },
-  { build: 104, version: '1.3.0', date: '2026-07-19', items: [
     '➕ « Enregistrer & nouveau » : ajoute plusieurs éléments d\'affilée dans les listes',
     '♿ Accessibilité renforcée des fenêtres (fermeture au clavier, focus)',
   ] },

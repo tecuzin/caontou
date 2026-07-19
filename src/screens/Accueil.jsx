@@ -3,6 +3,8 @@ import { KIDS_GAMES, EMERGENCY_NUMBERS } from '../data.js'
 import { featureKeyForAction } from '../features.js'
 import { CarSpot } from '../components/CarSpot.jsx'
 import { TodayCard } from './accueil/TodayCard.jsx'
+import { SkyCard } from './accueil/SkyCard.jsx'
+import { SearchSection } from './accueil/SearchSection.jsx'
 import { GamesSection } from './accueil/GamesSection.jsx'
 import { SuggestionsSection } from './accueil/SuggestionsSection.jsx'
 import { EmergencySection } from './accueil/EmergencySection.jsx'
@@ -17,11 +19,14 @@ const MODULES = [
   { emoji: '💶', name: 'Budget', sub: '1 800 € prévus', bg: '#e6ece0', action: 'tab:budget' },
   { emoji: '📸', name: 'Souvenirs', sub: 'Photos par journée', bg: '#f3e2d6', action: 'sub:souvenirs' },
   { emoji: '🍴', name: 'Restos', sub: 'Adresses & résas', bg: '#f1e4d4', action: 'sub:restos' },
+  { emoji: '🧀', name: 'Recettes', sub: 'Spécialités du Cantal', bg: '#f3e2d6', action: 'sub:recettes' },
   { emoji: '🔑', name: 'Départ du gîte', sub: 'Avant de rendre les clés', bg: '#f1e4d4', action: 'sub:departure' },
   { emoji: '🧭', name: 'Itinéraire', sub: 'Sorties par proximité', bg: '#e7ecdf', action: 'sub:itineraire' },
   { emoji: '🗺️', name: 'Carte', sub: 'Séjour & voiture', bg: '#dfeae6', action: 'sub:carte' },
   { emoji: '🧳', name: 'Mes séjours', sub: 'Sauver & réutiliser', bg: '#e7ecdf', action: 'sub:sejours' },
   { emoji: '🔗', name: 'Partager', sub: 'Config vers un autre tél.', bg: '#dfeae6', action: 'sub:partage-config' },
+  { emoji: '📴', name: 'Prêt hors-ligne', sub: 'Vérifier avant de partir', bg: '#eee7d4', action: 'sub:offline-check' },
+  { emoji: '🏅', name: 'Mes badges', sub: 'Récompenses des enfants', bg: '#e7ecdf', action: 'sub:badges' },
   // Réglages n'a pas de clé feature (mod_reglages inconnue) → toujours visible.
   { emoji: '🎛️', name: 'Réglages', sub: 'Activer / masquer', bg: '#eee7d4', action: 'sub:reglages' },
 ]
@@ -37,7 +42,7 @@ export function Accueil({
   dailyChallenge, challengeDone, markChallengeDone,
   carSpot, parkCar, findCar, forgetCar,
   isOn = () => true, kidsGames = KIDS_GAMES, emergencyNumbers = EMERGENCY_NUMBERS,
-  weatherSuggest = null, onOpenVisites,
+  weatherSuggest = null, onOpenVisites, storeData,
 }) {
   const shownModules = MODULES.filter((m) => {
     const key = featureKeyForAction(m.action)
@@ -81,7 +86,11 @@ export function Accueil({
         </div>
       )}
 
+      {isOn('extra_search') && storeData && <SearchSection sx={sx} storeData={storeData} setTab={setTab} setSub={setSub} setDay={setDay} />}
+
       {today && <TodayCard sx={sx} today={today} setTab={setTab} setDay={setDay} />}
+
+      {isOn('extra_sky') && <SkyCard sx={sx} />}
 
       {today && dailyChallenge && (
         <div data-testid="challenge-card" style={sx(`margin:0 18px 14px;background:#fffdf8;border:2px solid #5b7042;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(91,112,66,0.16);${challengeDone ? 'opacity:0.75;' : ''}`)}>

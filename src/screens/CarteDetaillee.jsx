@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { hasCoords } from '../geo.js'
 import { buildTileMap, chooseZoom, tileUrl } from '../osm.js'
 import { formatParkedAt } from '../carspot.js'
+import { visitedIdSet } from '../visits-progress.js'
 import { Carte } from './Carte.jsx'
 
 const VB_W = 340
@@ -26,13 +27,14 @@ function useOnline() {
  * hors-ligne si pas de réseau. Marqueurs : 🏠 gîte, emoji visite, 🚗 voiture.
  */
 export function CarteDetaillee(props) {
-  const { sx, visits = [], gite, carSpot, savedIds = [] } = props
+  const { sx, visits = [], gite, carSpot, savedIds = [], ratings = {} } = props
   const online = useOnline()
   const [selected, setSelected] = useState(null)
   const [zoom, setZoom] = useState(null) // null = auto-fit
 
   const placedVisits = visits.filter(hasCoords)
   const saved = new Set(savedIds)
+  const visited = visitedIdSet(placedVisits, ratings)
   const points = [
     ...(hasCoords(gite) ? [gite] : []),
     ...placedVisits,
@@ -88,13 +90,15 @@ export function CarteDetaillee(props) {
           {map && placedVisits.map((v) => {
             const p = map.project(v)
             const isSel = selected?.kind === 'visit' && selected.id === v.id
+            const isDone = visited.has(v.id)
             return (
               <button
                 key={v.id}
                 data-testid={`detmap-visit-${v.id}`}
-                onClick={() => setSelected({ kind: 'visit', id: v.id, name: v.name, meta: `${v.dist} · ${v.dur}` })}
-                style={{ position: 'absolute', left: `${p.x}px`, top: `${p.y}px`, transform: 'translate(-50%,-50%)', width: isSel ? '30px' : '26px', height: isSel ? '30px' : '26px', borderRadius: '50%', background: '#fffdf8', border: `${isSel ? 3 : 2}px solid ${saved.has(v.id) ? '#cf7d3c' : '#4f8a86'}`, cursor: 'pointer', fontSize: '13px', lineHeight: '1', padding: 0 }}
-              >{v.emoji}</button>
+                data-visited={isDone ? '1' : '0'}
+                onClick={() => setSelected({ kind: 'visit', id: v.id, name: v.name, meta: `${isDone ? '✓ Visité · ' : ''}${v.dist} · ${v.dur}` })}
+                style={{ position: 'absolute', left: `${p.x}px`, top: `${p.y}px`, transform: 'translate(-50%,-50%)', width: isSel ? '30px' : '26px', height: isSel ? '30px' : '26px', borderRadius: '50%', background: isDone ? '#dbe2c9' : '#fffdf8', border: `${isSel ? 3 : 2}px solid ${saved.has(v.id) ? '#cf7d3c' : '#4f8a86'}`, cursor: 'pointer', fontSize: '13px', lineHeight: '1', padding: 0 }}
+              >{isDone ? '✓' : v.emoji}</button>
             )
           })}
           {carXY && (

@@ -32,6 +32,9 @@ export const FEATURE_GROUPS = [
       { key: 'mod_departure', label: 'Départ du gîte' },
       { key: 'mod_itineraire', label: 'Itinéraire' },
       { key: 'mod_carte', label: 'Carte du séjour' },
+      { key: 'mod_offline-check', label: 'Prêt hors-ligne ?' },
+      { key: 'mod_badges', label: 'Badges enfants' },
+      { key: 'mod_recettes', label: 'Recettes du Cantal' },
     ],
   },
   {
@@ -41,6 +44,8 @@ export const FEATURE_GROUPS = [
       { key: 'extra_carspot', label: 'Mémo voiture' },
       { key: 'extra_vote', label: 'Vote familial' },
       { key: 'extra_weather_suggestions', label: 'Suggestions météo' },
+      { key: 'extra_sky', label: 'Ciel du jour (soleil & lune)' },
+      { key: 'extra_search', label: 'Recherche globale' },
       { key: 'extra_tracking', label: 'Parcours UX (local)' },
     ],
   },

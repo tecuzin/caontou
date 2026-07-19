@@ -1,13 +1,18 @@
+import { useState } from 'react'
 import { Ridge } from '../Scenery.jsx'
+import { ROUTE_DEPARTMENTS, pickISpy, plateProgress } from '../car-games.js'
 
-/** Sous-écran Trajet — étapes aller/retour + checklist avant départ. */
+/** Sous-écran Trajet — étapes aller/retour + checklist avant départ + jeux de route. */
 export function Trajet({
   sx, trajetDir, setTrajetDir, trip, fmtDayShort, trajets,
   editTrajetStep, deleteTrajetStep,
   setEditingTrajetIdx, setNewTrajetTime, setNewTrajetPlace, setNewTrajetNote, setNewTrajetColor, setShowTrajetEdit,
   tr, setShowAddTrajetCheck, toggleCheck, deleteTrajetCheckItem,
-  carGames, bumpCow, resetCows,
+  carGames, bumpCow, resetCows, togglePlate = () => {}, resetPlates = () => {},
 }) {
+  const [ispy, setISpy] = useState(null)
+  const plates = carGames.plates || {}
+  const plateProg = plateProgress(plates)
   return (
     <div style={sx('padding:16px 18px 40px;')}>
       <div style={sx('background:#4a5d3a;border-radius:20px;padding:18px;color:#f3ecda;box-shadow:0 8px 20px rgba(74,93,58,0.2);position:relative;overflow:hidden;')}>
@@ -92,6 +97,32 @@ export function Trajet({
           <span data-testid="cow-count-right" style={sx('font-family:Quicksand;font-weight:700;font-size:26px;color:#9c6b4a;')}>{carGames.cowRight}</span>
           <span style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Côté droit</span>
         </button>
+      </div>
+
+      {/* Je vois quelque chose de… (I-Spy) */}
+      <div style={sx('margin:22px 0 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>👀 Je vois quelque chose de…</div>
+      <button data-testid="btn-ispy" onClick={() => setISpy((p) => pickISpy(Date.now(), p))} style={sx('width:100%;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+        <span style={sx('font-size:22px;')}>🎲</span>
+        <span data-testid="ispy-prompt" style={sx('flex:1;text-align:left;font-family:Quicksand;font-weight:700;font-size:15px;')}>{ispy || 'Tape pour un nouveau défi'}</span>
+        <span style={sx('font-size:14px;color:#6b6354;')}>↻</span>
+      </button>
+
+      {/* Repère la plaque : départements de la route */}
+      <div style={sx('display:flex;align-items:center;justify-content:space-between;margin:22px 0 6px;')}>
+        <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🚗 Repère la plaque</div>
+        <button data-testid="btn-reset-plates" onClick={resetPlates} style={sx('border:none;background:transparent;cursor:pointer;font-size:15px;padding:2px 4px;color:#9c6b4a;')}>↺</button>
+      </div>
+      <div style={sx('font-size:12px;color:#6b6354;margin-bottom:10px;')}>Repère les départements sur les plaques croisées en route — <b data-testid="plate-progress">{plateProg.done}/{plateProg.total}</b> trouvés.</div>
+      <div style={sx('display:flex;flex-wrap:wrap;gap:8px;')}>
+        {ROUTE_DEPARTMENTS.map((d) => {
+          const on = !!plates[d.code]
+          return (
+            <button key={d.code} data-testid={`plate-${d.code}`} data-spotted={on ? '1' : '0'} onClick={() => togglePlate(d.code)} style={sx(`border:1px solid ${on ? '#4a5d3a' : '#efe6d4'};background:${on ? '#e7ecdf' : '#fffdf8'};border-radius:12px;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;min-width:58px;${on ? '' : 'opacity:0.85;'}`)}>
+              <span style={sx(`font-family:Quicksand;font-weight:700;font-size:15px;color:${on ? '#4a5d3a' : '#6b6354'};`)}>{on ? '✓ ' : ''}{d.code}</span>
+              <span style={sx('font-size:12px;color:#6b6354;')}>{d.name}</span>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

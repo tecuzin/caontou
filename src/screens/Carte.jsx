@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { hasCoords, makeProjector } from '../geo.js'
 import { formatParkedAt } from '../carspot.js'
+import { visitedIdSet, visitProgress } from '../visits-progress.js'
 
 const VB_W = 340
 const VB_H = 430
@@ -11,10 +12,14 @@ const VB_H = 430
  * leurs positions relatives réelles. Un tap sur un marqueur affiche son détail.
  * La carte topographique détaillée (OpenTopoMap, en ligne) est un écran séparé.
  */
-export function Carte({ sx, visits = [], gite, carSpot, savedIds = [], findCar, openDetailed }) {
+export function Carte({ sx, visits = [], gite, carSpot, savedIds = [], findCar, openDetailed, ratings = {} }) {
   const [selected, setSelected] = useState(null) // { kind, id, name, meta }
+  const [filter, setFilter] = useState('all')     // all | todo | done
 
-  const placedVisits = visits.filter(hasCoords)
+  const allPlaced = visits.filter(hasCoords)
+  const visited = visitedIdSet(allPlaced, ratings)
+  const progress = visitProgress(allPlaced, ratings)
+  const placedVisits = allPlaced.filter((v) => filter === 'all' || (filter === 'done') === visited.has(v.id))
   const saved = new Set(savedIds)
   const points = [
     ...(hasCoords(gite) ? [gite] : []),
@@ -28,8 +33,17 @@ export function Carte({ sx, visits = [], gite, carSpot, savedIds = [], findCar, 
 
   return (
     <div data-testid="screen-carte" style={sx('padding:0 18px 24px;')}>
-      <div style={sx('font-size:13px;color:#6b6354;margin:2px 0 12px;')}>
-        Le séjour d'un coup d'œil — {placedVisits.length} lieux placés autour du gîte, sans réseau.
+      <div style={sx('display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px;')}>
+        <div style={sx('font-size:13px;color:#6b6354;')}>
+          Le séjour d'un coup d'œil, sans réseau.
+        </div>
+        <div data-testid="visit-progress" style={sx('flex:0 0 auto;font-family:Quicksand;font-weight:700;font-size:13px;color:#4a5d3a;background:#e7ecdf;border-radius:12px;padding:4px 10px;')}>✓ {progress.done}/{progress.total} visités</div>
+      </div>
+
+      <div data-testid="carte-filter" style={sx('display:flex;gap:8px;margin-bottom:12px;')}>
+        {[['all', 'Tout'], ['todo', 'À faire'], ['done', 'Faites']].map(([key, label]) => (
+          <button key={key} data-testid={`carte-filter-${key}`} onClick={() => setFilter(key)} style={sx(`flex:1;border:1px solid ${filter === key ? '#4a5d3a' : '#efe6d4'};background:${filter === key ? '#e7ecdf' : '#fffdf8'};color:${filter === key ? '#4a5d3a' : '#6b6354'};font-weight:${filter === key ? '700' : '600'};font-family:Quicksand;font-size:13px;border-radius:12px;padding:8px;cursor:pointer;`)}>{label}</button>
+        ))}
       </div>
 
       {openDetailed && (typeof navigator === 'undefined' || navigator.onLine) && (
@@ -56,10 +70,17 @@ export function Carte({ sx, visits = [], gite, carSpot, savedIds = [], findCar, 
             const p = project(v)
             const isSel = selected?.kind === 'visit' && selected.id === v.id
             const isSaved = saved.has(v.id)
+            const isDone = visited.has(v.id)
             return (
-              <g key={v.id} data-testid={`map-visit-${v.id}`} onClick={() => setSelected({ kind: 'visit', id: v.id, name: v.name, meta: `${v.dist} · ${v.dur}` })} style={{ cursor: 'pointer' }}>
-                <circle cx={p.x} cy={p.y} r={isSel ? 15 : 12} fill="#fffdf8" stroke={isSaved ? '#cf7d3c' : '#4f8a86'} strokeWidth={isSel ? 3 : 2} />
+              <g key={v.id} data-testid={`map-visit-${v.id}`} data-visited={isDone ? '1' : '0'} onClick={() => setSelected({ kind: 'visit', id: v.id, name: v.name, meta: `${isDone ? '✓ Visité · ' : ''}${v.dist} · ${v.dur}` })} style={{ cursor: 'pointer' }}>
+                <circle cx={p.x} cy={p.y} r={isSel ? 15 : 12} fill={isDone ? '#dbe2c9' : '#fffdf8'} stroke={isSaved ? '#cf7d3c' : '#4f8a86'} strokeWidth={isSel ? 3 : 2} />
                 <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fontSize="13">{v.emoji}</text>
+                {isDone && (
+                  <g>
+                    <circle cx={p.x + 9} cy={p.y - 9} r="6" fill="#4a5d3a" stroke="#fffaf0" strokeWidth="1.5" />
+                    <text x={p.x + 9} y={p.y - 9} textAnchor="middle" dominantBaseline="central" fontSize="7" fill="#fffaf0" fontWeight="700">✓</text>
+                  </g>
+                )}
               </g>
             )
           })}

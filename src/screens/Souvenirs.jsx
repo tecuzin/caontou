@@ -3,6 +3,7 @@ import { groupPhotosByDay } from '../photos.js'
 import { hasJournalEntry, journalSnippet } from '../journal.js'
 import { buildAlbumHtml, buildNativeSrcMap, shareAlbum, albumHasContent } from '../album.js'
 import { useEscapeKey } from '../hooks/useEscapeKey.js'
+import { Postcard } from './Postcard.jsx'
 
 /** Vignette : charge son URL affichable à l'affichage (async Filesystem). */
 function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
@@ -19,6 +20,7 @@ function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
 /** Sous-écran Souvenirs — galerie photo du séjour regroupée par journée. */
 export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay, journal = {}, openDayJournal, trip = {} }) {
   const [viewer, setViewer] = useState(null) // meta de la photo ouverte en plein écran
+  const [postcard, setPostcard] = useState(null) // { src } pour le composeur de carte postale
   const [busy, setBusy] = useState(false) // génération de l'album en cours
   useEscapeKey(() => setViewer(null), !!viewer) // fermeture clavier de la visionneuse
   const groups = groupPhotosByDay(photos, days)
@@ -109,9 +111,15 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
           </div>
           <div onClick={(e) => e.stopPropagation()} style={sx('flex:0 0 auto;display:flex;gap:10px;padding:14px 18px 34px;')}>
             <button onClick={() => setViewer(null)} style={sx('flex:1;border:1px solid rgba(255,255,255,0.4);background:transparent;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Fermer</button>
+            <button data-testid="btn-postcard" onClick={() => setPostcard({ src: srcMap[viewer.id] })} style={sx('flex:1;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>🖼️ Carte postale</button>
             <button data-testid="btn-delete-photo" onClick={() => { deletePhoto(viewer.id); setViewer(null) }} style={sx('flex:1;border:none;background:#b8503f;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>🗑️ Supprimer</button>
           </div>
         </div>
+      )}
+
+      {/* Composeur de carte postale « Carladès » */}
+      {postcard && (
+        <Postcard sx={sx} src={postcard.src} onClose={() => setPostcard(null)} />
       )}
     </div>
   )
