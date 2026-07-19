@@ -3,6 +3,7 @@ import { KIDS_GAMES, EMERGENCY_NUMBERS } from '../data.js'
 import { featureKeyForAction } from '../features.js'
 import { CarSpot } from '../components/CarSpot.jsx'
 import { TodayCard } from './accueil/TodayCard.jsx'
+import { SkyCard } from './accueil/SkyCard.jsx'
 import { GamesSection } from './accueil/GamesSection.jsx'
 import { SuggestionsSection } from './accueil/SuggestionsSection.jsx'
 import { EmergencySection } from './accueil/EmergencySection.jsx'
@@ -82,6 +83,8 @@ export function Accueil({
       )}
 
       {today && <TodayCard sx={sx} today={today} setTab={setTab} setDay={setDay} />}
+
+      {isOn('extra_sky') && <SkyCard sx={sx} />}
 
       {today && dailyChallenge && (
         <div data-testid="challenge-card" style={sx(`margin:0 18px 14px;background:#fffdf8;border:2px solid #5b7042;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(91,112,66,0.16);${challengeDone ? 'opacity:0.75;' : ''}`)}>
