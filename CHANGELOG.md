@@ -2,6 +2,35 @@
 
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
+## [1.3.0] - 2026-07-19
+Mineure fonctionnelle (builds 92→104). Assistant de premier lancement, multi-séjours,
+album souvenir, suggestions météo et partage de config par QR, accessibilité renforcée,
+et un socle d'outillage de développement (graphe de code, board Epiq, visualisation
+d'agents). Suite 619 tests unitaires/intégration au vert.
+### Ajouté
+- **Assistant de configuration au premier lancement** (onboarding) + bouton
+  « Relancer l'assistant » dans Réglages ; ne s'affiche qu'en installation neuve.
+- **Multi-séjours réutilisables** : snapshot JSON du store, bascule entre séjours.
+- **Album souvenir** de fin de séjour, partageable.
+- **Suggestions d'activités selon la météo** (repli indoor s'il pleut).
+- **Partage de config par QR + copier/coller** entre téléphones, 100 % hors-ligne.
+- **« Enregistrer & nouveau »** dans les modales d'ajout d'items (listes) : saisie
+  en rafale sans refermer la feuille.
+- **Tracking de parcours local + partage JSON** (Réglages) pour l'analyse UX.
+### Accessibilité
+- Visionneuses plein écran accessibles (Échap, `role=presentation`) ; 9 modales
+  inline migrées vers `ModalShell` (piège de focus, aria).
+### Technique
+- **Outillage dev reproductible** : graphe de code (CodeGraphContext / `cgc` + MCP),
+  board **Epiq** comme source de vérité unique du backlog (MCP), visualisation
+  d'activité des sous-agents (`tools/agent-viz`, flint-chart — tokens & temps par
+  agent et par outil), skills `dev-tooling` / `vega`.
+- **Allègement d'`App.jsx`** : `Accueil.jsx` découpé en sous-composants de section ;
+  **routeur de navigation extrait** dans `Navigation.jsx` (App.jsx 1528→1222 lignes).
+- Consolidation typographique (11 → 7 tailles de texte).
+### Corrigé
+- Onboarding : ne se déclenche plus sur un store existant (déjà « onboarded »).
+
 ## [1.2.0] - 2026-07-17
 Grosse mineure fonctionnelle (builds 68→91). Deux cartes du séjour, personnalisation
 totale de l'app, et de nombreux ajouts famille. Suite de tests 542 unitaires + 29 E2E
