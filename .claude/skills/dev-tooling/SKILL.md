@@ -18,6 +18,7 @@ et les dépanner.
 | **CodeGraphContext** | Graphe du code de `src/` (FalkorDB embarqué) : appelants, dépendances, complexité, dead-code | `cgc` (`~/.local/bin`) | `codegraphcontext` |
 | **Epiq** | Board de tickets = **source de vérité unique du backlog** (voir skill `project-manage`) | `epiq` | `epiq` |
 | **graphify** | Transforme n'importe quelle entrée (code, docs, images…) en graphe de connaissances | — | skill `/graphify` (`~/.claude/skills/graphify/`) |
+| **flint-chart / Vega** | Visualiser des données de dev/analyse (activité des agents, analyse UX) — voir skill `vega` | `tools/agent-viz/` | — |
 
 ## Configuration (reproductible)
 

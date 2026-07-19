@@ -1,0 +1,7 @@
+{
+  "name": "cantou-agent-viz",
+  "private": true,
+  "type": "module",
+  "description": "Outil de dev : visualise l'activité des sous-agents (flint-chart → Vega-Lite). Isolé, hors de l'app Cantou.",
+  "dependencies": { "flint-chart": "0.2.2" }
+}
