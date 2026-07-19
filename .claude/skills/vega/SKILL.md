@@ -67,12 +67,13 @@ de l'app. Réinstaller : `cd tools/agent-viz && npm install`. En cas de blocage
 ## Exemple concret dans le repo
 
 `tools/agent-viz/build.mjs` — visualise l'**activité des sous-agents** Claude Code :
-parse les transcripts JSONL → `[{agent, tool, count}]` + tokens (`usage`) + durée
-(bornes de `timestamp`) → `assembleVegaLite` → page HTML (vega-embed CDN) avec
-**2 graphes** (appels d'outils / tokens consommés par agent) + tableau récap
-détaillant **temps passé et tokens (entrée+cache / sortie / total) par tâche et
-par agent**, avec ligne de total. Ces deux métriques (temps + tokens) sont
-attendues systématiquement dans la sortie.
+parse les transcripts JSONL → appels d'outils + tokens (`usage`) + durée (bornes de
+`timestamp`) → `assembleVegaLite` → page HTML (vega-embed CDN) avec **5 graphes** et
+2 tableaux. La **répartition des tokens ET du temps** est fournie **par sous-agent
+(≈ tâche, un transcript = une invocation) et par outil** : les tokens et le temps de
+chaque tour sont attribués au(x) outil(s) appelé(s) (bucket « génération/réflexion »
+pour les tours sans outil). Ces deux métriques (temps + tokens), sur ces deux
+dimensions (agent, outil), sont attendues systématiquement dans la sortie.
 
 ```bash
 node tools/agent-viz/build.mjs [dossier-transcripts] [sortie.html]   # défaut: auto-découverte + /tmp/agent-activity.html
