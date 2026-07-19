@@ -1,9 +1,12 @@
-import { useState } from 'react'
 import { Panorama } from '../Scenery.jsx'
 import { KIDS_GAMES, EMERGENCY_NUMBERS } from '../data.js'
 import { featureKeyForAction } from '../features.js'
 import { CarSpot } from '../components/CarSpot.jsx'
-import { TelLink } from '../components/Links.jsx'
+import { TodayCard } from './accueil/TodayCard.jsx'
+import { GamesSection } from './accueil/GamesSection.jsx'
+import { SuggestionsSection } from './accueil/SuggestionsSection.jsx'
+import { EmergencySection } from './accueil/EmergencySection.jsx'
+import { BackupSection } from './accueil/BackupSection.jsx'
 
 const MODULES = [
   { emoji: '🚗', name: 'Trajet', sub: 'Aller & retour', bg: '#dfeae6', action: 'sub:trajet' },
@@ -36,7 +39,6 @@ export function Accueil({
   isOn = () => true, kidsGames = KIDS_GAMES, emergencyNumbers = EMERGENCY_NUMBERS,
   weatherSuggest = null, onOpenVisites,
 }) {
-  const [gamesOpen, setGamesOpen] = useState(false)
   const shownModules = MODULES.filter((m) => {
     const key = featureKeyForAction(m.action)
     return !key || isOn(key)
@@ -79,31 +81,7 @@ export function Accueil({
         </div>
       )}
 
-      {today && (
-        <div data-testid="today-card" style={sx('margin:0 18px 14px;background:#fffdf8;border:2px solid #cf7d3c;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(207,125,60,0.18);')}>
-          <div style={sx('display:flex;align-items:center;justify-content:space-between;')}>
-            <div style={sx('font-size:12px;letter-spacing:1px;font-weight:700;color:#cf7d3c;')}>🗓️ AUJOURD'HUI · {today.d.dow} {today.d.num}</div>
-            {today.w && <div style={sx('font-family:Quicksand;font-weight:700;font-size:14px;')}>{today.w.icon} {today.w.hi}° <span style={sx('color:#6b6354;')}>{today.w.lo}°</span></div>}
-          </div>
-          <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-top:6px;')}>{today.d.title}</div>
-          <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>{today.d.sub}</div>
-          {today.d.items.length > 0 && (
-            <div style={sx('margin-top:12px;display:flex;flex-direction:column;gap:8px;')}>
-              {today.d.items.map((it, i) => (
-                <div key={i} style={sx('display:flex;align-items:center;gap:10px;')}>
-                  <span style={sx(`width:8px;height:8px;border-radius:50%;background:${it.color};flex:0 0 auto;`)} />
-                  <span style={sx('font-size:13px;font-weight:700;color:#9a917f;width:44px;flex:0 0 auto;')}>{it.time}</span>
-                  <span style={sx('font-size:14px;flex:1;')}>{it.title}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          {today.meal && (
-            <div style={sx('margin-top:12px;background:#f1e4d4;border-radius:12px;padding:10px 12px;font-size:13px;color:#6b5a45;')}>🍽️ Ce soir : <b>{today.meal.dish}</b></div>
-          )}
-          <button onClick={() => { setTab('planning'); setDay(today.dayIdx) }} style={sx('margin-top:12px;width:100%;border:none;background:#cf7d3c;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Voir le planning du jour →</button>
-        </div>
-      )}
+      {today && <TodayCard sx={sx} today={today} setTab={setTab} setDay={setDay} />}
 
       {today && dailyChallenge && (
         <div data-testid="challenge-card" style={sx(`margin:0 18px 14px;background:#fffdf8;border:2px solid #5b7042;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(91,112,66,0.16);${challengeDone ? 'opacity:0.75;' : ''}`)}>
@@ -168,73 +146,11 @@ export function Accueil({
         ))}
       </div>
 
-      <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🎲 Jeux avec les enfants</div>
-      <div style={sx('padding:0 18px 12px;')}>
-        <button data-testid="btn-open-bingo" onClick={() => setSub('bingo')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🔍</div>
-          <div style={sx('flex:1;')}>
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Bingo du Cantal</div>
-            <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>16 trésors à repérer · une ligne complète = 🎉</div>
-          </div>
-          <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>›</div>
-        </button>
-        <button data-testid="btn-toggle-games" onClick={() => setGamesOpen((o) => !o)} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🎲</div>
-          <div style={sx('flex:1;')}>
-            <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Idées de jeux</div>
-            <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>{kidsGames.length} activités nature, au gîte et le soir</div>
-          </div>
-          <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>{gamesOpen ? '▲' : '▼'}</div>
-        </button>
-        {gamesOpen && (
-          <div data-testid="games-list" style={sx('margin-top:10px;display:flex;flex-direction:column;gap:10px;')}>
-            {kidsGames.map((g, i) => (
-              <div key={i} style={sx('display:flex;gap:12px;align-items:flex-start;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-                <div style={sx('width:44px;height:44px;flex:0 0 auto;border-radius:14px;background:#f3ece0;display:flex;align-items:center;justify-content:center;font-size:22px;')}>{g.emoji}</div>
-                <div style={sx('flex:1;min-width:0;')}>
-                  <div style={sx(`font-size:12px;font-weight:700;color:${g.color};text-transform:uppercase;letter-spacing:0.5px;`)}>{g.place}</div>
-                  <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;margin-top:2px;')}>{g.name}</div>
-                  <div style={sx('font-size:12px;color:#6b6354;margin-top:4px;line-height:1.4;')}>{g.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <GamesSection sx={sx} kidsGames={kidsGames} setSub={setSub} />
 
-      <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>💡 Suggestions</div>
-      <div style={sx('padding:0 18px 12px;')}>
-        <div style={sx('font-size:12px;color:#6b6354;margin-bottom:8px;')}>Une idée de fonctionnalité, une consigne pour les prochaines données ? Notez-la ici puis envoyez-la.</div>
-        <div style={sx('display:flex;gap:8px;')}>
-          <input data-testid="input-suggestion" value={newSuggestionText} onChange={(e) => setNewSuggestionText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && submitSuggestion()} placeholder="Ex : ajouter un mode sombre…" style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:10px 12px;font-size:14px;')} />
-          <button data-testid="btn-add-suggestion" onClick={submitSuggestion} style={sx('border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:0 16px;cursor:pointer;')}>+ Ajouter</button>
-        </div>
-        {suggestions.length > 0 && (
-          <div style={sx('display:flex;flex-direction:column;gap:8px;margin-top:10px;')}>
-            {suggestions.map((sug) => (
-              <div key={sug.id} style={sx('display:flex;align-items:center;gap:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;')}>
-                <span style={sx('font-size:13px;flex:1;')}>{sug.text}</span>
-                <button onClick={() => deleteSuggestion(sug.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;color:#b8503f;padding:2px 4px;')}>🗑️</button>
-              </div>
-            ))}
-            <button data-testid="btn-send-suggestions" onClick={sendSuggestions} style={sx('width:100%;margin-top:2px;border:1px solid #cf7d3c;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:13px;border-radius:12px;padding:10px;cursor:pointer;')}>📤 Envoyer sur Telegram / WhatsApp…</button>
-          </div>
-        )}
-      </div>
+      <SuggestionsSection sx={sx} newSuggestionText={newSuggestionText} setNewSuggestionText={setNewSuggestionText} submitSuggestion={submitSuggestion} suggestions={suggestions} deleteSuggestion={deleteSuggestion} sendSuggestions={sendSuggestions} />
 
-      <div style={sx('padding:6px 18px 10px;font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>🆘 Urgences & repères</div>
-      <div style={sx('padding:0 18px 12px;')}>
-        <div data-testid="emergency-block" style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:6px 14px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          {emergencyNumbers.map((e, i) => (
-            <div key={e.num} style={sx(`display:flex;align-items:center;gap:10px;padding:10px 0;${i < emergencyNumbers.length - 1 ? 'border-bottom:1px solid #f1e9da;' : ''}`)}>
-              <span style={sx('font-size:19px;flex:0 0 auto;')}>{e.emoji}</span>
-              <span style={sx('flex:1;font-size:14px;color:#3a352b;')}>{e.label}</span>
-              <TelLink sx={sx} num={e.num} style={'color:#b8503f;font-weight:700;text-decoration:none;font-family:Quicksand;font-size:15px;'}>📞 {e.num}</TelLink>
-            </div>
-          ))}
-        </div>
-        <button data-testid="btn-my-position" onClick={openMyPosition} style={sx('width:100%;margin-top:10px;border:1px solid #4f8a86;background:#fffdf8;color:#4f8a86;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:14px;padding:12px;cursor:pointer;')}>📍 Ma position → Google Maps</button>
-      </div>
+      <EmergencySection sx={sx} emergencyNumbers={emergencyNumbers} openMyPosition={openMyPosition} />
 
       <div style={sx('padding:6px 18px 12px;')}>
         <button data-testid="btn-open-bilan" onClick={() => setSub('bilan')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
@@ -247,18 +163,7 @@ export function Accueil({
         </button>
       </div>
 
-      <div style={sx('padding:6px 18px 4px;display:flex;align-items:baseline;justify-content:space-between;')}>
-        <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>Sauvegarde</div>
-        <div data-testid="last-backup-label" style={sx('font-size:12px;color:#6b6354;')}>Dernière : {formatLastBackup(lastBackupAt)}</div>
-      </div>
-      <div style={sx('padding:6px 18px 12px;display:flex;gap:12px;')}>
-        <button data-testid="btn-export" onClick={() => { setExportCopied(false); setShowExport(true) }} style={sx('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:12px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#4a5d3a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬇️ Exporter (JSON)</button>
-        <button data-testid="btn-import" onClick={() => setShowImport(true)} style={sx('flex:1;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:12px;cursor:pointer;font-family:Quicksand;font-weight:700;font-size:14px;color:#9c6b4a;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>⬆️ Importer</button>
-      </div>
-      <div style={sx('padding:0 18px 12px;display:flex;gap:10px;')}>
-        <button data-testid="btn-selftest" onClick={runSelfTestAndShow} style={sx('flex:1;border:1px dashed #d8cbb0;background:transparent;border-radius:14px;padding:10px;cursor:pointer;font-family:Quicksand;font-weight:600;font-size:12px;color:#9a917f;')}>🔧 Auto-diagnostic</button>
-        <button data-testid="btn-open-historique" onClick={openChangelog} style={sx('flex:1;border:1px dashed #d8cbb0;background:transparent;border-radius:14px;padding:10px;cursor:pointer;font-family:Quicksand;font-weight:600;font-size:12px;color:#9a917f;')}>🗂️ Historique des versions</button>
-      </div>
+      <BackupSection sx={sx} lastBackupAt={lastBackupAt} formatLastBackup={formatLastBackup} setExportCopied={setExportCopied} setShowExport={setShowExport} setShowImport={setShowImport} runSelfTestAndShow={runSelfTestAndShow} openChangelog={openChangelog} />
       <div style={sx('height:16px;')} />
     </div>
   )
