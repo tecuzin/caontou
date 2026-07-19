@@ -19,7 +19,25 @@ describe('Carte — carte simplifiée hors-ligne', () => {
     expect(screen.getByTestId('map-visit-2')).toBeInTheDocument()
     // la visite sans coords n'est pas placée
     expect(screen.queryByTestId('map-visit-3')).toBeNull()
-    expect(screen.getByText(/2 lieux placés/)).toBeInTheDocument()
+  })
+
+  it('affiche le compteur de progression et marque les visites faites', () => {
+    // visite 1 notée (4★) = faite ; visite 2 non notée
+    render(<Carte sx={s} visits={visits} gite={gite} carSpot={null} savedIds={[]} ratings={{ 1: { stars: 4 } }} />)
+    expect(screen.getByTestId('visit-progress')).toHaveTextContent('1/2 visités')
+    expect(screen.getByTestId('map-visit-1')).toHaveAttribute('data-visited', '1')
+    expect(screen.getByTestId('map-visit-2')).toHaveAttribute('data-visited', '0')
+  })
+
+  it('filtre les visites faites / à faire', async () => {
+    const user = userEvent.setup()
+    render(<Carte sx={s} visits={visits} gite={gite} carSpot={null} savedIds={[]} ratings={{ 1: { stars: 4 } }} />)
+    await user.click(screen.getByTestId('carte-filter-done'))
+    expect(screen.getByTestId('map-visit-1')).toBeInTheDocument()
+    expect(screen.queryByTestId('map-visit-2')).toBeNull()
+    await user.click(screen.getByTestId('carte-filter-todo'))
+    expect(screen.queryByTestId('map-visit-1')).toBeNull()
+    expect(screen.getByTestId('map-visit-2')).toBeInTheDocument()
   })
 
   it('n\'affiche pas la voiture sans position mémorisée', () => {

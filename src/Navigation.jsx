@@ -94,12 +94,12 @@ export function Navigation({
 
             {/* CARTE DU SÉJOUR (hors-ligne) */}
             {sub === 'carte' && (
-              <Carte sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} openDetailed={() => setSub('carte-detaillee')} />
+              <Carte sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} openDetailed={() => setSub('carte-detaillee')} ratings={ratings} />
             )}
 
             {/* CARTE DÉTAILLÉE (OpenTopoMap, en ligne, repli hors-ligne) */}
             {sub === 'carte-detaillee' && (
-              <CarteDetaillee sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} />
+              <CarteDetaillee sx={sx} visits={visits} gite={{ ...GITE_COORDS, name: hebergement?.nom }} carSpot={carSpot} savedIds={Object.keys(saved).filter((k) => saved[k]).map(Number)} findCar={findCar} ratings={ratings} />
             )}
 
             {/* RÉGLAGES (fonctions désactivables) */}
