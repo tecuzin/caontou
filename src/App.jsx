@@ -597,7 +597,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
