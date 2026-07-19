@@ -965,3 +965,4 @@
 {"v":1,"id":["01KXVM0FH1CBKJ4YHZ2SA3HCFJ","01KXVM073NSF9BMV7GGZMQY36R"],"add.issue.tag":{"id":"01KXVKW34XHVE0XS2FR5DF5ZC5","tag":"01KWWGKX50GRNA24CY4GH2394Z"}}
 {"v":1,"id":["01KXVM0P75K1FW5RA9CJBTZP7V","01KXVM0FH1CBKJ4YHZ2SA3HCFJ"],"add.issue.tag":{"id":"01KXVKW34XHVE0XS2FR5DF5ZC5","tag":"01KWXE3HE7R6WWF2EN3X6D5JVG"}}
 {"v":1,"id":["01KXVM0ZTCGA6NNCH6JJ4V44Y8","01KXVM0P75K1FW5RA9CJBTZP7V"],"add.issue":{"id":"01KXVM0ZT861HC1SYYAHVK2NA2","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"📴 Contrôle « prêt hors-ligne » avant de perdre le réseau","rank":"feffffffffffffffffffffff"}}
+{"v":1,"id":["01KXWBB24J8ZT0MAQNQ16M07X0","01KXVM0ZTCGA6NNCH6JJ4V44Y8"],"add.issue":{"id":"01KXWBB24EWVMYT6YAA1Q3F19E","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"📴 Contrôle « prêt hors-ligne » avant de perdre le réseau","rank":"ff7fffffffffffffffffffff"}}
