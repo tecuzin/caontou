@@ -168,6 +168,7 @@ export function Navigation({
                 carSpot={carSpot} parkCar={isOn('extra_carspot') ? parkCar : null} findCar={findCar} forgetCar={forgetCar}
                 isOn={isOn} kidsGames={kidsGames} emergencyNumbers={emergencyNumbers}
                 weatherSuggest={today && isOn('extra_weather_suggestions') ? weatherSuggestion(today.w, visits) : null} onOpenVisites={() => { setTab('visites'); setSub(null) }}
+                storeData={currentStoreData}
               />
             )}
 

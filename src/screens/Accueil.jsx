@@ -4,6 +4,7 @@ import { featureKeyForAction } from '../features.js'
 import { CarSpot } from '../components/CarSpot.jsx'
 import { TodayCard } from './accueil/TodayCard.jsx'
 import { SkyCard } from './accueil/SkyCard.jsx'
+import { SearchSection } from './accueil/SearchSection.jsx'
 import { GamesSection } from './accueil/GamesSection.jsx'
 import { SuggestionsSection } from './accueil/SuggestionsSection.jsx'
 import { EmergencySection } from './accueil/EmergencySection.jsx'
@@ -38,7 +39,7 @@ export function Accueil({
   dailyChallenge, challengeDone, markChallengeDone,
   carSpot, parkCar, findCar, forgetCar,
   isOn = () => true, kidsGames = KIDS_GAMES, emergencyNumbers = EMERGENCY_NUMBERS,
-  weatherSuggest = null, onOpenVisites,
+  weatherSuggest = null, onOpenVisites, storeData,
 }) {
   const shownModules = MODULES.filter((m) => {
     const key = featureKeyForAction(m.action)
@@ -81,6 +82,8 @@ export function Accueil({
           <button data-testid="btn-checkout" onClick={() => setSub('departure')} style={sx('margin-top:12px;width:100%;border:none;background:#9c6b4a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Ouvrir la checklist de départ →</button>
         </div>
       )}
+
+      {isOn('extra_search') && storeData && <SearchSection sx={sx} storeData={storeData} setTab={setTab} setSub={setSub} setDay={setDay} />}
 
       {today && <TodayCard sx={sx} today={today} setTab={setTab} setDay={setDay} />}
 
