@@ -4,6 +4,20 @@
 > Voyage paramétrable dans l'app (⚙️ sur l'accueil) — par défaut **5 → 15 août 2026**
 > (Beauvais → Laschamps → Cantal). Deadline app : **15 juillet 2026**.
 
+## ✅ Lot « Carladès » — 8 cartes Todo (19 juillet, build 105)
+
+- [x] Livré en build 105 / v1.3.0 (8 cartes Epiq → UAT/EUA, taguées build105+v1.3.0
+  + commentées) : **Carte** visites faites + compteur/filtre · **Ciel du jour**
+  (soleil & lune, `astro.js`) · **Recherche globale** (`search.js`) · **Badges
+  enfants** (`badges.js`) · **Jeux de route** (`car-games.js`) · **Prêt
+  hors-ligne** (`offline-check.js`) · **Recettes du Cantal** éditables (collection
+  `recipes` au store) · **Carte postale** canvas (`postcard.js`). Tout hors-ligne
+  et désactivable ; 7 modules purs testés, 675 tests verts, audit design 83.
+- [x] Nouvel agent **`proposal-researcher`** créé (recherche web → Proposal).
+- [x] Règle skill : **répondre systématiquement aux commentaires Epiq** de David
+  (project-manage, règle 5 + scan au démarrage). Commentaire « il manque les tags »
+  traité (Proposal doublon `prêt hors-ligne` tagué + réponse).
+
 ## ✅ Release v1.3.0 (19 juillet, build 104)
 
 - [x] **Release v1.3.0** taguée sur `main` + APK `cantou-v1.3.0-build104` déployé
