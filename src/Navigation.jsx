@@ -34,6 +34,7 @@ const Reglages = lazy(() => import('./screens/Reglages.jsx').then(m => ({ defaul
 const PartageConfig = lazy(() => import('./screens/PartageConfig.jsx').then(m => ({ default: m.PartageConfig })))
 const Sejours = lazy(() => import('./screens/Sejours.jsx').then(m => ({ default: m.Sejours })))
 const OfflineCheck = lazy(() => import('./screens/OfflineCheck.jsx').then(m => ({ default: m.OfflineCheck })))
+const Badges = lazy(() => import('./screens/Badges.jsx').then(m => ({ default: m.Badges })))
 
 export function Navigation({
   addDepartureItem, addShoppingItem, bingo, bingoItems, budgetCats, budgetTotal, bumpCow, capturePhoto, carGames, carSpot, catColor, challengeDone, checks, countdown, coursesDone, coursesGroups, coursesPct, coursesSorted, coursesTotal, cur, currentStoreData, dailyChallenge, darkMode, day, days, deleteActivity, deleteCourseCategory, deleteCourseItem, deleteExpense, deleteLogiItem, deleteLogiList, deleteMeal, deleteMeteo, deletePhoto, deleteResto, deleteShoppingItem, deleteSuggestion, deleteTrajetCheckItem, deleteTrajetStep, deleteVisit, departure, editActivity, editDay, editMeal, editMeteo, editTrajetStep, editVisit, emergencyNumbers, expenses, familyMembers, filter, filteredVisits, findCar, forgetCar, haptic, hebergement, isCheckoutSoon, isDepartureDay, isOn, journal, kidsGames, lastBackupAt, loadSrc, logi, logiSorted, markChallengeDone, mealTab, meals, meteo, newShoppingItem, newSuggestionText, openAddMeal, openAddMeteo, openAddResto, openDayJournal, openEditResto, openHebEdit, openJournal, openMaps, openModule, openMyPosition, openTripEdit, packDone, packPct, packTotal, parkCar, photos, rateVisit, ratings, recapData, remain, removeDepartureItem, resetCows, resetToDefaults, restos, runSelfTestAndShow, saved, savedCount, sendSuggestions, setBudgetTotal, setCoursesSorted, setDarkMode, setDay, setEditingCourseKey, setEditingLogiKey, setEditingTrajetIdx, setEditingVisitId, setExportCopied, setFeatures, setFilter, setLogiSorted, setMealTab, setNewBudgetTotal, setNewShoppingItem, setNewSuggestionText, setNewTrajetColor, setNewTrajetNote, setNewTrajetPlace, setNewTrajetTime, setNewVisitAge, setNewVisitCat, setNewVisitDist, setNewVisitDur, setNewVisitName, setOnboarded, setSaved, setShowAdd, setShowAddCourseCat, setShowAddCourseItem, setShowAddLogiItem, setShowAddLogiList, setShowAddTrajetCheck, setShowBudgetTotalEdit, setShowChangelog, setShowDayAdd, setShowExport, setShowImport, setShowTrajetEdit, setShowVisitEdit, setShowVote, setSortExpenses, setSub, setTab, setTrajetDir, setTrip, setVisitNote, setVisitSort, shareActivity, shareDay, shoppingItems, sortExpenses, spent, spentPct, srcMap, startAddActivity, startEditExpense, sub, subScreenSwipe, subTitle, submitSuggestion, suggestions, sx, tab, tabBarSwipe, today, toggleBingo, toggleCheck, toggleDeparture, toggleFeature, toggleSaved, toggleShoppingItem, tr, trajetDir, trajets, trip, visibleTabs, visitSort, visits,
@@ -119,6 +120,11 @@ export function Navigation({
             {/* PRÊT HORS-LIGNE ? (contrôle de disponibilité offline) */}
             {sub === 'offline-check' && (
               <OfflineCheck sx={sx} storeData={currentStoreData} />
+            )}
+
+            {/* MES BADGES (gamification enfants) */}
+            {sub === 'badges' && (
+              <Badges sx={sx} storeData={currentStoreData} />
             )}
 
             {/* PARTAGE DE CONFIG (QR + copier/coller, hors-ligne) */}

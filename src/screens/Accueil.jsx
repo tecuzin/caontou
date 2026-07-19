@@ -25,6 +25,7 @@ const MODULES = [
   { emoji: '🧳', name: 'Mes séjours', sub: 'Sauver & réutiliser', bg: '#e7ecdf', action: 'sub:sejours' },
   { emoji: '🔗', name: 'Partager', sub: 'Config vers un autre tél.', bg: '#dfeae6', action: 'sub:partage-config' },
   { emoji: '📴', name: 'Prêt hors-ligne', sub: 'Vérifier avant de partir', bg: '#eee7d4', action: 'sub:offline-check' },
+  { emoji: '🏅', name: 'Mes badges', sub: 'Récompenses des enfants', bg: '#e7ecdf', action: 'sub:badges' },
   // Réglages n'a pas de clé feature (mod_reglages inconnue) → toujours visible.
   { emoji: '🎛️', name: 'Réglages', sub: 'Activer / masquer', bg: '#eee7d4', action: 'sub:reglages' },
 ]
