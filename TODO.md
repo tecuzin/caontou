@@ -4,6 +4,22 @@
 > Voyage paramétrable dans l'app (⚙️ sur l'accueil) — par défaut **5 → 15 août 2026**
 > (Beauvais → Laschamps → Cantal). Deadline app : **15 juillet 2026**.
 
+## ✅ Release v1.3.0 (19 juillet, build 104)
+
+- [x] **Release v1.3.0** taguée sur `main` + APK `cantou-v1.3.0-build104` déployé
+  sur Telegram (digest keystore stable vérifié) + **bundle QA** (APK + Appium) envoyé.
+  Regroupe builds 92→104 : onboarding + relance, multi-séjours, album souvenir,
+  suggestions météo, partage config QR, « Enregistrer & nouveau », tracking UX,
+  accessibilité (viewers + 9 modales → ModalShell), consolidation typo, et le
+  **technique** : allègement `App.jsx` (Accueil découpé + routeur `Navigation.jsx`
+  extrait → 1528→1222 lignes), outillage dev (graphe de code, Epiq, agent-viz).
+- [x] Historique à jour (`CHANGELOG.md` + `src/changelog.js` build 104), `main` et
+  `develop` synchronisés à 1.3.0/build104. Cartes refacto (Accueil, Navigation)
+  taguées build104/v1.3.0 puis **validées en Done** par David.
+- [x] Nouvel agent **`proposal-researcher`** : recherche web → tickets Epiq Proposal
+  (sourcés, tagués, offline-first Carladès). Agent-viz enrichi (tokens + temps par
+  agent **et** par outil).
+
 ## ✅ « Enregistrer & nouveau » dans les listes (18 juillet, build 101)
 
 - [x] Les modales d'ajout d'items de liste (préparatifs, courses, checklist
