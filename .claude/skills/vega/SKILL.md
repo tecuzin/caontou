@@ -80,6 +80,11 @@ node tools/agent-viz/build.mjs [dossier-transcripts] [sortie.html]   # défaut: 
 open /tmp/agent-activity.html
 ```
 
+> **À régénérer SYSTÉMATIQUEMENT** dès qu'on a lancé des sous-agents dans la
+> session (en fin de travail ou après chaque lot). La sortie doit toujours être à
+> jour avec l'activité courante — ne jamais laisser un `agent-viz` périmé après
+> avoir utilisé des agents (voir skill `dev-tooling`, section Maintenance).
+
 ## Bonnes pratiques
 
 - **On-brand** : réutiliser la palette du projet (`node scripts/design-audit.mjs`

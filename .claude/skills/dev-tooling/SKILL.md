@@ -53,6 +53,17 @@ skill `project-manage`).
 
 ## Maintenance & indexation
 
+> **Agent-viz : tenir à jour SYSTÉMATIQUEMENT.** Dès qu'on utilise des
+> sous-agents (Agent tool) dans une session, **régénérer la visualisation
+> d'activité** en fin de travail (ou après chaque lot d'agents) :
+> ```bash
+> node tools/agent-viz/build.mjs        # → /tmp/agent-activity.html
+> ```
+> La sortie doit **toujours** refléter les agents de la session en cours (temps
+> passé + tokens par agent **et** par outil, voir skill `vega`). Réflexe non
+> optionnel : un `agent-viz` périmé après avoir lancé des agents = travail
+> incomplet. Ouvrir le HTML si David veut voir la répartition.
+
 **Re-indexation automatique** : les hooks git **CGC** (`.git/hooks/post-commit`
 et `post-checkout`) lancent `cgc update <repo> --quiet` à chaque commit / changement
 de branche → le graphe suit le code sans intervention. (Hooks gérés par cgc,
