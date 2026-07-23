@@ -1,10 +1,44 @@
 import { useState, useEffect } from 'react'
 import { settlement } from '../settle.js'
+import { donutArcs } from '../budget.js'
 import { useEscapeKey } from '../hooks/useEscapeKey.js'
 
 const SectionLabel = ({ sx, children }) => (
   <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;')}>{children}</div>
 )
+
+/**
+ * Donut « où part l'argent » — répartition des dépenses par catégorie, rendu
+ * SVG maison (aucune lib de charting → bundle léger, 100 % hors-ligne).
+ * Réutilise les couleurs de catégorie (CATS). Accessible : `role="img"` +
+ * `aria-label` énumérant les parts (l'info ne passe jamais par la seule couleur).
+ */
+function BudgetDonut({ sx, eur, budgetCats, spent }) {
+  const R = 50, CX = 60, CY = 60, STROKE = 16
+  const circ = 2 * Math.PI * R
+  const arcs = donutArcs(budgetCats, R)
+  const label = 'Répartition des dépenses : ' +
+    budgetCats.map((c) => `${c.name} ${eur(c.amt)} (${c.pct} %)`).join(', ')
+  return (
+    <div data-testid="budget-donut" style={sx('display:flex;align-items:center;justify-content:center;padding:0 18px 4px;')}>
+      <svg viewBox="0 0 120 120" width="132" height="132" role="img" aria-label={label} style={{ flex: '0 0 auto' }}>
+        <circle cx={CX} cy={CY} r={R} fill="none" stroke="#efe6d4" strokeWidth={STROKE} />
+        <g transform={`rotate(-90 ${CX} ${CY})`}>
+          {arcs.map((a) => (
+            <circle
+              key={a.name} cx={CX} cy={CY} r={R} fill="none"
+              stroke={a.color} strokeWidth={STROKE}
+              strokeDasharray={`${a.len} ${circ - a.len}`}
+              strokeDashoffset={-a.offset}
+            />
+          ))}
+        </g>
+        <text x={CX} y={CY - 3} textAnchor="middle" style={{ font: '700 17px Quicksand, sans-serif', fill: '#4a5d3a' }}>{eur(spent)}</text>
+        <text x={CX} y={CY + 13} textAnchor="middle" style={{ font: '600 9px Quicksand, sans-serif', fill: '#8a7f6b', letterSpacing: '0.5px' }}>DÉPENSÉ</text>
+      </svg>
+    </div>
+  )
+}
 
 /** Vignette de reçu attaché à une dépense (charge son URL à l'affichage). */
 function ReceiptThumb({ sx, id, srcMap, loadSrc, onOpen }) {
@@ -50,7 +84,13 @@ export function Budget({
         </div>
       )}
       <button data-testid="btn-add-depense" onClick={() => setShowAdd(true)} style={sx('margin:0 18px 18px;width:calc(100% - 36px);border:1.5px dashed #c2a778;background:#fbf4e6;color:#9c6b4a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>+ Ajouter une dépense</button>
-      <div style={sx('padding:0 18px 8px;')}><SectionLabel sx={sx}>Par catégorie</SectionLabel></div>
+      {budgetCats.length > 0 && (
+        <>
+          <div style={sx('padding:0 18px 8px;')}><SectionLabel sx={sx}>Où part l’argent</SectionLabel></div>
+          <BudgetDonut sx={sx} eur={eur} budgetCats={budgetCats} spent={spent} />
+        </>
+      )}
+      <div style={sx('padding:8px 18px 8px;')}><SectionLabel sx={sx}>Par catégorie</SectionLabel></div>
       <div style={sx('padding:0 18px 14px;display:flex;flex-direction:column;gap:12px;')}>
         {budgetCats.map((c) => (
           <div key={c.name}>

@@ -56,6 +56,7 @@ const JournalModal = lazy(() => import('./modals/JournalModal.jsx').then(mod => 
 const VoteModal = lazy(() => import('./modals/VoteModal.jsx').then(mod => ({ default: mod.VoteModal })))
 import { countCompletedLines } from './bingo.js'
 import { computeRecap } from './recap.js'
+import { budgetByCategory } from './budget.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
 const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
 const Onboarding = lazy(() => import('./screens/Onboarding.jsx').then(m => ({ default: m.Onboarding })))
@@ -584,10 +585,7 @@ export default function App() {
   const spent = expenses.reduce((a, e) => a + e.amt, 0)
   const remain = budgetTotal - spent
   const spentPct = Math.round((spent / budgetTotal) * 100)
-  const budgetCats = CATS
-    .map((c) => { const a = expenses.filter((e) => e.cat === c.name).reduce((sum, e) => sum + e.amt, 0); return { ...c, amt: a, pct: Math.round(spent ? (a / spent) * 100 : 0) } })
-    .filter((c) => c.amt > 0)
-    .sort((a, b) => b.amt - a.amt)
+  const budgetCats = budgetByCategory(expenses, CATS)
 
   // dérivés courses
   let coursesDone = 0, coursesTotal = 0
