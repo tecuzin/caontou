@@ -91,6 +91,24 @@ Pour **chaque carte Epiq embarquée** dans l'APK envoyé :
 
 Voir le skill `project-manage` pour le workflow complet du board.
 
+## Avec CHAQUE build : envoyer le plan de test manuel (systématique)
+
+> **Règle systématique.** Chaque APK déployé s'accompagne du **plan de test
+> manuel** posté sur le canal Telegram, pour que la famille rejoue la même
+> checklist sur chaque build et réponde avec le nº de build + ✅/❌.
+
+```bash
+# Après l'envoi de l'APK (build-docker.sh --deploy ou deploy-telegram.sh) :
+scripts/send-test-plan.sh            # numéro de build lu depuis build.number
+scripts/send-test-plan.sh 108        # ou forcer le numéro affiché
+```
+
+Le contenu de la checklist vit dans `scripts/send-test-plan.sh` (source unique) :
+lancement/données, **persistance**, **Budget + donut**, navigation, hors-ligne.
+**Le tenir à jour** quand une fonctionnalité livrée mérite une vérification
+manuelle dédiée (ajouter/retirer une ligne `☐`), au même titre que le changelog
+et le board Epiq.
+
 ## Dépannage fréquent
 
 - **HTTP 400** → CHAT_ID incorrect ou bot pas admin du canal

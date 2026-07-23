@@ -56,7 +56,24 @@ IDs utiles : board `01KWSTHN79VWRQB7MGPQWR153M` · Proposal `01KX43H1YZHXADB0SA2
 
 ## Démarrage de session (TOUJOURS faire en premier)
 
+> **Étape 0 — chercher les entrées Telegram.** Chaque session **commence** par
+> vérifier si la famille a déposé sur le canal Telegram de **nouvelles
+> suggestions** (idées, retours de test, rapports de bug) ou **des données à
+> traiter** (ex. export de tracking de parcours `cantou-ux` en JSON, analysé par
+> l'agent `ux-analyst`). Ce qui en ressort devient des cartes Epiq (Proposal) ou
+> des corrections.
+
 ```bash
+# 0. Entrées Telegram (best-effort — le bot ne reçoit pas toujours l'historique
+#    du canal via getUpdates ; si vide, DEMANDER à David de transférer/coller).
+source .env.deploy 2>/dev/null
+curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=-20" \
+  | python3 -c "import sys,json;[print(((u.get('channel_post') or u.get('message') or {}).get('text') or '[non-texte]')) for u in json.load(sys.stdin).get('result',[])]"
+#    → suggestions/retours → cartes Epiq en Proposal (documentées + taguées).
+#    → données cantou-ux (JSON) → lancer l'agent `ux-analyst`.
+#    Si getUpdates ne renvoie rien d'exploitable : demander explicitement à David
+#    s'il y a des messages/exports Telegram à traiter avant de coder.
+
 # 1. Lire le board Epiq (mcp epiq_issue_list) : cartes en Todo = travail autorisé,
 #    cartes revenues de UAT/EUA en Todo = rapports de test à corriger en priorité.
 #    → Taguer toute carte des colonnes actives (Proposal/Todo/In progress/UAT)
