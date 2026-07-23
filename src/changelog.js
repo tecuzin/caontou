@@ -5,6 +5,10 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 113, version: '1.3.0', date: '2026-07-23', items: [
+    '📅 Arrivée & départ du gîte : choix de la date au calendrier et de l’heure à l’horloge',
+    '🛠️ Correction : l’édition des infos d’hébergement s’enregistre bien maintenant',
+  ] },
   { build: 112, version: '1.3.0', date: '2026-07-23', items: [
     '📸 Bouton photo sur les visites et les repas : la photo rejoint la galerie Souvenirs, avec sa légende',
     '🗜️ Photos redimensionnées avant enregistrement → moins d’espace utilisé et affichage plus rapide',

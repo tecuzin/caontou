@@ -3,6 +3,16 @@
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
 ## [Non publié]
+Lot « Dates hébergement » (build 113, sur `develop`) — 718 tests, audit design vert.
+### Ajouté
+- **Arrivée/départ du gîte au calendrier + horloge** (build 113, `heb-datetime.js`) : les
+  deux dernières dates en texte libre deviennent des sélecteurs natifs ; chaîne lisible
+  composée pour l'affichage, repli sur l'ancienne valeur tant qu'aucune date n'est choisie.
+### Corrigé
+- **Édition de l'hébergement** (build 113) : les champs ne s'enregistraient pas (le modal
+  passait une fonction à un `setHebFields` attendant un objet) → corrigé, tous les champs
+  sont pris en compte.
+
 Lot « Photos partout » (build 112, sur `develop`) — 711 tests, audit design vert.
 ### Ajouté
 - **Bouton 📸 sur les éléments** (build 112, `AttachPhotoButton`) : attacher une photo
