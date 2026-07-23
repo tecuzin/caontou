@@ -22,6 +22,8 @@ done
 PHASE="init"
 on_exit() {
   code=$?
+  # Libère le verrou de build si on le détient (voir acquisition plus bas).
+  [ "${WE_OWN_LOCK:-0}" = "1" ] && rm -rf "$LOCK_DIR" 2>/dev/null
   if [ "$DEPLOY" = "1" ] && [ "$code" -ne 0 ]; then
     bash scripts/deploy-telegram.sh --message \
       "❌ *Build Cantou échoué* — build n°${BUILD_NUMBER:-?} (\`${VERSION_NAME:-?}\`)
@@ -30,6 +32,27 @@ $(date '+%Y-%m-%d %H:%M')" 2>/dev/null || true
   fi
 }
 trap on_exit EXIT
+
+# ── Verrou mono-build (anti-collision de conteneur) ──────────────────────────
+# Deux builds simultanés partagent le même nom de conteneur et se détruisent
+# mutuellement (« Nettoyage ancien conteneur ») → APK corrompu / build tué.
+# Cas réel : merge sur develop → le hook Git Flow lance `--deploy` en tâche de
+# fond pendant qu'un build manuel tourne. `mkdir` est atomique (portable macOS,
+# pas besoin de flock). Si un build tourne déjà : on s'arrête proprement (exit 0,
+# pas de fausse alerte Telegram) SANS incrémenter build.number.
+LOCK_DIR=".git/.build-docker.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  owner=$(cat "$LOCK_DIR/pid" 2>/dev/null)
+  if [ -n "$owner" ] && kill -0 "$owner" 2>/dev/null; then
+    echo "⏳ Un build Cantou tourne déjà (PID $owner) — abandon pour éviter la collision de conteneur."
+    exit 0
+  fi
+  echo "🧹 Verrou de build obsolète (PID ${owner:-?} mort) — récupération."
+  rm -rf "$LOCK_DIR"
+  mkdir "$LOCK_DIR" 2>/dev/null || { echo "⚠️ Impossible d'acquérir le verrou de build."; exit 0; }
+fi
+echo $$ > "$LOCK_DIR/pid"
+WE_OWN_LOCK=1
 
 # ── Chrono (mesure du temps total de build) ──────────────────────────────────
 SECONDS=0
