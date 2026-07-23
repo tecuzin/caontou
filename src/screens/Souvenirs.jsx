@@ -9,10 +9,13 @@ import { Postcard } from './Postcard.jsx'
 function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
   useEffect(() => { if (!src) loadSrc(meta) }, [src, meta, loadSrc])
   return (
-    <button onClick={() => onOpen(meta)} style={sx('border:none;padding:0;background:#ece2cf;border-radius:14px;overflow:hidden;aspect-ratio:1;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.10);')}>
+    <button onClick={() => onOpen(meta)} style={sx('position:relative;border:none;padding:0;background:#ece2cf;border-radius:14px;overflow:hidden;aspect-ratio:1;cursor:pointer;box-shadow:0 2px 8px rgba(74,93,58,0.10);')}>
       {src
-        ? <img src={src} alt="" style={sx('width:100%;height:100%;object-fit:cover;display:block;')} />
+        ? <img src={src} alt={meta.label || ''} style={sx('width:100%;height:100%;object-fit:cover;display:block;')} />
         : <span style={sx('display:flex;align-items:center;justify-content:center;height:100%;font-size:22px;')}>🖼️</span>}
+      {meta.label && (
+        <span data-testid="photo-caption" style={sx('position:absolute;left:0;right:0;bottom:0;padding:12px 8px 6px;background:linear-gradient(transparent,rgba(20,16,10,0.75));color:#fffaf0;font-size:11px;font-weight:700;text-align:left;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;')}>{meta.label}</span>
+      )}
     </button>
   )
 }

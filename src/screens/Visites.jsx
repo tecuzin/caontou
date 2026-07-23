@@ -1,4 +1,5 @@
 import { DriveLink } from '../components/Links.jsx'
+import { AttachPhotoButton } from '../components/AttachPhotoButton.jsx'
 
 const VCAT = { Nature: '#5b7042', Famille: '#cf7d3c', Patrimoine: '#9c6b4a', Baignade: '#4f8a86', Gourmand: '#b8503f', Marché: '#8a8b3d', Sport: '#4a6d9c' }
 const FILTERS = ['Tous', 'Nature', 'Famille', 'Patrimoine', 'Baignade', 'Gourmand', 'Marché', 'Sport']
@@ -8,7 +9,7 @@ export function Visites({
   sx, savedCount, filter, setFilter, visitSort, setVisitSort, filteredVisits, saved,
   setEditingVisitId, setNewVisitName, setNewVisitDist, setNewVisitDur, setNewVisitAge, setNewVisitCat, setShowVisitEdit,
   toggleSaved, editVisit, deleteVisit, openVote,
-  ratings = {}, rateVisit, setVisitNote,
+  ratings = {}, rateVisit, setVisitNote, capturePhoto,
 }) {
   return (
     <div data-testid="screen-visites">
@@ -51,6 +52,7 @@ export function Visites({
                   <div style={sx('display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;')}>
                     <div style={sx('display:inline-block;font-size:12px;font-weight:700;color:#6b6354;background:#f1e9da;border-radius:8px;padding:4px 8px;')}>👶 {v.age}</div>
                     <DriveLink sx={sx} place={(typeof v.lat === 'number' && typeof v.lng === 'number') ? v : `${v.name}, Cantal`} style={'display:inline-flex;align-items:center;gap:5px;background:#e8c07a;color:#2f2a22;font-weight:700;font-family:Quicksand;text-decoration:none;border-radius:8px;padding:4px 9px;font-size:12px;'} />
+                    <AttachPhotoButton sx={sx} capturePhoto={capturePhoto} label={v.name} text="📸 Photo" />
                   </div>
                 </div>
                 <button onClick={() => toggleSaved(v.id)} style={sx('flex:0 0 auto;width:40px;height:40px;border:none;background:transparent;cursor:pointer;font-size:26px;line-height:1;')}>

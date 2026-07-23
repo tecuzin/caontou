@@ -208,14 +208,14 @@ export function Navigation({
                 setNewVisitDur={setNewVisitDur} setNewVisitAge={setNewVisitAge} setNewVisitCat={setNewVisitCat} setShowVisitEdit={setShowVisitEdit}
                 toggleSaved={toggleSaved} editVisit={editVisit} deleteVisit={deleteVisit}
                 openVote={isOn('extra_vote') ? () => setShowVote(true) : null}
-                ratings={ratings} rateVisit={rateVisit} setVisitNote={setVisitNote}
+                ratings={ratings} rateVisit={rateVisit} setVisitNote={setVisitNote} capturePhoto={capturePhoto}
               />
             )}
 
             {/* REPAS */}
             {tab === 'repas' && (
               <Repas
-                sx={sx} mealTab={mealTab} setMealTab={setMealTab} meals={meals} editMeal={editMeal} deleteMeal={deleteMeal} openAddMeal={openAddMeal}
+                sx={sx} mealTab={mealTab} setMealTab={setMealTab} meals={meals} editMeal={editMeal} deleteMeal={deleteMeal} openAddMeal={openAddMeal} capturePhoto={capturePhoto}
                 coursesDone={coursesDone} coursesTotal={coursesTotal} coursesPct={coursesPct} coursesSorted={coursesSorted} setCoursesSorted={setCoursesSorted} coursesGroups={coursesGroups}
                 toggleCheck={toggleCheck} deleteCourseCategory={deleteCourseCategory} deleteCourseItem={deleteCourseItem}
                 setEditingCourseKey={setEditingCourseKey} setShowAddCourseItem={setShowAddCourseItem} setShowAddCourseCat={setShowAddCourseCat}

@@ -1,6 +1,8 @@
+import { AttachPhotoButton } from '../components/AttachPhotoButton.jsx'
+
 /** Écran Repas & courses — menus du séjour + liste de courses par catégorie. */
 export function Repas({
-  sx, mealTab, setMealTab, meals, editMeal, deleteMeal, openAddMeal,
+  sx, mealTab, setMealTab, meals, editMeal, deleteMeal, openAddMeal, capturePhoto,
   coursesDone, coursesTotal, coursesPct, coursesSorted, setCoursesSorted, coursesGroups,
   toggleCheck, deleteCourseCategory, deleteCourseItem, setEditingCourseKey, setShowAddCourseItem, setShowAddCourseCat,
   shoppingItems, toggleShoppingItem, deleteShoppingItem,
@@ -23,6 +25,7 @@ export function Repas({
               <div key={ml.id} style={sx('display:flex;align-items:center;gap:14px;background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;padding:12px 14px;')}>
                 <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;color:#cf7d3c;width:54px;flex:0 0 auto;')}>{ml.day}</div>
                 <div style={sx('font-weight:600;font-size:14px;flex:1;')}>{ml.dish}</div>
+                <AttachPhotoButton sx={sx} capturePhoto={capturePhoto} label={ml.dish} />
                 <button onClick={() => editMeal(ml.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;')}>✏️</button>
                 <button onClick={() => deleteMeal(ml.id)} style={sx('border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;color:#b8503f;')}>🗑️</button>
               </div>
