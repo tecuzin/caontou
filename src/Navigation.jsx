@@ -195,7 +195,7 @@ export function Navigation({
               <Planning
                 sx={sx} days={days} trip={trip} fmtDayShort={fmtDayShort} day={day} setDay={setDay} setShowDayAdd={setShowDayAdd}
                 cur={cur} editDay={editDay} editActivity={editActivity} deleteActivity={deleteActivity} startAddActivity={startAddActivity}
-                openJournal={openJournal} shareActivity={shareActivity}
+                openJournal={openJournal} shareActivity={shareActivity} meals={meals} setTab={setTab}
               />
             )}
 

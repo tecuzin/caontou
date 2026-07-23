@@ -1,9 +1,12 @@
+import { mealsForDay } from '../day-schedule.js'
+
 /** Écran Planning — jours du séjour + activités du jour sélectionné. */
 export function Planning({
   sx, days, trip, fmtDayShort, day, setDay, setShowDayAdd,
   cur, editDay, editActivity, deleteActivity, startAddActivity,
-  openJournal, shareActivity,
+  openJournal, shareActivity, meals = [], setTab,
 }) {
+  const dayMeals = mealsForDay(cur, meals)
   return (
     <div data-testid="screen-planning">
       <div style={sx('padding:54px 18px 4px;')}>
@@ -30,6 +33,19 @@ export function Planning({
             <button onClick={() => editDay(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:15px;padding:4px;')}>✏️</button>
           </div>
         </div>
+        {dayMeals.length > 0 && (
+          <button
+            data-testid="planning-day-meal"
+            onClick={setTab ? () => setTab('repas') : undefined}
+            style={sx(`width:100%;text-align:left;display:flex;align-items:center;gap:10px;background:#f3ece0;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;margin-bottom:14px;cursor:${setTab ? 'pointer' : 'default'};`)}
+          >
+            <span style={sx('font-size:18px;flex:0 0 auto;')}>🍴</span>
+            <div style={sx('flex:1;min-width:0;')}>
+              <div style={sx('font-size:12px;font-weight:700;color:#9c6b4a;text-transform:uppercase;letter-spacing:0.5px;')}>Repas du jour</div>
+              <div style={sx('font-size:14px;color:#6b6354;margin-top:1px;')}>{dayMeals.map((m) => m.dish).join(' · ')}</div>
+            </div>
+          </button>
+        )}
         {cur.items.map((it, i) => (
           <div key={i} style={sx('display:flex;gap:12px;')}>
             <div style={sx('width:48px;flex:0 0 auto;font-size:13px;font-weight:700;color:#9a917f;padding-top:2px;')}>{it.time}</div>
