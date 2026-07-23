@@ -10,6 +10,22 @@ comportement visible** de l'app (pixel-fidélité au design, mêmes données,
 mêmes `data-testid`). Un refactor qui casse un test existant est un refactor
 raté — le test avait raison.
 
+> ## 🎯 Cap : `src/App.jsx` doit rester MINIMALISTE
+> App.jsx est le **point de composition** de l'app : il **importe et câble des
+> modules**, il ne les *contient* pas. Objectif permanent — y compris quand on
+> ajoute une fonctionnalité, pas seulement pendant un refactor dédié :
+> - **Aucun JSX d'écran** dans App.jsx → chaque écran/modal vit dans son fichier
+>   (`src/screens/*`, `src/modals/*`) et reçoit état + handlers en props.
+> - **Aucune logique métier** (agrégations, calculs, validation, formatage) dans
+>   App.jsx → modules purs testables (`src/*.js`) ; les handlers CRUD par domaine
+>   → hooks (`src/hooks/use*.js`).
+> - App.jsx ne garde que : le state de haut niveau, le branchement des hooks, et
+>   le rendu de `<Navigation>` / des modals. **Si on ajoute du code à App.jsx,
+>   se demander d'abord dans quel module il devrait vivre.**
+> - Règle pratique : toute nouvelle feature crée/enrichit un module + son test,
+>   et App.jsx se contente d'un `import` + du passage de props. On ne fait
+>   *grossir* App.jsx que d'une ligne de câblage, jamais d'un bloc de logique.
+
 ## Point de départ (toujours faire en premier)
 
 > **Epiq est la source de vérité unique du backlog** (board
