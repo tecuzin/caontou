@@ -1075,3 +1075,7 @@
 {"v":1,"id":["01KY6N8EPMG590QDGFT6BZFEQ9","01KY6N8DNFFDDVGBS1FZ6QBY3X"],"add.issue.tag":{"id":"01KY6N6HWQGYX4QJSGAQ72QXYZ","tag":"01KWWGM0ZBV1DTDPADAM9NMJFM"}}
 {"v":1,"id":["01KY6N8FT43ABFFDCJKE32F8E5","01KY6N8EPMG590QDGFT6BZFEQ9"],"add.issue.tag":{"id":"01KY6N6HWQGYX4QJSGAQ72QXYZ","tag":"01KWWGKSBEM79T3GPHK06BH05P"}}
 {"v":1,"id":["01KY6N8GW0AMTRGYKVX7QVV75S","01KY6N8FT43ABFFDCJKE32F8E5"],"add.issue.tag":{"id":"01KY6N6HWQGYX4QJSGAQ72QXYZ","tag":"01KWXE3HE7R6WWF2EN3X6D5JVG"}}
+{"v":1,"id":["01KY6NBGZTF9P8CNCEPSN97R06","01KY6N8GW0AMTRGYKVX7QVV75S"],"add.issue":{"id":"01KY6NBGZNHENRV27WSCX2VWNG","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"📅 Sélecteurs natifs de date (calendrier) et d'heure (horloge) partout","rank":"fbffffffffffffffffffffff"}}
+{"v":1,"id":["01KY6NBJGCDT1DYQ4W3SS17DRS","01KY6NBGZTF9P8CNCEPSN97R06"],"add.issue":{"id":"01KY6NBJG872G50EQARBJXAFVX","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🗺️ « Y aller en voiture » : ouvrir tout champ lieu dans Maps","rank":"fdffffffffffffffffffffff"}}
+{"v":1,"id":["01KY6NBKHCFXFJ3A88719EF9SG","01KY6NBJGCDT1DYQ4W3SS17DRS"],"add.issue":{"id":"01KY6NBKH8GCJD1R7D2B9JA7GP","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🗓️ Tout élément daté apparaît dans le calendrier du jour + le récapitulatif","rank":"feffffffffffffffffffffff"}}
+{"v":1,"id":["01KY6NBMKBV0APGG749RB5F9D4","01KY6NBKHCFXFJ3A88719EF9SG"],"add.issue":{"id":"01KY6NBMK6DZB421K4K5QKCX68","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"📸 Ajouter des photos à n'importe quel élément (alimente la galerie)","rank":"ff7fffffffffffffffffffff"}}
