@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { telHref, mapsHref, mapsCoordsHref } from '../links.js'
+import { telHref, mapsHref, mapsCoordsHref, mapsDriveHref, placeQuery } from '../links.js'
 
 describe('Liens actionnables', () => {
   it('telHref nettoie les espaces et garde le +', () => {
@@ -27,5 +27,24 @@ describe('Liens actionnables', () => {
     expect(mapsCoordsHref(45.03, 2.66)).toBe('https://www.google.com/maps/search/?api=1&query=45.03,2.66')
     expect(mapsCoordsHref(NaN, 2)).toBeNull()
     expect(mapsCoordsHref('a', 'b')).toBeNull()
+  })
+
+  it('placeQuery privilégie les coordonnées, sinon adresse/place/nom', () => {
+    expect(placeQuery({ lat: 45.02, lng: 2.66, name: 'Pas de Cère' })).toBe('45.02,2.66')
+    expect(placeQuery({ adresse: 'Vezels-Roussy (15130)' })).toBe('Vezels-Roussy (15130)')
+    expect(placeQuery({ place: 'Vic-sur-Cère' })).toBe('Vic-sur-Cère')
+    expect(placeQuery({ name: 'Château de Messilhac' })).toBe('Château de Messilhac')
+    expect(placeQuery('Aurillac')).toBe('Aurillac')
+    expect(placeQuery({ lat: NaN, lng: 2 })).toBe('')
+    expect(placeQuery(null)).toBe('')
+  })
+
+  it('mapsDriveHref construit un itinéraire voiture (coords ou texte)', () => {
+    expect(mapsDriveHref({ lat: 45.02, lng: 2.66 }))
+      .toBe('https://www.google.com/maps/dir/?api=1&destination=45.02%2C2.66&travelmode=driving')
+    expect(mapsDriveHref('Vezels-Roussy, Cantal'))
+      .toBe('https://www.google.com/maps/dir/?api=1&destination=Vezels-Roussy%2C%20Cantal&travelmode=driving')
+    expect(mapsDriveHref('  ')).toBeNull()
+    expect(mapsDriveHref(null)).toBeNull()
   })
 })

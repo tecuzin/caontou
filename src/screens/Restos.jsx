@@ -1,4 +1,4 @@
-import { TelLink, MapLink } from '../components/Links.jsx'
+import { TelLink, MapLink, DriveLink } from '../components/Links.jsx'
 
 /** Sous-écran Restos — carnet d'adresses + réservations, liens cliquables. */
 export function Restos({ sx, restos, openAddResto, openEditResto, deleteResto }) {
@@ -18,7 +18,12 @@ export function Restos({ sx, restos, openAddResto, openEditResto, deleteResto })
           <div style={sx('display:flex;align-items:flex-start;gap:8px;')}>
             <div style={sx('flex:1;')}>
               <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>{r.name}</div>
-              {r.place && <div style={sx('margin-top:4px;')}><MapLink sx={sx} place={r.place} style={'color:#4f8a86;font-weight:600;text-decoration:none;font-size:13px;'}>📍 {r.place}</MapLink></div>}
+              {r.place && (
+                <div style={sx('margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;')}>
+                  <MapLink sx={sx} place={r.place} style={'color:#4f8a86;font-weight:600;text-decoration:none;font-size:13px;'}>📍 {r.place}</MapLink>
+                  <DriveLink sx={sx} place={r.place} />
+                </div>
+              )}
               {r.tel && <div style={sx('margin-top:4px;')}><TelLink sx={sx} num={r.tel} style={'color:#9c6b4a;font-weight:700;text-decoration:none;font-size:14px;'}>📞 {r.tel}</TelLink></div>}
             </div>
             <div style={sx('display:flex;gap:2px;flex:0 0 auto;')}>

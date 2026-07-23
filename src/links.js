@@ -20,6 +20,26 @@ export function mapsHref(query) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
 }
 
+/** Réduit un lieu (objet ou texte) en requête Maps : "lat,lng" si coordonnées
+ *  exploitables, sinon adresse/place/nom en texte. '' si rien d'exploitable. */
+export function placeQuery(place) {
+  if (place && typeof place.lat === 'number' && typeof place.lng === 'number' &&
+      Number.isFinite(place.lat) && Number.isFinite(place.lng)) {
+    return `${place.lat},${place.lng}`
+  }
+  const txt = typeof place === 'string' ? place
+    : (place && (place.adresse || place.place || place.name)) || ''
+  return String(txt).trim()
+}
+
+/** Lien Google Maps « itinéraire voiture » vers un lieu (position réelle →
+ *  destination). Accepte un objet lieu ou une adresse/coords en texte. */
+export function mapsDriveHref(place) {
+  const dest = placeQuery(place)
+  if (!dest) return null
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving`
+}
+
 /** Ouvre un lien externe (Maps/navigateur) : `_system` sur natif, `_blank` sur web. */
 export function openExternal(href) {
   if (!href) return

@@ -1,4 +1,5 @@
 import { GiteScene } from '../Scenery.jsx'
+import { DriveLink } from '../components/Links.jsx'
 
 const HEB_EQUIP = ['Wi-Fi', 'Cheminée (cantou)', 'Lave-linge', 'Lit bébé', 'Jardin clos', 'Parking', 'Lave-vaisselle', 'Barbecue']
 
@@ -24,7 +25,10 @@ export function Hebergement({ sx, hebergement, openHebEdit }) {
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;flex:1;')}>{hebergement.nom}</div>
         <button onClick={openHebEdit} style={sx('border:none;background:transparent;cursor:pointer;font-size:19px;padding:4px;')}>✏️</button>
       </div>
-      <div style={sx('font-size:13px;color:#6b6354;margin-top:2px;')}>📍 {hebergement.adresse}</div>
+      <div style={sx('display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px;')}>
+        <div style={sx('font-size:13px;color:#6b6354;')}>📍 {hebergement.adresse}</div>
+        <DriveLink sx={sx} place={hebergement.adresse} label="Aller au gîte" />
+      </div>
       <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
         <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Arrivée</div><div style={sx('font-weight:700;font-size:14px;margin-top:4px;')}>{hebergement.arrivee}</div></div>
         <div style={sx('flex:1;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px;')}><div style={sx('font-size:12px;color:#6b6354;')}>Départ</div><div style={sx('font-weight:700;font-size:14px;margin-top:4px;')}>{hebergement.depart}</div></div>
