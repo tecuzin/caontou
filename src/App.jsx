@@ -483,6 +483,12 @@ export default function App() {
   const [newHebAdresse, setNewHebAdresse] = useState('')
   const [newHebArrivee, setNewHebArrivee] = useState('')
   const [newHebDepart, setNewHebDepart] = useState('')
+  // Arrivée/départ structurés (calendrier + horloge natifs) — la chaîne
+  // affichée (newHebArrivee/newHebDepart) est composée depuis ces champs.
+  const [newHebArriveeDate, setNewHebArriveeDate] = useState('')
+  const [newHebArriveeTime, setNewHebArriveeTime] = useState('')
+  const [newHebDepartDate, setNewHebDepartDate] = useState('')
+  const [newHebDepartTime, setNewHebDepartTime] = useState('')
   const [newHebCapacite, setNewHebCapacite] = useState('')
   const [newHebWifiNom, setNewHebWifiNom] = useState('')
   const [newHebWifiPass, setNewHebWifiPass] = useState('')
@@ -960,13 +966,15 @@ export default function App() {
   const openHebEdit = () => {
     setNewHebNom(hebergement.nom); setNewHebAdresse(hebergement.adresse)
     setNewHebArrivee(hebergement.arrivee); setNewHebDepart(hebergement.depart)
+    setNewHebArriveeDate(hebergement.arriveeDate || ''); setNewHebArriveeTime(hebergement.arriveeTime || '')
+    setNewHebDepartDate(hebergement.departDate || ''); setNewHebDepartTime(hebergement.departTime || '')
     setNewHebCapacite(hebergement.capacite); setNewHebWifiNom(hebergement.wifiNom)
     setNewHebWifiPass(hebergement.wifiPass); setNewHebContact(hebergement.contact)
     setShowHebEdit(true)
   }
   const saveHebergement = () => {
     haptic(ImpactStyle.Medium)
-    setHebergement({ ...hebergement, nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact })
+    setHebergement({ ...hebergement, nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, arriveeDate: newHebArriveeDate, arriveeTime: newHebArriveeTime, departDate: newHebDepartDate, departTime: newHebDepartTime, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact })
     setShowHebEdit(false)
   }
 
@@ -1153,7 +1161,7 @@ export default function App() {
       {showBudgetTotalEdit && <Suspense fallback={null}><EditBudgetModal isOpen={showBudgetTotalEdit} onClose={() => setShowBudgetTotalEdit(false)} newBudgetTotal={newBudgetTotal} setNewBudgetTotal={setNewBudgetTotal} budgetTotal={budgetTotal} darkMode={darkMode} onSubmit={saveBudgetTotal} /></Suspense>}
 
       {/* MODAL: Hébergement edit */}
-      {showHebEdit && <Suspense fallback={null}><EditHebergementModal isOpen={showHebEdit} onClose={() => setShowHebEdit(false)} hebFields={{ nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact }} setHebFields={(update) => { Object.entries(update).forEach(([k, v]) => { if (k === 'nom') setNewHebNom(v); else if (k === 'adresse') setNewHebAdresse(v); else if (k === 'arrivee') setNewHebArrivee(v); else if (k === 'depart') setNewHebDepart(v); else if (k === 'capacite') setNewHebCapacite(v); else if (k === 'wifiNom') setNewHebWifiNom(v); else if (k === 'wifiPass') setNewHebWifiPass(v); else if (k === 'contact') setNewHebContact(v); }); }} darkMode={darkMode} onSubmit={saveHebergement} /></Suspense>}
+      {showHebEdit && <Suspense fallback={null}><EditHebergementModal isOpen={showHebEdit} onClose={() => setShowHebEdit(false)} hebFields={{ nom: newHebNom, adresse: newHebAdresse, arrivee: newHebArrivee, depart: newHebDepart, arriveeDate: newHebArriveeDate, arriveeTime: newHebArriveeTime, departDate: newHebDepartDate, departTime: newHebDepartTime, capacite: newHebCapacite, wifiNom: newHebWifiNom, wifiPass: newHebWifiPass, contact: newHebContact }} setHebFields={(update) => { Object.entries(update).forEach(([k, v]) => { if (k === 'nom') setNewHebNom(v); else if (k === 'adresse') setNewHebAdresse(v); else if (k === 'arrivee') setNewHebArrivee(v); else if (k === 'depart') setNewHebDepart(v); else if (k === 'arriveeDate') setNewHebArriveeDate(v); else if (k === 'arriveeTime') setNewHebArriveeTime(v); else if (k === 'departDate') setNewHebDepartDate(v); else if (k === 'departTime') setNewHebDepartTime(v); else if (k === 'capacite') setNewHebCapacite(v); else if (k === 'wifiNom') setNewHebWifiNom(v); else if (k === 'wifiPass') setNewHebWifiPass(v); else if (k === 'contact') setNewHebContact(v); }); }} darkMode={darkMode} onSubmit={saveHebergement} /></Suspense>}
 
       {showAddTrajetCheck && <Suspense fallback={null}><AddTrajetCheckModal isOpen={showAddTrajetCheck} onClose={() => setShowAddTrajetCheck(false)} newTrajetCheckItem={newTrajetCheckItem} setNewTrajetCheckItem={setNewTrajetCheckItem} darkMode={darkMode} onSubmit={addTrajetCheckItem} onSubmitAndNew={addTrajetCheckItemKeep} /></Suspense>}
 
