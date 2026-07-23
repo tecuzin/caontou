@@ -16,6 +16,9 @@ vi.mock('@capacitor/core', () => ({ Capacitor: { isNativePlatform: () => native.
 vi.mock('@capacitor/camera', () => ({ Camera: { getPhoto: (...a) => getPhoto(...a) }, CameraResultType: { Base64: 'b64' }, CameraSource: { Camera: 'CAM', Photos: 'PHO' } }))
 vi.mock('@capacitor/filesystem', () => ({ Filesystem: fs, Directory: { Data: 'DATA' } }))
 vi.mock('@capacitor/share', () => ({ Share: { share: (...a) => shareSpy(...a) } }))
+// Le redimensionnement (canvas) n'est pas exerçable en jsdom (Image ne charge
+// pas) : passthrough ici, testé isolément dans image.test.js.
+vi.mock('../image.js', () => ({ resizeBase64Jpeg: async (b) => b }))
 
 const { usePhotos } = await import('../hooks/usePhotos.js')
 

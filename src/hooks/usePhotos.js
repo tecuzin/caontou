@@ -4,6 +4,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { photoId, dayKeyForDate } from '../photos.js'
+import { resizeBase64Jpeg } from '../image.js'
 
 const PHOTO_DIR = 'cantou-photos'
 
@@ -37,13 +38,16 @@ export function usePhotos(initial, trip, days) {
         correctOrientation: true,
       })
       if (!shot?.base64String) return null
+      // Redimensionne avant stockage (empreinte disque/mémoire réduite ; repli
+      // sûr sur l'original si le canvas échoue → jamais de perte de photo).
+      const data = await resizeBase64Jpeg(shot.base64String, { maxEdge: 1600, quality: 0.8 })
       await ensureDir()
       const id = photoId()
       const file = `${PHOTO_DIR}/${id}.jpeg`
-      await Filesystem.writeFile({ path: file, data: shot.base64String, directory: Directory.Data })
+      await Filesystem.writeFile({ path: file, data, directory: Directory.Data })
       const meta = { id, file, day: dayKeyForDate(trip, days), takenAt: new Date().toISOString(), ...extra }
       setPhotos((p) => [...p, meta])
-      setSrcMap((m) => ({ ...m, [id]: `data:image/jpeg;base64,${shot.base64String}` }))
+      setSrcMap((m) => ({ ...m, [id]: `data:image/jpeg;base64,${data}` }))
       return meta
     } catch {
       return null // permission refusée ou annulation utilisateur
