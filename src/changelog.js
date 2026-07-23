@@ -5,7 +5,7 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
-  { build: 107, version: '1.3.0', date: '2026-07-23', items: [
+  { build: 108, version: '1.3.0', date: '2026-07-23', items: [
     '📈 Budget : donut « où part l’argent » — répartition des dépenses par catégorie en un coup d’œil',
   ] },
   { build: 106, version: '1.3.0', date: '2026-07-19', items: [
