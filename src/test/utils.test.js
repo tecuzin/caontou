@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, fmtMonthYear } from '../utils.js'
+import { s, eur, buildList, sortItemsByTime, parseDist, tripDate, fmtDayShort, fmtMonthYear, toTimeInput } from '../utils.js'
 
 describe('s() — CSS string to React style object', () => {
   it('converts a single property', () => {
@@ -133,6 +133,27 @@ describe('sortItemsByTime()', () => {
     const items = [{ time: '9:00', title: 'Nine' }, { time: '10:00', title: 'Ten' }]
     const sorted = sortItemsByTime(items)
     expect(sorted[0].title).toBe('Nine')
+  })
+})
+
+describe('toTimeInput() — normalisation pour <input type="time">', () => {
+  it('laisse une heure HH:MM inchangée', () => {
+    expect(toTimeInput('09:30')).toBe('09:30')
+    expect(toTimeInput('14:00')).toBe('14:00')
+  })
+  it('zéro-pad les heures à un chiffre', () => {
+    expect(toTimeInput('9:00')).toBe('09:00')
+    expect(toTimeInput('8:5')).toBe('08:05')
+  })
+  it('accepte le format "8h30" / "8h"', () => {
+    expect(toTimeInput('8h30')).toBe('08:30')
+    expect(toTimeInput('8h')).toBe('08:00')
+  })
+  it('borne les heures aberrantes à 23 et renvoie "" pour le vide/non-heure', () => {
+    expect(toTimeInput('25:00')).toBe('23:00')
+    expect(toTimeInput('')).toBe('')
+    expect(toTimeInput(null)).toBe('')
+    expect(toTimeInput('Matin')).toBe('')
   })
 })
 

@@ -54,6 +54,20 @@ export function sortItemsByTime(items) {
 }
 
 /**
+ * Normalise une heure vers "HH:MM" (24 h) pour un `<input type="time">`.
+ * Accepte "9:00", "9h", "9h30", "09:30", "09:00" → "09:00"/"09:30".
+ * Valeur non exploitable ou vide → "" (le sélecteur natif s'affiche à vide).
+ */
+export function toTimeInput(v) {
+  if (!v) return ''
+  const m = String(v).match(/^(\d{1,2})[:hH ]*([0-5]?\d)?/)
+  if (!m) return ''
+  const h = String(Math.min(23, parseInt(m[1], 10))).padStart(2, '0')
+  const min = (m[2] || '00').padStart(2, '0')
+  return `${h}:${min}`
+}
+
+/**
  * Parse a distance string (e.g. "25 min") to integer minutes.
  */
 export function parseDist(d) {

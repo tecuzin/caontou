@@ -1,4 +1,4 @@
-import { s } from '../utils.js'
+import { s, toTimeInput } from '../utils.js'
 import { ModalShell } from './ModalShell.jsx'
 
 export function EditTrajetStepModal({ isOpen, onClose, editingTrajetIdx, newTrajetTime, setNewTrajetTime, newTrajetPlace, setNewTrajetPlace, newTrajetNote, setNewTrajetNote, newTrajetColor, setNewTrajetColor, darkMode, onSubmit }) {
@@ -10,7 +10,7 @@ export function EditTrajetStepModal({ isOpen, onClose, editingTrajetIdx, newTraj
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer etape</div>
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-        <input value={newTrajetTime} onChange={e => setNewTrajetTime(e.target.value)} placeholder="Ex : 08:30" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <input type="time" value={toTimeInput(newTrajetTime)} onChange={e => setNewTrajetTime(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Lieu</div>
         <input value={newTrajetPlace} onChange={e => setNewTrajetPlace(e.target.value)} placeholder="Ex : Lyon" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Note</div>

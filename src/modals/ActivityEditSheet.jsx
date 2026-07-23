@@ -1,4 +1,5 @@
 import { ModalShell } from './ModalShell.jsx'
+import { toTimeInput } from '../utils.js'
 
 /** Feuille « Éditer activité » du planning — horaire + titre. */
 export function ActivityEditSheet({ sx, onClose, time, setTime, title, setTitle, onSubmit }) {
@@ -8,7 +9,7 @@ export function ActivityEditSheet({ sx, onClose, time, setTime, title, setTitle,
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:16px;')}>Editer activite</div>
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Horaire</div>
-        <input value={time} onChange={(e) => setTime(e.target.value)} placeholder="Ex : 10:00" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
+        <input type="time" value={toTimeInput(time)} onChange={(e) => setTime(e.target.value)} style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Titre</div>
         <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex : Visite musee" style={sx('width:100%;margin-top:6px;margin-bottom:20px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         <div style={sx('display:flex;gap:10px;')}>
