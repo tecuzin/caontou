@@ -5,6 +5,11 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 111, version: '1.3.0', date: '2026-07-23', items: [
+    '🕐 Saisie de l’heure avec une horloge (activités, étapes de trajet) au lieu de taper le texte',
+    '🚗 Bouton « Y aller » sur les lieux (gîte, restos, visites) : itinéraire voiture direct dans Maps',
+    '🍴 Le repas du jour apparaît maintenant dans le planning de la journée',
+  ] },
   { build: 108, version: '1.3.0', date: '2026-07-23', items: [
     '📈 Budget : donut « où part l’argent » — répartition des dépenses par catégorie en un coup d’œil',
   ] },

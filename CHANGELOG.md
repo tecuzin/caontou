@@ -3,6 +3,17 @@
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
 ## [Non publié]
+Lot « Confort de saisie & lieux » (build 111, sur `develop`) — 703 tests, audit design vert.
+### Ajouté
+- **Sélecteurs d'heure natifs** (build 111) : les champs horaire (activités du planning,
+  étapes de trajet) ouvrent l'horloge Android au lieu d'une saisie texte. Helper pur
+  `toTimeInput`. Les dates de séjour utilisaient déjà `type="date"`.
+- **Bouton « 🚗 Y aller »** (build 111, `mapsDriveHref`/`DriveLink`) : itinéraire voiture
+  direct dans Maps depuis les lieux — gîte (adresse), restos (place), visites (coordonnées).
+- **Repas du jour dans le planning** (build 111, `day-schedule.js`) : le repas daté d'une
+  journée s'affiche dans sa timeline (bandeau cliquable → onglet Repas). Récap inchangé.
+- **Donut budget** (build 108) : répartition des dépenses par catégorie en un coup d'œil.
+
 Lot « Carladès » (builds 105-106, sur `develop`) — fonctionnalités familiales, toutes
 hors-ligne et désactivables, s'appuyant sur des modules purs testés. Suite 680 tests.
 ### Ajouté
