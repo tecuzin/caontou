@@ -5,6 +5,10 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 112, version: '1.3.0', date: '2026-07-23', items: [
+    '📸 Bouton photo sur les visites et les repas : la photo rejoint la galerie Souvenirs, avec sa légende',
+    '🗜️ Photos redimensionnées avant enregistrement → moins d’espace utilisé et affichage plus rapide',
+  ] },
   { build: 111, version: '1.3.0', date: '2026-07-23', items: [
     '🕐 Saisie de l’heure avec une horloge (activités, étapes de trajet) au lieu de taper le texte',
     '🚗 Bouton « Y aller » sur les lieux (gîte, restos, visites) : itinéraire voiture direct dans Maps',

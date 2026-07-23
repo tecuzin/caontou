@@ -3,6 +3,15 @@
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
 ## [Non publié]
+Lot « Photos partout » (build 112, sur `develop`) — 711 tests, audit design vert.
+### Ajouté
+- **Bouton 📸 sur les éléments** (build 112, `AttachPhotoButton`) : attacher une photo
+  depuis une visite ou un repas ; elle rejoint la galerie Souvenirs, étiquetée (légende
+  sur la vignette). Les reçus de dépense restent exclus de la galerie.
+- **Redimensionnement des photos avant stockage** (build 112, `image.js`) : plus grand
+  côté borné à 1600 px, ré-encodage JPEG q0.8 → empreinte disque/mémoire réduite ; repli
+  sûr sur l'original si le canvas échoue.
+
 Lot « Confort de saisie & lieux » (build 111, sur `develop`) — 703 tests, audit design vert.
 ### Ajouté
 - **Sélecteurs d'heure natifs** (build 111) : les champs horaire (activités du planning,
