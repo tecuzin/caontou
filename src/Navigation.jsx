@@ -24,6 +24,8 @@ const Logistique = lazy(() => import('./screens/Logistique.jsx').then(m => ({ de
 const Trajet = lazy(() => import('./screens/Trajet.jsx').then(m => ({ default: m.Trajet })))
 const Souvenirs = lazy(() => import('./screens/Souvenirs.jsx').then(m => ({ default: m.Souvenirs })))
 const Bingo = lazy(() => import('./screens/Bingo.jsx').then(m => ({ default: m.Bingo })))
+const Quiz = lazy(() => import('./screens/Quiz.jsx').then(m => ({ default: m.Quiz })))
+const PrintSheet = lazy(() => import('./screens/PrintSheet.jsx').then(m => ({ default: m.PrintSheet })))
 const Bilan = lazy(() => import('./screens/Bilan.jsx').then(m => ({ default: m.Bilan })))
 const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
 const Departure = lazy(() => import('./screens/Departure.jsx').then(m => ({ default: m.Departure })))
@@ -73,6 +75,16 @@ export function Navigation({
             {/* BINGO */}
             {sub === 'bingo' && (
               <Bingo sx={sx} items={bingoItems} checked={bingo} toggleBingo={toggleBingo} />
+            )}
+
+            {/* QUIZ */}
+            {sub === 'quiz' && (
+              <Quiz sx={sx} />
+            )}
+
+            {/* PENSE-BÊTE IMPRIMABLE */}
+            {sub === 'imprimer' && (
+              <PrintSheet sx={sx} cur={cur} meals={meals} visits={visits} saved={saved} trip={trip} />
             )}
 
             {/* BILAN */}
@@ -195,7 +207,7 @@ export function Navigation({
               <Planning
                 sx={sx} days={days} trip={trip} fmtDayShort={fmtDayShort} day={day} setDay={setDay} setShowDayAdd={setShowDayAdd}
                 cur={cur} editDay={editDay} editActivity={editActivity} deleteActivity={deleteActivity} startAddActivity={startAddActivity}
-                openJournal={openJournal} shareActivity={shareActivity} meals={meals} setTab={setTab}
+                openJournal={openJournal} shareActivity={shareActivity} meals={meals} setTab={setTab} setSub={setSub}
               />
             )}
 

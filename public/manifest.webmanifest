@@ -1,0 +1,22 @@
+{
+  "name": "Cantou — Vacances Cantal",
+  "short_name": "Cantou",
+  "description": "L'app du séjour familial dans le Cantal (Carladès) : planning, visites, repas, budget, checklists et souvenirs, 100 % hors ligne.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4ecdc",
+  "theme_color": "#4a5d3a",
+  "icons": [
+    { "src": "/cantou-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/cantou-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Aujourd'hui", "short_name": "Aujourd'hui", "url": "/?tab=accueil", "icons": [{ "src": "/cantou-icon.png", "sizes": "512x512" }] },
+    { "name": "Planning du jour", "short_name": "Planning", "url": "/?tab=planning", "icons": [{ "src": "/cantou-icon.png", "sizes": "512x512" }] },
+    { "name": "Repas du jour", "short_name": "Repas", "url": "/?tab=repas", "icons": [{ "src": "/cantou-icon.png", "sizes": "512x512" }] },
+    { "name": "Budget", "short_name": "Budget", "url": "/?tab=budget", "icons": [{ "src": "/cantou-icon.png", "sizes": "512x512" }] }
+  ]
+}

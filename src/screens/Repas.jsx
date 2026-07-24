@@ -1,4 +1,5 @@
 import { AttachPhotoButton } from '../components/AttachPhotoButton.jsx'
+import { MarketsCard } from '../components/MarketsCard.jsx'
 
 /** Écran Repas & courses — menus du séjour + liste de courses par catégorie. */
 export function Repas({
@@ -43,6 +44,7 @@ export function Repas({
 
       {mealTab === 'courses' && (
         <div style={sx('padding:0 18px 16px;')}>
+          <MarketsCard sx={sx} />
           <div style={sx('display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6b6354;margin-bottom:6px;')}><span>Liste de courses</span><span>{coursesDone}/{coursesTotal}</span></div>
           <div style={sx('height:9px;border-radius:8px;background:#efe6d4;overflow:hidden;margin-bottom:14px;')}><div style={sx(`height:100%;background:#5b7042;width:${coursesPct}%;`)} /></div>
           <div style={sx('display:flex;justify-content:flex-end;margin-bottom:14px;')}>

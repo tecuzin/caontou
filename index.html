@@ -7,6 +7,7 @@
     <meta name="description" content="Cantou — l'app du séjour familial dans le Cantal (Carladès) : planning, visites, repas, budget, checklists et souvenirs, 100 % hors ligne." />
     <link rel="icon" href="/cantou-icon.svg" />
     <link rel="apple-touch-icon" href="/cantou-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <title>Cantou — Vacances Cantal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,6 +36,15 @@
         *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
       }
       body.dark { background: #1c1a16; }
+      /* Pense-bête imprimable (skill p3) : à l'impression, on ne montre que la
+         feuille `.print-sheet`, en noir sur blanc, sans le chrome de l'app. */
+      @media print {
+        body, body.dark { background: #fff !important; }
+        body * { visibility: hidden; }
+        .print-hide { display: none !important; }
+        .print-sheet, .print-sheet * { visibility: visible; }
+        .print-sheet { position: absolute; left: 0; top: 0; width: 100%; border: none !important; border-radius: 0 !important; padding: 0 !important; color: #000 !important; background: #fff !important; }
+      }
     </style>
     <script>
       // Anti-flash : applique le fond sombre avant même le montage React,

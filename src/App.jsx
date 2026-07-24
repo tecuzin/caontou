@@ -57,6 +57,7 @@ const VoteModal = lazy(() => import('./modals/VoteModal.jsx').then(mod => ({ def
 import { countCompletedLines } from './bingo.js'
 import { computeRecap } from './recap.js'
 import { budgetByCategory } from './budget.js'
+import { initialTabFromSearch } from './deeplink.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
 const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
 const Onboarding = lazy(() => import('./screens/Onboarding.jsx').then(m => ({ default: m.Onboarding })))
@@ -253,8 +254,9 @@ export default function App() {
   }, [darkMode])
   const sx = (css) => s(darkMode ? applyDarkTheme(css) : css)
 
-  // état UI (non persisté)
-  const [tab, setTab] = useState('accueil')
+  // état UI (non persisté) — onglet initial éventuellement imposé par un
+  // deep-link `?tab=…` (raccourci Web App Manifest / lien partagé).
+  const [tab, setTab] = useState(() => initialTabFromSearch(typeof window !== 'undefined' ? window.location.search : '') || 'accueil')
   const [sub, setSub] = useState(null)
   const [day, setDay] = useState(0)
   const [filter, setFilter] = useState('Tous')
@@ -606,7 +608,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?', badges: 'Mes badges', recettes: 'Recettes du Cantal' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', quiz: 'Quiz du Carladès', imprimer: 'Pense-bête du jour', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?', badges: 'Mes badges', recettes: 'Recettes du Cantal' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {

@@ -4,7 +4,7 @@ import { mealsForDay } from '../day-schedule.js'
 export function Planning({
   sx, days, trip, fmtDayShort, day, setDay, setShowDayAdd,
   cur, editDay, editActivity, deleteActivity, startAddActivity,
-  openJournal, shareActivity, meals = [], setTab,
+  openJournal, shareActivity, meals = [], setTab, setSub,
 }) {
   const dayMeals = mealsForDay(cur, meals)
   return (
@@ -29,6 +29,7 @@ export function Planning({
             <div style={sx('font-size:13px;color:#6b6354;margin-bottom:16px;')}>{cur.sub}</div>
           </div>
           <div style={sx('display:flex;gap:4px;flex:0 0 auto;')}>
+            {setSub && <button data-testid="btn-print-day" onClick={() => setSub('imprimer')} style={sx('border:none;background:transparent;cursor:pointer;font-size:15px;padding:4px;')}>🖨️</button>}
             <button data-testid="btn-journal" onClick={() => openJournal(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:15px;padding:4px;')}>📔</button>
             <button onClick={() => editDay(day)} style={sx('border:none;background:transparent;cursor:pointer;font-size:15px;padding:4px;')}>✏️</button>
           </div>
