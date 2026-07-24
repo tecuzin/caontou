@@ -3,6 +3,18 @@
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
 ## [Non publié]
+Lot « Contenu & confort » (build 114, sur `develop`) — 728 tests, audit design vert.
+### Ajouté
+- **Marchés du Carladès** (build 114, `markets.js`) : fiche Vic-sur-Cère & Aurillac
+  (jours/horaires + « Y aller »), en tête de l'onglet Courses. Contenu rebasé Carladès.
+- **Quiz du Carladès** (build 114, `quiz.js` + `screens/Quiz.jsx`) : flashcards enfants,
+  12 questions factuelles, score + record local. Entrée dans la section Jeux de l'accueil.
+- **Pense-bête imprimable du jour** (build 114, `screens/PrintSheet.jsx` + CSS `@media print`) :
+  planning + repas + visites cochées en une page N/B, bouton 🖨️ dans Planning.
+- **Raccourcis d'onglet** (build 114, `deeplink.js` + manifest) : ouverture directe d'un
+  onglet via `?tab=…` (Web App Manifest `shortcuts` ; deep-link géré au démarrage).
+
+## [Historique]
 Lot « Dates hébergement » (build 113, sur `develop`) — 718 tests, audit design vert.
 ### Ajouté
 - **Arrivée/départ du gîte au calendrier + horloge** (build 113, `heb-datetime.js`) : les

@@ -5,6 +5,12 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 114, version: '1.3.0', date: '2026-07-24', items: [
+    '🧺 Marchés du Carladès (Vic-sur-Cère, Aurillac) : jours, horaires et itinéraire, dans l’onglet Courses',
+    '❓ Quiz du Carladès pour les enfants (section Jeux de l’accueil) — questions rigolotes sur le coin',
+    '🖨️ Pense-bête du jour imprimable (planning + repas + visites) depuis le Planning',
+    '🏠 Raccourci d’ouverture directe d’un onglet via l’URL (Aujourd’hui/Planning/Repas/Budget)',
+  ] },
   { build: 113, version: '1.3.0', date: '2026-07-23', items: [
     '📅 Arrivée & départ du gîte : choix de la date au calendrier et de l’heure à l’horloge',
     '🛠️ Correction : l’édition des infos d’hébergement s’enregistre bien maintenant',
