@@ -16,6 +16,10 @@ export default {
   core: { disableTelemetry: true },
   async viteFinal(config) {
     return mergeConfig(config, {
+      // Runtime JSX automatique (comme l'app) : sans ça, esbuild compile le JSX
+      // en React.createElement sans React global → « Can't find variable: React ».
+      esbuild: { jsx: 'automatic' },
+      optimizeDeps: { esbuildOptions: { jsx: 'automatic' } },
       resolve: {
         alias: {
           '@capacitor/core': cap,
