@@ -20,7 +20,7 @@ export function RestoModal({ isOpen, onClose, sx, editing, fields, setField, onS
         <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>Réservation (date, heure, couverts)</div>
         <input data-testid="resto-resa" value={fields.resa} onChange={(e) => setField('resa', e.target.value)} placeholder="Ex : Sam 8 · 20 h · 4 couverts" style={sx('width:100%;margin-top:6px;margin-bottom:14px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
 
-        <button data-testid="resto-reserved" onClick={() => setField('reserved', !fields.reserved)} style={sx(`width:100%;margin-bottom:18px;border:${fields.reserved ? '2px solid #4a5d3a' : '1px solid #d8cbb0'};background:${fields.reserved ? '#e7ecdf' : '#fffdf8'};color:#3a352b;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:12px;padding:12px;cursor:pointer;`)}>{fields.reserved ? '✓ Réservé' : 'Marquer comme réservé'}</button>
+        <button data-testid="resto-reserved" onClick={() => setField('reserved', !fields.reserved)} style={sx(`width:100%;margin-bottom:18px;border:${fields.reserved ? '2px solid #4a5d3a' : '1px solid #d8cbb0'};background:${fields.reserved ? '#e7ecdf' : '#fffdf8'};color:#2f2a22;font-weight:700;font-family:Quicksand;font-size:14px;border-radius:12px;padding:12px;cursor:pointer;`)}>{fields.reserved ? '✓ Réservé' : 'Marquer comme réservé'}</button>
 
         <div style={sx('display:flex;gap:10px;')}>
           <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>

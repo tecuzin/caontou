@@ -65,11 +65,11 @@ export function Recipes({ sx, recipes = [], setRecipes }) {
                 {open && (
                   <div style={sx('margin-top:10px;')}>
                     <div style={sx('font-size:12px;font-weight:700;color:#6b6354;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;')}>Ingrédients</div>
-                    <ul style={sx('margin:0 0 10px;padding-left:18px;font-size:13px;color:#3a352b;line-height:1.5;')}>
+                    <ul style={sx('margin:0 0 10px;padding-left:18px;font-size:13px;color:#2f2a22;line-height:1.5;')}>
                       {r.ingredients.map((it, i) => <li key={i}>{it}</li>)}
                     </ul>
                     <div style={sx('font-size:12px;font-weight:700;color:#6b6354;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;')}>Préparation</div>
-                    <ol style={sx('margin:0;padding-left:18px;font-size:13px;color:#3a352b;line-height:1.5;')}>
+                    <ol style={sx('margin:0;padding-left:18px;font-size:13px;color:#2f2a22;line-height:1.5;')}>
                       {r.steps.map((it, i) => <li key={i} style={sx('margin-bottom:4px;')}>{it}</li>)}
                     </ol>
                     <div style={sx('display:flex;gap:10px;margin-top:12px;')}>

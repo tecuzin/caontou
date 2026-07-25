@@ -17,12 +17,12 @@ export function Bilan({ sx, recap, onShare }) {
     <div data-testid="screen-bilan" style={sx('padding:16px 18px 40px;')}>
       <div style={sx('background:#9c6b4a;border-radius:20px;padding:18px;color:#fffaf0;box-shadow:0 8px 20px rgba(156,107,74,0.2);')}>
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>📊 Bilan du séjour</div>
-        <div style={sx('font-size:13px;color:#ecd9c4;margin-top:4px;')}>Un petit récap de nos vacances dans le Cantal, à garder ou à envoyer aux proches.</div>
+        <div style={sx('font-size:13px;color:#f1e4d4;margin-top:4px;')}>Un petit récap de nos vacances dans le Cantal, à garder ou à envoyer aux proches.</div>
       </div>
 
       <div style={sx('display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;')}>
         <Tile sx={sx} emoji="📅" value={recap.daysCount} label={`jour${recap.daysCount > 1 ? 's' : ''} sur place`} bg="#eee7d4" />
-        <Tile sx={sx} emoji="❤️" value={recap.savedVisits} label="visites coup de cœur" bg="#f3e2d6" />
+        <Tile sx={sx} emoji="❤️" value={recap.savedVisits} label="visites coup de cœur" bg="#f1e4d4" />
         <Tile sx={sx} emoji="💶" value={`${recap.spentPct} %`} label={`${eur(recap.spent)} / ${eur(recap.budgetTotal)}`} bg="#e6ece0" />
         <Tile sx={sx} emoji="🍽️" value={recap.mealsPlanned} label="repas planifiés" bg="#f1e4d4" />
         <Tile sx={sx} emoji="🧳" value={`${recap.packPct} %`} label="préparatifs cochés" bg="#e7ecdf" />

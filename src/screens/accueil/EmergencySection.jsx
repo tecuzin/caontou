@@ -10,7 +10,7 @@ export function EmergencySection({ sx, emergencyNumbers, openMyPosition }) {
           {emergencyNumbers.map((e, i) => (
             <div key={e.num} style={sx(`display:flex;align-items:center;gap:10px;padding:10px 0;${i < emergencyNumbers.length - 1 ? 'border-bottom:1px solid #f1e9da;' : ''}`)}>
               <span style={sx('font-size:19px;flex:0 0 auto;')}>{e.emoji}</span>
-              <span style={sx('flex:1;font-size:14px;color:#3a352b;')}>{e.label}</span>
+              <span style={sx('flex:1;font-size:14px;color:#2f2a22;')}>{e.label}</span>
               <TelLink sx={sx} num={e.num} style={'color:#b8503f;font-weight:700;text-decoration:none;font-family:Quicksand;font-size:15px;'}>📞 {e.num}</TelLink>
             </div>
           ))}

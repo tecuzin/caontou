@@ -45,7 +45,7 @@ export function Hebergement({ sx, hebergement, openHebEdit }) {
       </div>
       <div style={sx('margin-top:10px;background:#fffdf8;border:1px solid #efe6d4;border-radius:14px;padding:12px 14px;font-size:14px;')}>📞 {hebergement.contact}</div>
       <div style={sx('margin-top:10px;background:#f1e4d4;border-radius:14px;padding:14px;font-size:13px;line-height:1.5;color:#6b5a45;')}>{hebergement.note}</div>
-      <div data-testid="heb-urgences" style={sx('margin-top:16px;background:#fbe9e6;border:1px solid #e6bcb2;border-radius:14px;padding:14px;')}>
+      <div data-testid="heb-urgences" style={sx('margin-top:16px;background:#f7e2dc;border:1px solid #e6bcb2;border-radius:14px;padding:14px;')}>
         <div style={sx('font-weight:700;font-family:Quicksand;color:#b8503f;')}>🚨 Urgences</div>
         <div style={sx('display:flex;flex-direction:column;gap:6px;margin-top:10px;')}>
           {URGENCES.map((u) => (

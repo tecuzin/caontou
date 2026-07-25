@@ -59,12 +59,12 @@ export function JournalModal({ isOpen, onClose, sx, dayLabel, entry, updateEntry
         <div style={sx('display:flex;align-items:center;justify-content:space-between;gap:10px;')}>
           <div style={sx('font-size:12px;font-weight:700;color:#6b6354;')}>📔 Le récit du jour</div>
           {micSupported && (
-            <button data-testid="btn-journal-mic" onClick={toggleMic} aria-pressed={recording} aria-label={recording ? 'Arrêter la dictée' : 'Dicter le récit'} style={sx(`border:none;border-radius:10px;padding:5px 10px;font-size:12px;font-weight:700;font-family:Quicksand;cursor:pointer;display:flex;align-items:center;gap:5px;background:${recording ? '#cf4a3c' : '#e7ecdf'};color:${recording ? '#fffaf0' : '#4a5d3a'};`)}>{recording ? '⏺ Enregistre…' : '🎙️ Dicter'}</button>
+            <button data-testid="btn-journal-mic" onClick={toggleMic} aria-pressed={recording} aria-label={recording ? 'Arrêter la dictée' : 'Dicter le récit'} style={sx(`border:none;border-radius:10px;padding:5px 10px;font-size:12px;font-weight:700;font-family:Quicksand;cursor:pointer;display:flex;align-items:center;gap:5px;background:${recording ? '#b8503f' : '#e7ecdf'};color:${recording ? '#fffaf0' : '#4a5d3a'};`)}>{recording ? '⏺ Enregistre…' : '🎙️ Dicter'}</button>
           )}
         </div>
         <textarea data-testid="journal-text" value={e.text || ''} onChange={(ev) => updateEntry('text', ev.target.value)} rows={4} placeholder="Ce qu'on a fait, vu, ri, mangé… quelques mots pour s'en souvenir." style={sx('width:100%;margin-top:6px;margin-bottom:4px;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;resize:vertical;line-height:1.4;')} />
         {micError
-          ? <div data-testid="journal-mic-error" style={sx('font-size:12px;color:#cf4a3c;margin-bottom:10px;')}>{micError}</div>
+          ? <div data-testid="journal-mic-error" style={sx('font-size:12px;color:#b8503f;margin-bottom:10px;')}>{micError}</div>
           : recording
             ? <div style={sx('font-size:12px;color:#6b6354;margin-bottom:10px;')}>Parle, ça s'écrit tout seul. Touche à nouveau pour arrêter.</div>
             : <div style={sx('margin-bottom:10px;')} />}

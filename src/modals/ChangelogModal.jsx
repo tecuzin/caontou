@@ -20,7 +20,7 @@ export function ChangelogModal({ isOpen, onClose, sx, currentBuild }) {
               <span style={sx('font-size:12px;color:#9a917f;')}>{e.date}</span>
             </div>
             {e.items.map((it, i) => (
-              <div key={i} style={sx('font-size:14px;padding:4px 0;color:#3a352b;')}>{it}</div>
+              <div key={i} style={sx('font-size:14px;padding:4px 0;color:#2f2a22;')}>{it}</div>
             ))}
           </div>
         ))}

@@ -15,11 +15,11 @@ const MODULES = [
   { emoji: '🏡', name: 'Hébergement', sub: 'Vezels-Roussy', bg: '#f1e4d4', action: 'sub:hebergement' },
   { emoji: '🧳', name: 'Préparatifs', sub: 'Valises & listes', bg: '#e7ecdf', action: 'sub:logistique' },
   { emoji: '⛅', name: 'Météo', sub: '7 jours sur place', bg: '#eee7d4', action: 'sub:meteo' },
-  { emoji: '🍽️', name: 'Repas', sub: 'Menus & courses', bg: '#f3e2d6', action: 'tab:repas' },
+  { emoji: '🍽️', name: 'Repas', sub: 'Menus & courses', bg: '#f1e4d4', action: 'tab:repas' },
   { emoji: '💶', name: 'Budget', sub: '1 800 € prévus', bg: '#e6ece0', action: 'tab:budget' },
-  { emoji: '📸', name: 'Souvenirs', sub: 'Photos par journée', bg: '#f3e2d6', action: 'sub:souvenirs' },
+  { emoji: '📸', name: 'Souvenirs', sub: 'Photos par journée', bg: '#f1e4d4', action: 'sub:souvenirs' },
   { emoji: '🍴', name: 'Restos', sub: 'Adresses & résas', bg: '#f1e4d4', action: 'sub:restos' },
-  { emoji: '🧀', name: 'Recettes', sub: 'Spécialités du Cantal', bg: '#f3e2d6', action: 'sub:recettes' },
+  { emoji: '🧀', name: 'Recettes', sub: 'Spécialités du Cantal', bg: '#f1e4d4', action: 'sub:recettes' },
   { emoji: '🔑', name: 'Départ du gîte', sub: 'Avant de rendre les clés', bg: '#f1e4d4', action: 'sub:departure' },
   { emoji: '🧭', name: 'Itinéraire', sub: 'Sorties par proximité', bg: '#e7ecdf', action: 'sub:itineraire' },
   { emoji: '🗺️', name: 'Carte', sub: 'Séjour & voiture', bg: '#dfeae6', action: 'sub:carte' },
@@ -163,7 +163,7 @@ export function Accueil({
 
       <div style={sx('padding:6px 18px 12px;')}>
         <button data-testid="btn-open-bilan" onClick={() => setSub('bilan')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
-          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#f3e2d6;display:flex;align-items:center;justify-content:center;font-size:22px;')}>📊</div>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#f1e4d4;display:flex;align-items:center;justify-content:center;font-size:22px;')}>📊</div>
           <div style={sx('flex:1;')}>
             <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Bilan du séjour</div>
             <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>Stats & récap à partager</div>
