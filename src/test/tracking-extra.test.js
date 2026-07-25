@@ -78,12 +78,16 @@ describe('buildTrackingExport — valeurs par défaut', () => {
       .toBe('2023-11-14T22:13:20.000Z')
   })
 
-  it('traite now = 0 comme « pas de date fournie » (test de garde)', () => {
-    // Le module utilise `meta.now ? … : new Date()` : 0 est falsy, donc l'epoch
-    // n'est pas atteignable et on retombe sur l'heure courante. Comportement
-    // sans impact fonctionnel (aucun appelant ne passe 0) mais verrouillé ici.
+  it('honore now = 0 (epoch) au lieu de le confondre avec « non fourni »', () => {
+    // Garde `!= null` : un horodatage 0 est une valeur valide. Un test de
+    // véracité (`meta.now ?`) l'aurait silencieusement remplacé par l'heure
+    // courante — c'était le cas avant correction.
     const out = buildTrackingExport([], { now: 0 })
-    expect(out.exportedAt).not.toBe('1970-01-01T00:00:00.000Z')
+    expect(out.exportedAt).toBe('1970-01-01T00:00:00.000Z')
+  })
+
+  it('retombe sur l’heure courante quand now est absent', () => {
+    const out = buildTrackingExport([], {})
     expect(Date.parse(out.exportedAt)).toBeGreaterThan(0)
   })
 

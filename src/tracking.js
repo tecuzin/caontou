@@ -24,7 +24,10 @@ export function buildTrackingExport(events, meta = {}) {
     app: 'cantou-ux',
     schema: 1,
     build: meta.build ?? null,
-    exportedAt: (meta.now ? new Date(meta.now) : new Date()).toISOString(),
+    // `!= null` et non un test de véracité : un horodatage 0 (epoch) est une
+    // valeur valide, qu'un `meta.now ?` aurait silencieusement remplacée par
+    // l'heure courante.
+    exportedAt: (meta.now != null ? new Date(meta.now) : new Date()).toISOString(),
     count: (events || []).length,
     events: events || [],
   }

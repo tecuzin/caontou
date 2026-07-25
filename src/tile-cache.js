@@ -42,23 +42,31 @@ function openDB() {
   })
 }
 
+// `db.transaction()` / `objectStore()` peuvent lever de façon SYNCHRONE (base
+// ouverte mais object store absent — upgrade partiellement échoué). Sans garde,
+// la promesse rejetterait, à rebours du contrat du module : toujours dégrader
+// vers une valeur neutre plutôt que de faire échouer l'appelant.
 function idbPut(url, blob) {
   return openDB().then((db) => new Promise((resolve) => {
     if (!db) return resolve(false)
-    const tx = db.transaction(STORE, 'readwrite')
-    tx.objectStore(STORE).put(blob, url)
-    tx.oncomplete = () => resolve(true)
-    tx.onerror = () => resolve(false)
+    try {
+      const tx = db.transaction(STORE, 'readwrite')
+      tx.objectStore(STORE).put(blob, url)
+      tx.oncomplete = () => resolve(true)
+      tx.onerror = () => resolve(false)
+    } catch { resolve(false) }
   }))
 }
 
 function idbGet(url) {
   return openDB().then((db) => new Promise((resolve) => {
     if (!db) return resolve(null)
-    const tx = db.transaction(STORE, 'readonly')
-    const rq = tx.objectStore(STORE).get(url)
-    rq.onsuccess = () => resolve(rq.result || null)
-    rq.onerror = () => resolve(null)
+    try {
+      const tx = db.transaction(STORE, 'readonly')
+      const rq = tx.objectStore(STORE).get(url)
+      rq.onsuccess = () => resolve(rq.result || null)
+      rq.onerror = () => resolve(null)
+    } catch { resolve(null) }
   }))
 }
 
@@ -66,11 +74,13 @@ function idbGet(url) {
 export function countCachedTiles() {
   return openDB().then((db) => new Promise((resolve) => {
     if (!db) return resolve(0)
-    const tx = db.transaction(STORE, 'readonly')
-    const rq = tx.objectStore(STORE).count()
-    rq.onsuccess = () => resolve(rq.result || 0)
-    rq.onerror = () => resolve(0)
-  }))
+    try {
+      const tx = db.transaction(STORE, 'readonly')
+      const rq = tx.objectStore(STORE).count()
+      rq.onsuccess = () => resolve(rq.result || 0)
+      rq.onerror = () => resolve(0)
+    } catch { resolve(0) }
+  })).catch(() => 0)
 }
 
 /**
@@ -94,8 +104,10 @@ export async function prefetchTiles(tiles, onProgress = () => {}) {
   return countCachedTiles()
 }
 
-/** URL objet d'une tuile mise en cache, ou null si absente. */
+/** URL objet d'une tuile mise en cache, ou null si absente/indisponible. */
 export async function cachedTileObjectURL(url) {
-  const blob = await idbGet(url)
-  return blob && typeof URL !== 'undefined' && URL.createObjectURL ? URL.createObjectURL(blob) : null
+  try {
+    const blob = await idbGet(url)
+    return blob && typeof URL !== 'undefined' && URL.createObjectURL ? URL.createObjectURL(blob) : null
+  } catch { return null }
 }
