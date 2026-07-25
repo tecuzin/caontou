@@ -1,0 +1,26 @@
+{
+  "name": "cantou-storybook",
+  "private": true,
+  "type": "module",
+  "description": "Catalogue de composants Cantou (Storybook). Outil de dev ISOLÉ — node_modules gitignorés, aucune dépendance ajoutée à l'app ni au build APK. Les stories vivent dans src/**/*.stories.jsx.",
+  "scripts": {
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build": "storybook build -o storybook-static"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/react-vite": "^8.6.14",
+    "@vitejs/plugin-react": "^4.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^8.6.14",
+    "vite": "^5.0.0"
+  },
+  "allowScripts": {
+    "esbuild": true,
+    "rollup": true,
+    "@swc/core": true,
+    "core-js": true,
+    "core-js-pure": true
+  }
+}

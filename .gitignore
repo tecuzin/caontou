@@ -48,3 +48,7 @@ local.properties
 *.cgc
 .codegraphcontext/
 .env.github
+
+# Storybook (outil de dev isolé — deps hors repo)
+tools/storybook/node_modules/
+tools/storybook/storybook-static/

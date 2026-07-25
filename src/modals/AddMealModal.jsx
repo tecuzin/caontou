@@ -11,13 +11,13 @@ export function AddMealModal({ isOpen, onClose, newMealDay, setNewMealDay, newMe
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:12px;')}>Ajouter un repas</div>
         <div style={sx('margin-bottom:12px;')}>
           <label htmlFor="add-meal-day" style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Jour</label>
-          <select id="add-meal-day" value={newMealDay} onChange={e => setNewMealDay(Number(e.target.value))} style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')}>
+          <select id="add-meal-day" value={newMealDay} onChange={e => setNewMealDay(Number(e.target.value))} style={sx('width:100%;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
             {days.map((d, i) => <option key={i} value={i}>J{i} — {d.title}</option>)}
           </select>
         </div>
         <div style={sx('margin-bottom:12px;')}>
           <label htmlFor="add-meal-type" style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Type</label>
-          <select id="add-meal-type" value={newMealType} onChange={e => setNewMealType(e.target.value)} style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')}>
+          <select id="add-meal-type" value={newMealType} onChange={e => setNewMealType(e.target.value)} style={sx('width:100%;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')}>
             <option value="petit-dej">Petit-déj</option>
             <option value="dejeuner">Déjeuner</option>
             <option value="gouter">Goûter</option>
@@ -26,11 +26,11 @@ export function AddMealModal({ isOpen, onClose, newMealDay, setNewMealDay, newMe
         </div>
         <div style={sx('margin-bottom:14px;')}>
           <label htmlFor="add-meal-label" style={sx('display:block;font-size:12px;font-weight:600;color:#6b6354;margin-bottom:6px;')}>Plat</label>
-          <input id="add-meal-label" type="text" value={newMealLabel} onChange={e => setNewMealLabel(e.target.value)} placeholder="Croque-monsieur…" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;')} />
+          <input id="add-meal-label" type="text" value={newMealLabel} onChange={e => setNewMealLabel(e.target.value)} placeholder="Croque-monsieur…" style={sx('width:100%;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;')} />
         </div>
         <div style={sx('display:flex;gap:10px;')}>
-          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>Annuler</button>
-          <button onClick={onSubmit} style={sx('flex:1;border:none;background:#9c6b4a;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>✓ Ajouter</button>
+          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+          <button onClick={onSubmit} style={sx('flex:1;border:none;background:#9c6b4a;color:#fffaf0;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>✓ Ajouter</button>
         </div>
       </div>
     </ModalShell>

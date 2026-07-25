@@ -15,7 +15,7 @@ export function PrintSheet({ sx, cur, meals = [], visits = [], saved = {}, trip 
       <div className="print-hide" style={sx('font-size:12px;color:#9a917f;margin-bottom:16px;text-align:center;')}>Un pense-bête d’une page, lisible même sans téléphone.</div>
 
       <div className="print-sheet" style={sx('background:#ffffff;border:1px solid #e3d8c2;border-radius:14px;padding:20px;color:#000;')}>
-        <div style={sx('font-family:Quicksand;font-weight:700;font-size:20px;')}>Pense-bête — {cur?.dow} {cur?.num}</div>
+        <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;')}>Pense-bête — {cur?.dow} {cur?.num}</div>
         <div style={sx('font-size:13px;color:#2f2a22;margin-bottom:2px;')}>{cur?.title}{cur?.sub ? ` · ${cur.sub}` : ''}</div>
         <div style={sx('font-size:12px;color:#6b6354;border-bottom:1px solid #000;padding-bottom:8px;margin-bottom:12px;')}>Séjour {trip?.dest || 'Cantal'}</div>
 

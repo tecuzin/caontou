@@ -52,9 +52,9 @@ export function Quiz({ sx }) {
 
       <button data-testid="quiz-card" onClick={() => setRevealed(true)} style={sx('width:100%;text-align:left;background:#fffdf8;border:1px solid #efe6d4;border-radius:18px;padding:22px 18px;cursor:pointer;box-shadow:0 4px 14px rgba(74,93,58,0.08);min-height:150px;')}>
         <div style={sx('font-size:12px;font-weight:700;color:#8a8b3d;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;')}>Question</div>
-        <div style={sx('font-family:Quicksand;font-weight:700;font-size:18px;color:#2f2a22;')}>{card.q}</div>
+        <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;color:#2f2a22;')}>{card.q}</div>
         {revealed
-          ? <div data-testid="quiz-answer" style={sx('margin-top:16px;padding-top:14px;border-top:1px solid #f1e9da;')}><div style={sx('font-size:12px;font-weight:700;color:#4a5d3a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;')}>Réponse</div><div style={sx('font-size:16px;color:#4a5d3a;font-weight:600;')}>{card.a}</div></div>
+          ? <div data-testid="quiz-answer" style={sx('margin-top:16px;padding-top:14px;border-top:1px solid #f1e9da;')}><div style={sx('font-size:12px;font-weight:700;color:#4a5d3a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;')}>Réponse</div><div style={sx('font-size:15px;color:#4a5d3a;font-weight:600;')}>{card.a}</div></div>
           : <div style={sx('margin-top:16px;font-size:13px;color:#9a917f;')}>👆 Touche la carte pour voir la réponse</div>}
       </button>
 
