@@ -1298,3 +1298,4 @@
 {"v":1,"id":["01KYCW73NQXFR8ZC6AA5BEZ7K7","01KYCW726R418WHTFGRF37ZRQJ"],"add.issue.tag":{"id":"01KYCVXV7AXQEYF0471AQEER06","tag":"01KX5725PTHHMFXTC3V5Y4NJ8Q"}}
 {"v":1,"id":["01KYCW754TR7A04MEY5MQ588PV","01KYCW73NQXFR8ZC6AA5BEZ7K7"],"add.issue.tag":{"id":"01KYCVXV7AXQEYF0471AQEER06","tag":"01KWXE3HE7R6WWF2EN3X6D5JVG"}}
 {"v":1,"id":["01KYCWDQS4ZMKXGBDQV183G72R","01KYCW754TR7A04MEY5MQ588PV"],"add.issue":{"id":"01KYCWDQRXMC0E8CFR892TBHC3","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🧹 Dégraisser App.jsx (1234 lignes, 55 % couvert) — extraire vers des modules","rank":"fffffffdffffffffffffffff"}}
+{"v":1,"id":["01KYCWDSAKP6AG1HACVBC8VQ3V","01KYCWDQS4ZMKXGBDQV183G72R"],"add.issue":{"id":"01KYCWDSADN0776GXPSPWXPDF5","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🎨 Consolider la palette (62/100) — 22 paires de couleurs quasi-doublons","rank":"fffffffeffffffffffffffff"}}
