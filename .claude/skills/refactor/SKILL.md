@@ -57,10 +57,28 @@ cgc analyze callers <fonction>       # qui appelle cette fonction ? (avant de la
 cgc analyze calls <fonction>         # ce que la fonction appelle (ses dépendances)
 cgc analyze deps <module>            # imports/dépendances d'un module
 cgc analyze dead-code                # fonctions non appelées (candidates à suppression)
-cgc analyze complexity               # complexité cyclomatique → cibles prioritaires
 cgc find name <symbole>              # localiser une définition
 cgc find content "<texte>"           # recherche plein-texte (source + docstrings)
 ```
+
+> ### ⚠️ `cgc analyze complexity` NE MESURE PAS LE JS SUR CE PROJET
+> CodeGraphContext ne calcule la complexité cyclomatique que pour Python : le
+> seul score non trivial du graphe vient de `scripts/generate-icon.py`. **Toutes
+> les fonctions JS/JSX ressortent à 1**, y compris `App()` (>1200 lignes). La
+> commande est silencieusement inopérante — s'y fier oriente le refactor vers
+> les mauvaises cibles. Idem pour le tool MCP `find_most_complex_functions`.
+>
+> **Utiliser à la place :**
+> ```bash
+> npm run audit:complexity              # top 15 des fonctions JS/JSX les plus complexes
+> node scripts/complexity-audit.mjs --json --top 30
+> ```
+> Heuristique textuelle sans dépendance (points de décision : `if`, `for`,
+> `while`, `case`, `catch`, `?:`, `&&`, `||`, `??`, prédicats `.filter/.find/…`),
+> documentée dans l'en-tête de `scripts/complexity-audit.mjs`. Ce n'est pas un
+> AST : les scores CLASSENT des cibles, ils ne valent pas un McCabe canonique.
+> Le reste du graphe (appelants, dépendances, dead-code) reste fiable et
+> obligatoire.
 
 Via l'outillage MCP (mêmes données) : `analyze_code_relationships`,
 `find_code`, `find_dead_code`, `find_most_complex_functions`,

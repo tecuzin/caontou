@@ -42,12 +42,32 @@ cgc analyze callers <fonction>   # qui appelle ? (avant de déplacer)
 cgc analyze calls <fonction>     # dépendances de la fonction
 cgc analyze deps <module>        # imports d'un module
 cgc analyze dead-code            # fonctions non appelées
-cgc analyze complexity           # cibles prioritaires de refactor
 cgc find name <symbole> | content "<texte>"
 ```
 
+> ### ⚠️ Trou connu : la complexité du graphe ignore le JS
+> `cgc analyze complexity` (et le tool MCP `find_most_complex_functions`) ne
+> calcule la complexité cyclomatique **que pour Python** : sur Cantou, le seul
+> résultat réel vient de `scripts/generate-icon.py`, et **toutes les fonctions
+> JS/JSX ressortent à 1** — y compris `App()` (>1200 lignes). Ne pas s'en servir
+> pour choisir une cible de refactor : la mesure est inopérante, pas nulle.
+>
+> Remplacement maison, sans dépendance :
+> ```bash
+> npm run audit:complexity                            # top 15 JS/JSX
+> node scripts/complexity-audit.mjs --json --top 30   # sortie machine
+> ```
+> Heuristique textuelle (source masqué + regex sur les points de décision),
+> **pas un AST** : les scores servent à classer des cibles, pas à produire un
+> McCabe canonique. Méthode détaillée en en-tête du script.
+>
+> Note d'indexation : le `.cgcignore` racine exclut `.vite/`, `dist/`, `build/`,
+> `android/`, `node_modules/` et `tools/*/node_modules/` — sans ça
+> `cgc analyze dead-code` est noyé par les bundles de `.vite/deps/**`.
+
 MCP équivalents : `analyze_code_relationships`, `find_code`, `find_dead_code`,
-`find_most_complex_functions`, `execute_cypher_query`. Pour le board :
+`execute_cypher_query` (voir l'avertissement ci-dessus pour
+`find_most_complex_functions`). Pour le board :
 `mcp epiq_issue_list/create/move/tag_add/comment_add` (workflow complet dans le
 skill `project-manage`).
 
