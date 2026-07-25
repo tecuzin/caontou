@@ -18,6 +18,7 @@ export const Filesystem = {
   readFile: async () => ({ data: '' }), getUri: async () => ({ uri: '' }), readdir: async () => ({ files: [] }),
 }
 export const Directory = { Data: 'DATA', Documents: 'DOCUMENTS', Cache: 'CACHE' }
+export const Encoding = { UTF8: 'utf8', ASCII: 'ascii', UTF16: 'utf16' }
 
 export const Camera = { getPhoto: async () => ({ base64String: '' }), requestPermissions: noop }
 export const CameraResultType = { Base64: 'base64', Uri: 'uri', DataUrl: 'dataUrl' }
