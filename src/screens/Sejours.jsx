@@ -128,7 +128,7 @@ export function Sejours({ sx, trip, fmtDayShort, fmtMonthYear, currentStoreData,
             {(dialog.type === 'save' || dialog.type === 'rename') && (
               <>
                 <div style={sx('font-size:12px;color:#6b6354;margin-bottom:14px;')}>Nom du séjour</div>
-                <input data-testid="sejours-name-input" type="text" value={nameInput} onChange={(e) => setNameInput(e.target.value)} placeholder="Ex : Cantal août 2026…" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;margin-bottom:14px;')} />
+                <input data-testid="sejours-name-input" type="text" value={nameInput} onChange={(e) => setNameInput(e.target.value)} placeholder="Ex : Cantal août 2026…" style={sx('width:100%;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;margin-bottom:14px;')} />
               </>
             )}
             {dialog.type === 'delete' && (
@@ -142,12 +142,12 @@ export function Sejours({ sx, trip, fmtDayShort, fmtMonthYear, currentStoreData,
             )}
 
             <div style={sx('display:flex;gap:10px;')}>
-              <button data-testid="sejours-dialog-cancel" onClick={closeDialog} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>Annuler</button>
-              {dialog.type === 'save' && <button data-testid="sejours-dialog-confirm" onClick={confirmSave} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>💾 Sauvegarder</button>}
-              {dialog.type === 'rename' && <button data-testid="sejours-dialog-confirm" onClick={confirmRename} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>✓ Renommer</button>}
-              {dialog.type === 'delete' && <button data-testid="sejours-dialog-confirm" onClick={confirmDelete} style={sx('flex:1;border:none;background:#b8503f;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>🗑️ Supprimer</button>}
-              {dialog.type === 'load' && <button data-testid="sejours-dialog-confirm" onClick={confirmLoad} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>📂 Charger</button>}
-              {dialog.type === 'new' && <button data-testid="sejours-dialog-confirm" onClick={confirmNew} style={sx('flex:1;border:none;background:#9c6b4a;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>✨ Repartir de zéro</button>}
+              <button data-testid="sejours-dialog-cancel" onClick={closeDialog} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+              {dialog.type === 'save' && <button data-testid="sejours-dialog-confirm" onClick={confirmSave} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>💾 Sauvegarder</button>}
+              {dialog.type === 'rename' && <button data-testid="sejours-dialog-confirm" onClick={confirmRename} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>✓ Renommer</button>}
+              {dialog.type === 'delete' && <button data-testid="sejours-dialog-confirm" onClick={confirmDelete} style={sx('flex:1;border:none;background:#b8503f;color:#fffaf0;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>🗑️ Supprimer</button>}
+              {dialog.type === 'load' && <button data-testid="sejours-dialog-confirm" onClick={confirmLoad} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>📂 Charger</button>}
+              {dialog.type === 'new' && <button data-testid="sejours-dialog-confirm" onClick={confirmNew} style={sx('flex:1;border:none;background:#9c6b4a;color:#fffaf0;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>✨ Repartir de zéro</button>}
             </div>
           </div>
         </ModalShell>

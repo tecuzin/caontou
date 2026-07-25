@@ -14,13 +14,13 @@ export function AddCourseItemModal({ isOpen, onClose, selectedCourseKey, newCour
         <div style={sx('width:40px;height:4px;border-radius:4px;background:#d8cbb0;margin:0 auto 16px;')} />
         <div style={sx('font-family:Quicksand;font-weight:700;font-size:19px;margin-bottom:6px;')}>Ajouter à {group?.name}</div>
         <div style={sx('font-size:12px;color:#6b6354;margin-bottom:14px;')}>Nouvel article</div>
-        <input ref={inputRef} type="text" value={newCourseItem} onChange={e => setNewCourseItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && onSubmitAndNew) saveAndNew() }} placeholder="Ex: Fromage…" style={sx('width:100%;border:1px solid #d8cbb0;border-radius:8px;padding:10px;font-size:14px;margin-bottom:14px;')} />
+        <input ref={inputRef} type="text" value={newCourseItem} onChange={e => setNewCourseItem(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && onSubmitAndNew) saveAndNew() }} placeholder="Ex: Fromage…" style={sx('width:100%;border:1px solid #d8cbb0;background:#fffdf8;border-radius:12px;padding:12px 14px;font-size:15px;margin-bottom:14px;')} />
         {onSubmitAndNew && (
           <button data-testid="btn-add-course-item-new" onClick={saveAndNew} style={sx('width:100%;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer;')}>＋ Enregistrer & nouveau</button>
         )}
         <div style={sx('display:flex;gap:10px;')}>
-          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>Annuler</button>
-          <button onClick={onSubmit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:8px;padding:12px;cursor:pointer;')}>✓ Ajouter</button>
+          <button onClick={onClose} style={sx('flex:1;border:1px solid #d8cbb0;background:#fffdf8;color:#6b6354;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>Annuler</button>
+          <button onClick={onSubmit} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:600;border-radius:14px;padding:12px;cursor:pointer;')}>✓ Ajouter</button>
         </div>
       </div>
     </ModalShell>

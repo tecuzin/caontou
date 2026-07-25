@@ -33,6 +33,9 @@ function walk(dir) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name)
     if (statSync(p).isDirectory()) out.push(...walk(p))
+    // Les stories Storybook (catalogue de dev) contiennent des données mock —
+    // leurs couleurs/tailles ne font pas partie du design de l'app.
+    else if (name.endsWith('.stories.jsx')) continue
     else if (['.js', '.jsx'].includes(extname(p))) out.push(p)
   }
   return out

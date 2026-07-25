@@ -20,7 +20,7 @@ export function MarketsCard({ sx }) {
           </div>
         ))}
       </div>
-      <div style={sx('font-size:11px;color:#9a917f;margin-top:10px;')}>ℹ️ {MARKETS_DISCLAIMER}</div>
+      <div style={sx('font-size:12px;color:#9a917f;margin-top:10px;')}>ℹ️ {MARKETS_DISCLAIMER}</div>
     </div>
   )
 }

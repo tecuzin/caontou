@@ -14,7 +14,7 @@ function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
         ? <img src={src} alt={meta.label || ''} style={sx('width:100%;height:100%;object-fit:cover;display:block;')} />
         : <span style={sx('display:flex;align-items:center;justify-content:center;height:100%;font-size:22px;')}>🖼️</span>}
       {meta.label && (
-        <span data-testid="photo-caption" style={sx('position:absolute;left:0;right:0;bottom:0;padding:12px 8px 6px;background:linear-gradient(transparent,rgba(20,16,10,0.75));color:#fffaf0;font-size:11px;font-weight:700;text-align:left;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;')}>{meta.label}</span>
+        <span data-testid="photo-caption" style={sx('position:absolute;left:0;right:0;bottom:0;padding:12px 8px 6px;background:linear-gradient(transparent,rgba(20,16,10,0.75));color:#fffaf0;font-size:12px;font-weight:700;text-align:left;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;')}>{meta.label}</span>
       )}
     </button>
   )

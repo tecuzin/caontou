@@ -40,7 +40,7 @@ export function Planning({
             onClick={setTab ? () => setTab('repas') : undefined}
             style={sx(`width:100%;text-align:left;display:flex;align-items:center;gap:10px;background:#f3ece0;border:1px solid #efe6d4;border-radius:12px;padding:10px 12px;margin-bottom:14px;cursor:${setTab ? 'pointer' : 'default'};`)}
           >
-            <span style={sx('font-size:18px;flex:0 0 auto;')}>🍴</span>
+            <span style={sx('font-size:19px;flex:0 0 auto;')}>🍴</span>
             <div style={sx('flex:1;min-width:0;')}>
               <div style={sx('font-size:12px;font-weight:700;color:#9c6b4a;text-transform:uppercase;letter-spacing:0.5px;')}>Repas du jour</div>
               <div style={sx('font-size:14px;color:#6b6354;margin-top:1px;')}>{dayMeals.map((m) => m.dish).join(' · ')}</div>
