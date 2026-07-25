@@ -2,7 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { BUILD_NUMBER } from '../build-info.js'
 
-const SRC = readFileSync(new URL('../build-info.js', import.meta.url), 'utf8')
+// Chemin résolu depuis la racine du dépôt : sous Vitest, `import.meta.url`
+// n'est pas une URL `file:` → `new URL(...)` casse la collecte du fichier
+// (les tests ne s'exécutaient alors PAS, sans erreur visible).
+const SRC = readFileSync('src/build-info.js', 'utf8')
 
 describe('BUILD_NUMBER', () => {
   it('est un entier fini et positif ou nul', () => {
@@ -13,9 +16,7 @@ describe('BUILD_NUMBER', () => {
   })
 
   it('correspond au contenu de build.number (valeur injectée par Vite)', () => {
-    const fromFile = Number(
-      readFileSync(new URL('../../build.number', import.meta.url), 'utf8').trim(),
-    )
+    const fromFile = Number(readFileSync('build.number', 'utf8').trim())
     expect(BUILD_NUMBER).toBe(fromFile)
   })
 
@@ -30,19 +31,23 @@ describe('repli quand les métadonnées de build manquent', () => {
     expect(SRC).toContain("typeof __BUILD_NUMBER__ !== 'undefined'")
   })
 
-  it('vaut 0 si __BUILD_NUMBER__ n’est pas défini', () => {
-    // Reproduit l'expression du module dans un scope où le define Vite est absent.
-    const evaluate = new Function(
-      "return typeof __BUILD_NUMBER__ !== 'undefined' ? __BUILD_NUMBER__ : 0",
-    )
-    expect(evaluate()).toBe(0)
+  // ⚠️ Le `define` de Vite remplace `__BUILD_NUMBER__` TEXTUELLEMENT, y compris
+  // à l'intérieur des chaînes de caractères de ce fichier. Le nom est donc
+  // reconstitué à l'exécution (`ID`) pour que la substitution ne s'applique pas
+  // et qu'on évalue réellement l'expression d'origine.
+  const ID = '__BUILD' + '_NUMBER__'
+  const EXPR = `return typeof ${ID} !== 'undefined' ? ${ID} : 0`
+
+  it('vaut 0 si le numéro n’est pas injecté', () => {
+    // `__BUILD_NUMBER__` existe comme global dans l'environnement de test : on ne
+    // peut pas l'« absenter ». On le MASQUE donc par un paramètre laissé à
+    // undefined — ce qui met bien la garde `typeof` sur son chemin de repli.
+    const evaluate = new Function(ID, EXPR)
+    expect(evaluate(undefined)).toBe(0)
   })
 
   it('utilise la valeur injectée quand elle existe', () => {
-    const evaluate = new Function(
-      '__BUILD_NUMBER__',
-      "return typeof __BUILD_NUMBER__ !== 'undefined' ? __BUILD_NUMBER__ : 0",
-    )
+    const evaluate = new Function(ID, EXPR)
     expect(evaluate(42)).toBe(42)
   })
 })
