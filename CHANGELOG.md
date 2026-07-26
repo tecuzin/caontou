@@ -3,6 +3,23 @@
 Format inspiré de *Keep a Changelog* ; versionnage **SemVer**.
 
 ## [Non publié]
+Lot « Enfants & confort » (build 116, sur `develop`) — 967 tests, audit design 94.
+### Ajouté
+- **Mode plein soleil** (`theme.js`) : 3e thème à contraste maximal (surfaces blanches,
+  séparateurs épaissis, ombres retirées). N'introduit aucune couleur nouvelle.
+- **Mode « prêté aux enfants »** (`kids-lock.js`) : listes blanches d'écrans, verrou
+  persisté, déverrouillage par un petit calcul.
+- **Mémory du Carladès** (`memory.js`) : paires à retrouver, motifs repris du bingo.
+- **Coin dessin** (`screens/DrawPad.jsx` + `usePhotos.savePhotoData`) : canvas tactile,
+  le dessin rejoint la galerie comme une photo.
+- **Toise de vacances** (`heights.js`) : mesures horodatées par enfant, incluses dans
+  l'export JSON.
+- **Bingo par enfant** (`progress.js`, migration v4 → v5) : progression indexée par
+  prénom ; la progression historique est rattachée au bucket « Famille », sans perte.
+### Corrigé
+- **Filet « Annuler »** étendu aux restos, idées et items de départ ; `setSuggestions`
+  n'était pas destructuré, ce qui faisait échouer la restauration en silence.
+
 Lot « Contenu & confort » (build 114, sur `develop`) — 728 tests, audit design vert.
 ### Ajouté
 - **Marchés du Carladès** (build 114, `markets.js`) : fiche Vic-sur-Cère & Aurillac

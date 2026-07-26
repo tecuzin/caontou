@@ -29,12 +29,20 @@ Rapide (~2-3 min). Cocher au fur et à mesure, répondre ici avec le nº de buil
 ☐ Supprimer toutes les dépenses → le donut disparaît
 ☐ Couleurs du donut = couleurs des barres « Par catégorie »
 
-*4. Navigation*
+*4. Nouveautés du build*
+☐ Réglages → Affichage → *Mode plein soleil* : tout devient blanc/très contrasté
+☐ Réglages → *Mode enfant* : Budget et Réglages disparaissent ; le calcul déverrouille
+☐ Accueil → Jeux : *Mémory*, *Coin dessin*, *Toise* s'ouvrent
+☐ Coin dessin → dessiner → Enregistrer : le dessin apparaît dans Souvenirs
+☐ ⚠️ *Bingo* : les cases déjà cochées AVANT cette mise à jour sont TOUJOURS là
+☐ Bingo → « Qui joue ? » : chaque prénom a bien sa propre grille
+
+*5. Navigation*
 ☐ Les 5 onglets s'ouvrent
 ☐ Chaque sous-écran s'ouvre + le retour fonctionne
 ☐ Carte : s'affiche, tuiles dispo hors-ligne
 
-*5. Hors-ligne*
+*6. Hors-ligne*
 ☐ Mode avion → app utilisable, données présentes
 
 _Garder ce message épinglé : à rejouer sur chaque nouvel APK._

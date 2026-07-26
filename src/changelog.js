@@ -5,6 +5,14 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 116, version: '1.3.0', date: '2026-07-26', items: [
+    '☀️ Mode plein soleil : contraste renforcé pour lire l’écran dehors (Réglages → Affichage)',
+    '🔒 Mode enfant : ne laisse que les jeux quand on prête le téléphone (un petit calcul déverrouille)',
+    '🧩 Mémory du Carladès et 🎨 Coin dessin — le dessin rejoint les souvenirs',
+    '📏 Toise de vacances : mesurer les enfants et garder la trace',
+    '👨‍👩‍👧‍👦 Bingo par enfant : chacun sa grille (la progression déjà faite est conservée)',
+    '↩️ « Annuler » couvre maintenant aussi les restos, les idées et la checklist de départ',
+  ] },
   { build: 114, version: '1.3.0', date: '2026-07-24', items: [
     '🧺 Marchés du Carladès (Vic-sur-Cère, Aurillac) : jours, horaires et itinéraire, dans l’onglet Courses',
     '❓ Quiz du Carladès pour les enfants (section Jeux de l’accueil) — questions rigolotes sur le coin',
