@@ -356,7 +356,7 @@ export default function App() {
   const [budgetTotal, setBudgetTotal] = useState(initial.budgetTotal || BUDGET_INITIAL)
   const [hebergement, setHebergement] = useState(initial.hebergement || structuredClone(HEB_INITIAL))
   const [trajetCheckItems, setTrajetCheckItems] = useState(initial.trajetCheckItems || [...TRAJET_CHECK_ITEMS_INITIAL])
-  const { suggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
+  const { suggestions, setSuggestions, addSuggestion, removeSuggestion } = useSuggestions(initial.suggestions)
   const [lastBackupAt, setLastBackupAt] = useState(initial.lastBackupAt || null)
   const [journal, setJournal] = useState(initial.journal || {})
   const [carGames, setCarGames] = useState(initial.carGames || { cowLeft: 0, cowRight: 0 })
@@ -437,7 +437,7 @@ export default function App() {
     else updateResto(editingRestoId, data)
     setShowResto(false)
   }
-  const deleteResto = (id) => { haptic(ImpactStyle.Medium); removeResto(id); setShowResto(false) }
+  const deleteResto = (id) => { haptic(ImpactStyle.Medium); offerUndo('Resto supprimé'); removeResto(id); setShowResto(false) }
   const [bingo, setBingo] = useState(initial.bingo || {})
   const toggleBingo = (idx) => {
     haptic(ImpactStyle.Light)
@@ -460,7 +460,7 @@ export default function App() {
   const undoSnapRef = useRef(null)
   const undoTimerRef = useRef(null)
   const offerUndo = (msg) => {
-    undoSnapRef.current = { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems }
+    undoSnapRef.current = { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, restos, suggestions, departure }
     setUndoMsg(msg)
     clearTimeout(undoTimerRef.current)
     undoTimerRef.current = setTimeout(() => setUndoMsg(null), 5000)
@@ -473,6 +473,7 @@ export default function App() {
     setShoppingItems(s0.shoppingItems); setDays(s0.days); setVisits(s0.visits); setMeteo(s0.meteo)
     setTrajets(s0.trajets); setTrip(s0.trip); setLogi(s0.logi); setCourses(s0.courses)
     setBudgetTotal(s0.budgetTotal); setHebergement(s0.hebergement); setTrajetCheckItems(s0.trajetCheckItems)
+    setRestos(s0.restos); setSuggestions(s0.suggestions); setDeparture(s0.departure)
     setUndoMsg(null)
     undoSnapRef.current = null
   }
@@ -1042,7 +1043,13 @@ export default function App() {
   }
   const deleteSuggestion = (id) => {
     haptic(ImpactStyle.Medium)
+    offerUndo('Idée supprimée')
     removeSuggestion(id)
+  }
+  const deleteDepartureItem = (id) => {
+    haptic(ImpactStyle.Medium)
+    offerUndo('Item de départ supprimé')
+    removeDepartureItem(id)
   }
   const sendSuggestions = () => shareSuggestions(suggestions)
 
@@ -1105,7 +1112,7 @@ export default function App() {
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}
         openMaps={openMaps} openModule={openModule} openMyPosition={openMyPosition} openTripEdit={openTripEdit} packDone={packDone} packPct={packPct}
         packTotal={packTotal} parkCar={parkCar} photos={photos} rateVisit={rateVisit} ratings={ratings} recapData={recapData} recipes={recipes} setRecipes={setRecipes}
-        remain={remain} removeDepartureItem={removeDepartureItem} resetCows={resetCows} resetPlates={resetPlates} togglePlate={togglePlate} resetToDefaults={resetToDefaults} restos={restos} runSelfTestAndShow={runSelfTestAndShow}
+        remain={remain} removeDepartureItem={deleteDepartureItem} resetCows={resetCows} resetPlates={resetPlates} togglePlate={togglePlate} resetToDefaults={resetToDefaults} restos={restos} runSelfTestAndShow={runSelfTestAndShow}
         saved={saved} savedCount={savedCount} sendSuggestions={sendSuggestions} setBudgetTotal={setBudgetTotal} setCoursesSorted={setCoursesSorted} setDarkMode={setDarkMode}
         setDay={setDay} setEditingCourseKey={setEditingCourseKey} setEditingLogiKey={setEditingLogiKey} setEditingTrajetIdx={setEditingTrajetIdx} setEditingVisitId={setEditingVisitId} setExportCopied={setExportCopied}
         setFeatures={setFeatures} setFilter={setFilter} setLogiSorted={setLogiSorted} setMealTab={setMealTab} setNewBudgetTotal={setNewBudgetTotal} setNewShoppingItem={setNewShoppingItem}

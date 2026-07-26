@@ -334,6 +334,27 @@ describe('Undo suppression', () => {
     expect(screen.getByText('Test undo')).toBeInTheDocument()
     expect(screen.queryByTestId('undo-snackbar')).not.toBeInTheDocument()
   })
+
+  // Les restos, idées et items de départ ne bénéficiaient PAS du filet : leurs
+  // suppressions n'appelaient pas offerUndo et leurs données étaient absentes
+  // de l'instantané. Ce test verrouille l'extension.
+  it('restaure aussi une idée supprimée', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await user.type(screen.getByTestId('input-suggestion'), 'Balade au Puy Mary')
+    await user.click(screen.getByTestId('btn-add-suggestion'))
+    expect(screen.getByText('Balade au Puy Mary')).toBeInTheDocument()
+
+    // La corbeille de l'idée : seul 🗑️ de la section suggestions.
+    const idea = screen.getByText('Balade au Puy Mary').closest('div')
+    await user.click(within(idea).getByText('🗑️'))
+    expect(screen.queryByText('Balade au Puy Mary')).not.toBeInTheDocument()
+    expect(screen.getByTestId('undo-snackbar')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('btn-undo'))
+    expect(screen.getByText('Balade au Puy Mary')).toBeInTheDocument()
+    expect(screen.queryByTestId('undo-snackbar')).not.toBeInTheDocument()
+  })
 })
 
 describe('Paramètres du voyage', () => {
