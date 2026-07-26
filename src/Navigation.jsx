@@ -27,6 +27,7 @@ const Souvenirs = lazy(() => import('./screens/Souvenirs.jsx').then(m => ({ defa
 const Bingo = lazy(() => import('./screens/Bingo.jsx').then(m => ({ default: m.Bingo })))
 const Quiz = lazy(() => import('./screens/Quiz.jsx').then(m => ({ default: m.Quiz })))
 const Memory = lazy(() => import('./screens/Memory.jsx').then(m => ({ default: m.Memory })))
+const Dialect = lazy(() => import('./screens/Dialect.jsx').then(m => ({ default: m.Dialect })))
 const Heights = lazy(() => import('./screens/Heights.jsx').then(m => ({ default: m.Heights })))
 const DrawPad = lazy(() => import('./screens/DrawPad.jsx').then(m => ({ default: m.DrawPad })))
 const PrintSheet = lazy(() => import('./screens/PrintSheet.jsx').then(m => ({ default: m.PrintSheet })))
@@ -87,6 +88,11 @@ export function Navigation({
             {/* QUIZ */}
             {sub === 'quiz' && (
               <Quiz sx={sx} />
+            )}
+
+            {/* LEXIQUE AUVERGNAT */}
+            {sub === 'lexique' && (
+              <Dialect sx={sx} />
             )}
 
             {/* COIN DESSIN */}

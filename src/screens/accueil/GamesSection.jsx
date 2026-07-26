@@ -31,6 +31,14 @@ export function GamesSection({ sx, kidsGames, setSub }) {
           </div>
           <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>›</div>
         </button>
+        <button data-testid="btn-open-lexique" onClick={() => setSub('lexique')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
+          <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🗣️</div>
+          <div style={sx('flex:1;')}>
+            <div style={sx('font-family:Quicksand;font-weight:700;font-size:15px;')}>Parler d’Auvergne</div>
+            <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;')}>Des mots d’ici à deviner (d’où vient « Cantou » ?)</div>
+          </div>
+          <div style={sx('font-size:14px;color:#6b6354;flex:0 0 auto;')}>›</div>
+        </button>
         <button data-testid="btn-open-dessin" onClick={() => setSub('dessin')} style={sx('width:100%;text-align:left;border:1px solid #efe6d4;background:#fffdf8;border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,93,58,0.05);')}>
           <div style={sx('width:42px;height:42px;flex:0 0 auto;border-radius:14px;background:#e7ecdf;display:flex;align-items:center;justify-content:center;font-size:22px;')}>🎨</div>
           <div style={sx('flex:1;')}>

@@ -10,6 +10,7 @@ export const CHANGELOG = [
     '🔒 Mode enfant : ne laisse que les jeux quand on prête le téléphone (un petit calcul déverrouille)',
     '🧩 Mémory du Carladès et 🎨 Coin dessin — le dessin rejoint les souvenirs',
     '📏 Toise de vacances : mesurer les enfants et garder la trace',
+    '🗣️ Parler d’Auvergne : des mots d’ici à deviner (d’où vient « Cantou » ?)',
     '👨‍👩‍👧‍👦 Bingo par enfant : chacun sa grille (la progression déjà faite est conservée)',
     '↩️ « Annuler » couvre maintenant aussi les restos, les idées et la checklist de départ',
   ] },

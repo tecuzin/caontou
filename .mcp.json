@@ -2,10 +2,22 @@
   "mcpServers": {
     "codegraphcontext": {
       "command": "cgc",
-      "args": ["mcp", "start"]
+      "args": [
+        "mcp",
+        "start"
+      ]
     },
     "epiq": {
       "command": "epiq-mcp"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
     }
   }
 }
