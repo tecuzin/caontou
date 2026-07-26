@@ -58,6 +58,7 @@ import { countCompletedLines } from './bingo.js'
 import { computeRecap } from './recap.js'
 import { budgetByCategory } from './budget.js'
 import { addHeight, removeHeight } from './heights.js'
+import { isTabAllowed, isSubAllowed, makeUnlockChallenge, randomChallengeSeed } from './kids-lock.js'
 import { initialTabFromSearch } from './deeplink.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
 const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
@@ -175,6 +176,7 @@ const DEFAULTS = {
   emergencyNumbers: structuredClone(EMERGENCY_NUMBERS),
   recipes: structuredClone(RECIPES_INITIAL),
   heights: [],
+  kidsLock: false,
   onboarded: false,
 }
 
@@ -223,6 +225,7 @@ function loadStore() {
       // Store existant (raw présent) = utilisateur déjà installé → pas d'assistant.
       // Le 1er lancement (pas de raw) part de DEFAULTS (onboarded:false) → assistant.
       heights: p.heights ?? [],
+      kidsLock: p.kidsLock ?? false,
       onboarded: p.onboarded ?? true,
     }
   } catch {
@@ -429,6 +432,13 @@ export default function App() {
   const rateVisit = (id, stars) => { haptic(ImpactStyle.Light); rateVisitEntry(id, stars) }
   const openMaps = (url) => { try { window.open(url, '_blank') } catch { /* WebView sans window.open */ } }
   const [challengesDone, setChallengesDone] = useState(initial.challengesDone || {})
+  // Mode « prêté aux enfants » : masque les écrans sensibles et neutralise les
+  // actions destructives. Déverrouillage par un petit calcul (kids-lock.js).
+  const [kidsLock, setKidsLock] = useState(initial.kidsLock || false)
+  const [kidsChallenge, setKidsChallenge] = useState(() => makeUnlockChallenge(randomChallengeSeed()))
+  const lockKids = () => { haptic(ImpactStyle.Medium); setKidsChallenge(makeUnlockChallenge(randomChallengeSeed())); setKidsLock(true); setSub(null); setTab('accueil') }
+  const unlockKids = () => { haptic(ImpactStyle.Medium); setKidsLock(false) }
+
   // Toise de vacances — mesures horodatées des enfants (logique pure heights.js)
   const [heights, setHeights] = useState(initial.heights || [])
   const saveDrawing = async (base64) => { haptic(ImpactStyle.Medium); await savePhotoData(base64, { label: 'Dessin' }); setSub('souvenirs') }
@@ -529,8 +539,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, onboarded })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, onboarded])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, kidsLock, onboarded })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, kidsLock, onboarded])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -1023,7 +1033,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, onboarded })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, kidsLock, onboarded })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -1075,11 +1085,14 @@ export default function App() {
 
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
   // Onglets réellement affichés (l'accueil ne se coupe jamais).
-  const visibleTabs = TABS.filter(([key]) => key === 'accueil' || isOn(`tab_${key}`))
+  const visibleTabs = TABS.filter(([key]) => (key === 'accueil' || isOn(`tab_${key}`)) && isTabAllowed(key, kidsLock))
   // Garde-fou : si l'onglet courant vient d'être désactivé, revenir à l'accueil.
   useEffect(() => {
     if (tab !== 'accueil' && !isOn(`tab_${tab}`)) { setTab('accueil'); setSub(null) }
-  }, [tab, features]) // eslint-disable-line react-hooks/exhaustive-deps
+    // Mode enfant : rabat vers l'accueil tout écran non autorisé.
+    if (!isTabAllowed(tab, kidsLock)) { setTab('accueil'); setSub(null) }
+    else if (!isSubAllowed(sub, kidsLock)) setSub(null)
+  }, [tab, sub, features, kidsLock]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Tracking de parcours (local, anonyme) — journalise l'onglet et le
   // sous-écran affichés quand la fonction est activée (flag extra_tracking).
@@ -1126,7 +1139,7 @@ export default function App() {
         deleteSuggestion={deleteSuggestion} deleteTrajetCheckItem={deleteTrajetCheckItem} deleteTrajetStep={deleteTrajetStep} deleteVisit={deleteVisit} departure={departure} editActivity={editActivity}
         editDay={editDay} editMeal={editMeal} editMeteo={editMeteo} editTrajetStep={editTrajetStep} editVisit={editVisit} emergencyNumbers={emergencyNumbers}
         expenses={expenses} familyMembers={familyMembers} filter={filter} filteredVisits={filteredVisits} findCar={findCar} forgetCar={forgetCar}
-        haptic={haptic} hebergement={hebergement} heights={heights} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
+        haptic={haptic} hebergement={hebergement} heights={heights} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
         kidsGames={kidsGames} lastBackupAt={lastBackupAt} loadSrc={loadSrc} logi={logi} logiSorted={logiSorted} markChallengeDone={markChallengeDone}
         mealTab={mealTab} meals={meals} meteo={meteo} newShoppingItem={newShoppingItem} newSuggestionText={newSuggestionText} openAddMeal={openAddMeal}
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}

@@ -21,7 +21,7 @@ function Toggle({ sx, on, onClick, label }) {
  * les données restent intactes (rien n'est supprimé). Tout est exporté dans
  * le JSON de sauvegarde.
  */
-export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode }) {
+export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode, kidsLock, lockKids }) {
   return (
     <div data-testid="screen-reglages" style={sx('padding:0 18px 24px;')}>
       <div style={sx('font-size:13px;color:#6b6354;margin:2px 0 16px;')}>
@@ -39,6 +39,15 @@ export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, tracking
               </span>
               <Toggle sx={sx} on={!!sunMode} onClick={() => setSunMode((v) => !v)} label="Mode plein soleil" />
             </div>
+            {lockKids && (
+              <div data-testid="reglage-row-kids-lock" style={sx('display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-top:1px solid #f1e9da;')}>
+                <span style={sx('flex:1;min-width:0;')}>
+                  <span style={sx('display:block;font-size:15px;')}>🔒 Mode enfant</span>
+                  <span style={sx('display:block;font-size:12px;color:#6b6354;margin-top:2px;')}>Ne laisse que les jeux et la consultation ; un petit calcul déverrouille</span>
+                </span>
+                <Toggle sx={sx} on={!!kidsLock} onClick={lockKids} label="Mode enfant" />
+              </div>
+            )}
           </div>
         </div>
       )}
