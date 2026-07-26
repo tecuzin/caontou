@@ -431,6 +431,7 @@ export default function App() {
   const [challengesDone, setChallengesDone] = useState(initial.challengesDone || {})
   // Toise de vacances — mesures horodatées des enfants (logique pure heights.js)
   const [heights, setHeights] = useState(initial.heights || [])
+  const saveDrawing = async (base64) => { haptic(ImpactStyle.Medium); await savePhotoData(base64, { label: 'Dessin' }); setSub('souvenirs') }
   const addHeightEntry = (entry) => { haptic(ImpactStyle.Light); setHeights((l) => addHeight(l, entry)) }
   const removeHeightEntry = (id) => { haptic(ImpactStyle.Medium); offerUndo('Mesure supprimée'); setHeights((l) => removeHeight(l, id)) }
   const todayKey = dayKey()
@@ -471,7 +472,7 @@ export default function App() {
       return next
     })
   }
-  const { photos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
+  const { photos, srcMap, capturePhoto, savePhotoData, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
   // restaurable pendant 5 s via le bandeau « Annuler »
@@ -628,7 +629,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', quiz: 'Quiz du Carladès', memory: 'Mémory du Carladès', toise: 'Toise de vacances', imprimer: 'Pense-bête du jour', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?', badges: 'Mes badges', recettes: 'Recettes du Cantal' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', quiz: 'Quiz du Carladès', memory: 'Mémory du Carladès', toise: 'Toise de vacances', dessin: 'Coin dessin', imprimer: 'Pense-bête du jour', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?', badges: 'Mes badges', recettes: 'Recettes du Cantal' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {
@@ -1125,7 +1126,7 @@ export default function App() {
         deleteSuggestion={deleteSuggestion} deleteTrajetCheckItem={deleteTrajetCheckItem} deleteTrajetStep={deleteTrajetStep} deleteVisit={deleteVisit} departure={departure} editActivity={editActivity}
         editDay={editDay} editMeal={editMeal} editMeteo={editMeteo} editTrajetStep={editTrajetStep} editVisit={editVisit} emergencyNumbers={emergencyNumbers}
         expenses={expenses} familyMembers={familyMembers} filter={filter} filteredVisits={filteredVisits} findCar={findCar} forgetCar={forgetCar}
-        haptic={haptic} hebergement={hebergement} heights={heights} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
+        haptic={haptic} hebergement={hebergement} heights={heights} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
         kidsGames={kidsGames} lastBackupAt={lastBackupAt} loadSrc={loadSrc} logi={logi} logiSorted={logiSorted} markChallengeDone={markChallengeDone}
         mealTab={mealTab} meals={meals} meteo={meteo} newShoppingItem={newShoppingItem} newSuggestionText={newSuggestionText} openAddMeal={openAddMeal}
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}

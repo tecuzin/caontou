@@ -25,6 +25,29 @@ export function usePhotos(initial, trip, days) {
   }
 
   /**
+   * Range une image DÉJÀ produite localement (ex. dessin du coin dessin) dans
+   * la galerie, exactement comme une photo prise : même redimensionnement,
+   * même stockage Filesystem, même rangement par journée.
+   * @param {string} base64  JPEG base64 SANS le préfixe `data:…;base64,`
+   */
+  const savePhotoData = async (base64, extra = {}) => {
+    if (!base64) return null
+    try {
+      const data = await resizeBase64Jpeg(base64, { maxEdge: 1600, quality: 0.8 })
+      await ensureDir()
+      const id = photoId()
+      const file = `${PHOTO_DIR}/${id}.jpeg`
+      await Filesystem.writeFile({ path: file, data, directory: Directory.Data })
+      const meta = { id, file, day: dayKeyForDate(trip, days), takenAt: new Date().toISOString(), ...extra }
+      setPhotos((p) => [...p, meta])
+      setSrcMap((m) => ({ ...m, [id]: `data:image/jpeg;base64,${data}` }))
+      return meta
+    } catch {
+      return null
+    }
+  }
+
+  /**
    * Prend une photo (source='camera') ou importe depuis la galerie ('photos').
    * `extra` enrichit la métadonnée (ex. { kind: 'receipt' } pour un reçu, exclu
    * de la galerie souvenirs).
@@ -93,5 +116,5 @@ export function usePhotos(initial, trip, days) {
     } catch { }
   }
 
-  return { photos, setPhotos, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay }
+  return { photos, setPhotos, srcMap, capturePhoto, savePhotoData, deletePhoto, loadSrc, shareDay }
 }
