@@ -609,7 +609,7 @@ export default function App() {
 
   const cur = days[day]
   const tr = buildList(checks, 'tr_dep', trajetCheckItems)
-  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', quiz: 'Quiz du Carladès', imprimer: 'Pense-bête du jour', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?', badges: 'Mes badges', recettes: 'Recettes du Cantal' }[sub] || ''
+  const subTitle = { trajet: 'Le trajet', logistique: 'Valises & préparatifs', hebergement: 'Hébergement', meteo: 'Météo', souvenirs: 'Souvenirs', bingo: 'Bingo du Cantal', quiz: 'Quiz du Carladès', memory: 'Mémory du Carladès', imprimer: 'Pense-bête du jour', bilan: 'Bilan du séjour', restos: 'Nos restos', departure: 'Départ du gîte', itineraire: 'Itinéraire du jour', carte: 'Carte du séjour', 'carte-detaillee': 'Carte détaillée', reglages: 'Réglages', sejours: 'Mes séjours', 'partage-config': 'Partager la config', 'offline-check': 'Prêt hors-ligne ?', badges: 'Mes badges', recettes: 'Recettes du Cantal' }[sub] || ''
 
   // confetti si une checklist atteint 100%
   useEffect(() => {

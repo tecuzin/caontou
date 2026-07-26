@@ -25,6 +25,7 @@ const Trajet = lazy(() => import('./screens/Trajet.jsx').then(m => ({ default: m
 const Souvenirs = lazy(() => import('./screens/Souvenirs.jsx').then(m => ({ default: m.Souvenirs })))
 const Bingo = lazy(() => import('./screens/Bingo.jsx').then(m => ({ default: m.Bingo })))
 const Quiz = lazy(() => import('./screens/Quiz.jsx').then(m => ({ default: m.Quiz })))
+const Memory = lazy(() => import('./screens/Memory.jsx').then(m => ({ default: m.Memory })))
 const PrintSheet = lazy(() => import('./screens/PrintSheet.jsx').then(m => ({ default: m.PrintSheet })))
 const Bilan = lazy(() => import('./screens/Bilan.jsx').then(m => ({ default: m.Bilan })))
 const Restos = lazy(() => import('./screens/Restos.jsx').then(m => ({ default: m.Restos })))
@@ -80,6 +81,11 @@ export function Navigation({
             {/* QUIZ */}
             {sub === 'quiz' && (
               <Quiz sx={sx} />
+            )}
+
+            {/* MÉMORY */}
+            {sub === 'memory' && (
+              <Memory sx={sx} />
             )}
 
             {/* PENSE-BÊTE IMPRIMABLE */}
