@@ -9,7 +9,7 @@ import { computeToday } from './today.js'
 // ils ne sont montés qu'à l'ouverture depuis l'accueil (sub === …).
 import { Navigation } from './Navigation.jsx'
 import { scheduleAllNotifications } from './notifications.js'
-import { applyDarkTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
+import { applyDarkTheme, applySunTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
 import { parseImport } from './backup.js'
 import { track } from './tracking.js'
 import { DEPARTURE_INITIAL, isCheckoutWindow } from './departure.js'
@@ -252,7 +252,19 @@ export default function App() {
     StatusBar.setStyle({ style: darkMode ? Style.Dark : Style.Light }).catch(() => {})
     StatusBar.setBackgroundColor({ color: darkMode ? '#10162b' : '#f4ecdc' }).catch(() => {})
   }, [darkMode])
-  const sx = (css) => s(darkMode ? applyDarkTheme(css) : css)
+  // Mode plein soleil — 3e thème (contraste maximal pour lire dehors), local
+  // à l'appareil comme le mode sombre. Prioritaire sur le sombre s'il est actif.
+  const [sunMode, setSunMode] = useState(() => {
+    try { return localStorage.getItem('cantou.sunMode') === 'true' } catch { return false }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('cantou.sunMode', String(sunMode)) } catch { }
+    if (sunMode) {
+      StatusBar.setStyle({ style: Style.Light }).catch(() => {})
+      StatusBar.setBackgroundColor({ color: '#ffffff' }).catch(() => {})
+    }
+  }, [sunMode])
+  const sx = (css) => s(sunMode ? applySunTheme(css) : darkMode ? applyDarkTheme(css) : css)
 
   // état UI (non persisté) — onglet initial éventuellement imposé par un
   // deep-link `?tab=…` (raccourci Web App Manifest / lien partagé).
@@ -1084,7 +1096,7 @@ export default function App() {
   return (
     <main data-testid="app-root" style={{
       ...sx("height:100%;display:flex;flex-direction:column;overflow:hidden;background:#f4ecdc;color:#2f2a22;font-family:'Nunito Sans',system-ui,sans-serif;position:relative;"),
-      ...(darkMode ? { backgroundImage: STARRY_BACKGROUND_IMAGE, backgroundRepeat: 'no-repeat' } : {}),
+      ...(darkMode && !sunMode ? { backgroundImage: STARRY_BACKGROUND_IMAGE, backgroundRepeat: 'no-repeat' } : {}),
     }}>
       <Confetti trigger={confettiTrigger} />
 
@@ -1120,7 +1132,7 @@ export default function App() {
         setNewVisitCat={setNewVisitCat} setNewVisitDist={setNewVisitDist} setNewVisitDur={setNewVisitDur} setNewVisitName={setNewVisitName} setOnboarded={setOnboarded} setSaved={setSaved}
         setShowAdd={setShowAdd} setShowAddCourseCat={setShowAddCourseCat} setShowAddCourseItem={setShowAddCourseItem} setShowAddLogiItem={setShowAddLogiItem} setShowAddLogiList={setShowAddLogiList} setShowAddTrajetCheck={setShowAddTrajetCheck}
         setShowBudgetTotalEdit={setShowBudgetTotalEdit} setShowChangelog={setShowChangelog} setShowDayAdd={setShowDayAdd} setShowExport={setShowExport} setShowImport={setShowImport} setShowTrajetEdit={setShowTrajetEdit}
-        setShowVisitEdit={setShowVisitEdit} setShowVote={setShowVote} setSortExpenses={setSortExpenses} setSub={setSub} setTab={setTab} setTrajetDir={setTrajetDir}
+        setShowVisitEdit={setShowVisitEdit} setShowVote={setShowVote} setSortExpenses={setSortExpenses} setSub={setSub} sunMode={sunMode} setSunMode={setSunMode} setTab={setTab} setTrajetDir={setTrajetDir}
         setTrip={setTrip} setVisitNote={setVisitNote} setVisitSort={setVisitSort} shareActivity={shareActivity} shareDay={shareDay} shoppingItems={shoppingItems}
         sortExpenses={sortExpenses} spent={spent} spentPct={spentPct} srcMap={srcMap} startAddActivity={startAddActivity} startEditExpense={startEditExpense}
         sub={sub} subScreenSwipe={subScreenSwipe} subTitle={subTitle} submitSuggestion={submitSuggestion} suggestions={suggestions} sx={sx}

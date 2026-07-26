@@ -103,3 +103,65 @@ export const STARRY_BACKGROUND_IMAGE = [
   'radial-gradient(1.5px 1.5px at 60% 45%, rgba(255,255,255,0.35) 1px, transparent 0)',
   'radial-gradient(1px 1px at 92% 12%, rgba(255,255,255,0.4) 1px, transparent 0)',
 ].join(', ')
+
+/* ------------------------------------------------------------------ *
+ * Mode PLEIN SOLEIL — 3e thème, pour lire l'écran dehors en plein été
+ * (Ronesque, Le Lioran, terrasse). Même mécanique que le mode sombre :
+ * substitution de couleurs dans la chaîne CSS avant parsing.
+ *
+ * Principes : surfaces poussées au blanc pur, textes gris ramenés au brun
+ * très foncé, séparateurs épaissis ET assombris, ombres supprimées (elles
+ * n'apportent rien en plein soleil et mangent du contraste).
+ *
+ * Toutes les couleurs cibles (#ffffff, #2f2a22, #6b6354) existent déjà dans
+ * la palette de l'app : ce thème n'introduit AUCUNE couleur nouvelle.
+ * ------------------------------------------------------------------ */
+
+// Appliqué en premier : épaissit et assombrit les séparateurs.
+export const SUN_BORDER_MAP = {
+  'border:1px solid #efe6d4': 'border:2px solid #6b6354',
+  'border:1px solid #e3d8c2': 'border:2px solid #6b6354',
+  'border:1px solid #d8cbb0': 'border:2px solid #6b6354',
+  'border:1px solid #ece2cf': 'border:2px solid #6b6354',
+  'border-bottom:1px solid #f1e9da': 'border-bottom:2px solid #6b6354',
+  'border-top:1px solid #f1e9da': 'border-top:2px solid #6b6354',
+}
+
+// Surfaces → blanc pur. `#fffaf0` est volontairement absent : comme en mode
+// sombre, il sert de TEXTE clair sur bouton coloré, jamais de fond.
+export const SUN_COLOR_MAP = {
+  '#f4ecdc': '#ffffff',
+  '#fffdf8': '#ffffff',
+  '#f6efe2': '#ffffff',
+  '#f3ece0': '#ffffff',
+  '#f1e4d4': '#ffffff',
+  '#fbf4e6': '#ffffff',
+  '#ece2cf': '#ffffff',
+}
+
+// Textes gris/atténués → brun très foncé (contraste maximal sur blanc).
+export const SUN_TEXT_COLOR_MAP = {
+  '#6b6354': '#2f2a22',
+  '#9a917f': '#2f2a22',
+  '#8a7f6b': '#2f2a22',
+  '#6b5a45': '#2f2a22',
+}
+
+const SUN_CACHE = new Map()
+
+/** Transforme une chaîne CSS claire en sa variante « plein soleil ». */
+export function applySunTheme(css) {
+  const hit = SUN_CACHE.get(css)
+  if (hit !== undefined) return hit
+  let out = css
+  for (const [from, to] of Object.entries(SUN_BORDER_MAP)) out = out.split(from).join(to)
+  for (const [from, to] of Object.entries(SUN_COLOR_MAP)) out = out.split(from).join(to)
+  for (const [from, to] of Object.entries(SUN_TEXT_COLOR_MAP)) {
+    out = out.split(`color:${from}`).join(`color:${to}`)
+  }
+  // Les ombres portées diluent le contraste en plein soleil : on les retire.
+  out = out.replace(/box-shadow:[^;]*;?/g, '')
+  if (SUN_CACHE.size > 4000) SUN_CACHE.clear()
+  SUN_CACHE.set(css, out)
+  return out
+}

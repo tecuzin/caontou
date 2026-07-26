@@ -21,12 +21,27 @@ function Toggle({ sx, on, onClick, label }) {
  * les données restent intactes (rien n'est supprimé). Tout est exporté dans
  * le JSON de sauvegarde.
  */
-export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking }) {
+export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode }) {
   return (
     <div data-testid="screen-reglages" style={sx('padding:0 18px 24px;')}>
       <div style={sx('font-size:13px;color:#6b6354;margin:2px 0 16px;')}>
         Masque ce que tu n'utilises pas. Rien n'est supprimé — tout revient en réactivant.
       </div>
+
+      {setSunMode && (
+        <div style={sx('margin-bottom:18px;')}>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;margin-bottom:8px;')}>Affichage</div>
+          <div style={sx('background:#fffdf8;border:1px solid #efe6d4;border-radius:16px;overflow:hidden;')}>
+            <div data-testid="reglage-row-sun-mode" style={sx('display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;')}>
+              <span style={sx('flex:1;min-width:0;')}>
+                <span style={sx('display:block;font-size:15px;')}>☀️ Mode plein soleil</span>
+                <span style={sx('display:block;font-size:12px;color:#6b6354;margin-top:2px;')}>Contraste maximal pour lire dehors (prioritaire sur le mode sombre)</span>
+              </span>
+              <Toggle sx={sx} on={!!sunMode} onClick={() => setSunMode((v) => !v)} label="Mode plein soleil" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {FEATURE_GROUPS.map((g) => (
         <div key={g.group} style={sx('margin-bottom:18px;')}>
