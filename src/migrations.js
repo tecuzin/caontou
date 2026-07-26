@@ -1,12 +1,13 @@
 import { TRIP_INITIAL, TRAJETS_INITIAL, VISITS_INITIAL, KIDS_GAMES, BINGO_CANTAL, EMERGENCY_NUMBERS } from './data.js'
 import { normalizeProgress } from './progress.js'
+import { DIALECT_WORDS } from './dialect.js'
 
 /**
  * Migration system pour cantou.v1 store.
  * Applique les transformations ordonnées au chargement (ensureStoreIsUpToDate).
  */
 
-export const LATEST_SCHEMA = 5
+export const LATEST_SCHEMA = 6
 
 const MIGRATIONS = [
   // v1 → v2 : re-basage Carladès. Les stores créés par les premiers builds
@@ -94,6 +95,19 @@ const MIGRATIONS = [
       const s = { ...store }
       if (s.bingo !== undefined) s.bingo = normalizeProgress(s.bingo)
       if (s.challengesDone !== undefined) s.challengesDone = normalizeProgress(s.challengesDone)
+      return s
+    },
+  },
+  // v5 → v6 : le lexique auvergnat devient ÉDITABLE. Comme les autres listes de
+  // référence (jeux, bingo, urgences, recettes), il est semé dans le store —
+  // donc dans l'export JSON — pour être corrigé et enrichi à la main. Seedé
+  // uniquement s'il est absent, afin de préserver toute personnalisation.
+  {
+    from: 5,
+    to: 6,
+    apply(store) {
+      const s = { ...store }
+      if (!Array.isArray(s.dialectWords)) s.dialectWords = structuredClone(DIALECT_WORDS)
       return s
     },
   },

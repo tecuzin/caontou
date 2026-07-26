@@ -60,6 +60,7 @@ import { budgetByCategory } from './budget.js'
 import { addHeight, removeHeight } from './heights.js'
 import { isTabAllowed, isSubAllowed, makeUnlockChallenge, randomChallengeSeed } from './kids-lock.js'
 import { toggleChildEntry, childNames } from './progress.js'
+import { DIALECT_WORDS } from './dialect.js'
 import { bingoGrid } from './bingo.js'
 import { initialTabFromSearch } from './deeplink.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
@@ -178,6 +179,7 @@ const DEFAULTS = {
   emergencyNumbers: structuredClone(EMERGENCY_NUMBERS),
   recipes: structuredClone(RECIPES_INITIAL),
   heights: [],
+  dialectWords: structuredClone(DIALECT_WORDS),
   kidsLock: false,
   onboarded: false,
 }
@@ -227,6 +229,7 @@ function loadStore() {
       // Store existant (raw présent) = utilisateur déjà installé → pas d'assistant.
       // Le 1er lancement (pas de raw) part de DEFAULTS (onboarded:false) → assistant.
       heights: p.heights ?? [],
+      dialectWords: p.dialectWords ?? structuredClone(DIALECT_WORDS),
       kidsLock: p.kidsLock ?? false,
       onboarded: p.onboarded ?? true,
     }
@@ -443,6 +446,8 @@ export default function App() {
 
   // Toise de vacances — mesures horodatées des enfants (logique pure heights.js)
   const [heights, setHeights] = useState(initial.heights || [])
+  // Lexique auvergnat éditable (semé au schéma 6 depuis DIALECT_WORDS)
+  const [dialectWords, setDialectWords] = useState(initial.dialectWords || DIALECT_WORDS)
   const saveDrawing = async (base64) => { haptic(ImpactStyle.Medium); await savePhotoData(base64, { label: 'Dessin' }); setSub('souvenirs') }
   const addHeightEntry = (entry) => { haptic(ImpactStyle.Light); setHeights((l) => addHeight(l, entry)) }
   const removeHeightEntry = (id) => { haptic(ImpactStyle.Medium); offerUndo('Mesure supprimée'); setHeights((l) => removeHeight(l, id)) }
@@ -549,8 +554,8 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, kidsLock, onboarded })) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, kidsLock, onboarded])
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded })) } catch { }
+  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -1043,7 +1048,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, kidsLock, onboarded })
+  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded })
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
@@ -1149,7 +1154,7 @@ export default function App() {
         deleteSuggestion={deleteSuggestion} deleteTrajetCheckItem={deleteTrajetCheckItem} deleteTrajetStep={deleteTrajetStep} deleteVisit={deleteVisit} departure={departure} editActivity={editActivity}
         editDay={editDay} editMeal={editMeal} editMeteo={editMeteo} editTrajetStep={editTrajetStep} editVisit={editVisit} emergencyNumbers={emergencyNumbers}
         expenses={expenses} familyMembers={familyMembers} filter={filter} filteredVisits={filteredVisits} findCar={findCar} forgetCar={forgetCar}
-        haptic={haptic} hebergement={hebergement} heights={heights} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
+        haptic={haptic} hebergement={hebergement} heights={heights} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
         kidsGames={kidsGames} lastBackupAt={lastBackupAt} loadSrc={loadSrc} logi={logi} logiSorted={logiSorted} markChallengeDone={markChallengeDone}
         mealTab={mealTab} meals={meals} meteo={meteo} newShoppingItem={newShoppingItem} newSuggestionText={newSuggestionText} openAddMeal={openAddMeal}
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}
