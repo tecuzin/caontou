@@ -1367,3 +1367,6 @@
 {"v":1,"id":["01KYFKFWN8HZTQK5XYJQCZHBCR","01KYFKFV276SN9KJRH5WEHGG5J"],"add.issue.tag":{"id":"01KYFKF29M3ET6PYFKCTAEVWN7","tag":"01KWXE3GVFD7JC3EAR9W6V3ETC"}}
 {"v":1,"id":["01KYFKKBWTTX5DVS52PK6W4CNS","01KYFKFWN8HZTQK5XYJQCZHBCR"],"move.node":{"id":"01KYCVXBH770W7ZKH9PNE2NRJR","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","rank":"7fffffffffffffffffffffff"}}
 {"v":1,"id":["01KYFKKD2DVPK2NBV9Q7MEBWM6","01KYFKKBWTTX5DVS52PK6W4CNS"],"move.node":{"id":"01KYCVXA7VTEFS13F04P35DBY1","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","rank":"3fffffffffffffffffffffff"}}
+{"v":1,"id":["01KYFKQKK90QX97NMWWA6XVKG5","01KYFKKD2DVPK2NBV9Q7MEBWM6"],"add.issue":{"id":"01KYFKQKK2P20K0FJN166CGZKE","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"📩 « On est arrivés » — SMS pré-rempli de position/statut","rank":"ffffffff7fffffffffffffff"}}
+{"v":1,"id":["01KYFKQN707QRN5N3TN2S1W1WM","01KYFKQKK90QX97NMWWA6XVKG5"],"add.issue":{"id":"01KYFKQN6T8BSYM9S9MC7KJ9KY","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🤳 Retour haptique de confirmation sur les actions clés","rank":"ffffffffbfffffffffffffff"}}
+{"v":1,"id":["01KYFKQQVW7028M0Q7E1GCW0HB","01KYFKQN707QRN5N3TN2S1W1WM"],"add.issue":{"id":"01KYFKQQTYK9BWM8Q4W879R80R","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🌙 Plage horaire silencieuse pour les rappels (pas de notif nuit/sieste)","rank":"ffffffffdfffffffffffffff"}}
