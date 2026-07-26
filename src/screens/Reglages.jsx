@@ -1,4 +1,5 @@
 import { FEATURE_GROUPS } from '../features.js'
+import { formatBytes } from '../storage-usage.js'
 
 /** Interrupteur on/off simple (style pilule), piloté par `on`. */
 function Toggle({ sx, on, onClick, label }) {
@@ -21,7 +22,7 @@ function Toggle({ sx, on, onClick, label }) {
  * les données restent intactes (rien n'est supprimé). Tout est exporté dans
  * le JSON de sauvegarde.
  */
-export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode, kidsLock, lockKids }) {
+export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode, kidsLock, lockKids, storage }) {
   return (
     <div data-testid="screen-reglages" style={sx('padding:0 18px 24px;')}>
       <div style={sx('font-size:13px;color:#6b6354;margin:2px 0 16px;')}>
@@ -48,6 +49,30 @@ export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, tracking
                 <Toggle sx={sx} on={!!kidsLock} onClick={lockKids} label="Mode enfant" />
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {storage && (
+        <div data-testid="storage-section" style={sx('margin-bottom:18px;')}>
+          <div style={sx('font-family:Quicksand;font-weight:700;font-size:13px;letter-spacing:0.5px;color:#6b6354;text-transform:uppercase;margin-bottom:8px;')}>Stockage</div>
+          <div style={sx(`background:#fffdf8;border:1px solid ${storage.level === 'ok' ? '#efe6d4' : '#b8503f'};border-radius:16px;padding:14px 16px;`)}>
+            <div style={sx('display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#6b6354;margin-bottom:6px;')}>
+              <span>Données de l’app</span>
+              <span data-testid="storage-pct">{storage.pct} %</span>
+            </div>
+            <div style={sx('height:9px;border-radius:8px;background:#efe6d4;overflow:hidden;')}>
+              <div style={sx(`height:100%;background:${storage.level === 'ok' ? '#5b7042' : '#b8503f'};width:${storage.pct}%;`)} />
+            </div>
+            <div style={sx('font-size:12px;color:#6b6354;margin-top:8px;')}>
+              {formatBytes(storage.storeBytes)} de textes · {storage.photosCount} photo{storage.photosCount > 1 ? 's' : ''} ({formatBytes(storage.photosBytes)})
+            </div>
+            {storage.level !== 'ok' && (
+              <div data-testid="storage-warning" style={sx('font-size:13px;color:#b8503f;font-weight:600;margin-top:8px;')}>⚠️ {storage.advice}</div>
+            )}
+            <div data-testid="storage-photos-notice" style={sx('font-size:12px;color:#9c6b4a;background:#fbf4e6;border-radius:12px;padding:10px 12px;margin-top:10px;line-height:1.4;')}>
+              📸 <b>Les photos ne sont pas incluses dans la sauvegarde JSON</b> — elles vivent dans la mémoire du téléphone. Partage-les depuis Souvenirs (📤 par journée ou 📕 Album) avant de changer d’appareil.
+            </div>
           </div>
         </div>
       )}

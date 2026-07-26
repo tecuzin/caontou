@@ -61,6 +61,8 @@ import { addHeight, removeHeight } from './heights.js'
 import { isTabAllowed, isSubAllowed, makeUnlockChallenge, randomChallengeSeed } from './kids-lock.js'
 import { toggleChildEntry, childNames } from './progress.js'
 import { DIALECT_WORDS } from './dialect.js'
+import { measureStorage } from './storage-usage.js'
+import { Filesystem, Directory } from '@capacitor/filesystem'
 import { bingoGrid } from './bingo.js'
 import { initialTabFromSearch } from './deeplink.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
@@ -448,6 +450,9 @@ export default function App() {
   const [heights, setHeights] = useState(initial.heights || [])
   // Lexique auvergnat éditable (semé au schéma 6 depuis DIALECT_WORDS)
   const [dialectWords, setDialectWords] = useState(initial.dialectWords || DIALECT_WORDS)
+  // Occupation du stockage — mesurée à l'ouverture des Réglages (pas à chaque
+  // render : c'est de l'I/O sur chaque fichier photo).
+  const [storage, setStorage] = useState(null)
   const saveDrawing = async (base64) => { haptic(ImpactStyle.Medium); await savePhotoData(base64, { label: 'Dessin' }); setSub('souvenirs') }
   const addHeightEntry = (entry) => { haptic(ImpactStyle.Light); setHeights((l) => addHeight(l, entry)) }
   const removeHeightEntry = (id) => { haptic(ImpactStyle.Medium); offerUndo('Mesure supprimée'); setHeights((l) => removeHeight(l, id)) }
@@ -498,6 +503,18 @@ export default function App() {
     })
   }
   const { photos, srcMap, capturePhoto, savePhotoData, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
+  // Mesure du stockage à l'ouverture des Réglages (I/O sur chaque photo :
+  // surtout pas à chaque render).
+  useEffect(() => {
+    if (sub !== 'reglages') return
+    let alive = true
+    measureStorage({
+      photos,
+      statFile: async (file) => (await Filesystem.stat({ path: file, directory: Directory.Data })).size,
+    }).then((m) => { if (alive) setStorage(m) }).catch(() => {})
+    return () => { alive = false }
+  }, [sub, photos])
+
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
   // restaurable pendant 5 s via le bandeau « Annuler »
@@ -1154,7 +1171,7 @@ export default function App() {
         deleteSuggestion={deleteSuggestion} deleteTrajetCheckItem={deleteTrajetCheckItem} deleteTrajetStep={deleteTrajetStep} deleteVisit={deleteVisit} departure={departure} editActivity={editActivity}
         editDay={editDay} editMeal={editMeal} editMeteo={editMeteo} editTrajetStep={editTrajetStep} editVisit={editVisit} emergencyNumbers={emergencyNumbers}
         expenses={expenses} familyMembers={familyMembers} filter={filter} filteredVisits={filteredVisits} findCar={findCar} forgetCar={forgetCar}
-        haptic={haptic} hebergement={hebergement} heights={heights} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
+        haptic={haptic} hebergement={hebergement} heights={heights} storage={storage} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
         kidsGames={kidsGames} lastBackupAt={lastBackupAt} loadSrc={loadSrc} logi={logi} logiSorted={logiSorted} markChallengeDone={markChallengeDone}
         mealTab={mealTab} meals={meals} meteo={meteo} newShoppingItem={newShoppingItem} newSuggestionText={newSuggestionText} openAddMeal={openAddMeal}
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}
