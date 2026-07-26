@@ -114,7 +114,7 @@ describe('Store migrations', () => {
       expect(result.kidsGames.length).toBeGreaterThan(0)
       expect(Array.isArray(result.bingoItems)).toBe(true)
       expect(Array.isArray(result.emergencyNumbers)).toBe(true)
-      expect(result.schemaVersion).toBe(4)
+      expect(result.schemaVersion).toBe(LATEST_SCHEMA)
     })
 
     it('ne réécrit pas des listes déjà personnalisées', () => {

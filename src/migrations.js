@@ -1,11 +1,12 @@
 import { TRIP_INITIAL, TRAJETS_INITIAL, VISITS_INITIAL, KIDS_GAMES, BINGO_CANTAL, EMERGENCY_NUMBERS } from './data.js'
+import { normalizeProgress } from './progress.js'
 
 /**
  * Migration system pour cantou.v1 store.
  * Applique les transformations ordonnées au chargement (ensureStoreIsUpToDate).
  */
 
-export const LATEST_SCHEMA = 4
+export const LATEST_SCHEMA = 5
 
 const MIGRATIONS = [
   // v1 → v2 : re-basage Carladès. Les stores créés par les premiers builds
@@ -73,6 +74,26 @@ const MIGRATIONS = [
       if (!Array.isArray(s.kidsGames)) s.kidsGames = structuredClone(KIDS_GAMES)
       if (!Array.isArray(s.bingoItems)) s.bingoItems = structuredClone(BINGO_CANTAL)
       if (!Array.isArray(s.emergencyNumbers)) s.emergencyNumbers = structuredClone(EMERGENCY_NUMBERS)
+      return s
+    },
+  },
+  // v4 → v5 : progression PAR ENFANT. `bingo` et `challengesDone` étaient
+  // plats et globaux à la famille :
+  //   bingo: { 0: true, 5: true }   challengesDone: { '2026-08-07': true }
+  // Ils deviennent indexés par prénom :
+  //   bingo: { 'Léa': { 0: true } } challengesDone: { 'Léa': { '…': true } }
+  //
+  // La progression déjà enregistrée n'est attribuable à personne : elle est
+  // rattachée telle quelle à la clé de repli FAMILY_KEY (« Famille »). RIEN
+  // n'est perdu. `normalizeProgress` étant tolérant (plat / par enfant /
+  // mixte), rejouer cette migration est sans effet — elle est idempotente.
+  {
+    from: 4,
+    to: 5,
+    apply(store) {
+      const s = { ...store }
+      if (s.bingo !== undefined) s.bingo = normalizeProgress(s.bingo)
+      if (s.challengesDone !== undefined) s.challengesDone = normalizeProgress(s.challengesDone)
       return s
     },
   },

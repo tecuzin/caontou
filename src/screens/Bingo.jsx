@@ -1,7 +1,7 @@
 import { countCompletedLines } from '../bingo.js'
 
 /** Sous-écran Bingo du Cantal — grille 4×4 à cocher pour les enfants. */
-export function Bingo({ sx, items, checked, toggleBingo }) {
+export function Bingo({ sx, items, checked, toggleBingo, currentChild = '', setCurrentChild, childOptions = [] }) {
   const done = items.reduce((n, _, i) => n + (checked[i] ? 1 : 0), 0)
   const lines = countCompletedLines(checked)
   return (
@@ -14,6 +14,23 @@ export function Bingo({ sx, items, checked, toggleBingo }) {
           <div style={sx('background:rgba(255,255,255,0.18);border-radius:12px;padding:6px 12px;font-weight:700;font-family:Quicksand;font-size:13px;')}>✓ {done}/16 cases</div>
         </div>
       </div>
+
+
+      {setCurrentChild && (
+        <div data-testid="bingo-child-picker" style={sx('display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;')}>
+          <span style={sx('font-size:12px;font-weight:700;color:#6b6354;text-transform:uppercase;letter-spacing:0.5px;')}>Qui joue ?</span>
+          {['', ...childOptions.filter((n) => n !== 'Famille')].map((name) => {
+            const on = currentChild === name
+            return (
+              <button
+                key={name || 'famille'} data-testid={`bingo-child-${name || 'famille'}`}
+                onClick={() => setCurrentChild(name)}
+                style={sx(`border:1px solid ${on ? '#4a5d3a' : '#ece2cf'};background:${on ? '#4a5d3a' : '#fffdf8'};color:${on ? '#fffaf0' : '#6b6354'};border-radius:999px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;`)}
+              >{name || '👨‍👩‍👧‍👦 Famille'}</button>
+            )
+          })}
+        </div>
+      )}
 
       <div style={sx('display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:16px;')}>
         {items.map((it, i) => {

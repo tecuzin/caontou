@@ -59,6 +59,8 @@ import { computeRecap } from './recap.js'
 import { budgetByCategory } from './budget.js'
 import { addHeight, removeHeight } from './heights.js'
 import { isTabAllowed, isSubAllowed, makeUnlockChallenge, randomChallengeSeed } from './kids-lock.js'
+import { toggleChildEntry, childNames } from './progress.js'
+import { bingoGrid } from './bingo.js'
 import { initialTabFromSearch } from './deeplink.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
 const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
@@ -469,12 +471,20 @@ export default function App() {
   }
   const deleteResto = (id) => { haptic(ImpactStyle.Medium); offerUndo('Resto supprimé'); removeResto(id); setShowResto(false) }
   const [bingo, setBingo] = useState(initial.bingo || {})
+  // Progression par enfant (schéma 5) : `bingo` est indexé par prénom. Le
+  // prénom vide = bucket « Famille », qui porte la progression historique.
+  const [currentChild, setCurrentChild] = useState('')
+  // Grille PLATE de l'enfant courant : c'est elle que l'écran Bingo consomme.
+  // Sans ce dépliage, l'écran lirait `checked[0]` sur un objet indexé par
+  // prénom et afficherait une grille vide — la progression paraîtrait perdue.
+  const bingoGridCurrent = bingoGrid(bingo, currentChild)
   const toggleBingo = (idx) => {
     haptic(ImpactStyle.Light)
     setBingo((b) => {
-      const next = { ...b, [idx]: !b[idx] }
+      const before = bingoGrid(b, currentChild)
+      const next = toggleChildEntry(b, currentChild, idx)
       // Célébration si cocher cette case complète une nouvelle ligne
-      if (!b[idx] && countCompletedLines(next) > countCompletedLines(b)) {
+      if (!before[idx] && countCompletedLines(bingoGrid(next, currentChild)) > countCompletedLines(before)) {
         haptic(ImpactStyle.Medium)
         setConfettiTrigger(true)
         setTimeout(() => setConfettiTrigger(false), 2500)
@@ -1130,7 +1140,7 @@ export default function App() {
 
       {/* ============ NAVIGATION (sous-écrans + onglets) — voir Navigation.jsx ============ */}
       <Navigation
-        addDepartureItem={addDepartureItem} addShoppingItem={addShoppingItem} bingo={bingo} bingoItems={bingoItems} budgetCats={budgetCats} budgetTotal={budgetTotal}
+        addDepartureItem={addDepartureItem} addShoppingItem={addShoppingItem} bingo={bingoGridCurrent} bingoItems={bingoItems} currentChild={currentChild} setCurrentChild={setCurrentChild} childOptions={[...new Set([...(familyMembers || []), ...childNames(bingo)])]} budgetCats={budgetCats} budgetTotal={budgetTotal}
         bumpCow={bumpCow} capturePhoto={capturePhoto} carGames={carGames} carSpot={carSpot} catColor={catColor} challengeDone={challengeDone}
         checks={checks} countdown={countdown} coursesDone={coursesDone} coursesGroups={coursesGroups} coursesPct={coursesPct} coursesSorted={coursesSorted}
         coursesTotal={coursesTotal} cur={cur} currentStoreData={currentStoreData} dailyChallenge={dailyChallenge} darkMode={darkMode} day={day}

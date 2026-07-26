@@ -30,7 +30,9 @@ describe('Bingo du Cantal (UI)', () => {
 
     await user.click(screen.getByTestId('bingo-cell-0'))
     const stored = JSON.parse(window.localStorage.getItem('cantou.v1'))
-    expect(stored.bingo['0']).toBe(true)
+    // Depuis le schéma 5, la progression est indexée par enfant ; sans prénom
+    // sélectionné elle atterrit dans le bucket de repli « Famille ».
+    expect(stored.bingo).toEqual({ Famille: { 0: true } })
   })
 
   it('complète une rangée et met à jour le compteur de lignes', async () => {
