@@ -32,9 +32,12 @@ function walk(dir) {
   const out = []
   for (const name of readdirSync(dir)) {
     const p = join(dir, name)
-    if (statSync(p).isDirectory()) out.push(...walk(p))
-    // Les stories Storybook (catalogue de dev) contiennent des données mock —
-    // leurs couleurs/tailles ne font pas partie du design de l'app.
+    // Le dossier de tests contient des chaînes CSS de FIXTURE (assertions du
+    // type `font-size:39px`) : ce n'est pas du design d'app, et les compter
+    // fausse la palette et la gamme typo.
+    if (name === 'test' && statSync(p).isDirectory()) continue
+    else if (statSync(p).isDirectory()) out.push(...walk(p))
+    // Idem pour les stories Storybook (catalogue de dev, données mock).
     else if (name.endsWith('.stories.jsx')) continue
     else if (['.js', '.jsx'].includes(extname(p))) out.push(p)
   }

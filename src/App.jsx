@@ -62,6 +62,8 @@ import { isTabAllowed, isSubAllowed, makeUnlockChallenge, randomChallengeSeed } 
 import { toggleChildEntry, childNames } from './progress.js'
 import { DIALECT_WORDS } from './dialect.js'
 import { measureStorage } from './storage-usage.js'
+import { applyTextScale, scaleFactor, TEXT_SCALES } from './text-scale.js'
+import { SavedIndicator } from './components/SavedIndicator.jsx'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 import { bingoGrid } from './bingo.js'
 import { initialTabFromSearch } from './deeplink.js'
@@ -277,7 +279,15 @@ export default function App() {
       StatusBar.setBackgroundColor({ color: '#ffffff' }).catch(() => {})
     }
   }, [sunMode])
-  const sx = (css) => s(sunMode ? applySunTheme(css) : darkMode ? applyDarkTheme(css) : css)
+  // Taille de texte — préférence locale à l'appareil (comme les thèmes).
+  const [textScale, setTextScale] = useState(() => {
+    try { return localStorage.getItem('cantou.textScale') || 'normal' } catch { return 'normal' }
+  })
+  useEffect(() => { try { localStorage.setItem('cantou.textScale', textScale) } catch { } }, [textScale])
+  const sx = (css) => {
+    const themed = sunMode ? applySunTheme(css) : darkMode ? applyDarkTheme(css) : css
+    return s(applyTextScale(themed, scaleFactor(textScale)))
+  }
 
   // état UI (non persisté) — onglet initial éventuellement imposé par un
   // deep-link `?tab=…` (raccourci Web App Manifest / lien partagé).
@@ -453,6 +463,11 @@ export default function App() {
   // Occupation du stockage — mesurée à l'ouverture des Réglages (pas à chaque
   // render : c'est de l'I/O sur chaque fichier photo).
   const [storage, setStorage] = useState(null)
+  // Horodatage de la dernière écriture, pour l'indicateur discret. La toute
+  // première écriture a lieu au MONTAGE (hydratation du store) : l'annoncer
+  // ferait clignoter « Enregistré » alors que l'utilisateur n'a rien fait.
+  const [savedAt, setSavedAt] = useState(null)
+  const firstSaveRef = useRef(true)
   const saveDrawing = async (base64) => { haptic(ImpactStyle.Medium); await savePhotoData(base64, { label: 'Dessin' }); setSub('souvenirs') }
   const addHeightEntry = (entry) => { haptic(ImpactStyle.Light); setHeights((l) => addHeight(l, entry)) }
   const removeHeightEntry = (id) => { haptic(ImpactStyle.Medium); offerUndo('Mesure supprimée'); setHeights((l) => removeHeight(l, id)) }
@@ -571,7 +586,7 @@ export default function App() {
   const [newMealDay, setNewMealDay] = useState('')
 
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded })) } catch { }
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded })); if (firstSaveRef.current) firstSaveRef.current = false; else setSavedAt(Date.now()) } catch { }
   }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded])
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
@@ -1171,7 +1186,7 @@ export default function App() {
         deleteSuggestion={deleteSuggestion} deleteTrajetCheckItem={deleteTrajetCheckItem} deleteTrajetStep={deleteTrajetStep} deleteVisit={deleteVisit} departure={departure} editActivity={editActivity}
         editDay={editDay} editMeal={editMeal} editMeteo={editMeteo} editTrajetStep={editTrajetStep} editVisit={editVisit} emergencyNumbers={emergencyNumbers}
         expenses={expenses} familyMembers={familyMembers} filter={filter} filteredVisits={filteredVisits} findCar={findCar} forgetCar={forgetCar}
-        haptic={haptic} hebergement={hebergement} heights={heights} storage={storage} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
+        haptic={haptic} hebergement={hebergement} heights={heights} storage={storage} textScale={textScale} setTextScale={setTextScale} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
         kidsGames={kidsGames} lastBackupAt={lastBackupAt} loadSrc={loadSrc} logi={logi} logiSorted={logiSorted} markChallengeDone={markChallengeDone}
         mealTab={mealTab} meals={meals} meteo={meteo} newShoppingItem={newShoppingItem} newSuggestionText={newSuggestionText} openAddMeal={openAddMeal}
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}
@@ -1294,6 +1309,8 @@ export default function App() {
       )}
 
       {/* BANDEAU UNDO SUPPRESSION */}
+      <SavedIndicator sx={sx} savedAt={savedAt} />
+
       {undoMsg && (
         <div data-testid="undo-snackbar" style={sx('position:fixed;left:18px;right:18px;bottom:96px;z-index:300;background:#2f2a22;color:#fffaf0;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3);animation:fadeIn 0.2s ease;')}>
           <span style={sx('flex:1;font-size:14px;font-weight:600;')}>{undoMsg}</span>

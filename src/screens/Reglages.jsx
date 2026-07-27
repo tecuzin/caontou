@@ -1,5 +1,6 @@
 import { FEATURE_GROUPS } from '../features.js'
 import { formatBytes } from '../storage-usage.js'
+import { TEXT_SCALES } from '../text-scale.js'
 
 /** Interrupteur on/off simple (style pilule), piloté par `on`. */
 function Toggle({ sx, on, onClick, label }) {
@@ -22,7 +23,7 @@ function Toggle({ sx, on, onClick, label }) {
  * les données restent intactes (rien n'est supprimé). Tout est exporté dans
  * le JSON de sauvegarde.
  */
-export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode, kidsLock, lockKids, storage }) {
+export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode, kidsLock, lockKids, storage, textScale, setTextScale }) {
   return (
     <div data-testid="screen-reglages" style={sx('padding:0 18px 24px;')}>
       <div style={sx('font-size:13px;color:#6b6354;margin:2px 0 16px;')}>
@@ -40,6 +41,18 @@ export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, tracking
               </span>
               <Toggle sx={sx} on={!!sunMode} onClick={() => setSunMode((v) => !v)} label="Mode plein soleil" />
             </div>
+            {setTextScale && (
+              <div data-testid="reglage-row-text-scale" style={sx('padding:13px 16px;border-top:1px solid #f1e9da;')}>
+                <div style={sx('font-size:15px;')}>🔤 Taille du texte</div>
+                <div style={sx('font-size:12px;color:#6b6354;margin-top:2px;margin-bottom:10px;')}>Agrandit les textes sans déformer la mise en page</div>
+                <div style={sx('display:flex;gap:8px;')}>
+                  {TEXT_SCALES.map((ts) => (
+                    <button key={ts.key} data-testid={`text-scale-${ts.key}`} onClick={() => setTextScale(ts.key)}
+                      style={sx(`flex:1;border:1px solid ${textScale === ts.key ? '#4a5d3a' : '#ece2cf'};background:${textScale === ts.key ? '#4a5d3a' : '#fffdf8'};color:${textScale === ts.key ? '#fffaf0' : '#6b6354'};border-radius:12px;padding:8px;font-weight:700;font-size:13px;cursor:pointer;`)}>{ts.label}</button>
+                  ))}
+                </div>
+              </div>
+            )}
             {lockKids && (
               <div data-testid="reglage-row-kids-lock" style={sx('display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-top:1px solid #f1e9da;')}>
                 <span style={sx('flex:1;min-width:0;')}>
