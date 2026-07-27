@@ -30,12 +30,13 @@ Rapide (~2-3 min). Cocher au fur et à mesure, répondre ici avec le nº de buil
 ☐ Couleurs du donut = couleurs des barres « Par catégorie »
 
 *4. Nouveautés du build*
-☐ Réglages → Affichage → *Mode plein soleil* : tout devient blanc/très contrasté
-☐ Réglages → *Mode enfant* : Budget et Réglages disparaissent ; le calcul déverrouille
-☐ Accueil → Jeux : *Mémory*, *Coin dessin*, *Toise* s'ouvrent
-☐ Coin dessin → dessiner → Enregistrer : le dessin apparaît dans Souvenirs
-☐ ⚠️ *Bingo* : les cases déjà cochées AVANT cette mise à jour sont TOUJOURS là
-☐ Bingo → « Qui joue ? » : chaque prénom a bien sa propre grille
+☐ Réglages → Affichage → *Taille du texte* : Grand / Très grand agrandit le texte SANS casser la mise en page
+☐ Réglages → *Stockage* : jauge affichée + rappel « photos pas dans la sauvegarde »
+☐ Souvenirs → *Importer* : on peut choisir plusieurs photos d'un coup
+☐ Jeux → *Parler d'Auvergne* → « Gérer le lexique » : ajouter / modifier / supprimer un mot
+☐ Après une modif, le repère « ✓ Enregistré » apparaît brièvement (et PAS au démarrage)
+☐ Mode plein soleil / Mode enfant (build 116) toujours OK
+☐ ⚠️ *Bingo* : les cases cochées AVANT la mise à jour sont TOUJOURS là
 
 *5. Navigation*
 ☐ Les 5 onglets s'ouvrent
