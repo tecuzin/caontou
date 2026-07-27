@@ -128,6 +128,6 @@ describe('Galerie souvenirs (navigation)', () => {
     // attendre la résolution du chunk avant d'asserter (findBy = async).
     expect(await screen.findByTestId('screen-souvenirs')).toBeInTheDocument()
     expect(screen.getByTestId('btn-take-photo')).toBeInTheDocument()
-    expect(screen.getByTestId('btn-import-photo')).toBeInTheDocument()
+    expect(screen.getByTestId('btn-import-photos-batch')).toBeInTheDocument()
   })
 })

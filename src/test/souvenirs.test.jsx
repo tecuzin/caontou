@@ -23,8 +23,28 @@ describe('Écran Souvenirs', () => {
     render(<Souvenirs {...baseProps} capturePhoto={capturePhoto} photos={[]} />)
     await user.click(screen.getByTestId('btn-take-photo'))
     expect(capturePhoto).toHaveBeenCalledWith('camera')
-    await user.click(screen.getByTestId('btn-import-photo'))
-    expect(capturePhoto).toHaveBeenCalledWith('photos')
+    // L'import unitaire a été remplacé par un import EN LOT (pickPhotos).
+    const pickPhotos = vi.fn().mockResolvedValue({ imported: 3, failed: 0 })
+    render(<Souvenirs {...baseProps} capturePhoto={capturePhoto} pickPhotos={pickPhotos} photos={[]} />)
+    await user.click(screen.getAllByTestId('btn-import-photos-batch')[1])
+    expect(pickPhotos).toHaveBeenCalled()
+    expect(await screen.findByTestId('import-note')).toHaveTextContent('3 photo(s) importée(s)')
+  })
+
+  it('annonce le bilan réel quand des photos sont illisibles', async () => {
+    const user = userEvent.setup()
+    const pickPhotos = vi.fn().mockResolvedValue({ imported: 2, failed: 1 })
+    render(<Souvenirs {...baseProps} pickPhotos={pickPhotos} photos={[]} />)
+    await user.click(screen.getByTestId('btn-import-photos-batch'))
+    // Le bilan ne doit PAS laisser croire à un succès complet.
+    expect(await screen.findByTestId('import-note')).toHaveTextContent('2 importée(s), 1 illisible(s)')
+  })
+
+  it('ne casse pas si pickPhotos n’est pas fourni', async () => {
+    const user = userEvent.setup()
+    render(<Souvenirs {...baseProps} photos={[]} />)
+    await user.click(screen.getByTestId('btn-import-photos-batch'))
+    expect(screen.queryByTestId('import-note')).toBeNull()
   })
 
   it('regroupe les photos et charge leur source, ouvre puis supprime via la visionneuse', async () => {

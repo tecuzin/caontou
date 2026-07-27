@@ -21,10 +21,12 @@ function PhotoThumb({ sx, meta, src, loadSrc, onOpen }) {
 }
 
 /** Sous-écran Souvenirs — galerie photo du séjour regroupée par journée. */
-export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto, loadSrc, shareDay, journal = {}, openDayJournal, trip = {} }) {
+export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, pickPhotos, deletePhoto, loadSrc, shareDay, journal = {}, openDayJournal, trip = {} }) {
   const [viewer, setViewer] = useState(null) // meta de la photo ouverte en plein écran
   const [postcard, setPostcard] = useState(null) // { src } pour le composeur de carte postale
   const [busy, setBusy] = useState(false) // génération de l'album en cours
+  const [importing, setImporting] = useState(null) // { done, total } pendant un import en lot
+  const [importNote, setImportNote] = useState('')  // bilan du dernier import
   useEscapeKey(() => setViewer(null), !!viewer) // fermeture clavier de la visionneuse
   const groups = groupPhotosByDay(photos, days)
   const journalDays = days
@@ -45,6 +47,19 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
       setBusy(false)
     }
   }
+  // Import en lot depuis la galerie. Les échecs unitaires ne cassent pas le
+  // lot : on annonce le bilan réel plutôt que de laisser croire à un succès.
+  const importBatch = async () => {
+    if (importing || typeof pickPhotos !== 'function') return
+    setImporting({ done: 0, total: 0 })
+    setImportNote('')
+    const res = await pickPhotos(30, (done, total) => setImporting({ done, total }))
+    setImporting(null)
+    if (!res || (!res.imported && !res.failed)) return          // annulé
+    if (res.failed > 0) setImportNote(`${res.imported} importée(s), ${res.failed} illisible(s)`)
+    else setImportNote(`${res.imported} photo(s) importée(s)`)
+  }
+
   return (
     <div data-testid="screen-souvenirs" style={sx('padding:16px 18px 40px;')}>
       <div style={sx('background:#9c6b4a;border-radius:20px;padding:18px;color:#fffaf0;box-shadow:0 8px 20px rgba(156,107,74,0.2);')}>
@@ -54,8 +69,17 @@ export function Souvenirs({ sx, photos, days, srcMap, capturePhoto, deletePhoto,
 
       <div style={sx('display:flex;gap:10px;margin-top:14px;')}>
         <button data-testid="btn-take-photo" onClick={() => capturePhoto('camera')} style={sx('flex:1;border:none;background:#4a5d3a;color:#fffaf0;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>📷 Prendre une photo</button>
-        <button data-testid="btn-import-photo" onClick={() => capturePhoto('photos')} style={sx('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}>🖼️ Importer</button>
+        <button
+          data-testid="btn-import-photos-batch"
+          onClick={importBatch}
+          disabled={!!importing}
+          style={sx('flex:1;border:1px solid #4a5d3a;background:#fffdf8;color:#4a5d3a;font-weight:700;font-family:Quicksand;font-size:15px;border-radius:14px;padding:12px;cursor:pointer;')}
+        >{importing ? `⏳ ${importing.done}/${importing.total || '…'}` : '🖼️ Importer'}</button>
       </div>
+
+      {importNote && (
+        <div data-testid="import-note" style={sx('margin-top:10px;font-size:13px;color:#4a5d3a;text-align:center;')}>{importNote}</div>
+      )}
 
       {canAlbum && (
         <button

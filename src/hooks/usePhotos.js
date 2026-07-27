@@ -48,6 +48,42 @@ export function usePhotos(initial, trip, days) {
   }
 
   /**
+   * Importe PLUSIEURS photos d'un coup depuis la galerie du téléphone
+   * (`Camera.pickImages`). Chaque image passe par le même pipeline que les
+   * autres : redimensionnement puis écriture Filesystem.
+   *
+   * Les échecs unitaires n'interrompent pas le lot — on importe ce qu'on peut
+   * et on renvoie le compte réel, plutôt que de tout perdre sur une image
+   * corrompue.
+   * @param {number} limit  nombre maximum d'images
+   * @returns {Promise<{ imported: number, failed: number }>}
+   */
+  const pickPhotos = async (limit = 20, onProgress = () => {}) => {
+    let result
+    try {
+      result = await Camera.pickImages({ quality: 80, limit })
+    } catch {
+      return { imported: 0, failed: 0 } // permission refusée ou annulation
+    }
+    const files = result?.photos || []
+    let imported = 0, failed = 0
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i]
+      // pickImages renvoie des URI (webPath/path) : on relit le fichier en base64.
+      let base64 = f.base64String
+      try {
+        if (!base64 && f.path) {
+          base64 = (await Filesystem.readFile({ path: f.path })).data
+        }
+      } catch { base64 = null }
+      const meta = base64 ? await savePhotoData(base64) : null
+      if (meta) imported++; else failed++
+      onProgress(i + 1, files.length)
+    }
+    return { imported, failed }
+  }
+
+  /**
    * Prend une photo (source='camera') ou importe depuis la galerie ('photos').
    * `extra` enrichit la métadonnée (ex. { kind: 'receipt' } pour un reçu, exclu
    * de la galerie souvenirs).
@@ -116,5 +152,5 @@ export function usePhotos(initial, trip, days) {
     } catch { }
   }
 
-  return { photos, setPhotos, srcMap, capturePhoto, savePhotoData, deletePhoto, loadSrc, shareDay }
+  return { photos, setPhotos, srcMap, capturePhoto, savePhotoData, pickPhotos, deletePhoto, loadSrc, shareDay }
 }

@@ -517,7 +517,7 @@ export default function App() {
       return next
     })
   }
-  const { photos, srcMap, capturePhoto, savePhotoData, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
+  const { photos, srcMap, capturePhoto, savePhotoData, pickPhotos, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
   // Mesure du stockage à l'ouverture des Réglages (I/O sur chaque photo :
   // surtout pas à chaque render).
   useEffect(() => {
@@ -1186,7 +1186,7 @@ export default function App() {
         deleteSuggestion={deleteSuggestion} deleteTrajetCheckItem={deleteTrajetCheckItem} deleteTrajetStep={deleteTrajetStep} deleteVisit={deleteVisit} departure={departure} editActivity={editActivity}
         editDay={editDay} editMeal={editMeal} editMeteo={editMeteo} editTrajetStep={editTrajetStep} editVisit={editVisit} emergencyNumbers={emergencyNumbers}
         expenses={expenses} familyMembers={familyMembers} filter={filter} filteredVisits={filteredVisits} findCar={findCar} forgetCar={forgetCar}
-        haptic={haptic} hebergement={hebergement} heights={heights} storage={storage} textScale={textScale} setTextScale={setTextScale} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
+        haptic={haptic} hebergement={hebergement} heights={heights} storage={storage} pickPhotos={pickPhotos} textScale={textScale} setTextScale={setTextScale} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
         kidsGames={kidsGames} lastBackupAt={lastBackupAt} loadSrc={loadSrc} logi={logi} logiSorted={logiSorted} markChallengeDone={markChallengeDone}
         mealTab={mealTab} meals={meals} meteo={meteo} newShoppingItem={newShoppingItem} newSuggestionText={newSuggestionText} openAddMeal={openAddMeal}
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}
