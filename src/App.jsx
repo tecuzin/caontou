@@ -68,6 +68,7 @@ import { SavedIndicator } from './components/SavedIndicator.jsx'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 import { bingoGrid } from './bingo.js'
 import { initialTabFromSearch } from './deeplink.js'
+import { resumeTarget, readLastScreen, writeLastScreen } from './last-screen.js'
 const WhatsNewModal = lazy(() => import('./modals/WhatsNewModal.jsx').then(mod => ({ default: mod.WhatsNewModal })))
 const ChangelogModal = lazy(() => import('./modals/ChangelogModal.jsx').then(mod => ({ default: mod.ChangelogModal })))
 const Onboarding = lazy(() => import('./screens/Onboarding.jsx').then(m => ({ default: m.Onboarding })))
@@ -481,6 +482,9 @@ export default function App() {
     return () => { alive = false; clearInterval(id) }
   }, [])
 
+  // Reprise du dernier écran, une seule fois au démarrage. Un deep-link
+  // `?tab=` reste PRIORITAIRE : l'intention explicite prime sur l'historique.
+  const resumedRef = useRef(false)
   const [savedAt, setSavedAt] = useState(null)
   const firstSaveRef = useRef(true)
   const saveDrawing = async (base64) => { haptic(ImpactStyle.Medium); await savePhotoData(base64, { label: 'Dessin' }); setSub('souvenirs') }
@@ -1148,6 +1152,23 @@ export default function App() {
   const TABS = [['accueil', '🏠', 'Accueil'], ['planning', '📅', 'Planning'], ['visites', '🥾', 'À faire'], ['repas', '🍽️', 'Repas'], ['budget', '💶', 'Budget']]
   // Onglets réellement affichés (l'accueil ne se coupe jamais).
   const visibleTabs = TABS.filter(([key]) => (key === 'accueil' || isOn(`tab_${key}`)) && isTabAllowed(key, kidsLock))
+
+  // Reprise du dernier écran (une seule fois, au démarrage). Un deep-link
+  // `?tab=` a déjà positionné l'onglet : dans ce cas on ne touche à rien.
+  useEffect(() => {
+    if (resumedRef.current) return
+    resumedRef.current = true
+    if (initialTabFromSearch(typeof window !== 'undefined' ? window.location.search : '')) return
+    const target = resumeTarget(readLastScreen(), Date.now(), visibleTabs.map(([k]) => k))
+    if (!target) return
+    // Le mode enfant filtre déjà visibleTabs ; on revalide le sous-écran.
+    if (!isSubAllowed(target.sub, kidsLock)) return
+    setTab(target.tab)
+    setSub(target.sub)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Mémorise l'écran courant pour la prochaine ouverture.
+  useEffect(() => { writeLastScreen(tab, sub) }, [tab, sub])
   // Garde-fou : si l'onglet courant vient d'être désactivé, revenir à l'accueil.
   useEffect(() => {
     if (tab !== 'accueil' && !isOn(`tab_${tab}`)) { setTab('accueil'); setSub(null) }
