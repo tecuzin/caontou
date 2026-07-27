@@ -63,6 +63,7 @@ import { toggleChildEntry, childNames } from './progress.js'
 import { DIALECT_WORDS } from './dialect.js'
 import { measureStorage } from './storage-usage.js'
 import { applyTextScale, scaleFactor, TEXT_SCALES } from './text-scale.js'
+import { batteryStatus, readBattery } from './battery.js'
 import { SavedIndicator } from './components/SavedIndicator.jsx'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 import { bingoGrid } from './bingo.js'
@@ -466,6 +467,20 @@ export default function App() {
   // Horodatage de la dernière écriture, pour l'indicateur discret. La toute
   // première écriture a lieu au MONTAGE (hydratation du store) : l'annoncer
   // ferait clignoter « Enregistré » alors que l'utilisateur n'a rien fait.
+  // Alerte batterie : relevé à l'ouverture puis toutes les 5 min. Discret et
+  // non bloquant — et rien du tout si l'appareil est en charge.
+  const [battery, setBattery] = useState(null)
+  useEffect(() => {
+    let alive = true
+    const check = async () => {
+      const b = await readBattery()
+      if (alive) setBattery(b ? batteryStatus(b.level, b.charging) : null)
+    }
+    check()
+    const id = setInterval(check, 5 * 60 * 1000)
+    return () => { alive = false; clearInterval(id) }
+  }, [])
+
   const [savedAt, setSavedAt] = useState(null)
   const firstSaveRef = useRef(true)
   const saveDrawing = async (base64) => { haptic(ImpactStyle.Medium); await savePhotoData(base64, { label: 'Dessin' }); setSub('souvenirs') }
@@ -1309,6 +1324,14 @@ export default function App() {
       )}
 
       {/* BANDEAU UNDO SUPPRESSION */}
+      {battery && (
+        <div data-testid="battery-alert" role="status" style={sx(`position:fixed;left:18px;right:18px;bottom:${undoMsg ? '150px' : '96px'};z-index:200;background:${battery.level === 'low' ? '#b8503f' : '#cf7d3c'};color:#fffaf0;border-radius:14px;padding:10px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;`)}>
+          <span style={sx('font-size:19px;')}>🔋</span>
+          <span style={sx('flex:1;')}>{battery.message}</span>
+          <button data-testid="battery-dismiss" onClick={() => setBattery(null)} style={sx('border:none;background:transparent;color:#fffaf0;font-size:15px;cursor:pointer;padding:2px 6px;')}>✕</button>
+        </div>
+      )}
+
       <SavedIndicator sx={sx} savedAt={savedAt} />
 
       {undoMsg && (
