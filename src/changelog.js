@@ -5,6 +5,14 @@
  * ancien, avec les nouveautés visibles par la famille.
  */
 export const CHANGELOG = [
+  { build: 117, version: '1.3.0', date: '2026-07-27', items: [
+    '📝 Lexique auvergnat modifiable : corrige, ajoute ou supprime les mots toi-même',
+    '🔤 Taille du texte au choix (Normal / Grand / Très grand) dans Réglages',
+    '📉 Jauge de stockage + alerte avant saturation, et rappel que les photos ne sont pas dans la sauvegarde',
+    '🖼️ Import de plusieurs photos d’un coup depuis la galerie',
+    '🔋 Alerte discrète quand la batterie faiblit (rien si l’appareil charge)',
+    '✓ Petit repère « Enregistré sur ce téléphone » après chaque modification',
+  ] },
   { build: 116, version: '1.3.0', date: '2026-07-26', items: [
     '☀️ Mode plein soleil : contraste renforcé pour lire l’écran dehors (Réglages → Affichage)',
     '🔒 Mode enfant : ne laisse que les jeux quand on prête le téléphone (un petit calcul déverrouille)',
