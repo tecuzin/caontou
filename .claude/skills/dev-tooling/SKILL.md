@@ -133,3 +133,63 @@ le prochain commit le faire).
   (`parentNodeId` → swimlane), pas le lire en entier.
 - **Hooks CGC absents** après un clone : ré-indexer le repo réinstalle les hooks
   gérés ; sinon les recréer (voir `.git/hooks/post-commit`).
+
+## 💸 Maîtriser la consommation de tokens des sous-agents
+
+Mesuré sur la session du 26-27/07/2026 (31 agents, 53,9 M tokens bruts) avec
+`node tools/agent-viz/metrics.mjs` et `cost-dashboard.mjs`. Trois constats, et
+les règles qui en découlent.
+
+### 1. Ne JAMAIS lire le board Epiq en entier
+`epiq_issue_list` renvoie **~288 000 caractères** (toutes colonnes, descriptions
+et commentaires compris). Appelé en boucle, c'était le **premier poste de
+dépense** : les tâches « backlog » coûtaient **4× une fonctionnalité**
+(1,3 M contre 215 k en coût pondéré).
+
+```bash
+node scripts/board.mjs                 # résumé par colonne   →  171 caractères
+node scripts/board.mjs --lane todo     # une colonne
+node scripts/board.mjs --tag p1        # par tag              → ~8 k caractères
+node scripts/board.mjs --show <id>     # UNE carte + description
+node scripts/board.mjs --untagged      # cartes actives sans tag/priorité
+```
+
+**99,94 % de volume en moins** sur le résumé, 97 % sur une requête filtrée.
+Le script rejoue le journal d'événements Epiq en local — même source de vérité,
+aucun appel réseau. N'utiliser le MCP `epiq_issue_list` que si `board.mjs`
+échoue, et dans ce cas **parser le fichier sauvegardé avec node** plutôt que de
+laisser la sortie entrer dans le contexte.
+
+### 2. Les agents qui meurent coûtent presque la moitié de la facture
+**18 agents sur 31 sont morts** (quota, connexion coupée, stall de 600 s) →
+**46 % du coût pondéré parti en pure perte**.
+
+- **Découper systématiquement** : un agent chargé de 16 tâches meurt en route et
+  perd tout ; deux agents de 8 survivent mieux.
+- **Ne pas déléguer ce qui prend 10 minutes inline.** Le coût fixe d'un agent
+  (recharger tout le contexte du projet) dépasse souvent la tâche elle-même.
+- **Quand un agent meurt, vérifier le working tree AVANT de relancer** : il a
+  souvent écrit des fichiers exploitables (`memory.js`, `heights.js`,
+  `kids-lock.js`, `DrawPad.jsx` ont tous été récupérés ainsi).
+
+### 3. 85 % du volume est du contexte relu, pas du travail neuf
+Sur 53,9 M tokens, **45,6 M sont de la lecture de cache**. Chaque agent
+recharge à chaque tour tout ce qu'il a déjà lu.
+
+- **Donner les chemins des fichiers modèles dans le prompt** au lieu de laisser
+  l'agent les chercher (`Grep`/`Glob` en série gonflent le contexte).
+- **Interdire aux agents les commandes verbeuses** : `vitest` sans filtre,
+  `git log` long, `cat` de gros fichiers. Toujours canaliser dans `grep -E`.
+- Préférer **un agent séquentiel** à N agents parallèles quand ils liraient
+  tous les mêmes fichiers : le contexte serait payé N fois.
+
+### Mesurer avant d'optimiser
+```bash
+node tools/agent-viz/metrics.mjs <dossier-transcripts>          # rapport texte
+node tools/agent-viz/metrics.mjs <dossier> --json               # données brutes
+node tools/agent-viz/cost-dashboard.mjs <dossier> /tmp/cost.html # graphiques
+```
+Le coût affiché est **pondéré** (sortie ×5, écriture de cache ×1,25, lecture de
+cache ×0,1) : ce n'est pas une facture, c'est une base de comparaison honnête
+entre postes — agréger les quatre postes en un seul chiffre masque justement
+ce qu'on cherche.
