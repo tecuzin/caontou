@@ -1,15 +1,14 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
-import { StatusBar, Style } from '@capacitor/status-bar'
 import { MEALS_INITIAL, SHOPPING_ITEMS_INITIAL, LOGI_INITIAL, COURSES_INITIAL, VISITS_INITIAL, METEO_INITIAL, TRAJETS_INITIAL, TRIP_INITIAL, DAYS_INITIAL, BINGO_CANTAL, RESTOS_INITIAL, RECIPES_INITIAL, KIDS_GAMES, EMERGENCY_NUMBERS } from './data.js'
-import { s, buildList, tripDate } from './utils.js'
+import { buildList, tripDate } from './utils.js'
 import { filterAndSortVisits } from './visits.js'
 import { computeToday } from './today.js'
 // Sous-écrans chargés à la demande (code-splitting) — allègent le bundle initial,
 // ils ne sont montés qu'à l'ouverture depuis l'accueil (sub === …).
 import { Navigation } from './Navigation.jsx'
 import { scheduleAllNotifications } from './notifications.js'
-import { applyDarkTheme, applySunTheme, STARRY_BACKGROUND_IMAGE } from './theme.js'
+import { STARRY_BACKGROUND_IMAGE } from './theme.js'
 import { parseImport } from './backup.js'
 import { track } from './tracking.js'
 import { DEPARTURE_INITIAL, isCheckoutWindow } from './departure.js'
@@ -61,12 +60,10 @@ import { addHeight, removeHeight } from './heights.js'
 import { isTabAllowed, isSubAllowed, makeUnlockChallenge, randomChallengeSeed } from './kids-lock.js'
 import { toggleChildEntry, childNames } from './progress.js'
 import { DIALECT_WORDS } from './dialect.js'
-import { measureStorage } from './storage-usage.js'
-import { applyTextScale, scaleFactor, TEXT_SCALES } from './text-scale.js'
-import { batteryStatus, readBattery } from './battery.js'
-import { nextThemeDecision } from './auto-theme.js'
+import { useStorageUsage } from './hooks/useStorageUsage.js'
+import { useBatteryAlert } from './hooks/useBatteryAlert.js'
+import { useDisplayPreferences } from './hooks/useDisplayPreferences.js'
 import { SavedIndicator } from './components/SavedIndicator.jsx'
-import { Filesystem, Directory } from '@capacitor/filesystem'
 import { bingoGrid } from './bingo.js'
 import { initialTabFromSearch } from './deeplink.js'
 import { resumeTarget, readLastScreen, writeLastScreen } from './last-screen.js'
@@ -252,73 +249,13 @@ const catColor = (n) => (CATS.find((x) => x.name === n) || {}).color || '#6b6354
 
 /* ================================================================== */
 export default function App() {
-  // Mode sombre — préférence locale à l'appareil (pas synchronisée via
-  // l'export/import, chacun peut avoir sa propre préférence). Défaut :
-  // préférence système si jamais réglé explicitement.
-  const [darkMode, setDarkMode] = useState(() => {
-    try {
-      const saved = localStorage.getItem('cantou.darkMode')
-      if (saved !== null) return saved === 'true'
-    } catch { }
-    try { return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches } catch { return false }
-  })
-  useEffect(() => {
-    try { localStorage.setItem('cantou.darkMode', String(darkMode)) } catch { }
-    // Barre de statut Android synchronisée avec le thème (crème/bleu nuit).
-    // Style.Light = fond clair (icônes sombres), Style.Dark = l'inverse.
-    // No-op silencieux hors app native (web/tests : promesse rejetée, catch).
-    StatusBar.setStyle({ style: darkMode ? Style.Dark : Style.Light }).catch(() => {})
-    StatusBar.setBackgroundColor({ color: darkMode ? '#10162b' : '#f4ecdc' }).catch(() => {})
-  }, [darkMode])
-  // Auto-bascule du thème selon l'heure. `themeOverride` mémorise que
-  // l'utilisateur a repris la main : tant qu'il est vrai, on ne touche plus à
-  // son choix — lui reprendre son thème dans le dos serait le pire des
-  // comportements. Il se réarme au prochain passage de frontière horaire.
-  // Désactivée PAR DÉFAUT, et c'est délibéré : l'activer d'office écraserait
-  // au démarrage la préférence de thème déjà enregistrée par l'utilisateur.
-  // Une automatisation qui contredit un réglage explicite est un bug, pas un
-  // service — les tests du mode sombre l'ont d'ailleurs immédiatement attrapé.
-  const [autoTheme, setAutoTheme] = useState(() => {
-    try { return localStorage.getItem('cantou.autoTheme') === 'true' } catch { return false }
-  })
-  const themeOverrideRef = useRef(false)
-  // Bascule MANUELLE : marque la reprise en main pour que l'auto-bascule
-  // n'écrase pas le choix de l'utilisateur au prochain tick.
-  const toggleDarkManual = (v) => { themeOverrideRef.current = true; setDarkMode(v) }
-  useEffect(() => { try { localStorage.setItem('cantou.autoTheme', String(autoTheme)) } catch { } }, [autoTheme])
-  useEffect(() => {
-    const tick = () => {
-      const decision = nextThemeDecision({
-        hour: new Date().getHours(), darkMode, enabled: autoTheme, userOverride: themeOverrideRef.current,
-      })
-      if (decision !== null) { themeOverrideRef.current = false; setDarkMode(decision) }
-    }
-    tick()
-    const id = setInterval(tick, 10 * 60 * 1000)
-    return () => clearInterval(id)
-  }, [autoTheme, darkMode])
+  // Préférences d'affichage (thème sombre, plein soleil, taille de texte,
+  // auto-bascule) : toutes locales à l'appareil, extraites dans un hook.
+  const {
+    sx, darkMode, setDarkMode, sunMode, setSunMode,
+    textScale, setTextScale, autoTheme, setAutoTheme,
+  } = useDisplayPreferences()
 
-  // Mode plein soleil — 3e thème (contraste maximal pour lire dehors), local
-  // à l'appareil comme le mode sombre. Prioritaire sur le sombre s'il est actif.
-  const [sunMode, setSunMode] = useState(() => {
-    try { return localStorage.getItem('cantou.sunMode') === 'true' } catch { return false }
-  })
-  useEffect(() => {
-    try { localStorage.setItem('cantou.sunMode', String(sunMode)) } catch { }
-    if (sunMode) {
-      StatusBar.setStyle({ style: Style.Light }).catch(() => {})
-      StatusBar.setBackgroundColor({ color: '#ffffff' }).catch(() => {})
-    }
-  }, [sunMode])
-  // Taille de texte — préférence locale à l'appareil (comme les thèmes).
-  const [textScale, setTextScale] = useState(() => {
-    try { return localStorage.getItem('cantou.textScale') || 'normal' } catch { return 'normal' }
-  })
-  useEffect(() => { try { localStorage.setItem('cantou.textScale', textScale) } catch { } }, [textScale])
-  const sx = (css) => {
-    const themed = sunMode ? applySunTheme(css) : darkMode ? applyDarkTheme(css) : css
-    return s(applyTextScale(themed, scaleFactor(textScale)))
-  }
 
   // état UI (non persisté) — onglet initial éventuellement imposé par un
   // deep-link `?tab=…` (raccourci Web App Manifest / lien partagé).
@@ -491,29 +428,14 @@ export default function App() {
   const [heights, setHeights] = useState(initial.heights || [])
   // Lexique auvergnat éditable (semé au schéma 6 depuis DIALECT_WORDS)
   const [dialectWords, setDialectWords] = useState(initial.dialectWords || DIALECT_WORDS)
-  // Occupation du stockage — mesurée à l'ouverture des Réglages (pas à chaque
-  // render : c'est de l'I/O sur chaque fichier photo).
-  const [storage, setStorage] = useState(null)
-  // Horodatage de la dernière écriture, pour l'indicateur discret. La toute
-  // première écriture a lieu au MONTAGE (hydratation du store) : l'annoncer
-  // ferait clignoter « Enregistré » alors que l'utilisateur n'a rien fait.
-  // Alerte batterie : relevé à l'ouverture puis toutes les 5 min. Discret et
-  // non bloquant — et rien du tout si l'appareil est en charge.
-  const [battery, setBattery] = useState(null)
-  useEffect(() => {
-    let alive = true
-    const check = async () => {
-      const b = await readBattery()
-      if (alive) setBattery(b ? batteryStatus(b.level, b.charging) : null)
-    }
-    check()
-    const id = setInterval(check, 5 * 60 * 1000)
-    return () => { alive = false; clearInterval(id) }
-  }, [])
+  // Alerte batterie (relevé périodique, silencieuse en charge) — hook dédié.
+  const [battery, setBattery] = useBatteryAlert()
 
-  // Reprise du dernier écran, une seule fois au démarrage. Un deep-link
-  // `?tab=` reste PRIORITAIRE : l'intention explicite prime sur l'historique.
+  // Reprise du dernier écran, une seule fois au démarrage (voir plus bas).
   const resumedRef = useRef(false)
+  // Horodatage de la dernière écriture, pour l'indicateur « Enregistré ». La
+  // toute première écriture a lieu au MONTAGE (hydratation du store) :
+  // l'annoncer ferait clignoter l'indicateur sans action de l'utilisateur.
   const [savedAt, setSavedAt] = useState(null)
   const firstSaveRef = useRef(true)
   const saveDrawing = async (base64) => { haptic(ImpactStyle.Medium); await savePhotoData(base64, { label: 'Dessin' }); setSub('souvenirs') }
@@ -566,17 +488,8 @@ export default function App() {
     })
   }
   const { photos, srcMap, capturePhoto, savePhotoData, pickPhotos, deletePhoto, loadSrc, shareDay } = usePhotos(initial.photos || [], trip, days)
-  // Mesure du stockage à l'ouverture des Réglages (I/O sur chaque photo :
-  // surtout pas à chaque render).
-  useEffect(() => {
-    if (sub !== 'reglages') return
-    let alive = true
-    measureStorage({
-      photos,
-      statFile: async (file) => (await Filesystem.stat({ path: file, directory: Directory.Data })).size,
-    }).then((m) => { if (alive) setStorage(m) }).catch(() => {})
-    return () => { alive = false }
-  }, [sub, photos])
+  // Occupation du stockage : mesurée seulement quand les Réglages sont ouverts.
+  const storage = useStorageUsage(sub === 'reglages', photos)
 
 
   // Undo suppression : instantané complet du store avant chaque 🗑️,
@@ -1258,7 +1171,7 @@ export default function App() {
         openMaps={openMaps} openModule={openModule} openMyPosition={openMyPosition} openTripEdit={openTripEdit} packDone={packDone} packPct={packPct}
         packTotal={packTotal} parkCar={parkCar} photos={photos} rateVisit={rateVisit} ratings={ratings} recapData={recapData} recipes={recipes} setRecipes={setRecipes}
         remain={remain} removeDepartureItem={deleteDepartureItem} resetCows={resetCows} resetPlates={resetPlates} togglePlate={togglePlate} resetToDefaults={resetToDefaults} restos={restos} runSelfTestAndShow={runSelfTestAndShow}
-        saved={saved} savedCount={savedCount} sendSuggestions={sendSuggestions} setBudgetTotal={setBudgetTotal} setCoursesSorted={setCoursesSorted} setDarkMode={toggleDarkManual}
+        saved={saved} savedCount={savedCount} sendSuggestions={sendSuggestions} setBudgetTotal={setBudgetTotal} setCoursesSorted={setCoursesSorted} setDarkMode={setDarkMode}
         setDay={setDay} setEditingCourseKey={setEditingCourseKey} setEditingLogiKey={setEditingLogiKey} setEditingTrajetIdx={setEditingTrajetIdx} setEditingVisitId={setEditingVisitId} setExportCopied={setExportCopied}
         setFeatures={setFeatures} setFilter={setFilter} setLogiSorted={setLogiSorted} setMealTab={setMealTab} setNewBudgetTotal={setNewBudgetTotal} setNewShoppingItem={setNewShoppingItem}
         setNewSuggestionText={setNewSuggestionText} setNewTrajetColor={setNewTrajetColor} setNewTrajetNote={setNewTrajetNote} setNewTrajetPlace={setNewTrajetPlace} setNewTrajetTime={setNewTrajetTime} setNewVisitAge={setNewVisitAge}
