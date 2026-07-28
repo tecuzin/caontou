@@ -61,6 +61,7 @@ import { isTabAllowed, isSubAllowed, makeUnlockChallenge, randomChallengeSeed } 
 import { toggleChildEntry, childNames } from './progress.js'
 import { DIALECT_WORDS } from './dialect.js'
 import { useStorageUsage } from './hooks/useStorageUsage.js'
+import { useUndo } from './hooks/useUndo.js'
 import { useBatteryAlert } from './hooks/useBatteryAlert.js'
 import { useDisplayPreferences } from './hooks/useDisplayPreferences.js'
 import { SavedIndicator } from './components/SavedIndicator.jsx'
@@ -492,29 +493,19 @@ export default function App() {
   const storage = useStorageUsage(sub === 'reglages', photos)
 
 
-  // Undo suppression : instantané complet du store avant chaque 🗑️,
-  // restaurable pendant 5 s via le bandeau « Annuler »
-  const [undoMsg, setUndoMsg] = useState(null)
-  const undoSnapRef = useRef(null)
-  const undoTimerRef = useRef(null)
-  const offerUndo = (msg) => {
-    undoSnapRef.current = { saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, restos, suggestions, departure }
-    setUndoMsg(msg)
-    clearTimeout(undoTimerRef.current)
-    undoTimerRef.current = setTimeout(() => setUndoMsg(null), 5000)
-  }
-  const applyUndo = () => {
-    const s0 = undoSnapRef.current
-    if (!s0) return
-    haptic(ImpactStyle.Medium)
-    setSaved(s0.saved); setChecks(s0.checks); setExpenses(s0.expenses); setMeals(s0.meals)
-    setShoppingItems(s0.shoppingItems); setDays(s0.days); setVisits(s0.visits); setMeteo(s0.meteo)
-    setTrajets(s0.trajets); setTrip(s0.trip); setLogi(s0.logi); setCourses(s0.courses)
-    setBudgetTotal(s0.budgetTotal); setHebergement(s0.hebergement); setTrajetCheckItems(s0.trajetCheckItems)
-    setRestos(s0.restos); setSuggestions(s0.suggestions); setDeparture(s0.departure)
-    setUndoMsg(null)
-    undoSnapRef.current = null
-  }
+  // Undo suppression : instantané des tranches listées, restaurable 5 s via le
+  // bandeau « Annuler ». Chaque tranche se déclare UNE fois (voir useUndo).
+  const { undoMsg, offerUndo, applyUndo: restoreUndo } = useUndo({
+    saved: [saved, setSaved], checks: [checks, setChecks], expenses: [expenses, setExpenses],
+    meals: [meals, setMeals], shoppingItems: [shoppingItems, setShoppingItems],
+    days: [days, setDays], visits: [visits, setVisits], meteo: [meteo, setMeteo],
+    trajets: [trajets, setTrajets], trip: [trip, setTrip], logi: [logi, setLogi],
+    courses: [courses, setCourses], budgetTotal: [budgetTotal, setBudgetTotal],
+    hebergement: [hebergement, setHebergement], trajetCheckItems: [trajetCheckItems, setTrajetCheckItems],
+    restos: [restos, setRestos], suggestions: [suggestions, setSuggestions],
+    departure: [departure, setDeparture],
+  })
+  const applyUndo = () => restoreUndo(() => haptic(ImpactStyle.Medium))
 
   // états UI modals nouveaux
   const [showBudgetTotalEdit, setShowBudgetTotalEdit] = useState(false)
