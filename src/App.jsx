@@ -64,6 +64,7 @@ import { DIALECT_WORDS } from './dialect.js'
 import { measureStorage } from './storage-usage.js'
 import { applyTextScale, scaleFactor, TEXT_SCALES } from './text-scale.js'
 import { batteryStatus, readBattery } from './battery.js'
+import { nextThemeDecision } from './auto-theme.js'
 import { SavedIndicator } from './components/SavedIndicator.jsx'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 import { bingoGrid } from './bingo.js'
@@ -269,6 +270,34 @@ export default function App() {
     StatusBar.setStyle({ style: darkMode ? Style.Dark : Style.Light }).catch(() => {})
     StatusBar.setBackgroundColor({ color: darkMode ? '#10162b' : '#f4ecdc' }).catch(() => {})
   }, [darkMode])
+  // Auto-bascule du thème selon l'heure. `themeOverride` mémorise que
+  // l'utilisateur a repris la main : tant qu'il est vrai, on ne touche plus à
+  // son choix — lui reprendre son thème dans le dos serait le pire des
+  // comportements. Il se réarme au prochain passage de frontière horaire.
+  // Désactivée PAR DÉFAUT, et c'est délibéré : l'activer d'office écraserait
+  // au démarrage la préférence de thème déjà enregistrée par l'utilisateur.
+  // Une automatisation qui contredit un réglage explicite est un bug, pas un
+  // service — les tests du mode sombre l'ont d'ailleurs immédiatement attrapé.
+  const [autoTheme, setAutoTheme] = useState(() => {
+    try { return localStorage.getItem('cantou.autoTheme') === 'true' } catch { return false }
+  })
+  const themeOverrideRef = useRef(false)
+  // Bascule MANUELLE : marque la reprise en main pour que l'auto-bascule
+  // n'écrase pas le choix de l'utilisateur au prochain tick.
+  const toggleDarkManual = (v) => { themeOverrideRef.current = true; setDarkMode(v) }
+  useEffect(() => { try { localStorage.setItem('cantou.autoTheme', String(autoTheme)) } catch { } }, [autoTheme])
+  useEffect(() => {
+    const tick = () => {
+      const decision = nextThemeDecision({
+        hour: new Date().getHours(), darkMode, enabled: autoTheme, userOverride: themeOverrideRef.current,
+      })
+      if (decision !== null) { themeOverrideRef.current = false; setDarkMode(decision) }
+    }
+    tick()
+    const id = setInterval(tick, 10 * 60 * 1000)
+    return () => clearInterval(id)
+  }, [autoTheme, darkMode])
+
   // Mode plein soleil — 3e thème (contraste maximal pour lire dehors), local
   // à l'appareil comme le mode sombre. Prioritaire sur le sombre s'il est actif.
   const [sunMode, setSunMode] = useState(() => {
@@ -1222,14 +1251,14 @@ export default function App() {
         deleteSuggestion={deleteSuggestion} deleteTrajetCheckItem={deleteTrajetCheckItem} deleteTrajetStep={deleteTrajetStep} deleteVisit={deleteVisit} departure={departure} editActivity={editActivity}
         editDay={editDay} editMeal={editMeal} editMeteo={editMeteo} editTrajetStep={editTrajetStep} editVisit={editVisit} emergencyNumbers={emergencyNumbers}
         expenses={expenses} familyMembers={familyMembers} filter={filter} filteredVisits={filteredVisits} findCar={findCar} forgetCar={forgetCar}
-        haptic={haptic} hebergement={hebergement} heights={heights} storage={storage} pickPhotos={pickPhotos} textScale={textScale} setTextScale={setTextScale} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
+        haptic={haptic} hebergement={hebergement} heights={heights} storage={storage} pickPhotos={pickPhotos} textScale={textScale} setTextScale={setTextScale} autoTheme={autoTheme} setAutoTheme={setAutoTheme} dialectWords={dialectWords} setDialectWords={setDialectWords} kidsLock={kidsLock} kidsChallenge={kidsChallenge} lockKids={lockKids} unlockKids={unlockKids} addHeightEntry={addHeightEntry} removeHeightEntry={removeHeightEntry} saveDrawing={saveDrawing} isCheckoutSoon={isCheckoutSoon} isDepartureDay={isDepartureDay} isOn={isOn} journal={journal}
         kidsGames={kidsGames} lastBackupAt={lastBackupAt} loadSrc={loadSrc} logi={logi} logiSorted={logiSorted} markChallengeDone={markChallengeDone}
         mealTab={mealTab} meals={meals} meteo={meteo} newShoppingItem={newShoppingItem} newSuggestionText={newSuggestionText} openAddMeal={openAddMeal}
         openAddMeteo={openAddMeteo} openAddResto={openAddResto} openDayJournal={openDayJournal} openEditResto={openEditResto} openHebEdit={openHebEdit} openJournal={openJournal}
         openMaps={openMaps} openModule={openModule} openMyPosition={openMyPosition} openTripEdit={openTripEdit} packDone={packDone} packPct={packPct}
         packTotal={packTotal} parkCar={parkCar} photos={photos} rateVisit={rateVisit} ratings={ratings} recapData={recapData} recipes={recipes} setRecipes={setRecipes}
         remain={remain} removeDepartureItem={deleteDepartureItem} resetCows={resetCows} resetPlates={resetPlates} togglePlate={togglePlate} resetToDefaults={resetToDefaults} restos={restos} runSelfTestAndShow={runSelfTestAndShow}
-        saved={saved} savedCount={savedCount} sendSuggestions={sendSuggestions} setBudgetTotal={setBudgetTotal} setCoursesSorted={setCoursesSorted} setDarkMode={setDarkMode}
+        saved={saved} savedCount={savedCount} sendSuggestions={sendSuggestions} setBudgetTotal={setBudgetTotal} setCoursesSorted={setCoursesSorted} setDarkMode={toggleDarkManual}
         setDay={setDay} setEditingCourseKey={setEditingCourseKey} setEditingLogiKey={setEditingLogiKey} setEditingTrajetIdx={setEditingTrajetIdx} setEditingVisitId={setEditingVisitId} setExportCopied={setExportCopied}
         setFeatures={setFeatures} setFilter={setFilter} setLogiSorted={setLogiSorted} setMealTab={setMealTab} setNewBudgetTotal={setNewBudgetTotal} setNewShoppingItem={setNewShoppingItem}
         setNewSuggestionText={setNewSuggestionText} setNewTrajetColor={setNewTrajetColor} setNewTrajetNote={setNewTrajetNote} setNewTrajetPlace={setNewTrajetPlace} setNewTrajetTime={setNewTrajetTime} setNewVisitAge={setNewVisitAge}

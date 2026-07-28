@@ -23,7 +23,7 @@ function Toggle({ sx, on, onClick, label }) {
  * les données restent intactes (rien n'est supprimé). Tout est exporté dans
  * le JSON de sauvegarde.
  */
-export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode, kidsLock, lockKids, storage, textScale, setTextScale }) {
+export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, trackingCount = 0, onShareTracking, onResetTracking, sunMode, setSunMode, kidsLock, lockKids, storage, textScale, setTextScale, autoTheme, setAutoTheme }) {
   return (
     <div data-testid="screen-reglages" style={sx('padding:0 18px 24px;')}>
       <div style={sx('font-size:13px;color:#6b6354;margin:2px 0 16px;')}>
@@ -51,6 +51,15 @@ export function Reglages({ sx, isOn, toggleFeature, relaunchOnboarding, tracking
                       style={sx(`flex:1;border:1px solid ${textScale === ts.key ? '#4a5d3a' : '#ece2cf'};background:${textScale === ts.key ? '#4a5d3a' : '#fffdf8'};color:${textScale === ts.key ? '#fffaf0' : '#6b6354'};border-radius:12px;padding:8px;font-weight:700;font-size:13px;cursor:pointer;`)}>{ts.label}</button>
                   ))}
                 </div>
+              </div>
+            )}
+            {setAutoTheme && (
+              <div data-testid="reglage-row-auto-theme" style={sx('display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-top:1px solid #f1e9da;')}>
+                <span style={sx('flex:1;min-width:0;')}>
+                  <span style={sx('display:block;font-size:15px;')}>🕰️ Thème sombre automatique</span>
+                  <span style={sx('display:block;font-size:12px;color:#6b6354;margin-top:2px;')}>Passe en sombre le soir (21 h – 7 h). Ton choix manuel reste prioritaire.</span>
+                </span>
+                <Toggle sx={sx} on={!!autoTheme} onClick={() => setAutoTheme((v) => !v)} label="Thème sombre automatique" />
               </div>
             )}
             {lockKids && (
