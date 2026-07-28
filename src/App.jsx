@@ -537,9 +537,22 @@ export default function App() {
   // états ajout repas
   const [newMealDay, setNewMealDay] = useState('')
 
+  // Photo du store, construite UNE seule fois et réutilisée pour l'écriture,
+  // les dépendances de l'effet ET l'export. Auparavant la liste des tranches
+  // était répétée à trois endroits : ajouter une donnée obligeait à y penser
+  // partout, et un oubli se traduisait par une donnée non sauvegardée.
+  const storeData = { schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded }
+
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded })); if (firstSaveRef.current) firstSaveRef.current = false; else setSavedAt(Date.now()) } catch { }
-  }, [saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded])
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(storeData))
+      // La toute première écriture est l'hydratation au montage : l'annoncer
+      // ferait clignoter « Enregistré » sans action de l'utilisateur.
+      if (firstSaveRef.current) firstSaveRef.current = false
+      else setSavedAt(Date.now())
+    } catch { /* quota plein : l'alerte de stockage prend le relais */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, Object.values(storeData))
 
   // (Re)planifie tous les rappels au démarrage et à chaque modification
   // du planning ou des menus — natif Android (survit à la fermeture) ou
@@ -1032,7 +1045,7 @@ export default function App() {
   }
 
   // Export / import complet des données (JSON) — logique pure dans backup.js
-  const currentStoreData = () => ({ schemaVersion: LATEST_SCHEMA, saved, checks, expenses, meals, shoppingItems, days, visits, meteo, trajets, trip, logi, courses, budgetTotal, hebergement, trajetCheckItems, suggestions, lastBackupAt, journal, carGames, photos, familyMembers, bingo, lastSeenBuild, restos, departure, ratings, challengesDone, carSpot, features, kidsGames, bingoItems, emergencyNumbers, recipes, heights, dialectWords, kidsLock, onboarded })
+  const currentStoreData = () => storeData
   const markBackedUp = () => setLastBackupAt(new Date().toISOString())
   const runSelfTestAndShow = () => {
     haptic(ImpactStyle.Light)
