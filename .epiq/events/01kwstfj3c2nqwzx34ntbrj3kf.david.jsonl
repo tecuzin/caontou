@@ -1773,3 +1773,4 @@
 {"v":1,"id":["01KYWT597C5ASZK7ZCAD17KE34","01KYWT52JEEE0CRT5SVHSRZ5N3"],"move.node":{"id":"01KYV679E5736CWH5887933RS4","parent":"01KX43H1Z2K4EWCCG0TV8CC8P5","rank":"ffffffff7fffffffffffffff"}}
 {"v":1,"id":["01KYWT5FJ3QWA6WW305R425RVM","01KYWT597C5ASZK7ZCAD17KE34"],"move.node":{"id":"01KYV67ZCKJ5W8DRZVRC63Q2YD","parent":"01KX43H1Z2K4EWCCG0TV8CC8P5","rank":"ffffffffbfffffffffffffff"}}
 {"v":1,"id":["01KYWT5QHM2HMKDVETDR87AWDX","01KYWT5FJ3QWA6WW305R425RVM"],"move.node":{"id":"01KYV6A1KR2363DV8GJMMMSMJ2","parent":"01KX43H1Z2K4EWCCG0TV8CC8P5","rank":"ffffffffdfffffffffffffff"}}
+{"v":1,"id":["01KYWWMQF69YWV2TMNEZXGC4M4","01KYWT5QHM2HMKDVETDR87AWDX"],"add.issue":{"id":"01KYWWMQEYGYASTZ8ZFEZSPHG9","parent":"01KX43H1YZHXADB0SA2NRVC6F2","name":"🧹 Ranger le premier écran : trop de tuiles, et des doublons avec les Réglages","rank":"feffffffffffffffffffffff"}}
