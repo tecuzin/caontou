@@ -1930,3 +1930,6 @@
 {"v":1,"id":["01KZ2YNGVWCDY1CBYB83RFBG3X","01KZ2YNE2H4DD73FXB2NVY7PEZ"],"move.node":{"id":"01KYCVXFG98A90N92V9C55ESNX","parent":"01KWSTHN7AKWFJT9N28CGWDPXM","rank":"fff8e38e38e38e38e38e38e2"}}
 {"v":1,"id":["01KZ2YNKR6TXFG2PXQZDZ6SGEH","01KZ2YNGVWCDY1CBYB83RFBG3X"],"move.node":{"id":"01KYCWDQRXMC0E8CFR892TBHC3","parent":"01KWSTHN7AKWFJT9N28CGWDPXM","rank":"fffc71c71c71c71c71c71c70"}}
 {"v":1,"id":["01KZ2YNPK35KS0T34Q6QKPS0PA","01KZ2YNKR6TXFG2PXQZDZ6SGEH"],"move.node":{"id":"01KYCWDSADN0776GXPSPWXPDF5","parent":"01KWSTHN7AKWFJT9N28CGWDPXM","rank":"fffe38e38e38e38e38e38e37"}}
+{"v":1,"id":["01KZ48QEPERDBAV4JKYSQ6WY42","01KZ2YNPK35KS0T34Q6QKPS0PA"],"add.issue":{"id":"01KZ48QEP4WYZC50T8ADGE5CQE","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","name":"🔴 Signaler en rouge sur la carte les visites sans fiche","rank":"bfffffffffffffffffffffff"}}
+{"v":1,"id":["01KZ48QJ0GN09TBTT2T98HZ3QD","01KZ48QEPERDBAV4JKYSQ6WY42"],"add.issue":{"id":"01KZ48QJ05WNX6T8Y2GD8WAVNV","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","name":"✍️ Compléter une fiche de visite à la main depuis l'app","rank":"dfffffffffffffffffffffff"}}
+{"v":1,"id":["01KZ48QN82N8MCHFRPC8DNNZ8K","01KZ48QJ0GN09TBTT2T98HZ3QD"],"add.issue":{"id":"01KZ48QN7S7NS8DM0XM5V0EMQ7","parent":"01KWSTHN7AKWFJT9N28CGWDPXK","name":"♿ Dire si une personne qui marche difficilement peut faire l'activité","rank":"efffffffffffffffffffffff"}}
